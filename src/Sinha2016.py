@@ -33,7 +33,7 @@ import random
 
 class Sinha2016:
 
-    """Replicates the neuron simulation from Vogels 2011."""
+    """Simulations for my PhD 2016."""
 
     def __init__(self):
         """Initialise variables."""
@@ -267,6 +267,12 @@ class Sinha2016:
         self.run_simulation(time)
         self.disable_pattern_recall_setup(self.pattern_count - 1)
 
+    def lesion_network(self):
+        """Lesion the network."""
+
+    def test_repair(self):
+        """Let the network repair itself."""
+
 if __name__ == "__main__":
     simulation = Sinha2016()
     simulation.setup_simulation()
@@ -277,5 +283,7 @@ if __name__ == "__main__":
         simulation.store_pattern()
         simulation.run_simulation(10)
 
-    # Only recall the last pattern because we're not using snapshots yet
+    # Only recall the last pattern because nest doesn't do snapshots
+    simulation.lesion_network()
+    simulation.test_repair()
     simulation.recall_last_pattern(2)
