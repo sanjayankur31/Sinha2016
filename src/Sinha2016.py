@@ -212,6 +212,9 @@ class Sinha2016:
             self.synaptic_weights_file.write(statement_w)
             self.synaptic_weights_file.flush()
 
+            print("Simulation time: "
+                  "{} ms".format(nest.GetKernelStatus()['time']))
+
     def store_pattern(self):
         """ Store a pattern and set up spike detectors."""
         local_neurons = nest.GetNodes(
@@ -248,11 +251,11 @@ class Sinha2016:
         All I'm doing is increasing the bg_current for the recall subset.
         """
         recall_neurons = self.patterns[pattern_number - 1]
-        nest.SetStatus(recall_neurons, {'I_e': 500.0})
+        nest.SetStatus(recall_neurons, {'I_e': 800.0})
 
         recall_spike_detector = nest.Create(
             'spike_detector', params=self.spike_detector_paramsR)
-        nest.Connect(pattern_neurons, recall_spike_detector)
+        nest.Connect(recall_neurons, recall_spike_detector)
         # save the detector
         self.sdR.append(recall_spike_detector)
 
@@ -276,7 +279,7 @@ class Sinha2016:
 if __name__ == "__main__":
     simulation = Sinha2016()
     simulation.setup_simulation()
-    simulation.run_simulation(10)
+    simulation.run_simulation(2)
 
     # store and stabilise patterns
     for i in range(0, simulation.numpats):
