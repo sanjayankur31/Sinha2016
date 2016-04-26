@@ -1,6 +1,4 @@
-Sinha2016Nest
---------------
+Sinha2016
+---------
 
-My simulations in Nest.
-
-
+My Ph.D. simulations
