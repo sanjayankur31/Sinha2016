@@ -29,7 +29,7 @@ module load openmpi
 
 SOURCE_PATH="/home/asinha/Documents/00_Code/00_repos/00_mine/Sinha2016/src/Sinha2016.py"
 RESULT_PATH="/stri-data/asinha/results/"
-SIM_TIME=$(date +%Y%M%d%H%M)
+SIM_TIME=$(date +%Y%m%d%H%M)
 
 echo "ANKUR>> Begun at $SIM_TIME"
 
@@ -38,5 +38,5 @@ cd $RESULT_PATH/$SIM_TIME
 
 mpirun -n 64 python $SOURCE_PATH
 
-END_TIME=$(date +%Y%M%d%H%M)
+END_TIME=$(date +%Y%m%d%H%M)
 echo "ANKUR>> Ended at $END_TIME"
