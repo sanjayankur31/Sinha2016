@@ -16,34 +16,29 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# File : consolidate-spikes.sh
+# File : generate-graphs.sh
 #
 
-echo "Combining files"
-mkdir consolidated_files
+echo "Generating graphs"
+pushd consolidated_files
+
+source activate python3
 
 (
-echo "Combining recall files"
-sort -k "2" -n --parallel=16 spikes-*recall*.gdf > spikes-recall.gdf
-mv spikes-recall.gdf consolidated_files
+python3 ~/Documents/00_Code/00_repos/00_mine/Sinha2016/postprocess/nest-spike2hz.py spikes-E.gdf firing-rate-E.gdf
 ) &
 (
-echo "Combining pattern files"
-sort -k "2" -n --parallel=16 spikes-*pattern*.gdf > spikes-pattern.gdf
-mv spikes-pattern.gdf consolidated_files
+python3 ~/Documents/00_Code/00_repos/00_mine/Sinha2016/postprocess/nest-spike2hz.py spikes-I.gdf firing-rate-I.gdf
 ) &
 (
-echo "Combining E files"
-sort -k "2" -n --parallel=16 spikes-*E*.gdf > spikes-E.gdf
-mv spikes-E.gdf consolidated_files
+python3 ~/Documents/00_Code/00_repos/00_mine/Sinha2016/postprocess/nest-spike2hz.py spikes-pattern.gdf firing-rate-pattern.gdf
 ) &
 (
-echo "Combining I files"
-sort -k "2" -n --parallel=16 spikes-*I*.gdf > spikes-I.gdf
-mv spikes-I.gdf consolidated_files
+python3 ~/Documents/00_Code/00_repos/00_mine/Sinha2016/postprocess/nest-spike2hz.py spikes-E.gdf firing-rate-E.gdf
 ) &
 
 wait
 
-echo "All files combined."
-exit 0
+gnuplot ~/Documents/00_Code/00_repos/00_mine/Sinha2016/postprocess/plot-firing-rates.plt
+
+source deactivate
