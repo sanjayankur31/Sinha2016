@@ -25,20 +25,20 @@ pushd consolidated_files
 source activate python3
 
 (
-python3 ~/Documents/00_Code/00_repos/00_mine/Sinha2016/postprocess/nest-spike2hz.py spikes-E.gdf firing-rate-E.gdf
+python3 ~/Documents/02_Code/00_repos/00_mine/Sinha2016/postprocess/nest-spike2hz.py spikes-E.gdf firing-rate-E.gdf
 ) &
 (
-python3 ~/Documents/00_Code/00_repos/00_mine/Sinha2016/postprocess/nest-spike2hz.py spikes-I.gdf firing-rate-I.gdf
+python3 ~/Documents/02_Code/00_repos/00_mine/Sinha2016/postprocess/nest-spike2hz.py spikes-I.gdf firing-rate-I.gdf
 ) &
 (
-python3 ~/Documents/00_Code/00_repos/00_mine/Sinha2016/postprocess/nest-spike2hz.py spikes-pattern.gdf firing-rate-pattern.gdf
+python3 ~/Documents/02_Code/00_repos/00_mine/Sinha2016/postprocess/nest-spike2hz.py spikes-pattern.gdf firing-rate-pattern.gdf
 ) &
 (
-python3 ~/Documents/00_Code/00_repos/00_mine/Sinha2016/postprocess/nest-spike2hz.py spikes-E.gdf firing-rate-E.gdf
+python3 ~/Documents/02_Code/00_repos/00_mine/Sinha2016/postprocess/nest-spike2hz.py spikes-E.gdf firing-rate-E.gdf
 ) &
 
 wait
 
-gnuplot ~/Documents/00_Code/00_repos/00_mine/Sinha2016/postprocess/plot-firing-rates.plt
+gnuplot ~/Documents/02_Code/00_repos/00_mine/Sinha2016/postprocess/plot-firing-rates.plt
 
 source deactivate

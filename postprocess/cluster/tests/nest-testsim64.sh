@@ -28,7 +28,7 @@ module list
 module unload mpi/mpich-x86_64
 module load openmpi
 
-SOURCE_PATH="/home/asinha/Documents/00_Code/00_repos/00_mine/Sinha2016/postprocess/cluster/tests"
+SOURCE_PATH="/home/asinha/Documents/02_Code/00_repos/00_mine/Sinha2016/postprocess/cluster/tests"
 
 cd /stri-data/asinha/results/tests/
 

@@ -27,7 +27,7 @@
 module unload mpi/mpich-x86_64
 module load openmpi
 
-SOURCE_PATH="/home/asinha/Documents/00_Code/00_repos/00_mine/Sinha2016/src/Sinha2016.py"
+SOURCE_PATH="/home/asinha/Documents/02_Code/00_repos/00_mine/Sinha2016/src/Sinha2016.py"
 RESULT_PATH="/stri-data/asinha/results/"
 SIM_TIME=$(date +%Y%m%d%H%M)
 
