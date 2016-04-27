@@ -25,15 +25,19 @@ pushd consolidated_files
 source activate python3
 
 (
+echo "Processing E spikes"
 python3 ~/Documents/02_Code/00_repos/00_mine/Sinha2016/postprocess/nest-spike2hz.py spikes-E.gdf firing-rate-E.gdf
 ) &
 (
+echo "Processing I spikes"
 python3 ~/Documents/02_Code/00_repos/00_mine/Sinha2016/postprocess/nest-spike2hz.py spikes-I.gdf firing-rate-I.gdf
 ) &
 (
+echo "Processing pattern spikes"
 python3 ~/Documents/02_Code/00_repos/00_mine/Sinha2016/postprocess/nest-spike2hz.py spikes-pattern.gdf firing-rate-pattern.gdf
 ) &
 (
+echo "Processing recall spikes"
 python3 ~/Documents/02_Code/00_repos/00_mine/Sinha2016/postprocess/nest-spike2hz.py spikes-E.gdf firing-rate-E.gdf
 ) &
 
