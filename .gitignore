@@ -63,4 +63,5 @@ target/
 *.swo
 *.swp
 
-src/tests/
+tests/
+
