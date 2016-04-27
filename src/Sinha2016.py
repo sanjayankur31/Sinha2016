@@ -177,40 +177,45 @@ class Sinha2016:
         nest.Connect(self.neuronsE, self.sdE)
         nest.Connect(self.neuronsI, self.sdI)
 
-    def run_simulation(self, simtime):
+    def run_simulation(self, simtime, step=False):
         """Run the simulation."""
         sim_steps = numpy.arange(0, simtime)
-        for i, step in enumerate(sim_steps):
+        if step:
+            print("Stepping through the simulation one second at a time")
+            for i, step in enumerate(sim_steps):
 
-            nest.Simulate(1000)
+                nest.Simulate(1000)
 
-            conns = nest.GetConnections(target=self.neuronsE,
-                                        source=self.neuronsI)
-            weightsIE = nest.GetStatus(conns, "weight")
-            mean_weightsIE = numpy.mean(weightsIE)
+                conns = nest.GetConnections(target=self.neuronsE,
+                                            source=self.neuronsI)
+                weightsIE = nest.GetStatus(conns, "weight")
+                mean_weightsIE = numpy.mean(weightsIE)
 
-            conns = nest.GetConnections(target=self.neuronsI,
-                                        source=self.neuronsI)
-            weightsII = nest.GetStatus(conns, "weight")
-            mean_weightsII = numpy.mean(weightsII)
+                conns = nest.GetConnections(target=self.neuronsI,
+                                            source=self.neuronsI)
+                weightsII = nest.GetStatus(conns, "weight")
+                mean_weightsII = numpy.mean(weightsII)
 
-            conns = nest.GetConnections(target=self.neuronsI,
-                                        source=self.neuronsE)
-            weightsEI = nest.GetStatus(conns, "weight")
-            mean_weightsEI = numpy.mean(weightsEI)
+                conns = nest.GetConnections(target=self.neuronsI,
+                                            source=self.neuronsE)
+                weightsEI = nest.GetStatus(conns, "weight")
+                mean_weightsEI = numpy.mean(weightsEI)
 
-            conns = nest.GetConnections(target=self.neuronsE,
-                                        source=self.neuronsE)
-            weightsEE = nest.GetStatus(conns, "weight")
-            mean_weightsEE = numpy.mean(weightsEE)
+                conns = nest.GetConnections(target=self.neuronsE,
+                                            source=self.neuronsE)
+                weightsEE = nest.GetStatus(conns, "weight")
+                mean_weightsEE = numpy.mean(weightsEE)
 
-            statement_w = "{0}\t{1}\t{2}\t{3}\n".format(mean_weightsEE,
-                                                        mean_weightsEI,
-                                                        mean_weightsII,
-                                                        mean_weightsIE)
+                statement_w = "{0}\t{1}\t{2}\t{3}\n".format(mean_weightsEE,
+                                                            mean_weightsEI,
+                                                            mean_weightsII,
+                                                            mean_weightsIE)
 
-            self.synaptic_weights_file.write(statement_w)
-            self.synaptic_weights_file.flush()
+                self.synaptic_weights_file.write(statement_w)
+                self.synaptic_weights_file.flush()
+        else:
+            print("Not stepping through it one second at a time")
+            nest.Simulate(simtime*1000)
 
             print("Simulation time: "
                   "{} ms".format(nest.GetKernelStatus()['time']))
@@ -264,10 +269,10 @@ class Sinha2016:
         recall_neurons = self.patterns[pattern_number - 1]
         nest.SetStatus(recall_neurons, {'I_e': 220.0})
 
-    def recall_last_pattern(self, time):
+    def recall_last_pattern(self, time, step):
         """Only setup the last pattern."""
         self.setup_pattern_for_recall(self.pattern_count - 1)
-        self.run_simulation(time)
+        self.run_simulation(time, step)
         self.disable_pattern_recall_setup(self.pattern_count - 1)
 
     def lesion_network(self):
@@ -277,16 +282,17 @@ class Sinha2016:
         """Let the network repair itself."""
 
 if __name__ == "__main__":
+    step = True
     simulation = Sinha2016()
     simulation.setup_simulation()
-    simulation.run_simulation(2)
+    simulation.run_simulation(2, step)
 
     # store and stabilise patterns
     for i in range(0, simulation.numpats):
         simulation.store_pattern()
-        simulation.run_simulation(10)
+        simulation.run_simulation(10, step)
 
     # Only recall the last pattern because nest doesn't do snapshots
     simulation.lesion_network()
     simulation.test_repair()
-    simulation.recall_last_pattern(2)
+    simulation.recall_last_pattern(2, step)
