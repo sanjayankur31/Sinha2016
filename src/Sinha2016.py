@@ -282,15 +282,15 @@ class Sinha2016:
         """Let the network repair itself."""
 
 if __name__ == "__main__":
-    step = True
+    step = False
     simulation = Sinha2016()
     simulation.setup_simulation()
-    simulation.run_simulation(2, step)
+    simulation.run_simulation(150, step)
 
     # store and stabilise patterns
     for i in range(0, simulation.numpats):
         simulation.store_pattern()
-        simulation.run_simulation(10, step)
+        simulation.run_simulation(150, step)
 
     # Only recall the last pattern because nest doesn't do snapshots
     simulation.lesion_network()
