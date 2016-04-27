@@ -19,7 +19,7 @@
 # File : generate-graphs.sh
 #
 
-SRC_DIR="~/Documents/02_Code/00_repos/00_mine/Sinha2016/"
+SRC_DIR="/home/asinha/Documents/02_Code/00_repos/00_mine/Sinha2016"
 echo "Generating graphs"
 pushd consolidated_files
 
