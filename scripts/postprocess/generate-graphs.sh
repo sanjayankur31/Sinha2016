@@ -27,24 +27,24 @@ source activate python3
 
 (
 echo "Processing E spikes"
-python3 $SRC_DIR/postprocess/nest-spike2hz.py spikes-E.gdf firing-rate-E.gdf
+python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-E.gdf firing-rate-E.gdf
 ) &
 (
 echo "Processing I spikes"
-python3 $SRC_DIR/postprocess/nest-spike2hz.py spikes-I.gdf firing-rate-I.gdf
+python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-I.gdf firing-rate-I.gdf
 ) &
 (
 echo "Processing pattern spikes"
-python3 $SRC_DIR/postprocess/nest-spike2hz.py spikes-pattern.gdf firing-rate-pattern.gdf
+python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-pattern.gdf firing-rate-pattern.gdf
 ) &
 (
 echo "Processing recall spikes"
-python3 $SRC_DIR/postprocess/nest-spike2hz.py spikes-recall.gdf firing-rate-recall.gdf
+python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-recall.gdf firing-rate-recall.gdf
 ) &
 
 wait
 
-gnuplot $SRC_DIR/postprocess/plot-firing-rates.plt
+gnuplot $SRC_DIR/scripts/postprocess/plot-firing-rates.plt
 
 popd
 
