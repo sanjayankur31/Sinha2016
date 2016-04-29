@@ -41,7 +41,7 @@ class Sinha2016:
         # http://www.nest-simulator.org/scheduling-and-simulation-flow/
         self.dt = 0.1
         # start with a smaller population
-        self.populations = {'E': 8000, 'I': 2000, 'P': 800, 'R': 800,
+        self.populations = {'E': 8000, 'I': 2000, 'P': 800, 'R': 200,
                             'EXT': 1000}
         self.numpats = 1
         # Global sparsity
@@ -256,7 +256,7 @@ class Sinha2016:
         All I'm doing is increasing the bg_current for the recall subset.
         """
         recall_neurons = self.patterns[pattern_number - 1]
-        nest.SetStatus(recall_neurons, {'I_e': 800.0})
+        nest.SetStatus(recall_neurons, {'I_e': 500.0})
 
         recall_spike_detector = nest.Create(
             'spike_detector', params=self.spike_detector_paramsR)

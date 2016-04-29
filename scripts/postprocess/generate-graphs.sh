@@ -19,6 +19,10 @@
 # File : generate-graphs.sh
 #
 
+NE=8000
+NI=2000
+NP=800
+NR=200
 SRC_DIR="/home/asinha/Documents/02_Code/00_repos/00_mine/Sinha2016"
 echo "Generating graphs"
 pushd consolidated_files
@@ -27,19 +31,19 @@ source activate python3
 
 (
 echo "Processing E spikes"
-python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-E.gdf firing-rate-E.gdf
+python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-E.gdf firing-rate-E.gdf $NE
 ) &
 (
 echo "Processing I spikes"
-python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-I.gdf firing-rate-I.gdf
+python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-I.gdf firing-rate-I.gdf $NI
 ) &
 (
 echo "Processing pattern spikes"
-python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-pattern.gdf firing-rate-pattern.gdf
+python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-pattern.gdf firing-rate-pattern.gdf $NP
 ) &
 (
 echo "Processing recall spikes"
-python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-recall.gdf firing-rate-recall.gdf
+python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-recall.gdf firing-rate-recall.gdf $NR
 ) &
 
 wait

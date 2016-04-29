@@ -97,22 +97,21 @@ class spike2hz:
 
         self.output_file.close()
 
-if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print("Incorrect arguments.", file=sys.stderr)
-        print(file=sys.stderr)
-        print("Usage: ", file=sys.stderr)
-        print("\t" + str(sys.argv[0]) +
-              " input_file output_file", file=sys.stderr)
-    else:
-        converter = spike2hz()
-        if len(sys.argv) == 4:
-            valid = converter.setup(str(sys.argv[1]), str(sys.argv[2]),
-                                    int(sys.argv[3]))
-        else:
-            valid = converter.setup(str(sys.argv[1]), str(sys.argv[2]))
+    def usage(self):
+        """Print usage."""
+        self.usage = ("Usage: \npython3 nest-spike2hz.py" +
+                      "input_file_name output_file_name number_neurons")
 
+if __name__ == "__main__":
+    converter = spike2hz()
+    if len(sys.argv) == 4:
+        valid = converter.setup(str(sys.argv[1]), str(sys.argv[2]),
+                                int(sys.argv[3]))
         if valid:
             print("Processing ...")
             converter.run()
             print("Finished ...")
+    else:
+        print("Incorrect arguments.", file=sys.stderr)
+        print(file=sys.stderr)
+        print(converter.usage, file=sys.stderr)
