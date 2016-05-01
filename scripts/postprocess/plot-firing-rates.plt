@@ -6,6 +6,14 @@ set output "firing-rate-pattern-recall.png"
 set title "Firing rate for pattern and recall neurons"
 plot "firing-rate-pattern.gdf" with lines lw 4 title "P", "firing-rate-recall.gdf" with lines lw 4 title "R";
 
+set output "firing-rate-recall.png"
+set title "Firing rate for recall neurons"
+plot "firing-rate-recall.gdf" with lines lw 4 title "R";
+
+set output "firing-rate-pattern.png"
+set title "Firing rate for pattern neurons"
+plot "firing-rate-pattern.gdf" with lines lw 4 title "P";
+
 set yrange [0:200]
 
 set output "firing-rate-E.png"
