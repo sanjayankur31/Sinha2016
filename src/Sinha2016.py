@@ -75,7 +75,7 @@ class Sinha2016:
         self.synDictE = {"weight": 3.}
         self.synDictII = {"weight": -30.}
 
-        self.synDictIE = {"weight": -7., "Wmax": -30000.,
+        self.synDictIE = {"weight": -1., "Wmax": -30000.,
                           'alpha': .32, 'eta': -0.001,
                           'tau': 20.}
 
@@ -229,10 +229,14 @@ class Sinha2016:
         pattern_neurons = random.sample(
             local_neurons,
             self.populations['P'])
+        print("ANKUR>> Number of pattern neurons: "
+              "{}".format(len(pattern_neurons)))
 
         # strengthen connections
         connections = nest.GetConnections(source=pattern_neurons,
                                           target=pattern_neurons)
+        print("ANKUR>> Number of connections strengthened: "
+              "{}".format(len(connections)))
         nest.SetStatus(connections, {"weight": 24.})
 
         # store these neurons
@@ -256,7 +260,9 @@ class Sinha2016:
         All I'm doing is increasing the bg_current for the recall subset.
         """
         recall_neurons = self.patterns[pattern_number - 1]
-        nest.SetStatus(recall_neurons, {'I_e': 500.0})
+        print("ANKUR>> Number of recall neurons: "
+              "{}".format(len(recall_neurons)))
+        nest.SetStatus(recall_neurons, {'I_e': 1000.0})
 
         recall_spike_detector = nest.Create(
             'spike_detector', params=self.spike_detector_paramsR)
@@ -278,23 +284,36 @@ class Sinha2016:
     def lesion_network(self):
         """Lesion the network."""
 
+    def dump_all_IE_weights(self, annotation):
+        """Dump all IE weights to a file."""
+        file_name = ("synaptic-weight-IE-" + annotation +
+                     "-{}".format(nest.GetKernelStatus()['time']) +
+                     ".txt")
+        file_handle = open(file_name, 'w')
+        connections = nest.GetConnections(source=self.neuronsI,
+                                          target=self.neuronsE)
+        print(connections, file=file_handle)
+        file_handle.close()
+
     def test_repair(self):
         """Let the network repair itself."""
 
 if __name__ == "__main__":
     step = False
-    stabilisation_time = 900
+    stabilisation_time = 2000
     simulation = Sinha2016()
     simulation.setup_simulation()
     simulation.run_simulation(stabilisation_time, step)
+    simulation.dump_all_IE_weights("initial_stabilisation")
 
     # store and stabilise patterns
     for i in range(0, simulation.numpats):
         simulation.store_pattern()
         simulation.run_simulation(stabilisation_time, step)
+        simulation.dump_all_IE_weights("pattern_stabilisation")
 
     # Only recall the last pattern because nest doesn't do snapshots
     simulation.lesion_network()
     simulation.test_repair()
     simulation.recall_last_pattern(2, step)
-    simulation.run_simulation(50, False)
+    simulation.run_simulation(50, step)
