@@ -114,4 +114,4 @@ if __name__ == "__main__":
     else:
         print("Incorrect arguments.", file=sys.stderr)
         print(file=sys.stderr)
-        print(converter.usage, file=sys.stderr)
+        print(converter.usage(), file=sys.stderr)
