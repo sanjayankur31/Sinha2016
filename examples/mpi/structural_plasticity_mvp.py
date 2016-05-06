@@ -143,7 +143,7 @@ class StructralPlasticityExample:
 
     def prepare_simulation(self):
         nest.ResetKernel()
-	nest.SetKernelStatus({'total_num_virtual_procs':12})
+        # nest.SetKernelStatus({'total_num_virtual_procs':12})
         nest.set_verbosity('M_ERROR')
         '''
         We set global kernel parameters. Here we define the resolution for the simulation,
