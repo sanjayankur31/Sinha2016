@@ -23,18 +23,18 @@
 '''
 Structural Plasticity example
 -----------------------
-This example shows a simple network of two populations where structural plasticity 
-is used. The network has 1000 neurons, 80% excitatory and 20% inhibitory. The 
-simulation starts without any connectivity. A set of homeostatic rules are defined, 
-according to which structural plasticity will create and delete synapses dynamically 
-during the simulation until a desired level of electrical activity is reached. The 
+This example shows a simple network of two populations where structural plasticity
+is used. The network has 1000 neurons, 80% excitatory and 20% inhibitory. The
+simulation starts without any connectivity. A set of homeostatic rules are defined,
+according to which structural plasticity will create and delete synapses dynamically
+during the simulation until a desired level of electrical activity is reached. The
 model of structural plasticity used here corresponds to the formulation presented
 in Butz, M., & van Ooyen, A. (2013). A simple rule for dendritic spine and axonal
 bouton formation can account for cortical reorganization after focal retinal
 lesions. PLoS Comput. Biol. 9 (10), e1003259.
 
-At the end of the simulation, a plot of the evolution of the connectivity in the network 
-and the average calcium concentration in the neurons is created. 
+At the end of the simulation, a plot of the evolution of the connectivity in the network
+and the average calcium concentration in the neurons is created.
 
 '''
 
@@ -44,6 +44,8 @@ First, we import all necessary modules.
 
 import nest
 import numpy
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as pl
 import sys
 
@@ -83,7 +85,7 @@ class StructralPlasticityExample:
             'eps': 0.05,  # Ca2+
         }
 
-        # Inhibitory synaptic elements of excitatory neurons 
+        # Inhibitory synaptic elements of excitatory neurons
         self.growth_curve_e_i = {
             'growth_curve': "gaussian",
             'growth_rate': 0.0001,  # (elements/ms)
@@ -92,7 +94,7 @@ class StructralPlasticityExample:
             'eps': self.growth_curve_e_e['eps'],  # Ca2+
         }
 
-        # Excitatory synaptic elements of inhibitory neurons 
+        # Excitatory synaptic elements of inhibitory neurons
         self.growth_curve_i_e = {
             'growth_curve': "gaussian",
             'growth_rate': 0.0004,  # (elements/ms)
@@ -101,7 +103,7 @@ class StructralPlasticityExample:
             'eps': 0.2,  # Ca2+
         }
 
-        # Inhibitory synaptic elements of inhibitory neurons 
+        # Inhibitory synaptic elements of inhibitory neurons
         self.growth_curve_i_i = {
             'growth_curve': "gaussian",
             'growth_rate': 0.0001,  # (elements/ms)
@@ -111,7 +113,7 @@ class StructralPlasticityExample:
         }
 
         '''
-        Now we specify the neuron model 
+        Now we specify the neuron model
         '''
         self.model_params = {'tau_m': 10.0,  # membrane time constant (ms)
                              'tau_syn_ex': 0.5,  # excitatory synaptic time constant (ms)
@@ -230,7 +232,7 @@ class StructralPlasticityExample:
 
     '''
     In order to save the amount of average calcium concentration in each population through time
-    we create the function record_ca. Here we use the GetStatus function to retrieve the 
+    we create the function record_ca. Here we use the GetStatus function to retrieve the
     value of Ca for every neuron in the network and then store the average.
     '''
     def record_ca(self):
@@ -244,7 +246,7 @@ class StructralPlasticityExample:
         self.mean_ca_i.append(numpy.mean(ca_i))
     '''
     In order to save the state of the connectivity in the network through time
-    we create the function record_connectivity. Here we use the GetStatus function to retrieve the 
+    we create the function record_connectivity. Here we use the GetStatus function to retrieve the
     number of connected pre synaptic elements of each neuron. The total amount of excitatory connections
     is equal to the total amount of connected excitatory pre synaptic elements. The same applies for
     inhibitory connections.
@@ -260,7 +262,7 @@ class StructralPlasticityExample:
         self.total_connections_i.append(sum(neuron['Axon_in']['z_connected'] for neuron in syn_elems_i))
 
     '''
-    We define a function to plot the recorded values at the end of the simulation. 
+    We define a function to plot the recorded values at the end of the simulation.
     '''
     def plot_data(self):
         fig, ax1 = pl.subplots()
@@ -281,8 +283,8 @@ class StructralPlasticityExample:
         pl.savefig('StructuralPlasticityExample_r'+str(nest.Rank())+'.eps', format='eps')
 
     '''
-    It is time to specify how we want to perform the simulation. In this function we first enable structural 
-    plasticity in the network and then we simulate in steps. On each step we record the calcium concentration 
+    It is time to specify how we want to perform the simulation. In this function we first enable structural
+    plasticity in the network and then we simulate in steps. On each step we record the calcium concentration
     and the connectivity. At the end of the simulation, the plot of connections and calcium concentration
     through time is generated.
     '''
@@ -302,7 +304,7 @@ class StructralPlasticityExample:
 
 '''
 Finally we take all the functions that we have defined and create the sequence for our example.
-We prepare the simulation, create the nodes for the network, connect the external input and 
+We prepare the simulation, create the nodes for the network, connect the external input and
 then simulate. Please note that as we are simulating 200 biological seconds in this example,
 it will take a few minutes to complete.
 '''

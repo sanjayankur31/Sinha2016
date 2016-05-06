@@ -44,6 +44,8 @@ First, we import all necessary modules.
 
 import nest
 import numpy
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as pl
 import sys
 
