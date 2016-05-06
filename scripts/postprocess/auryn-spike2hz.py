@@ -44,7 +44,7 @@ class spike2hz:
         # Initial indices
         self.left = 0.
         self.right = 0.
-        self.dt = 1.  # ms
+        self.dt = 0.001  # s
         self.num_neurons = 8000.
 
     def setup(self, input_file, output_file, num_neurons=8000.):
