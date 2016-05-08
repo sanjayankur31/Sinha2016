@@ -22,10 +22,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from __future__ import print_function
+import sys
+sys.argv.append('--quiet')
 import matplotlib
 matplotlib.use('Agg')
-import nest
 from matplotlib import pyplot as plt
+import nest
 import numpy
 import math
 import random
@@ -75,7 +77,7 @@ class Sinha2016:
         self.synDictE = {"weight": 3.}
         self.synDictII = {"weight": -30.}
 
-        self.synDictIE = {"weight": -1., "Wmax": -30000.,
+        self.synDictIE = {"weight": 0., "Wmax": -30000.,
                           'alpha': .32, 'eta': -0.001,
                           'tau': 20.}
 
@@ -121,6 +123,9 @@ class Sinha2016:
         self.synaptic_weights_file = open(self.synaptic_weights_file_name, 'w')
 
         random.seed(42)
+
+        # structural plasticity bits
+        self.sp_update_interval = 1000
 
     def setup_simulation(self):
         """Set up simulation."""
@@ -292,7 +297,8 @@ class Sinha2016:
         file_handle = open(file_name, 'w')
         connections = nest.GetConnections(source=self.neuronsI,
                                           target=self.neuronsE)
-        print(connections, file=file_handle)
+        weights = nest.GetStatus(connections, "weight")
+        print(weights, file=file_handle)
         file_handle.close()
 
     def test_repair(self):
