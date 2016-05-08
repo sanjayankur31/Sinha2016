@@ -20,9 +20,9 @@
 #
 
 #PBS -l walltime=24:00:00
-#PBS -l nodes=80
+#PBS -l nodes=40
 #PBS -m abe
-#PBS -N "nest-v-s-2000-1000"
+#PBS -N "nest-v-s"
 
 module unload mpi/mpich-x86_64
 module load openmpi
@@ -36,7 +36,7 @@ echo "ANKUR>> Begun at $SIM_TIME"
 mkdir $RESULT_PATH/$SIM_TIME
 cd $RESULT_PATH/$SIM_TIME
 
-mpirun -n 80 python $SOURCE_PATH
+mpirun -n 40 python $SOURCE_PATH
 
 END_TIME=$(date +%Y%m%d%H%M)
 echo "ANKUR>> Ended at $END_TIME"

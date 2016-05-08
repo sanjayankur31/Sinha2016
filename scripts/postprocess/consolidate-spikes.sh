@@ -42,6 +42,11 @@ echo "Combining I files"
 sort -k "2" -n --parallel=16 spikes-*I*.gdf > spikes-I.gdf
 mv spikes-I.gdf consolidated_files
 ) &
+(
+echo "Combining recall files"
+sort -k "2" -n --parallel=16 spikes-*lesioned*.gdf > spikes-lesioned.gdf
+mv spikes-lesioned.gdf consolidated_files
+) &
 
 wait
 

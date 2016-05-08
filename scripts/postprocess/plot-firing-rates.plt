@@ -3,8 +3,12 @@ set xlabel "Time (seconds)"
 set ylabel "Mean firing rate of neurons (Hz)"
 
 set output "firing-rate-pattern-recall.png"
-set title "Firing rate for pattern and recall neurons"
-plot "firing-rate-pattern.gdf" with lines lw 4 title "P", "firing-rate-recall.gdf" with lines lw 4 title "R";
+set title "Firing rate for pattern, recall, and lesioned neurons"
+plot "firing-rate-pattern.gdf" with lines lw 4 title "P", "firing-rate-recall.gdf" with lines lw 4 title "R", "firing-rate-lesioned.gdf" with lines lw 4 title "L";
+
+set output "firing-rate-lesioned.png"
+set title "Firing rate for lesioned neurons"
+plot "firing-rate-lesioned.gdf" with lines lw 4 title "L";
 
 set output "firing-rate-recall.png"
 set title "Firing rate for recall neurons"
@@ -30,4 +34,4 @@ plot "firing-rate-I.gdf" with lines lw 4 title "I", "firing-rate-E.gdf" with lin
 
 set output "firing-rate-all.png"
 set title "Firing rate for various neuron sets"
-plot "firing-rate-I.gdf" with lines lw 4 title "I", "firing-rate-E.gdf" with lines lw 4 title "E" , "firing-rate-pattern.gdf" with lines lw 4 title "P", "firing-rate-recall.gdf" with lines lw 4 title "R";
+plot "firing-rate-I.gdf" with lines lw 4 title "I", "firing-rate-E.gdf" with lines lw 4 title "E" , "firing-rate-pattern.gdf" with lines lw 4 title "P", "firing-rate-recall.gdf" with lines lw 4 title "R", "firing-rate-lesioned.gdf" with lines lw 4 title "L";

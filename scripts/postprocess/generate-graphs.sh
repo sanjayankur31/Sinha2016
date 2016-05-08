@@ -22,7 +22,8 @@
 NE=8000
 NI=2000
 NP=800
-NR=200
+NR=400
+NL=200
 SRC_DIR="/home/asinha/Documents/02_Code/00_repos/00_mine/Sinha2016"
 echo "Generating graphs"
 pushd consolidated_files
@@ -44,6 +45,10 @@ python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-pattern.gdf firing-
 (
 echo "Processing recall spikes"
 python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-recall.gdf firing-rate-recall.gdf $NR
+) &
+(
+echo "Processing lesioned spikes"
+python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-lesioned.gdf firing-rate-lesioned.gdf $NL
 ) &
 
 wait

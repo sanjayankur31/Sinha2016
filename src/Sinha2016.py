@@ -43,7 +43,7 @@ class Sinha2016:
         # http://www.nest-simulator.org/scheduling-and-simulation-flow/
         self.dt = 0.1
         # start with a smaller population
-        self.populations = {'E': 8000, 'I': 2000, 'P': 800, 'R': 200,
+        self.populations = {'E': 8000, 'I': 2000, 'P': 800, 'R': 400,
                             'L': 200, 'EXT': 1000}
         self.numpats = 1
         # Global sparsity
@@ -118,6 +118,7 @@ class Sinha2016:
                                            str(self.rank) + ".txt")
 
         self.patterns = []
+        self.recalls = []
         self.sdP = []
         self.sdR = []
         self.sdL = []
@@ -269,10 +270,15 @@ class Sinha2016:
 
         All I'm doing is increasing the bg_current for the recall subset.
         """
-        recall_neurons = self.patterns[pattern_number - 1]
+        pattern_neurons = self.patterns[pattern_number - 1]
+        recall_neurons = random.sample(
+            pattern_neurons,
+            self.populations['R'])
         print("ANKUR>> Number of recall neurons: "
               "{}".format(len(recall_neurons)))
-        nest.SetStatus(recall_neurons, {'I_e': 1000.0})
+        nest.SetStatus(recall_neurons, {'I_e': 1200.0})
+
+        self.recalls.append(recall_neurons)
 
         recall_spike_detector = nest.Create(
             'spike_detector', params=self.spike_detector_paramsR)
@@ -281,8 +287,8 @@ class Sinha2016:
         self.sdR.append(recall_spike_detector)
 
     def disable_pattern_recall_setup(self, pattern_number):
-        """Undo the setup."""
-        recall_neurons = self.patterns[pattern_number - 1]
+        """Undo the recall."""
+        recall_neurons = self.recalls[pattern_number - 1]
         nest.SetStatus(recall_neurons, {'I_e': 220.0})
 
     def recall_last_pattern(self, time, step):
@@ -334,8 +340,8 @@ if __name__ == "__main__":
         simulation.dump_all_IE_weights("pattern_stabilisation")
 
     # Only recall the last pattern because nest doesn't do snapshots
-    simulation.lesion_network()
-    simulation.run_simulation(stabilisation_time, step)
-    simulation.dump_all_IE_weights("lesion_repair")
+    # simulation.lesion_network()
+    # simulation.run_simulation(stabilisation_time, step)
+    # simulation.dump_all_IE_weights("lesion_repair")
     simulation.recall_last_pattern(2, step)
-    simulation.run_simulation(50, step)
+    # simulation.run_simulation(50, step)
