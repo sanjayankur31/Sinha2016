@@ -44,7 +44,7 @@ class Sinha2016:
         self.dt = 0.1
         # start with a smaller population
         self.populations = {'E': 8000, 'I': 2000, 'P': 800, 'R': 200,
-                            'EXT': 1000}
+                            'L': 200, 'EXT': 1000}
         self.numpats = 1
         # Global sparsity
         self.sparsity = 0.02
@@ -105,6 +105,10 @@ class Sinha2016:
             'to_file': True,
             'label': 'spikes-' + str(self.rank) + '-recall'
         }
+        self.spike_detector_paramsL = {
+            'to_file': True,
+            'label': 'spikes-' + str(self.rank) + '-lesioned'
+        }
         self.spike_detector_paramsI = {
             'to_file': True,
             'label': 'spikes-' + str(self.rank) + '-I'
@@ -116,6 +120,7 @@ class Sinha2016:
         self.patterns = []
         self.sdP = []
         self.sdR = []
+        self.sdL = []
         self.pattern_spike_count_file_names = []
         self.pattern_spike_count_files = []
         self.pattern_count = 0
@@ -288,6 +293,19 @@ class Sinha2016:
 
     def lesion_network(self):
         """Lesion the network."""
+        pattern_neurons = self.patterns[pattern_number - 1]
+        lesioned_neurons = random.sample(
+            pattern_neurons,
+            self.populations['L'])
+        print("ANKUR>> Number of lesion neurons: "
+              "{}".format(len(lesion_neurons)))
+        nest.SetStatus(lesion_neurons, {'I_e': 0.})
+
+        lesion_spike_detector = nest.Create(
+            'spike_detector', params=self.spike_detector_paramsL)
+        nest.Connect(lesion_neurons, lesion_spike_detector)
+        # save the detector
+        self.sdL.append(lesion_spike_detector)
 
     def dump_all_IE_weights(self, annotation):
         """Dump all IE weights to a file."""
@@ -300,9 +318,6 @@ class Sinha2016:
         weights = nest.GetStatus(connections, "weight")
         print(weights, file=file_handle)
         file_handle.close()
-
-    def test_repair(self):
-        """Let the network repair itself."""
 
 if __name__ == "__main__":
     step = False
@@ -320,6 +335,7 @@ if __name__ == "__main__":
 
     # Only recall the last pattern because nest doesn't do snapshots
     simulation.lesion_network()
-    simulation.test_repair()
+    simulation.run_simulation(stabilisation_time, step)
+    simulation.dump_all_IE_weights("lesion_repair")
     simulation.recall_last_pattern(2, step)
     simulation.run_simulation(50, step)
