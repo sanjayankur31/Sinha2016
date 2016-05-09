@@ -21,6 +21,7 @@
 
 NE=8000
 NI=2000
+NN=7200
 NP=800
 NR=400
 NL=200
@@ -41,6 +42,10 @@ python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-I.gdf firing-rate-I
 (
 echo "Processing pattern spikes"
 python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-pattern.gdf firing-rate-pattern.gdf $NP
+) &
+(
+echo "Processing noise spikes"
+python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-noise.gdf firing-rate-noise.gdf $NN
 ) &
 (
 echo "Processing recall spikes"

@@ -97,9 +97,17 @@ class Sinha2016:
             'to_file': True,
             'label': 'spikes-' + str(self.rank) + '-E'
         }
+        self.spike_detector_paramsI = {
+            'to_file': True,
+            'label': 'spikes-' + str(self.rank) + '-I'
+        }
         self.spike_detector_paramsP = {
             'to_file': True,
             'label': 'spikes-' + str(self.rank) + '-pattern'
+        }
+        self.spike_detector_paramsN = {
+            'to_file': True,
+            'label': 'spikes-' + str(self.rank) + '-noise'
         }
         self.spike_detector_paramsR = {
             'to_file': True,
@@ -108,10 +116,6 @@ class Sinha2016:
         self.spike_detector_paramsL = {
             'to_file': True,
             'label': 'spikes-' + str(self.rank) + '-lesioned'
-        }
-        self.spike_detector_paramsI = {
-            'to_file': True,
-            'label': 'spikes-' + str(self.rank) + '-I'
         }
 
         self.synaptic_weights_file_name = ("00-synaptic-weights-" +
@@ -122,6 +126,7 @@ class Sinha2016:
         self.sdP = []
         self.sdR = []
         self.sdL = []
+        self.sdN = []
         self.pattern_spike_count_file_names = []
         self.pattern_spike_count_files = []
         self.pattern_count = 0
@@ -252,13 +257,35 @@ class Sinha2016:
 
         # store these neurons
         self.patterns.append(pattern_neurons)
+        # print to file
+        file_name = "pattern-{}-rank-{}.txt".format(self.pattern_count,
+                                                    self.rank)
+        file_handle = open(file_name, 'w')
+        print(pattern_neurons, file=file_handle)
+        file_handle.close()
 
-        # set up spike detector
+        # noise neurons
+        noise_neurons = list(set(local_neurons) - set(pattern_neurons))
+        file_name = "noise-{}-rank-{}.txt".format(self.pattern_count,
+                                                  self.rank)
+        file_handle = open(file_name, 'w')
+        print(noise_neurons, file=file_handle)
+        file_handle.close()
+
+        # set up spike detectors
+        # pattern
         pattern_spike_detector = nest.Create(
             'spike_detector', params=self.spike_detector_paramsP)
         nest.Connect(pattern_neurons, pattern_spike_detector)
         # save the detector
         self.sdP.append(pattern_spike_detector)
+
+        # noise
+        noise_spike_detector = nest.Create(
+            'spike_detector', params=self.spike_detector_paramsN)
+        nest.Connect(noise_neurons, noise_spike_detector)
+        # save the detector
+        self.sdN.append(noise_spike_detector)
 
         # set up files
         self.pattern_count += 1
