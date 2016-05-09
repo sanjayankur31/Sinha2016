@@ -38,8 +38,8 @@ class spike2hz:
 
     def __init__(self):
         """Main init method."""
-        self.input_file_name = ""
-        self.output_file_name = ""
+        self.input_filename = ""
+        self.output_filename = ""
 
         # Initial indices
         self.left = 0.
@@ -47,17 +47,17 @@ class spike2hz:
         self.dt = 1.  # ms
         self.num_neurons = 8000.
 
-    def setup(self, input_file, output_file, num_neurons=8000.):
+    def setup(self, input_filename, output_filename, num_neurons=8000.):
         """Setup various things."""
-        self.input_file_name = input_file
-        self.output_file_name = output_file
+        self.input_filename = input_filename
+        self.output_filename = output_filename
 
-        spikesDF = pandas.read_csv(self.input_file_name, sep='\s+',
+        spikesDF = pandas.read_csv(self.input_filename, sep='\s+',
                                    dtype=float, lineterminator="\n",
                                    skipinitialspace=True, header=None,
                                    index_col=None, names=None)
         self.spikes = spikesDF.values
-        self.output_file = open(self.output_file_name, 'w')
+        self.output_file = open(self.output_filename, 'w')
 
         self.num_neurons = int(num_neurons)
 
@@ -100,7 +100,7 @@ class spike2hz:
     def usage(self):
         """Print usage."""
         self.usage = ("Usage: \npython3 nest-spike2hz.py" +
-                      "input_file_name output_file_name number_neurons")
+                      "input_filename output_filename number_neurons")
 
 if __name__ == "__main__":
     converter = spike2hz()

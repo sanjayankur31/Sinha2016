@@ -261,7 +261,8 @@ class Sinha2016:
         file_name = "pattern-{}-rank-{}.txt".format(self.pattern_count,
                                                     self.rank)
         file_handle = open(file_name, 'w')
-        print(pattern_neurons, file=file_handle)
+        for neuron in pattern_neurons:
+            print(neuron, file=file_handle)
         file_handle.close()
 
         # noise neurons
@@ -269,7 +270,8 @@ class Sinha2016:
         file_name = "noise-{}-rank-{}.txt".format(self.pattern_count,
                                                   self.rank)
         file_handle = open(file_name, 'w')
-        print(noise_neurons, file=file_handle)
+        for neuron in noise_neurons:
+            print(neuron, file=file_handle)
         file_handle.close()
 
         # set up spike detectors
