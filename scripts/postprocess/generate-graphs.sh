@@ -31,32 +31,30 @@ pushd consolidated_files
 
 source activate python3
 
-(
+
 echo "Processing E spikes"
 python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-E.gdf firing-rate-E.gdf $NE
-) &
-(
+
+
 echo "Processing I spikes"
 python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-I.gdf firing-rate-I.gdf $NI
-) &
-(
+
+
 echo "Processing pattern spikes"
 python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-pattern.gdf firing-rate-pattern.gdf $NP
-) &
-(
+
+
 echo "Processing noise spikes"
 python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-noise.gdf firing-rate-noise.gdf $NN
-) &
-(
+
+
 echo "Processing recall spikes"
 python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-recall.gdf firing-rate-recall.gdf $NR
-) &
-(
+
+
 echo "Processing lesioned spikes"
 python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-lesioned.gdf firing-rate-lesioned.gdf $NL
-) &
 
-wait
 
 gnuplot $SRC_DIR/scripts/postprocess/plot-firing-rates.plt
 
