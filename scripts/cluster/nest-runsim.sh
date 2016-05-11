@@ -19,7 +19,7 @@
 # File : nest-runsim.sh
 #
 
-#PBS -l walltime=24:00:00
+#PBS -l walltime=40:00:00
 #PBS -l nodes=40
 #PBS -m abe
 #PBS -N "nest-v-s"
