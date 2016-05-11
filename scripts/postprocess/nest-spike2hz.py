@@ -82,9 +82,9 @@ class spike2hz:
             self.left += numpy.searchsorted(self.times[self.left:],
                                             current_time,
                                             side='left')
-            self.right += numpy.searchsorted(self.times[self.right:],
-                                             (current_time + 1000.),
-                                             side='right')
+            self.right = self.left + numpy.searchsorted(self.times[self.left:],
+                                                        (current_time + 1000.),
+                                                        side='right')
 
             statement = ("{}\t{}\n".format(
                 (current_time + 1000.)/1000.,
