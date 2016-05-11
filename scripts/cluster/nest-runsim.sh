@@ -20,7 +20,7 @@
 #
 
 #PBS -l walltime=40:00:00
-#PBS -l nodes=40
+#PBS -l nodes=50
 #PBS -m abe
 #PBS -N "nest-v-s"
 
@@ -51,7 +51,7 @@ echo "ANKUR>> Begun at $SIM_TIME"
 mkdir $RESULT_PATH/$SIM_TIME
 cd $RESULT_PATH/$SIM_TIME
 
-/usr/local/bin/mpiexec -n 40 python $SOURCE_PATH
+/usr/local/bin/mpiexec -n 50 python $SOURCE_PATH
 
 END_TIME=$(date +%Y%m%d%H%M)
 echo "ANKUR>> Ended at $END_TIME"

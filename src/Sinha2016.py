@@ -132,6 +132,7 @@ class Sinha2016:
         self.pattern_count = 0
 
         self.synaptic_weights_file = open(self.synaptic_weights_file_name, 'w')
+        self.recall_ext_i = 3000.
 
         random.seed(42)
 
@@ -305,7 +306,7 @@ class Sinha2016:
             self.populations['R'])
         print("ANKUR>> Number of recall neurons: "
               "{}".format(len(recall_neurons)))
-        nest.SetStatus(recall_neurons, {'I_e': 1200.0})
+        nest.SetStatus(recall_neurons, {'I_e': self.recall_ext_i})
 
         self.recalls.append(recall_neurons)
 
