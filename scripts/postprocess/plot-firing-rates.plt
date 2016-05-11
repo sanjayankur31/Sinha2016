@@ -1,6 +1,9 @@
 set term pngcairo font "OpenSans, 28" size 1920,1028
 set xlabel "Time (seconds)"
 set ylabel "Mean firing rate of neurons (Hz)"
+set yrange [0:200]
+set ytics border nomirror 20
+set xtics border nomirror
 
 set output "firing-rate-recall.png"
 set title "Firing rate for recall neurons"
@@ -17,7 +20,6 @@ plot "firing-rate-noise.gdf" with lines lw 4 title "N";
 set output "firing-rate-pattern-noise.png"
 set title "Firing rate for pattern and noise neurons"
 plot "firing-rate-pattern.gdf" with lines lw 4 title "P", "firing-rate-noise.gdf" with lines lw 4 title "N";
-set yrange [0:200]
 
 set output "firing-rate-E.png"
 set title "Firing rate for E neurons"
