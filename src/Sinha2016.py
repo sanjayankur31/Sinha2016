@@ -309,6 +309,14 @@ class Sinha2016:
 
         self.recalls.append(recall_neurons)
 
+        # print to file
+        file_name = "recall-{}-rank-{}.txt".format(self.pattern_count,
+                                                   self.rank)
+        file_handle = open(file_name, 'w')
+        for neuron in recall_neurons:
+            print(neuron, file=file_handle)
+        file_handle.close()
+
         recall_spike_detector = nest.Create(
             'spike_detector', params=self.spike_detector_paramsR)
         nest.Connect(recall_neurons, recall_spike_detector)
@@ -354,6 +362,18 @@ class Sinha2016:
         print(weights, file=file_handle)
         file_handle.close()
 
+    def dump_all_EE_weights(self, annotation):
+        """Dump all EE weights to a file."""
+        file_name = ("synaptic-weight-EE-" + annotation +
+                     "-{}".format(nest.GetKernelStatus()['time']) +
+                     ".txt")
+        file_handle = open(file_name, 'w')
+        connections = nest.GetConnections(source=self.neuronsE,
+                                          target=self.neuronsE)
+        weights = nest.GetStatus(connections, "weight")
+        print(weights, file=file_handle)
+        file_handle.close()
+
 if __name__ == "__main__":
     step = False
     stabilisation_time = 2000
@@ -361,12 +381,14 @@ if __name__ == "__main__":
     simulation.setup_simulation()
     simulation.run_simulation(stabilisation_time, step)
     simulation.dump_all_IE_weights("initial_stabilisation")
+    simulation.dump_all_EE_weights("initial_stabilisation")
 
     # store and stabilise patterns
     for i in range(0, simulation.numpats):
         simulation.store_pattern()
         simulation.run_simulation(stabilisation_time, step)
         simulation.dump_all_IE_weights("pattern_stabilisation")
+        simulation.dump_all_EE_weights("pattern_stabilisation")
 
     # Only recall the last pattern because nest doesn't do snapshots
     # simulation.lesion_network()
