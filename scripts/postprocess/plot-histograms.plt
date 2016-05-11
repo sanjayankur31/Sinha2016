@@ -67,7 +67,7 @@ min=0.
 width=(max-min)/n
 hist(x,width)=width*floor(x/width)+width/2.0
 set term pngcairo font "OpenSans, 28" size 1920,1028
-set output "histogram-noise.png"
+set output "histogram-background.png"
 set xrange[min:max]
 set yrange[0:]
 set offset graph 0.05,0.05,0.05,0.0
@@ -77,7 +77,7 @@ set style fill solid 0.5 #fillstyle
 set tics out nomirror
 set xlabel "Firing rate"
 set ylabel "Frequency"
-plot "recall-firing-rate-noise.gdf" u (hist($1,width)):(1.0) smooth freq w boxes title "noise"
+plot "recall-firing-rate-background.gdf" u (hist($1,width)):(1.0) smooth freq w boxes title "background"
 
 reset
 n=200
@@ -107,7 +107,7 @@ n2=200
 width2=(max-min)/n2
 hist(x,width)=width*floor(x/width)+width/2.0
 set term pngcairo font "OpenSans, 28" size 1920,1028
-set output "histogram-pattern-noise.png"
+set output "histogram-pattern-background.png"
 set xrange[min:max]
 set yrange[0:]
 set offset graph 0.05,0.05,0.05,0.0
@@ -117,5 +117,5 @@ set style fill transparent solid 0.5 #fillstyle
 set tics out nomirror
 set xlabel "Firing rate"
 set ylabel "Frequency"
-plot "recall-firing-rate-pattern.gdf" u (hist($1,width1)):(1.0) smooth freq w boxes title "pattern", "recall-firing-rate-noise.gdf" u (hist($1,width2)):(1.0) smooth freq w boxes title "noise"; 
+plot "recall-firing-rate-pattern.gdf" u (hist($1,width1)):(1.0) smooth freq w boxes title "pattern", "recall-firing-rate-background.gdf" u (hist($1,width2)):(1.0) smooth freq w boxes title "background"; 
 

@@ -107,7 +107,7 @@ class Sinha2016:
         }
         self.spike_detector_paramsN = {
             'to_file': True,
-            'label': 'spikes-' + str(self.rank) + '-noise'
+            'label': 'spikes-' + str(self.rank) + '-background'
         }
         self.spike_detector_paramsR = {
             'to_file': True,
@@ -266,12 +266,12 @@ class Sinha2016:
             print(neuron, file=file_handle)
         file_handle.close()
 
-        # noise neurons
-        noise_neurons = list(set(local_neurons) - set(pattern_neurons))
-        file_name = "noise-{}-rank-{}.txt".format(self.pattern_count,
-                                                  self.rank)
+        # background neurons
+        background_neurons = list(set(local_neurons) - set(pattern_neurons))
+        file_name = "background-{}-rank-{}.txt".format(self.pattern_count,
+                                                       self.rank)
         file_handle = open(file_name, 'w')
-        for neuron in noise_neurons:
+        for neuron in background_neurons:
             print(neuron, file=file_handle)
         file_handle.close()
 
@@ -283,12 +283,12 @@ class Sinha2016:
         # save the detector
         self.sdP.append(pattern_spike_detector)
 
-        # noise
-        noise_spike_detector = nest.Create(
+        # background
+        background_spike_detector = nest.Create(
             'spike_detector', params=self.spike_detector_paramsN)
-        nest.Connect(noise_neurons, noise_spike_detector)
+        nest.Connect(background_neurons, background_spike_detector)
         # save the detector
-        self.sdN.append(noise_spike_detector)
+        self.sdN.append(background_spike_detector)
 
         # set up files
         self.pattern_count += 1

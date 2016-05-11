@@ -13,13 +13,13 @@ set output "firing-rate-pattern.png"
 set title "Firing rate for pattern neurons"
 plot "firing-rate-pattern.gdf" with lines lw 4 title "P";
 
-set output "firing-rate-noise.png"
-set title "Firing rate for noise neurons"
-plot "firing-rate-noise.gdf" with lines lw 4 title "N";
+set output "firing-rate-background.png"
+set title "Firing rate for background neurons"
+plot "firing-rate-background.gdf" with lines lw 4 title "N";
 
-set output "firing-rate-pattern-noise.png"
-set title "Firing rate for pattern and noise neurons"
-plot "firing-rate-pattern.gdf" with lines lw 4 title "P", "firing-rate-noise.gdf" with lines lw 4 title "N";
+set output "firing-rate-pattern-background.png"
+set title "Firing rate for pattern and background neurons"
+plot "firing-rate-pattern.gdf" with lines lw 4 title "P", "firing-rate-background.gdf" with lines lw 4 title "N";
 
 set output "firing-rate-E.png"
 set title "Firing rate for E neurons"
@@ -35,7 +35,7 @@ plot "firing-rate-I.gdf" with lines lw 4 title "I", "firing-rate-E.gdf" with lin
 
 set output "firing-rate-all.png"
 set title "Firing rate for various neuron sets"
-plot "firing-rate-I.gdf" with lines lw 4 title "I", "firing-rate-E.gdf" with lines lw 4 title "E" , "firing-rate-pattern.gdf" with lines lw 4 title "P", "firing-rate-noise.gdf" with lines lw 4 title "N", "firing-rate-recall.gdf" with lines lw 4 title "R", "firing-rate-lesioned.gdf" with lines lw 4 title "L";
+plot "firing-rate-I.gdf" with lines lw 4 title "I", "firing-rate-E.gdf" with lines lw 4 title "E" , "firing-rate-pattern.gdf" with lines lw 4 title "P", "firing-rate-background.gdf" with lines lw 4 title "N", "firing-rate-recall.gdf" with lines lw 4 title "R", "firing-rate-lesioned.gdf" with lines lw 4 title "L";
 
 set output "firing-rate-pattern-recall.png"
 set title "Firing rate for pattern, recall, and lesioned neurons"

@@ -33,34 +33,34 @@ class calculateSNR:
     """
     Calculate SNR from spike files.
 
-    This takes the pattern and noise spike files, extracts the required spikes,
-    does the maths, and prints the SNR into a file.
+    This takes the pattern and background spike files, extracts the required
+    spikes, does the maths, and prints the SNR into a file.
     """
 
     def __init__(self):
         """Initialise variables."""
         self.pattern_spikes_filename = ""
-        self.noise_spikes_filename = ""
+        self.background_spikes_filename = ""
         self.recall_time = 0.
 
         self.num_neurons_pattern = 0
-        self.num_neurons_noise = 0
+        self.num_neurons_background = 0
 
-    def setup(self, pattern_spikes_filename, noise_spikes_filename,
+    def setup(self, pattern_spikes_filename, background_spikes_filename,
               num_neurons_pattern=800.,
-              num_neurons_noise=7200., recall_time=0.):
+              num_neurons_background=7200., recall_time=0.):
         """Setup various things.
 
-        Since we already have different files for pattern and noise spikes,
-        I don't need to load the neuron lists for them and use them to come up
-        with a firing rate - NEST already gives me different files
-        for pattern, and different for noise.
+        Since we already have different files for pattern and background
+        spikes, I don't need to load the neuron lists for them and use them to
+        come up with a firing rate - NEST already gives me different files for
+        pattern, and different for background.
         """
         self.pattern_spikes_filename = pattern_spikes_filename
-        self.noise_spikes_filename = noise_spikes_filename
+        self.background_spikes_filename = background_spikes_filename
 
         self.num_neurons_pattern = int(num_neurons_pattern)
-        self.num_neurons_noise = int(num_neurons_noise)
+        self.num_neurons_background = int(num_neurons_background)
         self.recall_time = float(recall_time)
 
         # Get spikes
@@ -71,16 +71,18 @@ class calculateSNR:
                                            index_col=None, names=None)
         self.spikes_pattern = spikesDF_pattern.values
 
-        spikesDF_noise = pandas.read_csv(self.noise_spikes_filename, sep='\s+',
-                                         dtype=float, lineterminator="\n",
-                                         skipinitialspace=True, header=None,
-                                         index_col=None, names=None)
-        self.spikes_noise = spikesDF_noise.values
+        spikesDF_background = pandas.read_csv(self.background_spikes_filename,
+                                              sep='\s+', dtype=float,
+                                              lineterminator="\n",
+                                              skipinitialspace=True,
+                                              header=None, index_col=None,
+                                              names=None)
+        self.spikes_background = spikesDF_background.values
 
         # If anything isn't OK, we error out
         return (
             self.__validate_spike_input(self.spikes_pattern) and
-            self.__validate_spike_input(self.spikes_noise)
+            self.__validate_spike_input(self.spikes_background)
         )
 
     def __validate_spike_input(self, spikes):
@@ -126,8 +128,8 @@ class calculateSNR:
         """Calculate the SNR."""
         spikes_pattern = self.get_spikes(self.spikes_pattern)
         # print("Pattern spikes: {}".format(spikes_pattern[0:]))
-        spikes_noise = self.get_spikes(self.spikes_noise)
-        # print("Noise spikes: {}".format(spikes_noise[0:]))
+        spikes_background = self.get_spikes(self.spikes_background)
+        # print("Background spikes: {}".format(spikes_background[0:]))
 
         rates_pattern = self.get_firing_rates(spikes_pattern,
                                               self.num_neurons_pattern)
@@ -137,46 +139,48 @@ class calculateSNR:
             print(rate, file=output_file)
         output_file.close()
 
-        rates_noise = self.get_firing_rates(spikes_noise,
-                                            self.num_neurons_noise)
+        rates_background = self.get_firing_rates(spikes_background,
+                                                 self.num_neurons_background)
         # print to file - for histograms
-        output_file = open("recall-firing-rate-noise.gdf", 'w')
-        for rate in rates_noise:
+        output_file = open("recall-firing-rate-background.gdf", 'w')
+        for rate in rates_background:
             print(rate, file=output_file)
         output_file.close()
 
         mean_pattern = numpy.mean(rates_pattern, dtype=float)
         print("Mean pattern is: {}".format(mean_pattern))
-        mean_noise = numpy.mean(rates_noise, dtype=float)
-        print("Mean noise is: {}".format(mean_noise))
+        mean_background = numpy.mean(rates_background, dtype=float)
+        print("Mean background is: {}".format(mean_background))
 
         std_pattern = numpy.std(rates_pattern, dtype=float)
         print("STD pattern is: {}".format(std_pattern))
-        std_noise = numpy.std(rates_noise, dtype=float)
-        print("STD noise is: {}".format(std_noise))
+        std_background = numpy.std(rates_background, dtype=float)
+        print("STD background is: {}".format(std_background))
 
-        snr = 2. * (math.pow((mean_pattern - mean_noise),
+        snr = 2. * (math.pow((mean_pattern - mean_background),
                              2.)/(math.pow(std_pattern, 2.) +
-                                  math.pow(std_noise, 2.)))
+                                  math.pow(std_background, 2.)))
 
         print("SNR is: {}".format(snr))
 
         # Open the output file
         output_file = open("recall-snr.gdf", 'w')
         print("{}\t{}\t{}\t{}\t{}".format(mean_pattern, std_pattern,
-                                          mean_noise, std_noise, snr),
+                                          mean_background, std_background,
+                                          snr),
               file=output_file)
         output_file.close()
 
         print("Result:\t{}\t{}\t{}\t{}\t{}".format(mean_pattern, std_pattern,
-                                                   mean_noise, std_noise, snr))
+                                                   mean_background,
+                                                   std_background, snr))
 
     def usage(self):
         """Print usage."""
         usage = ("Usage: \npython3 calculateSNR.py" +
-                 "pattern_spikes_filename noise_spikes_filename" +
+                 "pattern_spikes_filename background_spikes_filename" +
                  "num_neurons_pattern" +
-                 "num_neurons_noise recall_time"
+                 "num_neurons_background recall_time"
                  )
         print(usage, file=stderr)
 

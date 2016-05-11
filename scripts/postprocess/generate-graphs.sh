@@ -45,8 +45,8 @@ echo "Processing pattern spikes"
 python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-pattern.gdf firing-rate-pattern.gdf $NP
 
 
-echo "Processing noise spikes"
-python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-noise.gdf firing-rate-noise.gdf $NN
+echo "Processing background spikes"
+python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-background.gdf firing-rate-background.gdf $NN
 
 
 echo "Processing recall spikes"
@@ -60,7 +60,7 @@ echo "Plotting firing rate graphs"
 gnuplot $SRC_DIR/scripts/postprocess/plot-firing-rates.plt
 
 echo "Processing SNR information"
-python3 $SRC_DIR/scripts/postprocess/calculateSNR.py spikes-pattern.gdf spikes-noise.gdf $NP $NN $RECALLTIME
+python3 $SRC_DIR/scripts/postprocess/calculateSNR.py spikes-pattern.gdf spikes-background.gdf $NP $NN $RECALLTIME
 echo "Plotting histograms"
 gnuplot $SRC_DIR/scripts/postprocess/plot-histograms.plt
 

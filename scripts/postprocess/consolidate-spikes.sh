@@ -36,9 +36,9 @@ sort -k "2" -n --parallel=16 spikes-*lesioned*.gdf > spikes-lesioned.gdf
 mv spikes-lesioned.gdf consolidated_files
 
 
-echo "Combining noise files"
-sort -k "2" -n --parallel=16 spikes-*noise*.gdf > spikes-noise.gdf
-mv spikes-noise.gdf consolidated_files
+echo "Combining background files"
+sort -k "2" -n --parallel=16 spikes-*background*.gdf > spikes-background.gdf
+mv spikes-background.gdf consolidated_files
 
 echo "Combining E files"
 sort -k "2" -n --parallel=16 spikes-*E*.gdf > spikes-E.gdf
