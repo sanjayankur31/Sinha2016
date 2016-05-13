@@ -35,26 +35,27 @@ source activate python3
 
 echo "Processing E spikes"
 python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-E.gdf firing-rate-E.gdf $NE
-
+touch firing-rate-E.gdf
 
 echo "Processing I spikes"
 python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-I.gdf firing-rate-I.gdf $NI
-
+touch firing-rate-I.gdf
 
 echo "Processing pattern spikes"
 python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-pattern.gdf firing-rate-pattern.gdf $NP
-
+touch firing-rate-pattern.gdf
 
 echo "Processing background spikes"
 python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-background.gdf firing-rate-background.gdf $NN
-
+touch firing-rate-background.gdf
 
 echo "Processing recall spikes"
 python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-recall.gdf firing-rate-recall.gdf $NR
-
+touch firing-rate-recall.gdf
 
 echo "Processing lesioned spikes"
 python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-lesioned.gdf firing-rate-lesioned.gdf $NL
+touch firing-rate-lesioned.gdf
 
 echo "Plotting firing rate graphs"
 gnuplot $SRC_DIR/scripts/postprocess/plot-firing-rates.plt
