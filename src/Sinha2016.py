@@ -259,8 +259,8 @@ class Sinha2016:
         # store these neurons
         self.patterns.append(pattern_neurons)
         # print to file
-        file_name = "pattern-{}-rank-{}.txt".format(self.pattern_count,
-                                                    self.rank)
+        file_name = "patternneurons-{}-rank-{}.txt".format(self.pattern_count,
+                                                           self.rank)
         file_handle = open(file_name, 'w')
         for neuron in pattern_neurons:
             print(neuron, file=file_handle)
@@ -268,8 +268,9 @@ class Sinha2016:
 
         # background neurons
         background_neurons = list(set(local_neurons) - set(pattern_neurons))
-        file_name = "background-{}-rank-{}.txt".format(self.pattern_count,
-                                                       self.rank)
+        file_name =
+        "backgroundneurons-{}-rank-{}.txt".format(self.pattern_count,
+                                                  self.rank)
         file_handle = open(file_name, 'w')
         for neuron in background_neurons:
             print(neuron, file=file_handle)
@@ -311,8 +312,8 @@ class Sinha2016:
         self.recalls.append(recall_neurons)
 
         # print to file
-        file_name = "recall-{}-rank-{}.txt".format(self.pattern_count,
-                                                   self.rank)
+        file_name = "recallneurons-{}-rank-{}.txt".format(self.pattern_count,
+                                                          self.rank)
         file_handle = open(file_name, 'w')
         for neuron in recall_neurons:
             print(neuron, file=file_handle)
