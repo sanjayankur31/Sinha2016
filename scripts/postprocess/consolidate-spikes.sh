@@ -19,33 +19,35 @@
 # File : consolidate-spikes.sh
 #
 
+SORTTMPDIR="/home/asinha/dump/sort-tmpdir"
+
 echo "Combining files"
 mkdir consolidated_files
 
 echo "Combining recall files"
-sort -k "2" -n --parallel=16 spikes-*recall*.gdf > spikes-recall.gdf
+sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*recall*.gdf > spikes-recall.gdf
 mv spikes-recall.gdf consolidated_files
 
 echo "Combining pattern files"
-sort -k "2" -n --parallel=16 spikes-*pattern*.gdf > spikes-pattern.gdf
+sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*pattern*.gdf > spikes-pattern.gdf
 mv spikes-pattern.gdf consolidated_files
 
 
 echo "Combining lesion files"
-sort -k "2" -n --parallel=16 spikes-*lesioned*.gdf > spikes-lesioned.gdf
+sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*lesioned*.gdf > spikes-lesioned.gdf
 mv spikes-lesioned.gdf consolidated_files
 
 
 echo "Combining background files"
-sort -k "2" -n --parallel=16 spikes-*background*.gdf > spikes-background.gdf
+sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*background*.gdf > spikes-background.gdf
 mv spikes-background.gdf consolidated_files
 
 echo "Combining E files"
-sort -k "2" -n --parallel=16 spikes-*E*.gdf > spikes-E.gdf
+sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*E*.gdf > spikes-E.gdf
 mv spikes-E.gdf consolidated_files
 
 echo "Combining I files"
-sort -k "2" -n --parallel=16 spikes-*I*.gdf > spikes-I.gdf
+sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*I*.gdf > spikes-I.gdf
 mv spikes-I.gdf consolidated_files
 
 
