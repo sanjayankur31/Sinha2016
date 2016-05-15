@@ -268,9 +268,9 @@ class Sinha2016:
 
         # background neurons
         background_neurons = list(set(local_neurons) - set(pattern_neurons))
-        file_name =
-        "backgroundneurons-{}-rank-{}.txt".format(self.pattern_count,
-                                                  self.rank)
+        file_name = "backgroundneurons-{}-rank-{}.txt".format(
+            self.pattern_count, self.rank)
+
         file_handle = open(file_name, 'w')
         for neuron in background_neurons:
             print(neuron, file=file_handle)
