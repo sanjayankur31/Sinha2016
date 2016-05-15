@@ -78,7 +78,7 @@ class Sinha2016:
         self.synDictII = {"weight": -30.}
 
         self.synDictIE = {"weight": 0., "Wmax": -30000.,
-                          'alpha': .32, 'eta': -0.0001,
+                          'alpha': .32, 'eta': -0.001,
                           'tau': 20.}
 
         # see the aif source for symbol definitions
@@ -397,4 +397,4 @@ if __name__ == "__main__":
     # simulation.run_simulation(stabilisation_time, step)
     # simulation.dump_all_IE_weights("lesion_repair")
     simulation.recall_last_pattern(2, step)
-    # simulation.run_simulation(50, step)
+    simulation.run_simulation(50, step)
