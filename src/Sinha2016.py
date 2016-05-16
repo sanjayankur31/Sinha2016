@@ -42,9 +42,14 @@ class Sinha2016:
         # default resolution in nest is 0.1ms. Using the same value
         # http://www.nest-simulator.org/scheduling-and-simulation-flow/
         self.dt = 0.1
-        # start with a smaller population
+        # time to stabilise network after pattern storage etc.
+        self.stabilisation_time = 2000.
+        # time recall stimulus is enabled for
+        self.recall_time = 1.
+        # populations
         self.populations = {'E': 8000, 'I': 2000, 'P': 800, 'R': 400,
                             'L': 200, 'EXT': 1000}
+        # Number of patterns we store
         self.numpats = 1
         # Global sparsity
         self.sparsity = 0.02
@@ -61,6 +66,7 @@ class Sinha2016:
                                          self.populations['R'])
                                         * self.sparsityExtE)
 
+        # connection dictionaries
         self.connDictEE = {"rule": "fixed_total_number",
                            "N": self.connectionNumberEE}
         self.connDictEI = {"rule": "fixed_total_number",
@@ -89,6 +95,14 @@ class Sinha2016:
                            'E_ex': 0., 'E_in': -80.,
                            'tau_syn_ex': 5., 'tau_syn_in': 10.}
 
+        self.neuronDictExtE = {'rate': 100.,
+                               'origin': float
+                               (
+                                   (self.numpats + 1.) *
+                                   self.stabilisation_time
+                               ),
+                               'start': 0., 'stop': self.recall_time}
+
         self.rank = nest.Rank()
 
         # Get the number of spikes in these files and then post-process them to
@@ -100,6 +114,10 @@ class Sinha2016:
         self.spike_detector_paramsI = {
             'to_file': True,
             'label': 'spikes-' + str(self.rank) + '-I'
+        }
+        self.spike_detector_paramsExtE = {
+            'to_file': True,
+            'label': 'spikes-' + str(self.rank) + '-ExtE'
         }
         self.spike_detector_paramsP = {
             'to_file': True,
@@ -194,7 +212,18 @@ class Sinha2016:
         nest.Connect(self.neuronsE, self.sdE)
         nest.Connect(self.neuronsI, self.sdI)
 
-    def run_simulation(self, simtime, step=False):
+        # set up external stimulus
+        self.neuronsExtE = nest.Create('poisson_generator', 1,
+                                       self.neuronDictExtE)
+        self.sdExtE = nest.Create('spike_detector',
+                                  params=self.spike_detector_paramsExtE)
+        nest.Connect(self.neuronsExtE, self.sdExtE)
+
+    def stabilise(self, step=False):
+        """Stabilise network."""
+        self.run_simulation(self.stabilisation_time, step)
+
+    def run_simulation(self, simtime=2000, step=False):
         """Run the simulation."""
         sim_steps = numpy.arange(0, simtime)
         if step:
@@ -307,7 +336,9 @@ class Sinha2016:
             self.populations['R'])
         print("ANKUR>> Number of recall neurons: "
               "{}".format(len(recall_neurons)))
-        nest.SetStatus(recall_neurons, {'I_e': self.recall_ext_i})
+
+        nest.Connect(self.neuronsExtE, recall_neurons,
+                     conn_spec=self.connDictExtE)
 
         self.recalls.append(recall_neurons)
 
@@ -324,11 +355,12 @@ class Sinha2016:
         nest.Connect(recall_neurons, recall_spike_detector)
         # save the detector
         self.sdR.append(recall_spike_detector)
+        # nest.SetStatus(recall_neurons, {'I_e': self.recall_ext_i})
 
     def disable_pattern_recall_setup(self, pattern_number):
         """Undo the recall."""
-        recall_neurons = self.recalls[pattern_number - 1]
-        nest.SetStatus(recall_neurons, {'I_e': 220.0})
+        # recall_neurons = self.recalls[pattern_number - 1]
+        # nest.SetStatus(recall_neurons, {'I_e': 220.0})
 
     def recall_last_pattern(self, time, step):
         """Only setup the last pattern."""
@@ -378,17 +410,16 @@ class Sinha2016:
 
 if __name__ == "__main__":
     step = False
-    stabilisation_time = 2000
     simulation = Sinha2016()
     simulation.setup_simulation()
-    simulation.run_simulation(stabilisation_time, step)
+    simulation.stabilise(step)
     simulation.dump_all_IE_weights("initial_stabilisation")
     simulation.dump_all_EE_weights("initial_stabilisation")
 
     # store and stabilise patterns
     for i in range(0, simulation.numpats):
         simulation.store_pattern()
-        simulation.run_simulation(stabilisation_time, step)
+        simulation.stabilise(step)
         simulation.dump_all_IE_weights("pattern_stabilisation")
         simulation.dump_all_EE_weights("pattern_stabilisation")
 
@@ -396,5 +427,4 @@ if __name__ == "__main__":
     # simulation.lesion_network()
     # simulation.run_simulation(stabilisation_time, step)
     # simulation.dump_all_IE_weights("lesion_repair")
-    simulation.recall_last_pattern(2, step)
-    simulation.run_simulation(50, step)
+    simulation.recall_last_pattern(50, step)
