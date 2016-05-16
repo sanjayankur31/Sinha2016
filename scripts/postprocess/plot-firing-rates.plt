@@ -27,11 +27,11 @@ plot "firing-rate-pattern.gdf" with lines lw 4 title "P", "firing-rate-backgroun
 
 set output "firing-rate-E.png"
 set title "Firing rate for E neurons"
-plot "firing-rate-E.gdf" with lines lw 4 title "";
+plot "firing-rate-E.gdf" with lines lw 4 title "E";
 
 set output "firing-rate-I.png"
 set title "Firing rate for I neurons"
-plot "firing-rate-I.gdf" with lines lw 4 title "";
+plot "firing-rate-I.gdf" with lines lw 4 title "I";
 
 set output "firing-rate-I-E.png"
 set title "Firing rate for neurons"
