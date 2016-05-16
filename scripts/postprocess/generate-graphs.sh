@@ -25,6 +25,7 @@ NN=7200
 NP=800
 NR=400
 NL=200
+NEXTE=20000
 RECALLTIME=4001000
 SRC_DIR="/home/asinha/Documents/02_Code/00_repos/00_mine/Sinha2016"
 echo "Generating graphs"
@@ -56,6 +57,10 @@ touch firing-rate-recall.gdf
 echo "Processing lesioned spikes"
 python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-lesioned.gdf firing-rate-lesioned.gdf $NL
 touch firing-rate-lesioned.gdf
+
+echo "Processing ExtE spikes"
+python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-lesioned.gdf firing-rate-ExtE.gdf $NEXTE
+touch firing-rate-ExtE.gdf
 
 echo "Plotting firing rate graphs"
 gnuplot $SRC_DIR/scripts/postprocess/plot-firing-rates.plt
