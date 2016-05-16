@@ -76,5 +76,6 @@ dirname=${PWD##*/}
 
 mkdir $SRC_DIR/tests/$dirname
 cp consolidated_files/*.png $SRC_DIR/tests/$dirname/
+cp consolidated_files/recall-snr.gdf $SRC_DIR/tests/$dirname/
 
 source deactivate
