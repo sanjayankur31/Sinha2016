@@ -25,6 +25,7 @@ import numpy
 import sys
 import math
 import pandas
+import os.path
 
 
 class spike2hz:
@@ -52,16 +53,20 @@ class spike2hz:
         self.input_filename = input_filename
         self.output_filename = output_filename
 
-        spikesDF = pandas.read_csv(self.input_filename, sep='\s+',
-                                   dtype=float, lineterminator="\n",
-                                   skipinitialspace=True, header=None,
-                                   index_col=None, names=None)
-        self.spikes = spikesDF.values
-        self.output_file = open(self.output_filename, 'w')
+        if os.path.exists(self.input_filename):
+            spikesDF = pandas.read_csv(self.input_filename, sep='\s+',
+                                       dtype=float, lineterminator="\n",
+                                       skipinitialspace=True, header=None,
+                                       index_col=None, names=None)
+            self.spikes = spikesDF.values
+            self.output_file = open(self.output_filename, 'w')
 
-        self.num_neurons = int(num_neurons)
+            self.num_neurons = int(num_neurons)
 
-        return self.__validate_input()
+            return self.__validate_input()
+        else:
+            print("File not found. Exiting.", file=stderr)
+            return False
 
     def __validate_input(self):
         """Check to see the input file is a two column file."""
