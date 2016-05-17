@@ -65,7 +65,7 @@ class spike2hz:
 
             return self.__validate_input()
         else:
-            print("File not found. Exiting.", file=stderr)
+            print("File not found. Exiting.", file=sys.stderr)
             return False
 
     def __validate_input(self):
