@@ -59,7 +59,7 @@ python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-lesioned.gdf firing
 touch firing-rate-lesioned.gdf
 
 echo "Processing ExtE spikes"
-python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-lesioned.gdf firing-rate-ExtE.gdf $NEXTE
+python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-ExtE.gdf firing-rate-ExtE.gdf $NEXTE
 touch firing-rate-ExtE.gdf
 
 echo "Plotting firing rate graphs"
