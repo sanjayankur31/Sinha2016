@@ -424,7 +424,7 @@ if __name__ == "__main__":
         simulation.dump_all_EE_weights("pattern_stabilisation")
 
     # Only recall the last pattern because nest doesn't do snapshots
-    # simulation.lesion_network()
-    # simulation.run_simulation(stabilisation_time, step)
-    # simulation.dump_all_IE_weights("lesion_repair")
+    simulation.lesion_network()
+    simulation.stabilise(step)
+    simulation.dump_all_IE_weights("lesion_repair")
     simulation.recall_last_pattern(50, step)
