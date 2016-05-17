@@ -45,10 +45,10 @@ class Sinha2016:
         # time to stabilise network after pattern storage etc.
         self.stabilisation_time = 2000.
         # time recall stimulus is enabled for
-        self.recall_time = 1.
+        self.recall_time = 1000.  # ms
         # populations
         self.populations = {'E': 8000, 'I': 2000, 'P': 800, 'R': 400,
-                            'L': 200, 'EXT': 1000}
+                            'D': 200, 'EXT': 1000}
         # Number of patterns we store
         self.numpats = 1
         # Global sparsity
@@ -95,14 +95,6 @@ class Sinha2016:
                            'E_ex': 0., 'E_in': -80.,
                            'tau_syn_ex': 5., 'tau_syn_in': 10.}
 
-        self.neuronDictExtE = {'rate': 100.,
-                               'origin': float
-                               (
-                                   (self.numpats + 1.) *
-                                   self.stabilisation_time
-                               ),
-                               'start': 0., 'stop': self.recall_time}
-
         self.rank = nest.Rank()
 
         # Get the number of spikes in these files and then post-process them to
@@ -115,36 +107,22 @@ class Sinha2016:
             'to_file': True,
             'label': 'spikes-' + str(self.rank) + '-I'
         }
-        self.spike_detector_paramsExtE = {
+        self.spike_detector_paramsD = {
             'to_file': True,
-            'label': 'spikes-' + str(self.rank) + '-ExtE'
-        }
-        self.spike_detector_paramsP = {
-            'to_file': True,
-            'label': 'spikes-' + str(self.rank) + '-pattern'
-        }
-        self.spike_detector_paramsN = {
-            'to_file': True,
-            'label': 'spikes-' + str(self.rank) + '-background'
-        }
-        self.spike_detector_paramsR = {
-            'to_file': True,
-            'label': 'spikes-' + str(self.rank) + '-recall'
-        }
-        self.spike_detector_paramsL = {
-            'to_file': True,
-            'label': 'spikes-' + str(self.rank) + '-lesioned'
+            'label': 'spikes-' + str(self.rank) + '-deaffed'
         }
 
         self.synaptic_weights_file_name = ("00-synaptic-weights-" +
                                            str(self.rank) + ".txt")
 
         self.patterns = []
+        self.neuronsExtE = []
         self.recalls = []
         self.sdP = []
         self.sdR = []
         self.sdL = []
-        self.sdN = []
+        self.sdB = []
+        self.sdExtE = []
         self.pattern_spike_count_file_names = []
         self.pattern_spike_count_files = []
         self.pattern_count = 0
@@ -212,13 +190,6 @@ class Sinha2016:
         nest.Connect(self.neuronsE, self.sdE)
         nest.Connect(self.neuronsI, self.sdI)
 
-        # set up external stimulus
-        self.neuronsExtE = nest.Create('poisson_generator', 1,
-                                       self.neuronDictExtE)
-        self.sdExtE = nest.Create('spike_detector',
-                                  params=self.spike_detector_paramsExtE)
-        nest.Connect(self.neuronsExtE, self.sdExtE)
-
     def stabilise(self, step=False):
         """Stabilise network."""
         self.run_simulation(self.stabilisation_time, step)
@@ -268,6 +239,17 @@ class Sinha2016:
 
     def store_pattern(self):
         """ Store a pattern and set up spike detectors."""
+        spike_detector_paramsP = {
+            'to_file': True,
+            'label': ('spikes-' + str(self.rank) + '-pattern-' +
+                      str(self.pattern_count))
+        }
+        spike_detector_paramsB = {
+            'to_file': True,
+            'label': ('spikes-' + str(self.rank) + '-background-' +
+                      str(self.pattern_count))
+        }
+
         local_neurons = nest.GetNodes(
             nest.CurrentSubnet(), {'model': 'tif_neuronE'},
             local_only=False)[0]
@@ -308,19 +290,19 @@ class Sinha2016:
         # set up spike detectors
         # pattern
         pattern_spike_detector = nest.Create(
-            'spike_detector', params=self.spike_detector_paramsP)
+            'spike_detector', params=spike_detector_paramsP)
         nest.Connect(pattern_neurons, pattern_spike_detector)
         # save the detector
         self.sdP.append(pattern_spike_detector)
 
         # background
         background_spike_detector = nest.Create(
-            'spike_detector', params=self.spike_detector_paramsN)
+            'spike_detector', params=spike_detector_paramsB)
         nest.Connect(background_neurons, background_spike_detector)
         # save the detector
-        self.sdN.append(background_spike_detector)
+        self.sdB.append(background_spike_detector)
 
-        # set up files
+        # Increment count after it's all been set up
         self.pattern_count += 1
         print("Number of patterns stored: {}".format(self.pattern_count))
 
@@ -328,8 +310,30 @@ class Sinha2016:
         """
         Set up a pattern for recall.
 
-        All I'm doing is increasing the bg_current for the recall subset.
+        Creates a new poisson generator and connects it to a recall subset of
+        this pattern - the poisson stimulus will run for the set recall_time
+        from the invocation of this method.
         """
+        # set up external stimulus
+        stim_time = nest.GetKernelStatus()['time']
+        neuronDictExtE = {'rate': 100.,
+                          'origin': stim_time,
+                          'start': 0., 'stop': self.recall_time}
+        spike_detector_paramsExtE = {
+            'to_file': True,
+            'label': ('spikes-' + str(self.rank) + '-ExtE-' +
+                      str(pattern_number))
+
+        }
+
+        stim_neurons = nest.Create('poisson_generator', 1,
+                                   neuronDictExtE)
+        sd = nest.Create('spike_detector',
+                         params=spike_detector_paramsExtE)
+        nest.Connect(stim_neurons, sd)
+        self.sdExtE.append(sd)
+        self.neuronsExtE.append(stim_neurons)
+
         pattern_neurons = self.patterns[pattern_number - 1]
         recall_neurons = random.sample(
             pattern_neurons,
@@ -337,7 +341,7 @@ class Sinha2016:
         print("ANKUR>> Number of recall neurons: "
               "{}".format(len(recall_neurons)))
 
-        nest.Connect(self.neuronsExtE, recall_neurons,
+        nest.Connect(stim_neurons, recall_neurons,
                      conn_spec=self.connDictExtE)
 
         self.recalls.append(recall_neurons)
@@ -350,39 +354,54 @@ class Sinha2016:
             print(neuron, file=file_handle)
         file_handle.close()
 
+        spike_detector_paramsR = {
+            'to_file': True,
+            'label': ('spikes-' + str(self.rank) + '-recall-' +
+                      str(self.pattern_count))
+        }
         recall_spike_detector = nest.Create(
-            'spike_detector', params=self.spike_detector_paramsR)
+            'spike_detector', params=spike_detector_paramsR)
         nest.Connect(recall_neurons, recall_spike_detector)
         # save the detector
         self.sdR.append(recall_spike_detector)
         # nest.SetStatus(recall_neurons, {'I_e': self.recall_ext_i})
 
-    def disable_pattern_recall_setup(self, pattern_number):
-        """Undo the recall."""
-        # recall_neurons = self.recalls[pattern_number - 1]
-        # nest.SetStatus(recall_neurons, {'I_e': 220.0})
-
     def recall_last_pattern(self, time, step):
-        """Only setup the last pattern."""
-        self.setup_pattern_for_recall(self.pattern_count - 1)
+        """
+        Only setup the last pattern.
+
+        An extra helper method, since we'll be doing this most.
+        """
+        self.recall_pattern(time, step, self.pattern_count - 1)
+
+    def recall_pattern(self, time, step, pattern_number):
+        """Recall a pattern."""
+        self.setup_pattern_for_recall(pattern_number - 1)
         self.run_simulation(time, step)
-        self.disable_pattern_recall_setup(self.pattern_count - 1)
 
-    def lesion_network(self):
-        """Lesion the network."""
+    def deaff_last_pattern(self):
+        """
+        Deaff last pattern.
+
+        An extra helper method, since we'll be doing this most.
+        """
+        self.deaff_pattern(self.pattern_count - 1)
+
+    def deaff_pattern(self, pattern_number):
+        """Deaff the network."""
         pattern_neurons = self.patterns[pattern_number - 1]
-        lesioned_neurons = random.sample(
+        deaffed_neurons = random.sample(
             pattern_neurons,
-            self.populations['L'])
-        print("ANKUR>> Number of lesion neurons: "
-              "{}".format(len(lesion_neurons)))
-        nest.SetStatus(lesion_neurons, {'I_e': 0.})
+            self.populations['D'])
+        print("ANKUR>> Number of deaff neurons: "
+              "{}".format(len(deaffed_neurons)))
+        nest.SetStatus(deaffed_neurons, {'I_e': 0.})
 
-        lesion_spike_detector = nest.Create(
-            'spike_detector', params=self.spike_detector_paramsL)
-        nest.Connect(lesion_neurons, lesion_spike_detector)
+        deaff_spike_detector = nest.Create(
+            'spike_detector', params=self.spike_detector_paramsD)
+        nest.Connect(deaffed_neurons, deaff_spike_detector)
         # save the detector
-        self.sdL.append(lesion_spike_detector)
+        self.sdL.append(deaff_spike_detector)
 
     def dump_all_IE_weights(self, annotation):
         """Dump all IE weights to a file."""
@@ -424,7 +443,7 @@ if __name__ == "__main__":
         simulation.dump_all_EE_weights("pattern_stabilisation")
 
     # Only recall the last pattern because nest doesn't do snapshots
-    simulation.lesion_network()
-    simulation.stabilise(step)
-    simulation.dump_all_IE_weights("lesion_repair")
+    # simulation.deaff_last_pattern()
+    # simulation.stabilise(step)
+    # simulation.dump_all_IE_weights("deaff_repair")
     simulation.recall_last_pattern(50, step)
