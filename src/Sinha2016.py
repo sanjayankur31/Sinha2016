@@ -372,11 +372,11 @@ class Sinha2016:
 
         An extra helper method, since we'll be doing this most.
         """
-        self.recall_pattern(time, step, self.pattern_count - 1)
+        self.recall_pattern(time, step, self.pattern_count)
 
     def recall_pattern(self, time, step, pattern_number):
         """Recall a pattern."""
-        self.setup_pattern_for_recall(pattern_number - 1)
+        self.setup_pattern_for_recall(pattern_number)
         self.run_simulation(time, step)
 
     def deaff_last_pattern(self):
