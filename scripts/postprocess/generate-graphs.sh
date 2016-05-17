@@ -24,7 +24,7 @@ NI=2000
 NN=7200
 NP=800
 NR=400
-NL=200
+ND=200
 NEXTE=20000
 RECALLTIME=4001000
 SRC_DIR="/home/asinha/Documents/02_Code/00_repos/00_mine/Sinha2016"
@@ -54,9 +54,9 @@ echo "Processing recall spikes"
 python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-recall.gdf firing-rate-recall.gdf $NR
 touch firing-rate-recall.gdf
 
-echo "Processing lesioned spikes"
-python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-lesioned.gdf firing-rate-lesioned.gdf $NL
-touch firing-rate-lesioned.gdf
+echo "Processing deaffed spikes"
+python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-deaffed.gdf firing-rate-deaffed.gdf $ND
+touch firing-rate-deaffed.gdf
 
 echo "Processing ExtE spikes"
 python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-ExtE.gdf firing-rate-ExtE.gdf $NEXTE

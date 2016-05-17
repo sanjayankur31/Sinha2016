@@ -33,9 +33,9 @@ sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*pattern*.gdf > spikes-patter
 mv spikes-pattern.gdf consolidated_files
 
 
-echo "Combining lesion files"
-sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*lesioned*.gdf > spikes-lesioned.gdf
-mv spikes-lesioned.gdf consolidated_files
+echo "Combining deaff files"
+sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*deaffed*.gdf > spikes-deaffed.gdf
+mv spikes-deaffed.gdf consolidated_files
 
 echo "Combining background files"
 sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*background*.gdf > spikes-background.gdf
