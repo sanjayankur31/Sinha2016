@@ -326,7 +326,8 @@ class Sinha2016:
 
         }
 
-        stim_neurons = nest.Create('poisson_generator', 1,
+        stim_neurons = nest.Create('poisson_generator',
+                                   self.populations['EXT'],
                                    neuronDictExtE)
         sd = nest.Create('spike_detector',
                          params=spike_detector_paramsExtE)
