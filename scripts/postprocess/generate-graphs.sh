@@ -25,7 +25,7 @@ NN=7200
 NP=800
 NR=400
 ND=200
-NEXTE=20000
+NEXTE=1000
 RECALLTIME=4001000
 SRC_DIR="/home/asinha/Documents/02_Code/00_repos/00_mine/Sinha2016"
 echo "Generating graphs"
