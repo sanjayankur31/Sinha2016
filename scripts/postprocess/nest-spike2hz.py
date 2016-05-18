@@ -53,7 +53,10 @@ class spike2hz:
         self.input_filename = input_filename
         self.output_filename = output_filename
 
-        if os.path.exists(self.input_filename):
+        if (
+            os.path.exists(self.input_filename) and
+            os.stat(self.input_filename).st_size > 0
+        ):
             spikesDF = pandas.read_csv(self.input_filename, sep='\s+',
                                        dtype=float, lineterminator="\n",
                                        skipinitialspace=True, header=None,
