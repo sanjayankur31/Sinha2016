@@ -25,7 +25,7 @@ NN=7200
 NP=800
 NR=400
 ND=200
-NEXTE=1000
+NSTIM=1000
 RECALLTIME=4001000
 SRC_DIR="/home/asinha/Documents/02_Code/00_repos/00_mine/Sinha2016"
 echo "Generating graphs"
@@ -58,9 +58,9 @@ echo "Processing deaffed spikes"
 python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-deaffed.gdf firing-rate-deaffed.gdf $ND
 touch firing-rate-deaffed.gdf
 
-echo "Processing ExtE spikes"
-python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-ExtE.gdf firing-rate-ExtE.gdf $NEXTE
-touch firing-rate-ExtE.gdf
+echo "Processing Stim spikes"
+python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-Stim.gdf firing-rate-Stim.gdf $NSTIM
+touch firing-rate-Stim.gdf
 
 echo "Plotting firing rate graphs"
 gnuplot $SRC_DIR/scripts/postprocess/plot-firing-rates.plt

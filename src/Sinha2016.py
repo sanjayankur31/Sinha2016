@@ -48,12 +48,12 @@ class Sinha2016:
         self.recall_time = 1000.  # ms
         # populations
         self.populations = {'E': 8000, 'I': 2000, 'P': 800, 'R': 400,
-                            'D': 200, 'EXT': 1000}
+                            'D': 200, 'STIM': 1000}
         # Number of patterns we store
         self.numpats = 1
         # Global sparsity
         self.sparsity = 0.02
-        self.sparsityExtE = 0.05
+        self.sparsityStim = 0.05
         # Calculate connectivity - must be an integer
         self.connectionNumberEE = int((self.populations['E']**2) *
                                       self.sparsity)
@@ -62,9 +62,9 @@ class Sinha2016:
         self.connectionNumberIE = int((self.populations['I'] *
                                        self.populations['E']) * self.sparsity)
         self.connectionNumberEI = self.connectionNumberIE
-        self.connectionNumberExtE = int((self.populations['EXT'] *
+        self.connectionNumberStim = int((self.populations['STIM'] *
                                          self.populations['R'])
-                                        * self.sparsityExtE)
+                                        * self.sparsityStim)
 
         # connection dictionaries
         self.connDictEE = {"rule": "fixed_total_number",
@@ -75,8 +75,8 @@ class Sinha2016:
                            "N": self.connectionNumberII}
         self.connDictIE = {"rule": "fixed_total_number",
                            "N": self.connectionNumberIE}
-        self.connDictExtE = {"rule": "fixed_total_number",
-                             "N": self.connectionNumberExtE}
+        self.connDictStim = {"rule": "fixed_total_number",
+                             "N": self.connectionNumberStim}
 
         # Documentation says things are normalised in the iaf neuron so that
         # weight of 1 translates to 1nS
@@ -116,13 +116,13 @@ class Sinha2016:
                                            str(self.rank) + ".txt")
 
         self.patterns = []
-        self.neuronsExtE = []
+        self.neuronsStim = []
         self.recalls = []
         self.sdP = []
         self.sdR = []
         self.sdL = []
         self.sdB = []
-        self.sdExtE = []
+        self.sdStim = []
         self.pattern_spike_count_file_names = []
         self.pattern_spike_count_files = []
         self.pattern_count = 0
@@ -316,24 +316,24 @@ class Sinha2016:
         """
         # set up external stimulus
         stim_time = nest.GetKernelStatus()['time']
-        neuronDictExtE = {'rate': 100.,
+        neuronDictStim = {'rate': 100.,
                           'origin': stim_time,
                           'start': 0., 'stop': self.recall_time}
-        spike_detector_paramsExtE = {
+        spike_detector_paramsStim = {
             'to_file': True,
-            'label': ('spikes-' + str(self.rank) + '-ExtE-' +
+            'label': ('spikes-' + str(self.rank) + '-Stim-' +
                       str(pattern_number))
 
         }
 
         stim_neurons = nest.Create('poisson_generator',
-                                   self.populations['EXT'],
-                                   neuronDictExtE)
+                                   self.populations['STIM'],
+                                   neuronDictStim)
         sd = nest.Create('spike_detector',
-                         params=spike_detector_paramsExtE)
+                         params=spike_detector_paramsStim)
         nest.Connect(stim_neurons, sd)
-        self.sdExtE.append(sd)
-        self.neuronsExtE.append(stim_neurons)
+        self.sdStim.append(sd)
+        self.neuronsStim.append(stim_neurons)
 
         pattern_neurons = self.patterns[pattern_number - 1]
         recall_neurons = random.sample(
@@ -343,7 +343,7 @@ class Sinha2016:
               "{}".format(len(recall_neurons)))
 
         nest.Connect(stim_neurons, recall_neurons,
-                     conn_spec=self.connDictExtE)
+                     conn_spec=self.connDictStim)
 
         self.recalls.append(recall_neurons)
 
