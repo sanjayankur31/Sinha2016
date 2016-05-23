@@ -316,7 +316,7 @@ class Sinha2016:
         """
         # set up external stimulus
         stim_time = nest.GetKernelStatus()['time']
-        neuronDictStim = {'rate': 100.,
+        neuronDictStim = {'rate': 200.,
                           'origin': stim_time,
                           'start': 0., 'stop': self.recall_time}
         spike_detector_paramsStim = {
