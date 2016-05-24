@@ -26,7 +26,7 @@ NP=800
 NR=400
 ND=200
 NSTIM=1000
-RECALLTIME=4001000
+RECALLTIME=4000000
 SRC_DIR="/home/asinha/Documents/02_Code/00_repos/00_mine/Sinha2016"
 echo "Generating graphs"
 pushd consolidated_files
