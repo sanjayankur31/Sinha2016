@@ -74,6 +74,9 @@ popd
 
 dirname=${PWD##*/}
 
+rename "firing" "$dirname""-firing" *.png
+rename "hist" "$dirname""-hist" *.png
+
 mkdir $SRC_DIR/tests/$dirname
 cp consolidated_files/*.png $SRC_DIR/tests/$dirname/
 cp consolidated_files/recall-snr.gdf $SRC_DIR/tests/$dirname/
