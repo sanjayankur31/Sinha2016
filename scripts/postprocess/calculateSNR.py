@@ -182,7 +182,7 @@ class calculateSNR:
                  "num_neurons_pattern" +
                  "num_neurons_background recall_time"
                  )
-        print(usage, file=stderr)
+        print(usage, file=sys.stderr)
 
 if __name__ == "__main__":
     converter = calculateSNR()
