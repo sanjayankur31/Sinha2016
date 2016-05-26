@@ -135,6 +135,45 @@ class Sinha2016:
         # structural plasticity bits
         self.sp_update_interval = 1000
 
+        # Growth curves
+        # eta is the minimum calcium concentration
+        # epsilon is the target mean calcium concentration
+        # Excitatory synaptic elements of excitatory neurons
+        self.growth_curve_EE = {
+            'growth_curve': "gaussian",
+            'growth_rate': 0.0001,  # (elements/ms)
+            'continuous': False,
+            'eta': 0.0,
+            'eps': 0.05,
+        }
+
+        # Inhibitory synaptic elements of excitatory neurons
+        self.growth_curve_EI = {
+            'growth_curve': "gaussian",
+            'growth_rate': 0.0001,  # (elements/ms)
+            'continuous': False,
+            'eta': 0.0,
+            'eps': self.growth_curve_EE['eps'],
+        }
+
+        # Excitatory synaptic elements of inhibitory neurons
+        self.growth_curve_IE = {
+            'growth_curve': "gaussian",
+            'growth_rate': 0.0004,  # (elements/ms)
+            'continuous': False,
+            'eta': 0.0,
+            'eps': 0.2,
+        }
+
+        # Inhibitory synaptic elements of inhibitory neurons
+        self.growth_curve_II = {
+            'growth_curve': "gaussian",
+            'growth_rate': 0.0001,  # (elements/ms)
+            'continuous': False,
+            'eta': 0.0,
+            'eps': self.growth_curve_IE['eps']
+        }
+
     def setup_simulation(self):
         """Set up simulation."""
         # Nest stuff
