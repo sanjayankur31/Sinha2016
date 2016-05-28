@@ -517,8 +517,8 @@ class Sinha2016:
 
     def dump_ca_concentration(self):
         """Dump calcium concentration."""
-        ca_e = numpy.mean(nest.GetStatus(self.nodes_e, 'Ca'))
-        ca_i = numpy.mean(nest.GetStatus(self.nodes_i, 'Ca'))
+        ca_e = numpy.mean(nest.GetStatus(self.neuronsE, 'Ca'))
+        ca_i = numpy.mean(nest.GetStatus(self.neuronsI, 'Ca'))
         print("{}\t{}".format(ca_e, ca_i))
 
 if __name__ == "__main__":
