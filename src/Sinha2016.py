@@ -50,7 +50,7 @@ class Sinha2016:
         self.populations = {'E': 8000, 'I': 2000, 'P': 800, 'R': 400,
                             'D': 200, 'STIM': 1000}
         # Number of patterns we store
-        self.numpats = 1
+        self.numpats = 0
         # Global sparsity
         self.sparsity = 0.02
         self.sparsityStim = 0.05
@@ -88,7 +88,7 @@ class Sinha2016:
                           'tau': 20.}
 
         # see the aif source for symbol definitions
-        self.neuronDict = {'I_e': 250.0, 'V_m': -60.,
+        self.neuronDict = {'I_e': 100.0, 'V_m': -60.,
                            't_ref': 5.0, 'V_reset': -60.,
                            'V_th': -50., 'C_m': 200.,
                            'E_L': -60., 'g_L': 10.,
@@ -199,17 +199,10 @@ class Sinha2016:
                 'local_num_threads': 1
             }
         )
-        # Set up TIF neurons
-        # Setting up two models because then it makes it easier for me to get
-        # them when I need to set up patterns
-        nest.CopyModel("iaf_cond_exp", "tif_neuronE")
-        nest.SetDefaults("tif_neuronE", self.neuronDict)
-        nest.CopyModel("iaf_cond_exp", "tif_neuronI")
-        nest.SetDefaults("tif_neuronI", self.neuronDict)
-
-        self.neuronsE = nest.Create('tif_neuronE', self.populations['E'])
-        self.neuronsI = nest.Create('tif_neuronI', self.populations['I'])
-
+        # Update the SP interval
+        nest.SetStructuralPlasticityStatus({
+            'structural_plasticity_update_interval': self.sp_update_interval,
+        })
         # set up synapses
         nest.CopyModel("vogels_sprekeler_synapse", "inhibitory_plastic",
                        self.synDictIE)
@@ -218,14 +211,61 @@ class Sinha2016:
         nest.CopyModel("static_synapse", "excitatory_static",
                        self.synDictE)
 
-        nest.Connect(self.neuronsE, self.neuronsE, conn_spec=self.connDictEE,
-                     syn_spec="excitatory_static")
-        nest.Connect(self.neuronsE, self.neuronsI, conn_spec=self.connDictEI,
-                     syn_spec="excitatory_static")
-        nest.Connect(self.neuronsI, self.neuronsI, conn_spec=self.connDictII,
-                     syn_spec="inhibitory_static")
-        nest.Connect(self.neuronsI, self.neuronsE, conn_spec=self.connDictIE,
-                     syn_spec="inhibitory_plastic")
+        # Set up structural plasticity
+        nest.SetStructuralPlasticityStatus({
+            'structural_plasticity_synapses': {
+                'synapse_EE': {
+                    'model': 'excitatory_static',
+                    'pre_synaptic_element': 'Axon_ex',
+                    'post_synaptic_element': 'Den_ex',
+                },
+                'synapse_EI': {
+                    'model': 'excitatory_static',
+                    'pre_synaptic_element': 'Axon_ex',
+                    'post_synaptic_element': 'Den_ex',
+                },
+                'synapse_II': {
+                    'model': 'inhibitory_static',
+                    'pre_synaptic_element': 'Axon_in',
+                    'post_synaptic_element': 'Den_in',
+                },
+                'synapse_IE': {
+                    'model': 'inhibitory_plastic',
+                    'pre_synaptic_element': 'Axon_in',
+                    'post_synaptic_element': 'Den_in',
+                },
+            }
+        })
+
+        self.synaptic_elements_E = {
+            'Den_ex': self.growth_curve_EE,
+            'Den_in': self.growth_curve_IE,
+            'Axon_ex': self.growth_curve_EE
+        }
+
+        self.synaptic_elements_I = {
+            'Den_ex': self.growth_curve_IE,
+            'Den_in': self.growth_curve_II,
+            'Axon_inh': self.growth_curve_II
+        }
+
+        # Set up TIF neurons
+        # Setting up two models because then it makes it easier for me to get
+        # them when I need to set up patterns
+        nest.CopyModel("iaf_cond_exp", "tif_neuronE")
+        nest.SetDefaults("tif_neuronE", self.neuronDict)
+        nest.CopyModel("iaf_cond_exp", "tif_neuronI")
+        nest.SetDefaults("tif_neuronI", self.neuronDict)
+
+        self.neuronsE = nest.Create('tif_neuronE', self.populations['E'], {
+            'synaptic_elements': self.synaptic_elements_E})
+        self.neuronsI = nest.Create('tif_neuronI', self.populations['I'], {
+            'synaptic_elements': self.synaptic_elements_I})
+
+        nest.SetStatus(self.neuronsE, 'synaptic_elements',
+                       self.synaptic_elements_E)
+        nest.SetStatus(self.neuronsI, 'synaptic_elements',
+                       self.synaptic_elements_I)
 
         self.sdE = nest.Create('spike_detector',
                                params=self.spike_detector_paramsE)
@@ -502,4 +542,5 @@ if __name__ == "__main__":
     # simulation.deaff_last_pattern()
     # simulation.stabilise(step)
     # simulation.dump_all_IE_weights("deaff_repair")
-    simulation.recall_last_pattern(50, step)
+    # simulation.dump_ca_concentration()
+    # simulation.recall_last_pattern(50, step)
