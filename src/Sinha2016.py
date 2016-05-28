@@ -43,7 +43,7 @@ class Sinha2016:
         # http://www.nest-simulator.org/scheduling-and-simulation-flow/
         self.dt = 0.1
         # time to stabilise network after pattern storage etc.
-        self.stabilisation_time = 2000.
+        self.stabilisation_time = 2000.  # seconds
         # time recall stimulus is enabled for
         self.recall_time = 1000.  # ms
         # populations
@@ -133,7 +133,13 @@ class Sinha2016:
         random.seed(42)
 
         # structural plasticity bits
-        self.sp_update_interval = 1000
+        self.sp_update_interval = 100  # ms
+        self.ca_mean_E = []
+        self.ca_mean_I = []
+        self.ca_filename_E = "calcium-E.txt"
+        self.ca_filename_I = "calcium-I.txt"
+        self.ca_E_file_handle = open(self.ca_filename_E, 'w')
+        self.ca_I_file_handle = open(self.ca_filename_I, 'w')
 
         # Growth curves
         # eta is the minimum calcium concentration
@@ -469,6 +475,12 @@ class Sinha2016:
         print(weights, file=file_handle)
         file_handle.close()
 
+    def dump_ca_concentration(self):
+        """Dump calcium concentration."""
+        ca_e = numpy.mean(nest.GetStatus(self.nodes_e, 'Ca'))
+        ca_i = numpy.mean(nest.GetStatus(self.nodes_i, 'Ca'))
+        print("{}\t{}".format(ca_e, ca_i))
+
 if __name__ == "__main__":
     step = False
     simulation = Sinha2016()
@@ -476,6 +488,7 @@ if __name__ == "__main__":
     simulation.stabilise(step)
     simulation.dump_all_IE_weights("initial_stabilisation")
     simulation.dump_all_EE_weights("initial_stabilisation")
+    simulation.dump_ca_concentration()
 
     # store and stabilise patterns
     for i in range(0, simulation.numpats):
@@ -483,6 +496,7 @@ if __name__ == "__main__":
         simulation.stabilise(step)
         simulation.dump_all_IE_weights("pattern_stabilisation")
         simulation.dump_all_EE_weights("pattern_stabilisation")
+        simulation.dump_ca_concentration()
 
     # Only recall the last pattern because nest doesn't do snapshots
     # simulation.deaff_last_pattern()
