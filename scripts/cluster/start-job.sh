@@ -24,10 +24,11 @@ SOURCE_PATH="/home/asinha/Documents/02_Code/00_repos/00_mine/Sinha2016/scripts/c
 RUN_SCRIPT="nest-runsim.sh"
 
 pushd $SOURCE_PATH
-    GIT_SHORT_COMMIT=$(git lg | head -1 | cut -d" " -f2)
-    RUN_NEW="nest-"$GIT_SHORT_COMMIT"".sh"
+    GIT_SHORT_COMMIT=$(git lg | head -1 | cut -d" " -f2 | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g")
+    RUN_NEW="nest-""$GIT_SHORT_COMMIT"".sh"
+    echo "Commit is: $GIT_SHORT_COMMIT. File is $RUN_NEW."
 popd
 
 cp "$SOURCE_PATH""$RUN_SCRIPT" "$RUN_NEW"
-sed -i "$RUN_NEW" "s|#PBS -N nest-v-s|#PBS -N nest-$GIT_SHORT_COMMIT|"
+sed -i "s|nest_v_s|nest_$GIT_SHORT_COMMIT|" "$RUN_NEW"
 qsub "$RUN_NEW"
