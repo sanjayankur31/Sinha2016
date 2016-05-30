@@ -88,7 +88,7 @@ class Sinha2016:
                           'tau': 20.}
 
         # see the aif source for symbol definitions
-        self.neuronDict = {'I_e': 100.0, 'V_m': -60.,
+        self.neuronDict = {'I_e': 250.0, 'V_m': -60.,
                            't_ref': 5.0, 'V_reset': -60.,
                            'V_th': -50., 'C_m': 200.,
                            'E_L': -60., 'g_L': 10.,
@@ -203,6 +203,8 @@ class Sinha2016:
         nest.SetStructuralPlasticityStatus({
             'structural_plasticity_update_interval': self.sp_update_interval,
         })
+        # Enable SP
+        nest.EnableStructuralPlasticity()
         # set up synapses
         nest.CopyModel("vogels_sprekeler_synapse", "inhibitory_plastic",
                        self.synDictIE)
