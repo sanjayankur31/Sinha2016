@@ -22,7 +22,7 @@
 #PBS -l walltime=48:00:00
 #PBS -l nodes=50
 #PBS -m abe
-#PBS -N "nest-v-s"
+#PBS -N nest-v-s
 
 module unload mpi/mpich-x86_64
 module load mvapich2-1.7
@@ -32,7 +32,7 @@ RESULT_PATH="/stri-data/asinha/results/"
 SIM_TIME=$(date +%Y%m%d%H%M)
 
 echo ------------------------------------------------------
-echo -n 'Job is running on node '; cat $PBS_NODEFILE
+echo 'Job is running on node '; cat $PBS_NODEFILE
 echo ------------------------------------------------------
 echo PBS: qsub is running on $PBS_O_HOST
 echo PBS: originating queue is $PBS_O_QUEUE
@@ -47,6 +47,7 @@ echo PBS: PATH = $PBS_O_PATH
 echo ------------------------------------------------------
 
 echo "ANKUR>> Begun at $SIM_TIME"
+echo "ANKUR>> Script: ${0}"
 
 mkdir $RESULT_PATH/$SIM_TIME
 cd $RESULT_PATH/$SIM_TIME
