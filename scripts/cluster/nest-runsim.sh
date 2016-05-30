@@ -22,7 +22,7 @@
 #PBS -l walltime=48:00:00
 #PBS -l nodes=50
 #PBS -m abe
-#PBS -N nest-v-s
+#PBS -N nest_v_s
 
 module unload mpi/mpich-x86_64
 module load mvapich2-1.7
