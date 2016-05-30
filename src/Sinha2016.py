@@ -145,6 +145,7 @@ class Sinha2016:
         """Set up simulation."""
         # Nest stuff
         nest.ResetKernel()
+        nest.EnableStructuralPlasticity()
         # http://www.nest-simulator.org/sli/setverbosity/
         nest.set_verbosity('M_ERROR')
         # unless using the cluster, just use 24 local threads
