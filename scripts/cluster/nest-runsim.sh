@@ -27,12 +27,14 @@
 module unload mpi/mpich-x86_64
 module load mvapich2-1.7
 
-SOURCE_PATH="/home/asinha/Documents/02_Code/00_repos/00_mine/Sinha2016/src/Sinha2016.py"
-RESULT_PATH="/stri-data/asinha/results/"
-SIM_TIME=$(date +%Y%m%d%H%M)
+SIM_PATH="/stri-data/asinha/simulations-nest/"
+SIM_TIME=""
+PROGRAM_PATH="$SIM_PATH""$SIM_TIME""/Sinha2016/src/Sinha2016.py"
+RESULT_PATH="$SIM_PATH""$SIM_TIME""/result/"
+NUM_NODES=50
 
 echo ------------------------------------------------------
-echo 'Job is running on node '; cat $PBS_NODEFILE
+echo 'Job is running on nodes'; cat $PBS_NODEFILE
 echo ------------------------------------------------------
 echo PBS: qsub is running on $PBS_O_HOST
 echo PBS: originating queue is $PBS_O_QUEUE
@@ -49,10 +51,10 @@ echo ------------------------------------------------------
 echo "ANKUR>> Begun at $SIM_TIME"
 echo "ANKUR>> Script: ${0}"
 
-mkdir $RESULT_PATH/$SIM_TIME
-cd $RESULT_PATH/$SIM_TIME
+mkdir -pv $RESULT_PATH
+cd $RESULT_PATH
 
-/usr/local/bin/mpiexec -n 50 python $SOURCE_PATH
+/usr/local/bin/mpiexec -n $NUM_NODES python $PROGRAM_PATH
 
 END_TIME=$(date +%Y%m%d%H%M)
 echo "ANKUR>> Ended at $END_TIME"

@@ -20,15 +20,72 @@
 #
 # Queue's up a new job for me.
 
-SOURCE_PATH="/home/asinha/Documents/02_Code/00_repos/00_mine/Sinha2016/scripts/cluster/"
-RUN_SCRIPT="nest-runsim.sh"
+SOURCE_PATH="/home/asinha/Documents/02_Code/00_repos/00_mine/Sinha2016/"
+GIT_COMMIT=""
+SIM_PATH="/stri-data/asinha/simulations-nest/"
+SIM_TIME=$(date +%Y%m%d%H%M)
+RUN_SCRIPT="scripts/cluster/nest-runsim.sh"
+RUN_NEW=""
+ERROR="no"
+NUM_NODES=50
 
-pushd $SOURCE_PATH
-    GIT_SHORT_COMMIT=$(git lg | head -1 | cut -d" " -f2 | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g")
-    RUN_NEW="nest-""$GIT_SHORT_COMMIT"".sh"
-    echo "Commit is: $GIT_SHORT_COMMIT. File is $RUN_NEW."
-popd
+function queue_task
+{
+    qsub "$RUN_NEW"
+}
 
-cp "$SOURCE_PATH""$RUN_SCRIPT" "$RUN_NEW"
-sed -i "s|nest_v_s|nest_$GIT_SHORT_COMMIT|" "$RUN_NEW"
-qsub "$RUN_NEW"
+function setup_env
+{
+    CUR_SIM_PATH="$SIM_PATH""$SIM_TIME"
+    echo "This simulation will run in: $CUR_SIM_PATH"
+    mkdir -pv "$CUR_SIM_PATH"
+
+    pushd "$CUR_SIM_PATH"
+        echo "Cloning source repository..."
+        git clone "$SOURCE_PATH" "Sinha2016"
+
+        pushd "Sinha2016"
+            echo "Checking out commit $GIT_COMMIT..."
+            git checkout -b this_sim "$GIT_COMMIT"
+            if [ "$?" -ne 0 ]
+            then
+                echo "Error occured. Could not checkout $GIT_COMMIT. Exiting..."
+                ERROR="yes"
+            fi
+        popd
+    popd
+
+    if [ "xyes" ==  x"$ERROR" ] 
+    then
+        exit -1
+    fi
+
+    RUN_NEW="nest_""$GIT_COMMIT"".sh"
+    echo "Setting up $RUN_NEW..."
+    cp "$SOURCE_PATH""$RUN_SCRIPT" "$RUN_NEW" -v
+    sed -i "s|nest_v_s|nest_$GIT_COMMIT|" "$RUN_NEW"
+    sed -i "s|nodes=.*|nodes=$NUM_NODES|" "$RUN_NEW"
+    sed -i "s|NUM_NODES=.*|NUM_NODES=$NUM_NODES|" "$RUN_NEW"
+    sed -i "s|SIM_TIME=.*|SIM_TIME=$SIM_TIME|" "$RUN_NEW"
+}
+
+function usage
+{
+    echo "Usage: $0"
+    echo "Queue up a job to run a particular git commit"
+    echo "$0 <git_commit> <number_nodes>"
+}
+
+if [ "$#" -ne 3 ];
+then
+    echo "Error occurred. Exiting..."
+    usage
+    exit -1
+fi
+
+GIT_COMMIT="$1"
+NUM_NODES="$2"
+setup_env
+queue_task
+
+exit 0
