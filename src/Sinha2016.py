@@ -147,7 +147,7 @@ class Sinha2016:
         nest.ResetKernel()
         nest.EnableStructuralPlasticity()
         # http://www.nest-simulator.org/sli/setverbosity/
-        nest.set_verbosity('M_ERROR')
+        nest.set_verbosity('M_INFO')
         # unless using the cluster, just use 24 local threads
         # still gives out different spike files because they're different
         # virtual processes
