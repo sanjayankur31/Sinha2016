@@ -47,10 +47,10 @@ class Sinha2016:
         # time recall stimulus is enabled for
         self.recall_time = 1000.  # ms
         # populations
-        self.populations = {'E': 8000, 'I': 2000, 'P': 800, 'R': 400,
+        self.populations = {'E': 16000, 'I': 4000, 'P': 800, 'R': 400,
                             'D': 200, 'STIM': 1000}
         # Number of patterns we store
-        self.numpats = 1
+        self.numpats = 0
         # Global sparsity
         self.sparsity = 0.02
         self.sparsityStim = 0.05
@@ -464,4 +464,4 @@ if __name__ == "__main__":
     # simulation.deaff_last_pattern()
     # simulation.stabilise(step)
     # simulation.dump_all_IE_weights("deaff_repair")
-    simulation.recall_last_pattern(50, step)
+    # simulation.recall_last_pattern(50, step)
