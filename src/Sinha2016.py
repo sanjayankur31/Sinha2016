@@ -43,7 +43,7 @@ class Sinha2016:
         # http://www.nest-simulator.org/scheduling-and-simulation-flow/
         self.dt = 0.1
         # time to stabilise network after pattern storage etc.
-        self.stabilisation_time = 2000.  # seconds
+        self.stabilisation_time = 4000.  # seconds
         # time recall stimulus is enabled for
         self.recall_time = 1000.  # ms
         # populations
