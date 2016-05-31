@@ -28,10 +28,13 @@ RUN_SCRIPT="scripts/cluster/nest-runsim.sh"
 RUN_NEW=""
 ERROR="no"
 NUM_NODES=50
+CUR_SIM_PATH=""
 
 function queue_task
 {
-    qsub "$RUN_NEW"
+    pushd "$CUR_SIM_PATH"
+        qsub "$RUN_NEW"
+    popd
 }
 
 function setup_env
@@ -53,20 +56,20 @@ function setup_env
                 ERROR="yes"
             fi
         popd
+
+        if [ "xyes" ==  x"$ERROR" ] 
+        then
+            exit -1
+        fi
+
+        RUN_NEW="nest_""$GIT_COMMIT"".sh"
+        echo "Setting up $RUN_NEW..."
+        cp "$SOURCE_PATH""$RUN_SCRIPT" "$RUN_NEW" -v
+        sed -i "s|nest_v_s|nest_$GIT_COMMIT|" "$RUN_NEW"
+        sed -i "s|nodes=.*|nodes=$NUM_NODES|" "$RUN_NEW"
+        sed -i "s|NUM_NODES=.*|NUM_NODES=$NUM_NODES|" "$RUN_NEW"
+        sed -i "s|SIM_TIME=.*|SIM_TIME=$SIM_TIME|" "$RUN_NEW"
     popd
-
-    if [ "xyes" ==  x"$ERROR" ] 
-    then
-        exit -1
-    fi
-
-    RUN_NEW="nest_""$GIT_COMMIT"".sh"
-    echo "Setting up $RUN_NEW..."
-    cp "$SOURCE_PATH""$RUN_SCRIPT" "$RUN_NEW" -v
-    sed -i "s|nest_v_s|nest_$GIT_COMMIT|" "$RUN_NEW"
-    sed -i "s|nodes=.*|nodes=$NUM_NODES|" "$RUN_NEW"
-    sed -i "s|NUM_NODES=.*|NUM_NODES=$NUM_NODES|" "$RUN_NEW"
-    sed -i "s|SIM_TIME=.*|SIM_TIME=$SIM_TIME|" "$RUN_NEW"
 }
 
 function usage
@@ -76,9 +79,10 @@ function usage
     echo "$0 <git_commit> <number_nodes>"
 }
 
-if [ "$#" -ne 3 ];
+if [ "$#" -ne 2 ];
 then
     echo "Error occurred. Exiting..."
+    echo "Received $# arguments. Expected: 3"
     usage
     exit -1
 fi
