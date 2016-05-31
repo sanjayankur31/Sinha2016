@@ -1,4 +1,6 @@
-ranks = 16
+# load number of ranks
+load 'settings.plt'
+
 set term pngcairo font "OpenSans, 28" size 1920,1028
 set xlabel "Time in seconds"
 set ylabel "Mean Synaptic weight (nS)"

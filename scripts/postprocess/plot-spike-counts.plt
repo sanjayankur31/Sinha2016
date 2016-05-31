@@ -1,4 +1,5 @@
-ranks = 16
+load 'settings.plt'
+
 set term pngcairo font "OpenSans, 28" size 1920,1028
 set xlabel "Time (seconds)"
 set ylabel "Mean firing rate of neurons per rank (Hz)"
