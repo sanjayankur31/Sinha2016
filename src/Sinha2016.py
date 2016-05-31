@@ -134,12 +134,9 @@ class Sinha2016:
 
         # structural plasticity bits
         self.sp_update_interval = 100  # ms
-        self.ca_mean_E = []
-        self.ca_mean_I = []
-        self.ca_filename_E = "calcium-E.txt"
-        self.ca_filename_I = "calcium-I.txt"
-        self.ca_E_file_handle = open(self.ca_filename_E, 'w')
-        self.ca_I_file_handle = open(self.ca_filename_I, 'w')
+        self.ca_filename = ("calcium-" +
+                            str(self.rank) + ".txt")
+        self.ca_file_handle = open(self.ca_filename, 'w')
 
     def setup_simulation(self):
         """Set up simulation."""
@@ -439,14 +436,21 @@ class Sinha2016:
 
     def dump_ca_concentration(self):
         """Dump calcium concentration."""
-        ca_e = numpy.mean(nest.GetStatus(self.neuronsE, 'Ca'))
-        ca_i = numpy.mean(nest.GetStatus(self.neuronsI, 'Ca'))
-        print("{}\t{}".format(ca_e, ca_i))
+        loc_e = [stat['global_id'] for stat in nest.GetStatus(self.neuronsE)
+                 if stat['local']]
+        loc_i = [stat['global_id'] for stat in nest.GetStatus(self.neuronsI)
+                 if stat['local']]
+        ca_e = numpy.mean(nest.GetStatus(loc_e, 'Ca'))
+        ca_i = numpy.mean(nest.GetStatus(loc_i, 'Ca'))
+        print("{}\t{}".format(ca_e, ca_i), file=self.ca_file_handle)
 
 if __name__ == "__main__":
     step = False
     simulation = Sinha2016()
     simulation.setup_simulation()
+    simulation.dump_all_IE_weights("initial_stabilisation")
+    simulation.dump_all_EE_weights("initial_stabilisation")
+    simulation.dump_ca_concentration()
     simulation.stabilise(step)
     simulation.dump_all_IE_weights("initial_stabilisation")
     simulation.dump_all_EE_weights("initial_stabilisation")
