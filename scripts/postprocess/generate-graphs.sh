@@ -74,9 +74,12 @@ popd
 
 dirname=${PWD##*/}
 
-rename "firing" "$dirname""-firing" *.png
-rename "hist" "$dirname""-hist" *.png
+echo "Renaming files."
+rename "firing" "$dirname""-firing" consolidated_files/*.png
+rename "hist" "$dirname""-hist" consolidated_files/*.png
 
+
+echo "Moving files to test dir in repository."
 mkdir $SRC_DIR/tests/$dirname
 cp consolidated_files/*.png $SRC_DIR/tests/$dirname/
 cp consolidated_files/recall-snr.gdf $SRC_DIR/tests/$dirname/
