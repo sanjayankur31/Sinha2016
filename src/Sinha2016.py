@@ -44,6 +44,7 @@ class Sinha2016:
         self.dt = 0.1
         # time to stabilise network after pattern storage etc.
         self.stabilisation_time = 2000.  # seconds
+        self.sp_recording_interval = 1000.  # seconds
         # time recall stimulus is enabled for
         self.recall_time = 1000.  # ms
         # populations
@@ -280,7 +281,10 @@ class Sinha2016:
 
     def stabilise(self, step=False):
         """Stabilise network."""
-        self.run_simulation(self.stabilisation_time, step)
+        sim_steps = numpy.arange(0, self.stabilisation_time,
+                                 self.sp_recording_interval)
+        for i, j in enumerate(sim_steps):
+            self.run_simulation(self.sp_recording_interval, step)
 
     def run_simulation(self, simtime=2000, step=False):
         """Run the simulation."""
