@@ -138,6 +138,10 @@ class Sinha2016:
                             str(self.rank) + ".txt")
         self.ca_file_handle = open(self.ca_filename, 'w')
 
+        self.syn_filename = ("synaptic-" +
+                             str(self.rank) + ".txt")
+        self.syn_file_handle = open(self.syn_filename, 'w')
+
         # Growth curves
         # eta is the minimum calcium concentration
         # epsilon is the target mean calcium concentration
@@ -524,6 +528,57 @@ class Sinha2016:
         ca_i = numpy.mean(nest.GetStatus(loc_i, 'Ca'))
         print("{}\t{}".format(ca_e, ca_i), file=self.ca_file_handle)
 
+    def dump_synaptic_elements(self):
+        """Dump number of synaptic elements."""
+        loc_e = [stat['global_id'] for stat in nest.GetStatus(self.neuronsE)
+                 if stat['local']]
+        loc_i = [stat['global_id'] for stat in nest.GetStatus(self.neuronsI)
+                 if stat['local']]
+        syn_elems_e = nest.GetStatus(loc_e, 'synaptic_elements')
+        syn_elems_i = nest.GetStatus(loc_i, 'synaptic_elements')
+
+        # Only need presynaptic elements to find number of synapses
+        # Excitatory neuron set
+        axons_ex_total = sum(neuron['Axon_ex']['z'] for neuron in
+                             syn_elems_e)
+        axons_ex_connected = sum(neuron['Axon_ex']['z_connected'] for neuron in
+                                 syn_elems_e)
+        dendrites_ex_ex_total = sum(neuron['Den_ex']['z'] for neuron in
+                                    syn_elems_e)
+        dendrites_ex_ex_connected = sum(neuron['Den_ex']['z_connected'] for
+                                        neuron in syn_elems_e)
+        dendrites_ex_in_total = sum(neuron['Den_in']['z'] for neuron in
+                                    syn_elems_e)
+        dendrites_ex_in_connected = sum(neuron['Den_in']['z_connected'] for
+                                        neuron in syn_elems_e)
+
+        # Inhibitory neuron set
+        axons_in_total = sum(neuron['Axon_in']['z'] for neuron in
+                             syn_elems_i)
+        axons_in_connected = sum(neuron['Axon_in']['z_connected'] for neuron in
+                                 syn_elems_i)
+        dendrites_in_ex_total = sum(neuron['Den_ex']['z'] for neuron in
+                                    syn_elems_i)
+        dendrites_in_ex_connected = sum(neuron['Den_ex']['z_connected'] for
+                                        neuron in syn_elems_i)
+        dendrites_in_in_total = sum(neuron['Den_in']['z'] for neuron in
+                                    syn_elems_i)
+        dendrites_in_in_connected = sum(neuron['Den_in']['z_connected'] for
+                                        neuron in syn_elems_i)
+
+        print(
+            "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}".format
+            (
+                axons_ex_total, axons_ex_connected,
+                dendrites_ex_ex_total, dendrites_ex_ex_connected,
+                dendrites_ex_in_total, dendrites_ex_in_connected,
+                axons_in_total, axons_in_connected,
+                dendrites_in_ex_total, dendrites_in_ex_connected,
+                dendrites_in_in_total, dendrites_in_in_connected,
+            ),
+            file=self.syn_file_handle)
+
+
 if __name__ == "__main__":
     step = False
     simulation = Sinha2016()
@@ -535,6 +590,7 @@ if __name__ == "__main__":
     simulation.dump_all_IE_weights("initial_stabilisation")
     simulation.dump_all_EE_weights("initial_stabilisation")
     simulation.dump_ca_concentration()
+    simulation.dump_synaptic_elements()
 
     # store and stabilise patterns
     for i in range(0, simulation.numpats):
@@ -543,10 +599,12 @@ if __name__ == "__main__":
         simulation.dump_all_IE_weights("pattern_stabilisation")
         simulation.dump_all_EE_weights("pattern_stabilisation")
         simulation.dump_ca_concentration()
+        simulation.dump_synaptic_elements()
 
     # Only recall the last pattern because nest doesn't do snapshots
     # simulation.deaff_last_pattern()
     # simulation.stabilise(step)
     # simulation.dump_all_IE_weights("deaff_repair")
     # simulation.dump_ca_concentration()
+    # simulation.dump_synaptic_elements()
     # simulation.recall_last_pattern(50, step)
