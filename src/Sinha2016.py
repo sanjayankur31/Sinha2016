@@ -249,7 +249,7 @@ class Sinha2016:
         self.synaptic_elements_I = {
             'Den_ex': self.growth_curve_IE,
             'Den_in': self.growth_curve_II,
-            'Axon_inh': self.growth_curve_II
+            'Axon_in': self.growth_curve_II
         }
 
         # Set up TIF neurons
