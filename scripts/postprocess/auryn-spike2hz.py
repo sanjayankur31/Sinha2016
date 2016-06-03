@@ -41,6 +41,9 @@ class spike2hz:
         self.input_file_name = ""
         self.output_file_name = ""
 
+        self.usage = ("Usage: \npython3 nest-spike2hz.py " +
+                      "input_file_name output_file_name number_neurons")
+
         # Initial indices
         self.left = 0.
         self.right = 0.
@@ -97,10 +100,9 @@ class spike2hz:
 
         self.output_file.close()
 
-    def usage(self):
+    def print_usage(self):
         """Print usage."""
-        self.usage = ("Usage: \npython3 nest-spike2hz.py" +
-                      "input_file_name output_file_name number_neurons")
+        print(self.usage, file=sys.stderr)
 
 if __name__ == "__main__":
     converter = spike2hz()
@@ -114,4 +116,4 @@ if __name__ == "__main__":
     else:
         print("Incorrect arguments.", file=sys.stderr)
         print(file=sys.stderr)
-        print(converter.usage(), file=sys.stderr)
+        converter.print_usage()
