@@ -51,7 +51,6 @@ echo ------------------------------------------------------
 echo "ANKUR>> Begun at $SIM_TIME"
 echo "ANKUR>> Script: ${0}"
 
-mkdir -pv $RESULT_PATH
 cd $RESULT_PATH
 
 /usr/local/bin/mpiexec -n $NUM_NODES python $PROGRAM_PATH

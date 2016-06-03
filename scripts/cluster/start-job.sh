@@ -69,6 +69,9 @@ function setup_env
         sed -i "s|nodes=.*|nodes=$NUM_NODES|" "$RUN_NEW"
         sed -i "s|NUM_NODES=.*|NUM_NODES=$NUM_NODES|" "$RUN_NEW"
         sed -i "s|SIM_TIME=.*|SIM_TIME=$SIM_TIME|" "$RUN_NEW"
+
+        mkdir -v result
+        touch result/"00-GIT-COMMIT-""$GIT_COMMIT"
     popd
 }
 
