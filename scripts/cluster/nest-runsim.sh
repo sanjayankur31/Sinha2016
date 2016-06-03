@@ -19,13 +19,14 @@
 # File : nest-runsim.sh
 #
 
-#PBS -l walltime=48:00:00
+#PBS -l walltime=30:00:00
 #PBS -l nodes=50
 #PBS -m abe
 #PBS -N nest_v_s
 
-module unload mpi/mpich-x86_64
-module load mvapich2-1.7
+module load mpi/mpich-x86_64
+#module unload mpi/mpich-x86_64
+#module load mvapich2-1.7
 
 SIM_PATH="/stri-data/asinha/simulations-nest/"
 SIM_TIME=""
@@ -54,6 +55,7 @@ echo "ANKUR>> Script: ${0}"
 mkdir -pv $RESULT_PATH
 cd $RESULT_PATH
 
+#MV2_DEBUG_SHOW_BACKTRACE=1 /usr/local/bin/mpiexec -n $NUM_NODES python $PROGRAM_PATH
 /usr/local/bin/mpiexec -n $NUM_NODES python $PROGRAM_PATH
 
 END_TIME=$(date +%Y%m%d%H%M)
