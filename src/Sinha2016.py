@@ -47,7 +47,7 @@ class Sinha2016:
         # time recall stimulus is enabled for
         self.recall_time = 1000.  # ms
         # populations
-        self.populations = {'E': 16000, 'I': 4000, 'P': 800, 'R': 400,
+        self.populations = {'E': 8000, 'I': 2000, 'P': 800, 'R': 400,
                             'D': 200, 'STIM': 1000}
         # Number of patterns we store
         self.numpats = 0
@@ -84,7 +84,7 @@ class Sinha2016:
         self.synDictII = {"weight": -30.}
 
         self.synDictIE = {"weight": 0., "Wmax": -30000.,
-                          'alpha': .32, 'eta': -0.001,
+                          'alpha': .32, 'eta': -0.0001,
                           'tau': 20.}
 
         # see the aif source for symbol definitions
