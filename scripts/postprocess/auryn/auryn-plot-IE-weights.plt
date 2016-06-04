@@ -3,6 +3,6 @@ set xlabel "Time in seconds"
 set ylabel "Mean Synaptic weight (nS)"
 
 set title "IE weight time graph from an Auryn simulation"
-set output "IE-weights.png"
+set output "synaptic-weight-IE.png"
 
 plot "ie.weightinfo" using 1:($2*10) with lines lw 6 title ""
