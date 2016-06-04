@@ -2,9 +2,9 @@
 """
 Combine weightsuminfo files from Auryn and print out the mean weight.
 
-File: auryn-combine-weightsuminfo.py
+File: auryn-GetMeanWeights.py
 
-Copyright 2015 Ankur Sinha
+Copyright 2016 Ankur Sinha
 Author: Ankur Sinha <sanjay DOT ankur AT gmail DOT com>
 
 This program is free software: you can redistribute it and/or modify
@@ -40,30 +40,44 @@ class getMeanWeights:
         """Main init method."""
         self.output_file_name = ""
 
-        self.usage = ("Usage: \npython3 auryn-get-mean-weight.py " +
-                      "output_file_name number_synapses")
+        self.usage = (
+            "Usage: \npython3 auryn-get-mean-weight.py " +
+            "output_file_name number_synapses\n" +
+            "Default number of synapses: 8000 * 2000 * 0.02"
+        )
 
         # Initial indices
         self.num_synapses = 0.
+        self.conductance = 10
 
     def run(self, output_file, num_synapses=(8000. * 2000. * 0.02)):
         """Set up the script."""
         self.num_synapses = float(num_synapses)
         self.input_files = glob.glob("*_ie_stdp.weightinfo")
+        self.output_file_name = output_file
+
         weightsDF = pandas.DataFrame()
+        timingsDF = pandas.DataFrame()
+
+        timingsDF = pandas.read_csv(self.input_files[0], sep=" ", header=None,
+                                    usecols=[0], dtype=float)
 
         for f in self.input_files:
             df1 = pandas.read_csv(f, sep=" ", header=None, usecols=[1],
                                   dtype=float)
             weightsDF = pandas.concat([weightsDF, df1], axis=1)
 
-        print(weightsDF)
         sumDF = weightsDF.sum(axis=1)
         print(sumDF)
 
-        print(sumDF.divide(self.num_synapses))
+        meanDF = sumDF.divide(self.num_synapses)
+        print(meanDF)
 
-        # self.output_file = open(self.output_file_name, 'w')
+        combinedDF = pandas.concat([timingsDF, meanDF], axis=1)
+        print(combinedDF)
+
+        combinedDF.to_csv(self.output_file_name, sep='\t', header=False,
+                          index=False)
 
     def print_usage(self):
         """Print usage."""
@@ -72,7 +86,9 @@ class getMeanWeights:
 
 if __name__ == "__main__":
     converter = getMeanWeights()
-    if len(sys.argv) == 3:
+    if len(sys.argv) == 2:
+        converter.run(str(sys.argv[1]))
+    elif len(sys.argv) == 3:
         converter.run(str(sys.argv[1]), int(sys.argv[2]))
     else:
         print("Incorrect arguments.", file=sys.stderr)
