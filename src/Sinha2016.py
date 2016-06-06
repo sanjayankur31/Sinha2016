@@ -202,7 +202,6 @@ class Sinha2016:
             }
         )
         # Update the SP interval
-        nest.EnableStructuralPlasticity()
         nest.SetStructuralPlasticityStatus({
             'structural_plasticity_update_interval': self.sp_update_interval,
         })
@@ -252,6 +251,15 @@ class Sinha2016:
             'Den_in': self.growth_curve_II,
             'Axon_in': self.growth_curve_II
         }
+
+        nest.Connect(self.neuronsE, self.neuronsE, conn_spec=self.connDictEE,
+                     syn_spec="excitatory_static")
+        nest.Connect(self.neuronsE, self.neuronsI, conn_spec=self.connDictEI,
+                     syn_spec="excitatory_static")
+        nest.Connect(self.neuronsI, self.neuronsI, conn_spec=self.connDictII,
+                     syn_spec="inhibitory_static")
+        nest.Connect(self.neuronsI, self.neuronsE, conn_spec=self.connDictIE,
+                     syn_spec="inhibitory_plastic")
 
         # Set up TIF neurons
         # Setting up two models because then it makes it easier for me to get
@@ -587,12 +595,22 @@ if __name__ == "__main__":
     step = False
     simulation = Sinha2016()
     simulation.setup_simulation()
-    simulation.dump_all_IE_weights("initial_stabilisation")
-    simulation.dump_all_EE_weights("initial_stabilisation")
+
+    simulation.dump_all_IE_weights("initial")
+    simulation.dump_all_EE_weights("initial")
     simulation.dump_ca_concentration()
+    simulation.dump_synaptic_elements()
+
     simulation.stabilise(step)
-    simulation.dump_all_IE_weights("initial_stabilisation")
-    simulation.dump_all_EE_weights("initial_stabilisation")
+    simulation.dump_all_IE_weights("initial_stabilisation_sp")
+    simulation.dump_all_EE_weights("initial_stabilisation_sp")
+    simulation.dump_ca_concentration()
+    simulation.dump_synaptic_elements()
+
+    nest.EnableStructuralPlasticity()
+    simulation.stabilise(step)
+    simulation.dump_all_IE_weights("initial_stabilisation_msp")
+    simulation.dump_all_EE_weights("initial_stabilisation_msp")
     simulation.dump_ca_concentration()
     simulation.dump_synaptic_elements()
 
