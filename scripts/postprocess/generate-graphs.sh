@@ -70,6 +70,9 @@ python3 $SRC_DIR/scripts/postprocess/calculateSNR.py spikes-pattern.gdf spikes-b
 echo "Plotting histograms"
 gnuplot $SRC_DIR/scripts/postprocess/plot-histograms.plt
 
+echo "Plotting EvsI graph"
+gnuplot $SRC_DIR/scripts/postprocess/plot-EvsI.plt
+
 popd
 
 dirname=${PWD##*/}
