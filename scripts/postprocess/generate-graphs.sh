@@ -80,6 +80,7 @@ dirname=${PWD##*/}
 echo "Renaming files."
 rename "firing" "$dirname""-firing" consolidated_files/*.png
 rename "hist" "$dirname""-hist" consolidated_files/*.png
+rename "EvsI" "$dirname""-EvsI" consolidated_files/*.png
 
 
 echo "Moving files to test dir in repository."
