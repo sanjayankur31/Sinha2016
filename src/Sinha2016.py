@@ -251,16 +251,6 @@ class Sinha2016:
             'Den_in': self.growth_curve_II,
             'Axon_in': self.growth_curve_II
         }
-
-        nest.Connect(self.neuronsE, self.neuronsE, conn_spec=self.connDictEE,
-                     syn_spec="excitatory_static")
-        nest.Connect(self.neuronsE, self.neuronsI, conn_spec=self.connDictEI,
-                     syn_spec="excitatory_static")
-        nest.Connect(self.neuronsI, self.neuronsI, conn_spec=self.connDictII,
-                     syn_spec="inhibitory_static")
-        nest.Connect(self.neuronsI, self.neuronsE, conn_spec=self.connDictIE,
-                     syn_spec="inhibitory_plastic")
-
         # Set up TIF neurons
         # Setting up two models because then it makes it easier for me to get
         # them when I need to set up patterns
@@ -286,6 +276,15 @@ class Sinha2016:
 
         nest.Connect(self.neuronsE, self.sdE)
         nest.Connect(self.neuronsI, self.sdI)
+
+        nest.Connect(self.neuronsE, self.neuronsE, conn_spec=self.connDictEE,
+                     syn_spec="excitatory_static")
+        nest.Connect(self.neuronsE, self.neuronsI, conn_spec=self.connDictEI,
+                     syn_spec="excitatory_static")
+        nest.Connect(self.neuronsI, self.neuronsI, conn_spec=self.connDictII,
+                     syn_spec="inhibitory_static")
+        nest.Connect(self.neuronsI, self.neuronsE, conn_spec=self.connDictIE,
+                     syn_spec="inhibitory_plastic")
 
     def stabilise(self, step=False):
         """Stabilise network."""
