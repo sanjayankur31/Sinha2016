@@ -66,7 +66,7 @@ echo "Plotting firing rate graphs"
 gnuplot $SRC_DIR/scripts/postprocess/plot-firing-rates.plt
 
 echo "Processing SNR information"
-python3 $SRC_DIR/scripts/postprocess/calculateSNR.py spikes-pattern.gdf spikes-background.gdf $NP $NN $RECALLTIME
+python3 $SRC_DIR/scripts/postprocess/calculateSnapshotStats.py spikes-pattern.gdf spikes-background.gdf $NP $NN $RECALLTIME
 echo "Plotting histograms"
 gnuplot $SRC_DIR/scripts/postprocess/plot-histograms.plt
 

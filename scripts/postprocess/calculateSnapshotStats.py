@@ -2,7 +2,7 @@
 """
 Calculate SNR from spike files.
 
-File: scripts/postprocess/calculateSNR.py
+File: scripts/postprocess/calculateSnapshotStats.py
 
 Copyright 2016 Ankur Sinha
 Author: Ankur Sinha <sanjay DOT ankur AT gmail DOT com>
@@ -28,7 +28,7 @@ import math
 import collections
 
 
-class calculateSNR:
+class calculateSnapshotStats:
 
     """
     Calculate SNR from spike files.
@@ -177,7 +177,7 @@ class calculateSNR:
 
     def usage(self):
         """Print usage."""
-        usage = ("Usage: \npython3 calculateSNR.py" +
+        usage = ("Usage: \npython3 calculateSnapshotStats.py" +
                  "pattern_spikes_filename background_spikes_filename" +
                  "num_neurons_pattern" +
                  "num_neurons_background recall_time"
@@ -185,7 +185,7 @@ class calculateSNR:
         print(usage, file=sys.stderr)
 
 if __name__ == "__main__":
-    converter = calculateSNR()
+    converter = calculateSnapshotStats()
     if len(sys.argv) == 6:
         valid = converter.setup(str(sys.argv[1]), str(sys.argv[2]),
                                 int(sys.argv[3]), int(sys.argv[4]),
