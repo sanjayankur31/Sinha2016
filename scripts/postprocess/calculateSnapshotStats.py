@@ -33,56 +33,58 @@ class calculateSnapshotStats:
     """
     Calculate SNR from spike files.
 
-    This takes the pattern and background spike files, extracts the required
+    This takes the data1 and data2 spike files, extracts the required
     spikes, does the maths, and prints the SNR into a file.
     """
 
     def __init__(self):
         """Initialise variables."""
-        self.pattern_spikes_filename = ""
-        self.background_spikes_filename = ""
-        self.recall_time = 0.
+        self.data1_spikes_filename = ""
+        self.data2_spikes_filename = ""
+        self.time = 0.
 
-        self.num_neurons_pattern = 0
-        self.num_neurons_background = 0
+        self.num_neurons_data1 = 0
+        self.num_neurons_data2 = 0
 
-    def setup(self, pattern_spikes_filename, background_spikes_filename,
-              num_neurons_pattern=800.,
-              num_neurons_background=7200., recall_time=0.):
+    def setup(self, data1, data2,
+              num_neurons_data1=800.,
+              num_neurons_data2=7200., time=0.):
         """Setup various things.
 
-        Since we already have different files for pattern and background
+        Since we already have different files for data1 and data2
         spikes, I don't need to load the neuron lists for them and use them to
         come up with a firing rate - NEST already gives me different files for
-        pattern, and different for background.
+        data1, and different for data2.
         """
-        self.pattern_spikes_filename = pattern_spikes_filename
-        self.background_spikes_filename = background_spikes_filename
+        self.data1_spikes_filename = "spikes-{}.gdf".format(data1)
+        self.data2_spikes_filename = "spikes-{}.gdf".format(data2)
+        self.data1 = data1
+        self.data2 = data2
 
-        self.num_neurons_pattern = int(num_neurons_pattern)
-        self.num_neurons_background = int(num_neurons_background)
-        self.recall_time = float(recall_time)
+        self.num_neurons_data1 = int(num_neurons_data1)
+        self.num_neurons_data2 = int(num_neurons_data2)
+        self.time = float(time)
 
         # Get spikes
-        spikesDF_pattern = pandas.read_csv(self.pattern_spikes_filename,
-                                           sep='\s+', dtype=float,
-                                           lineterminator="\n",
-                                           skipinitialspace=True, header=None,
-                                           index_col=None, names=None)
-        self.spikes_pattern = spikesDF_pattern.values
+        spikesDF_data1 = pandas.read_csv(self.data1_spikes_filename,
+                                         sep='\s+', dtype=float,
+                                         lineterminator="\n",
+                                         skipinitialspace=True, header=None,
+                                         index_col=None, names=None)
+        self.spikes_data1 = spikesDF_data1.values
 
-        spikesDF_background = pandas.read_csv(self.background_spikes_filename,
-                                              sep='\s+', dtype=float,
-                                              lineterminator="\n",
-                                              skipinitialspace=True,
-                                              header=None, index_col=None,
-                                              names=None)
-        self.spikes_background = spikesDF_background.values
+        spikesDF_data2 = pandas.read_csv(self.data2_spikes_filename,
+                                         sep='\s+', dtype=float,
+                                         lineterminator="\n",
+                                         skipinitialspace=True,
+                                         header=None, index_col=None,
+                                         names=None)
+        self.spikes_data2 = spikesDF_data2.values
 
         # If anything isn't OK, we error out
         return (
-            self.__validate_spike_input(self.spikes_pattern) and
-            self.__validate_spike_input(self.spikes_background)
+            self.__validate_spike_input(self.spikes_data1) and
+            self.__validate_spike_input(self.spikes_data2)
         )
 
     def __validate_spike_input(self, spikes):
@@ -100,10 +102,10 @@ class calculateSnapshotStats:
         """Get spikes for this period."""
         times = all_spikes[:, 1]
         start = numpy.searchsorted(times,
-                                   self.recall_time,
+                                   self.time,
                                    side='left')
         end = numpy.searchsorted(times,
-                                 self.recall_time + 1000.,
+                                 self.time + 1000.,
                                  side='right')
         return all_spikes[start:end, 0]
 
@@ -126,67 +128,109 @@ class calculateSnapshotStats:
 
     def calculate_snr(self):
         """Calculate the SNR."""
-        spikes_pattern = self.get_spikes(self.spikes_pattern)
-        # print("Pattern spikes: {}".format(spikes_pattern[0:]))
-        spikes_background = self.get_spikes(self.spikes_background)
-        # print("Background spikes: {}".format(spikes_background[0:]))
+        spikes_data1 = self.get_spikes(self.spikes_data1)
+        # print("Pattern spikes: {}".format(spikes_data1[0:]))
+        spikes_data2 = self.get_spikes(self.spikes_data2)
+        # print("Background spikes: {}".format(spikes_data2[0:]))
 
-        rates_pattern = self.get_firing_rates(spikes_pattern,
-                                              self.num_neurons_pattern)
+        rates_data1 = self.get_firing_rates(spikes_data1,
+                                            self.num_neurons_data1)
         # print to file - for histograms
-        output_file = open("recall-firing-rate-pattern.gdf", 'w')
-        for rate in rates_pattern:
+        output_file = open("firing-rate-{}-{}.gdf".format(self.data1,
+                                                          self.time), 'w')
+        for rate in rates_data1:
             print(rate, file=output_file)
         output_file.close()
 
-        rates_background = self.get_firing_rates(spikes_background,
-                                                 self.num_neurons_background)
+        rates_data2 = self.get_firing_rates(spikes_data2,
+                                            self.num_neurons_data2)
         # print to file - for histograms
-        output_file = open("recall-firing-rate-background.gdf", 'w')
-        for rate in rates_background:
+        output_file = open("firing-rate-{}-{}.gdf".format(self.data2,
+                                                          self.time), 'w')
+        for rate in rates_data2:
             print(rate, file=output_file)
         output_file.close()
 
-        mean_pattern = numpy.mean(rates_pattern, dtype=float)
-        print("Mean pattern is: {}".format(mean_pattern))
-        mean_background = numpy.mean(rates_background, dtype=float)
-        print("Mean background is: {}".format(mean_background))
+        mean_data1 = numpy.mean(rates_data1, dtype=float)
+        print("Mean data1 is: {}".format(mean_data1))
+        mean_data2 = numpy.mean(rates_data2, dtype=float)
+        print("Mean data2 is: {}".format(mean_data2))
 
-        std_pattern = numpy.std(rates_pattern, dtype=float)
-        print("STD pattern is: {}".format(std_pattern))
-        std_background = numpy.std(rates_background, dtype=float)
-        print("STD background is: {}".format(std_background))
+        std_data1 = numpy.std(rates_data1, dtype=float)
+        print("STD data1 is: {}".format(std_data1))
+        std_data2 = numpy.std(rates_data2, dtype=float)
+        print("STD data2 is: {}".format(std_data2))
 
-        snr = 2. * (math.pow((mean_pattern - mean_background),
-                             2.)/(math.pow(std_pattern, 2.) +
-                                  math.pow(std_background, 2.)))
+        snr = 2. * (math.pow((mean_data1 - mean_data2),
+                             2.)/(math.pow(std_data1, 2.) +
+                                  math.pow(std_data2, 2.)))
 
         print("SNR is: {}".format(snr))
 
         # Open the output file
-        output_file = open("recall-snr.gdf", 'w')
-        print("{}\t{}\t{}\t{}\t{}".format(mean_pattern, std_pattern,
-                                          mean_background, std_background,
+        output_file = open("snr-{}.gdf".format(self.time), 'w')
+        print("{}\t{}\t{}\t{}\t{}".format(mean_data1, std_data1,
+                                          mean_data2, std_data2,
                                           snr),
               file=output_file)
         output_file.close()
 
-        print("Result:\t{}\t{}\t{}\t{}\t{}".format(mean_pattern, std_pattern,
-                                                   mean_background,
-                                                   std_background, snr))
+        print("Result:\t{}\t{}\t{}\t{}\t{}".format(mean_data1, std_data1,
+                                                   mean_data2,
+                                                   std_data2, snr))
+
+    def plot_histogram(self):
+        """Plot a histogram."""
+        print("Generating file for {}".format(self.time))
+        command = """
+        reset
+        max=200.
+        min=0.
+        n1=200
+        width1=(max-min)/n1
+        n2=200
+        width2=(max-min)/n2
+        hist(x,width)=width*floor(x/width)+width/2.0
+        set term pngcairo font "OpenSans, 28" size 1920,1028
+        set output "histogram-{}-{}-{}.png"
+        set xrange[min:max]
+        set yrange[0:]
+        set offset graph 0.05,0.05,0.05,0.0
+        set xtics min,20,max
+        set boxwidth width*0.9
+        set style fill transparent solid 0.5 #fillstyle
+        set tics out nomirror
+        set xlabel "Firing rate"
+        set ylabel "Frequency"
+        plot "{}-firing-rate.gdf" u (hist($1,width1)):(1.0) smooth freq w boxes title "{}", "{}-firing-rate.gdf" u (hist($1,width2)):(1.0) smooth freq w boxes title "{}";
+        """.format(self.time, self.data1, self.data2, self.data1, self.data1,
+                   self.data2, self.data2)
+
+        output_file = open("plot-histogram-{}.plt".format(self.time), 'w')
+        print(command, file=output_file)
+        output_file.close()
 
     def usage(self):
         """Print usage."""
         usage = ("Usage: \npython3 calculateSnapshotStats.py" +
-                 "pattern_spikes_filename background_spikes_filename" +
-                 "num_neurons_pattern" +
-                 "num_neurons_background recall_time"
+                 "data1 data2" +
+                 "num_neurons_data1" +
+                 "num_neurons_data2 time"
                  )
         print(usage, file=sys.stderr)
 
 if __name__ == "__main__":
     converter = calculateSnapshotStats()
     if len(sys.argv) == 6:
+        valid = converter.setup(str(sys.argv[1]), str(sys.argv[2]),
+                                int(sys.argv[3]), int(sys.argv[4]),
+                                int(sys.argv[5]))
+        if valid:
+            print("Processing ...")
+            converter.calculate_snr()
+            converter.plot_histogram()
+            print("Finished ...")
+    elif len(sys.argv) == 7:
         valid = converter.setup(str(sys.argv[1]), str(sys.argv[2]),
                                 int(sys.argv[3]), int(sys.argv[4]),
                                 int(sys.argv[5]))

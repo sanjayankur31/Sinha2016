@@ -28,6 +28,8 @@ ND=200
 NSTIM=1000
 RECALLTIME=4000000
 SRC_DIR="/home/asinha/Documents/02_Code/00_repos/00_mine/Sinha2016"
+RASTERS_DIR="rasters"
+HISTOGRAMS_DIR="histograms"
 echo "Generating graphs"
 pushd consolidated_files
 
@@ -65,14 +67,37 @@ touch firing-rate-Stim.gdf
 echo "Plotting firing rate graphs"
 gnuplot $SRC_DIR/scripts/postprocess/plot-firing-rates.plt
 
-echo "Processing SNR information"
-python3 $SRC_DIR/scripts/postprocess/calculateSnapshotStats.py spikes-pattern.gdf spikes-background.gdf $NP $NN $RECALLTIME
-echo "Plotting histograms"
-gnuplot $SRC_DIR/scripts/postprocess/plot-histograms.plt
 
 echo "Plotting EvsI graph"
 gnuplot $SRC_DIR/scripts/postprocess/plot-EvsI.plt
 
+echo "Plotting rasters"
+mkdir "$RASTERS_DIR"
+    pushd "$RASTERS_DIR"
+        python3 $SRC_DIR/scripts/postprocess/plot-rasters.py 0. 50.
+        python3 $SRC_DIR/scripts/postprocess/plot-rasters.py 80. 100.
+        python3 $SRC_DIR/scripts/postprocess/plot-rasters.py 850. 900.
+        python3 $SRC_DIR/scripts/postprocess/plot-rasters.py 5000. 5050.
+
+        cp ../spikes*gdf .
+        for i in *.plt; do gnuplot "$i"; done
+        rm spikes*gdf
+    popd
+
+mkdir "$HISTOGRAMS_DIR"
+    pushd "$HISTOGRAMS_DIR"
+        cp ../spikes*gdf .
+
+        python3 $SRC_DIR/scripts/postprocess/calculateSnapshotStats.py spikes-E.gdf spikes-I.gdf $NE $NI 0.
+        python3 $SRC_DIR/scripts/postprocess/calculateSnapshotStats.py spikes-E.gdf spikes-I.gdf $NE $NI 50.
+        python3 $SRC_DIR/scripts/postprocess/calculateSnapshotStats.py spikes-E.gdf spikes-I.gdf $NE $NI 80.
+        python3 $SRC_DIR/scripts/postprocess/calculateSnapshotStats.py spikes-E.gdf spikes-I.gdf $NE $NI 100.
+        python3 $SRC_DIR/scripts/postprocess/calculateSnapshotStats.py spikes-E.gdf spikes-I.gdf $NE $NI 850.
+        python3 $SRC_DIR/scripts/postprocess/calculateSnapshotStats.py spikes-E.gdf spikes-I.gdf $NE $NI 900.
+        python3 $SRC_DIR/scripts/postprocess/calculateSnapshotStats.py spikes-pattern.gdf spikes-background.gdf $NP $NN $RECALLTIME
+        for i in *.plt; do gnuplot "$i"; done
+        rm spikes*gdf
+    popd
 popd
 
 dirname=${PWD##*/}
@@ -84,8 +109,9 @@ rename "EvsI" "$dirname""-EvsI" consolidated_files/*.png
 
 
 echo "Moving files to test dir in repository."
-mkdir $SRC_DIR/tests/$dirname
+mkdir -p $SRC_DIR/tests/$dirname/$RASTERS_DIR
 cp consolidated_files/*.png $SRC_DIR/tests/$dirname/
 cp consolidated_files/recall-snr.gdf $SRC_DIR/tests/$dirname/
+cp consolidated_files/$RASTERS_DIR/*.png $SRC_DIR/tests/$dirname/$RASTERS_DIR
 
 source deactivate
