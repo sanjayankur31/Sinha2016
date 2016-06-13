@@ -37,15 +37,6 @@ class plotRasters:
         set xlabel "Time"
         set ylabel "Neurons"
         """
-
-        self.command_I = """
-        set title "Raster plot for I neurons"
-        """
-
-        self.command_E = """
-        set title "Raster plot for E neurons"
-        """
-
         self.input_file_I = "spikes-I.gdf"
         self.input_file_E = "spikes-E.gdf"
 
@@ -58,39 +49,34 @@ class plotRasters:
             self.plot_raster(interval)
 
     def plot_raster(self, interval):
-        print("Generating file for {}, {}".format(interval - 0.5, interval))
         """Plot raster."""
-        multiplot_command = """
-        set multiplot layout 2,1 title "0.5 second interval ending at {}"
+        print("Generating file for {}, {}".format(interval - 0.5, interval))
+        title_command = """
+        set title "0.5 second interval ending at {}"
         """.format(interval)
         output_plot_file = "raster-{}-{}.png".format(interval - 0.5, interval)
         output_command = """set output "{}" """.format(output_plot_file)
         range_command = """set xrange[{}:{}]""".format(interval - 0.5,
                                                        interval)
-        plot_command_I = (""" plot""" +
-                          """ "<(sed -n '/^{}/,/^{}/p;/^{}/q' {})" """.format(
-                              interval - 0.5, interval, interval,
-                              self.input_file_I) +
-                          """using 1:2 with points ps 0.5 lw 0.5 title "" """
-                          )
-        plot_command_E = (""" plot""" +
-                          """ "<(sed -n '/^{}/,/^{}/p;/^{}/q' {})" """.format(
-                              interval - 0.5, interval, interval,
-                              self.input_file_E) +
-                          """using 1:2 with points ps 0.5 lw 0.5 title "" """
-                          )
+        plot_command = (""" plot""" +
+                        """ "<(sed -n '/^{}/,/^{}/p;/^{}/q' {})" """.format(
+                            interval - 0.5, interval, interval,
+                            self.input_file_I) +
+                        """using 1:2 with points ps 0.5 lw 0.5 title "", """ +
+                        """ "<(sed -n '/^{}/,/^{}/p;/^{}/q' {})" """.format(
+                            interval - 0.5, interval, interval,
+                            self.input_file_E) +
+                        """using 1:2 with points ps 0.5 lw 0.5 title "" """
+                        )
 
         output_file = open("plot-raster-{}-{}.plt".format(interval - 0.5,
                                                           interval), 'w')
 
         print(textwrap.dedent(self.header), file=output_file)
         print(textwrap.dedent(output_command), file=output_file)
-        print(textwrap.dedent(multiplot_command), file=output_file)
+        print(textwrap.dedent(title_command), file=output_file)
         print(textwrap.dedent(range_command), file=output_file)
-        print(textwrap.dedent(self.command_I), file=output_file)
-        print(textwrap.dedent(plot_command_I), file=output_file)
-        print(textwrap.dedent(self.command_E), file=output_file)
-        print(textwrap.dedent(plot_command_E), file=output_file)
+        print(textwrap.dedent(plot_command), file=output_file)
 
         output_file.close()
 
