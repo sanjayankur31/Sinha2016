@@ -33,7 +33,7 @@ class plotRasters:
     def __init__(self):
         """Initialise."""
         self.header = """
-        set term pngcairo font "OpenSans, 28" size 1920,2048
+        set term pngcairo font "OpenSans, 28" size 1920,4096
         set xlabel "Time"
         set ylabel "Neurons"
         """
@@ -62,7 +62,8 @@ class plotRasters:
                         """ "<(sed -n '/^{}/,/^{}/p;/^{}/q' {})" """.format(
                             interval - 0.5, interval, interval,
                             self.input_file_I) +
-                        """using 1:2 with points ps 0.5 lw 0.5 title "", """ +
+                        """using 1:($2+8000) with points ps 0.5 lw 0.5""" +
+                        """ title "", """ +
                         """ "<(sed -n '/^{}/,/^{}/p;/^{}/q' {})" """.format(
                             interval - 0.5, interval, interval,
                             self.input_file_E) +
