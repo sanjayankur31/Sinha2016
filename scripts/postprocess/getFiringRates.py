@@ -144,6 +144,7 @@ class getFiringRates:
 if __name__ == "__main__":
     runner = getFiringRates()
     if len(sys.argv) < 5:
+        print("Wrong arguments. Exiting.")
         runner.usage()
     elif len(sys.argv) == 5:
         runner.run(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4],
@@ -151,3 +152,6 @@ if __name__ == "__main__":
     elif len(sys.argv) == 6:
         runner.run(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4],
                    sys.argv[5])
+    else:
+        print("Wrong arguments. Exiting.")
+        runner.usage()
