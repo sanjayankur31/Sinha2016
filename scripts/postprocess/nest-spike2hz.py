@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Take a nest gdf file with spike times and calculate firing rates.
+Take a nest gdf file with spike times and calculate mean firing rates.
 
 File: nest-spike2hz.py
 
@@ -35,13 +35,18 @@ class spike2hz:
     Nest gdf file format:
 
         <neuron gid>    <spike_time>
+
+    Takes an entire spike file and generates the mean firing rate file to be
+    used for time graphs.
     """
 
     def __init__(self):
         """Main init method."""
         self.input_filename = ""
         self.output_filename = ""
-        self.usage = ("Usage: \npython3 nest-spike2hz.py " +
+        self.usage = ("nest-spike2hz.py: generate mean firing rate file " +
+                      "from spike file\n\n" +
+                      "Usage: \npython3 nest-spike2hz.py " +
                       "input_filename output_filename number_neurons")
 
         # Initial indices
