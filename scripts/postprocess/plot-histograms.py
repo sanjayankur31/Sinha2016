@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+"""
+Generate histogram plotting files.
+
+File: plot-histograms.py
+
+Copyright 2016 Ankur Sinha
+Author: Ankur Sinha <sanjay DOT ankur AT gmail DOT com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
+import sys
+from textwrap import dedent
+import numpy
+
+
+class plotHistogram:
+
+    """Generate histogram plotting files."""
+
+    def print_plt_file(self, data1, data2):
+        """Print the final file."""
+        print("Generating file for {} and {}".format(data1,
+                                                     data2))
+
+        command = """
+        reset
+        max=200.
+        min=0.
+        n=200
+        width=(max-min)/n
+        hist(x,width)=width*floor(x/width)+width/2.0
+        set term pngcairo font "OpenSans, 28" size 1920,1028
+        set output "histogram-{}-{}.png"
+        set xrange[min:max]
+        set yrange[0:]
+        set offset graph 0.05,0.05,0.05,0.0
+        set xtics min,20,max
+        set boxwidth width*0.9
+        set style fill transparent solid 0.5 #fillstyle
+        set tics out nomirror
+        set xlabel "Firing rate"
+        set ylabel "Frequency"
+        """.format(data1, data2)
+        plot_command = (
+            """set title "histogram for {} and {}"\n""".format(
+                data1, data2
+            ) +
+            """plot "firing-rate-{}.gdf" """.format(data1) +
+            """u (hist($1,width)):(1.0) smooth freq """ +
+            """w boxes title "{}", """.format(data1) +
+            """ "firing-rate-{}.gdf" """.format(data2) +
+            """u (hist($1,width)):(1.0) smooth """ +
+            """freq w boxes title "{}" """.format(data2))
+
+        output_file = open("plot-histogram-{}-{}.plt".format(
+            data1, data2), 'w')
+        print(dedent(command), file=output_file)
+        print(plot_command, file=output_file)
+        output_file.close()
+
+    def run(self, data1, data2):
+        """Main runner method."""
+        self.print_plt_file(data1, data2)
+
+    def usage(self):
+        """Print usage."""
+        usage = ("Usage: \npython3 plot-histograms.py data1 data2")
+        print(usage, file=sys.stderr)
+
+if __name__ == "__main__":
+    runner = plotHistogram()
+    if len(sys.argv) < 3:
+        print("Wrong arguments. Exiting.")
+        runner.usage()
+    elif len(sys.argv) == 3:
+        runner.run(sys.argv[1], sys.argv[2])
+    else:
+        print("Wrong arguments. Exiting.")
+        runner.usage()
