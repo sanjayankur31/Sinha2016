@@ -80,9 +80,9 @@ class Sinha2016:
 
         # Documentation says things are normalised in the iaf neuron so that
         # weight of 1 translates to 1nS
-        self.synDictEE = {"weight": 3.}
-        self.synDictEI = {"weight": 3.}
-        self.synDictII = {"weight": -30.}
+        self.synDictEE = {"weight": 2.}
+        self.synDictEI = {"weight": 2.}
+        self.synDictII = {"weight": -20.}
 
         self.synDictIE = {"weight": 0., "Wmax": -30000.,
                           'alpha': .32, 'eta': -0.0001,
