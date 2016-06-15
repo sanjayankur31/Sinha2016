@@ -80,7 +80,8 @@ class Sinha2016:
 
         # Documentation says things are normalised in the iaf neuron so that
         # weight of 1 translates to 1nS
-        self.synDictE = {"weight": 3.}
+        self.synDictEE = {"weight": 3.}
+        self.synDictEI = {"weight": 3.}
         self.synDictII = {"weight": -30.}
 
         self.synDictIE = {"weight": 0., "Wmax": -30000.,
@@ -174,13 +175,15 @@ class Sinha2016:
                        self.synDictIE)
         nest.CopyModel("static_synapse", "inhibitory_static",
                        self.synDictII)
-        nest.CopyModel("static_synapse", "excitatory_static",
-                       self.synDictE)
+        nest.CopyModel("static_synapse", "excitatory_static_EE",
+                       self.synDictEE)
+        nest.CopyModel("static_synapse", "excitatory_static_EI",
+                       self.synDictEI)
 
         nest.Connect(self.neuronsE, self.neuronsE, conn_spec=self.connDictEE,
-                     syn_spec="excitatory_static")
+                     syn_spec="excitatory_static_EE")
         nest.Connect(self.neuronsE, self.neuronsI, conn_spec=self.connDictEI,
-                     syn_spec="excitatory_static")
+                     syn_spec="excitatory_static_EI")
         nest.Connect(self.neuronsI, self.neuronsI, conn_spec=self.connDictII,
                      syn_spec="inhibitory_static")
         nest.Connect(self.neuronsI, self.neuronsE, conn_spec=self.connDictIE,
