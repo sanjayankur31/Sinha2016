@@ -43,7 +43,7 @@ class Sinha2016:
         # http://www.nest-simulator.org/scheduling-and-simulation-flow/
         self.dt = 0.1
         # time to stabilise network after pattern storage etc.
-        self.stabilisation_time = 4000.  # seconds
+        self.stabilisation_time = 6000.  # seconds
         # time recall stimulus is enabled for
         self.recall_time = 1000.  # ms
         # populations
@@ -448,8 +448,8 @@ if __name__ == "__main__":
     step = False
     simulation = Sinha2016()
     simulation.setup_simulation()
-    simulation.dump_all_IE_weights("initial_stabilisation")
-    simulation.dump_all_EE_weights("initial_stabilisation")
+    simulation.dump_all_IE_weights("initial")
+    simulation.dump_all_EE_weights("initial")
     simulation.dump_ca_concentration()
     simulation.stabilise(step)
     simulation.dump_all_IE_weights("initial_stabilisation")
