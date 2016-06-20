@@ -30,11 +30,11 @@ RECALLTIME=4000000
 SRC_DIR="/home/asinha/Documents/02_Code/00_repos/00_mine/Sinha2016"
 RASTERS_DIR="rasters"
 HISTOGRAMS_DIR="histograms"
+
 echo "Generating graphs"
 pushd consolidated_files
 
 source activate python3
-
 
 echo "Processing E spikes"
 python3 $SRC_DIR/scripts/postprocess/nest-spike2hz.py spikes-E.gdf firing-rate-E.gdf $NE
@@ -67,51 +67,88 @@ touch firing-rate-Stim.gdf
 echo "Plotting firing rate graphs"
 gnuplot $SRC_DIR/scripts/postprocess/plot-firing-rates.plt
 
-
 echo "Plotting EvsI graph"
 gnuplot $SRC_DIR/scripts/postprocess/plot-EvsI.plt
 
+mkdir "$HISTOGRAMS_DIR"
+mv spikes-E.gdf $HISTOGRAMS_DIR
+mv spikes-I.gdf $HISTOGRAMS_DIR
+
+    pushd "$HISTOGRAMS_DIR"
+        ( python3 $SRC_DIR/scripts/postprocess/getFiringRates.py spikes-E.gdf E $NE 1. 30. )
+        ( python3 $SRC_DIR/scripts/postprocess/getFiringRates.py spikes-E.gdf E $NE 85. 100. )
+        ( python3 $SRC_DIR/scripts/postprocess/getFiringRates.py spikes-E.gdf E $NE 850. 870. )
+
+        wait
+
+        ( python3 $SRC_DIR/scripts/postprocess/getFiringRates.py spikes-E.gdf E $NE 2000. 2005. )
+        ( python3 $SRC_DIR/scripts/postprocess/getFiringRates.py spikes-E.gdf E $NE 4000. 4005. )
+        ( python3 $SRC_DIR/scripts/postprocess/getFiringRates.py spikes-E.gdf E $NE 5000. 5005. )
+        ( python3 $SRC_DIR/scripts/postprocess/getFiringRates.py spikes-E.gdf E $NE 5990. 5995. )
+
+        wait
+
+        ( python3 $SRC_DIR/scripts/postprocess/getFiringRates.py spikes-I.gdf I $NI 1. 30. )
+        ( python3 $SRC_DIR/scripts/postprocess/getFiringRates.py spikes-I.gdf I $NI 85. 100. )
+        ( python3 $SRC_DIR/scripts/postprocess/getFiringRates.py spikes-I.gdf I $NI 850. 870. )
+
+        wait
+
+        ( python3 $SRC_DIR/scripts/postprocess/getFiringRates.py spikes-I.gdf I $NI 2000. 2005. )
+        ( python3 $SRC_DIR/scripts/postprocess/getFiringRates.py spikes-I.gdf I $NI 4000. 4005. )
+        ( python3 $SRC_DIR/scripts/postprocess/getFiringRates.py spikes-I.gdf I $NI 5000. 5005. )
+        ( python3 $SRC_DIR/scripts/postprocess/getFiringRates.py spikes-I.gdf I $NI 5990. 5995. )
+
+        wait
+
+        python3 $SRC_DIR/scripts/postprocess/plot-histograms-time.py E I  1. 30.
+        python3 $SRC_DIR/scripts/postprocess/plot-histograms-time.py E I  85. 100.
+        python3 $SRC_DIR/scripts/postprocess/plot-histograms-time.py E I  850. 870.
+        python3 $SRC_DIR/scripts/postprocess/plot-histograms-time.py E I  2000. 2005.
+        python3 $SRC_DIR/scripts/postprocess/plot-histograms-time.py E I  4000. 4005.
+        python3 $SRC_DIR/scripts/postprocess/plot-histograms-time.py E I  5000. 5005.
+        python3 $SRC_DIR/scripts/postprocess/plot-histograms-time.py E I  5990. 5995.
+
+        echo "Running gnuplot on histograms."
+        for i in *.plt; do gnuplot "$i"; done
+
+    popd
+
 echo "Plotting rasters"
 mkdir "$RASTERS_DIR"
-    pushd "$RASTERS_DIR"
-        python3 $SRC_DIR/scripts/postprocess/plot-rasters.py 0. 50.
-        python3 $SRC_DIR/scripts/postprocess/plot-rasters.py 80. 100.
-        python3 $SRC_DIR/scripts/postprocess/plot-rasters.py 850. 900.
-        python3 $SRC_DIR/scripts/postprocess/plot-rasters.py 5000. 5050.
+    pushd $RASTERS_DIR
+        mv ../$HISTOGRAMS_DIR/spikes-E.gdf .
+        mv ../$HISTOGRAMS_DIR/spikes-I.gdf .
 
-        cp ../spikes*gdf .
+        python3 $SRC_DIR/scripts/postprocess/plot-rasters.py 85.0 100.0
+        python3 $SRC_DIR/scripts/postprocess/plot-rasters.py 5990.0 5995.0
+        python3 $SRC_DIR/scripts/postprocess/plot-rasters.py 5000.0 5005.0
+        python3 $SRC_DIR/scripts/postprocess/plot-rasters.py 4000.0 4005.0
+        python3 $SRC_DIR/scripts/postprocess/plot-rasters.py 2000.0 2005.0
+        python3 $SRC_DIR/scripts/postprocess/plot-rasters.py 850.0 870.0
+        python3 $SRC_DIR/scripts/postprocess/plot-rasters.py 1.0 30
+
+        echo "Running gnuplot on rasters."
         for i in *.plt; do gnuplot "$i"; done
-        rm spikes*gdf
     popd
 
-mkdir "$HISTOGRAMS_DIR"
-    pushd "$HISTOGRAMS_DIR"
-        cp ../spikes*gdf .
-
-        python3 $SRC_DIR/scripts/postprocess/calculateSnapshotStats.py spikes-E.gdf spikes-I.gdf $NE $NI 0.
-        python3 $SRC_DIR/scripts/postprocess/calculateSnapshotStats.py spikes-E.gdf spikes-I.gdf $NE $NI 50.
-        python3 $SRC_DIR/scripts/postprocess/calculateSnapshotStats.py spikes-E.gdf spikes-I.gdf $NE $NI 80.
-        python3 $SRC_DIR/scripts/postprocess/calculateSnapshotStats.py spikes-E.gdf spikes-I.gdf $NE $NI 100.
-        python3 $SRC_DIR/scripts/postprocess/calculateSnapshotStats.py spikes-E.gdf spikes-I.gdf $NE $NI 850.
-        python3 $SRC_DIR/scripts/postprocess/calculateSnapshotStats.py spikes-E.gdf spikes-I.gdf $NE $NI 900.
-        python3 $SRC_DIR/scripts/postprocess/calculateSnapshotStats.py spikes-pattern.gdf spikes-background.gdf $NP $NN $RECALLTIME
-        for i in *.plt; do gnuplot "$i"; done
-        rm spikes*gdf
-    popd
 popd
 
 dirname=${PWD##*/}
 
 echo "Renaming files."
 rename "firing" "$dirname""-firing" consolidated_files/*.png
-rename "hist" "$dirname""-hist" consolidated_files/*.png
+rename "hist" "$dirname""-hist" consolidated_files/$HISTOGRAMS_DIR/*.png
+rename "rast" "$dirname""-rast" consolidated_files/$RASTERS_DIR/*.png
 rename "EvsI" "$dirname""-EvsI" consolidated_files/*.png
 
 
 echo "Moving files to test dir in repository."
 mkdir -p $SRC_DIR/tests/$dirname/$RASTERS_DIR
+mkdir -p $SRC_DIR/tests/$dirname/$HISTOGRAMS_DIR
 cp consolidated_files/*.png $SRC_DIR/tests/$dirname/
 cp consolidated_files/recall-snr.gdf $SRC_DIR/tests/$dirname/
+cp consolidated_files/$HISTOGRAMS_DIR/*.png $SRC_DIR/tests/$dirname/$HISTOGRAMS_DIR
 cp consolidated_files/$RASTERS_DIR/*.png $SRC_DIR/tests/$dirname/$RASTERS_DIR
 
 source deactivate
