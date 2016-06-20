@@ -62,12 +62,12 @@ class plotRasters:
                         """ "<(sed -n '/^{}/,/^{}/p;/^{}/q' {})" """.format(
                             interval - 0.5, interval, interval,
                             self.input_file_I) +
-                        """using 2:($1+8000) with points ps 0.5 lw 0.5""" +
+                        """using 1:($2+8000) with points ps 0.5 lw 0.5""" +
                         """ title "", """ +
                         """ "<(sed -n '/^{}/,/^{}/p;/^{}/q' {})" """.format(
                             interval - 0.5, interval, interval,
                             self.input_file_E) +
-                        """using 2:1 with points ps 0.5 lw 0.5 title "" """
+                        """using 1:2 with points ps 0.5 lw 0.5 title "" """
                         )
 
         output_file = open("plot-raster-{}-{}.plt".format(interval - 0.5,
