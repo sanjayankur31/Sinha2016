@@ -85,7 +85,8 @@ class plotHistogram:
 
     def usage(self):
         """Print usage."""
-        usage = ("Usage: \npython3 plot-histograms.py data1 data2")
+        usage = ("Usage: \npython3 plot-histograms-time.py data1 data2" +
+                 " time_start time_end")
         print(usage, file=sys.stderr)
 
 if __name__ == "__main__":
