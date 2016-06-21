@@ -21,7 +21,7 @@
 
 SORTTMPDIR="/home/asinha/dump/sort-tmpdir"
 
-echo "Combining files"
+echo "Combining files for NEST simulation"
 mkdir consolidated_files
 
 echo "Combining recall files"
