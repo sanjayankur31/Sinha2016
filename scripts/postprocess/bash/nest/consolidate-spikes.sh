@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2015 Ankur Sinha 
+# Copyright 2016 Ankur Sinha 
 # Author: Ankur Sinha <sanjay DOT ankur AT gmail DOT com> 
 #
 # This program is free software: you can redistribute it and/or modify
@@ -32,7 +32,6 @@ echo "Combining pattern files"
 sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*pattern*.gdf > spikes-pattern.gdf
 mv spikes-pattern.gdf consolidated_files
 
-
 echo "Combining deaff files"
 sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*deaffed*.gdf > spikes-deaffed.gdf
 mv spikes-deaffed.gdf consolidated_files
@@ -53,6 +52,8 @@ echo "Combining Stim files"
 sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*Stim*.gdf > spikes-Stim.gdf
 mv spikes-Stim.gdf consolidated_files
 
+echo "Copying over settings file"
+#TODO copy over tasklist ini file
 
 echo "All files combined."
 exit 0

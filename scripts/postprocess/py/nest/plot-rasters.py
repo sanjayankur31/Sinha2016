@@ -59,7 +59,7 @@ class plotRasters:
         range_command = """set xrange[{}:{}]""".format(interval - 0.5,
                                                        interval)
         plot_command = (""" plot""" +
-                        """ "<(sed -n '/^{}/,/^{}/p;/^{}/q' {})" """.format(
+                        """ "<(sed -ne '/^[[:digit:]]\+\s\+{}/,/^[[:digit:]]\+\s\+{}/p;/^[[:digit:]]\+\s\+{}/q' {})" """.format(
                             interval - 0.5, interval, interval,
                             self.input_file_I) +
                         """using 2:($1+8000) with points ps 0.5 lw 0.5""" +

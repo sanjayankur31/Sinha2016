@@ -24,52 +24,38 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import sys
 from textwrap import dedent
 import numpy
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pylot as plt
+from nest-getFiringRates import getFiringRates as gfr
 
 
 class plotHistogram:
 
-    """Generate histogram plotting files."""
+    """Generate histograms."""
 
-    def print_plt_file(self, data1, data2, time):
-        """Print the final file."""
-        print("Generating file for {} and {} at {}".format(data1,
-                                                           data2, time))
+    def __init__(self):
+        """Initialise."""
+        self.rateGetter1 = gfr()
+        self.rateGetter2 = gfr()
+        self.data1 = ""
+        self.data2 = ""
+        self.file_name1 = ""
+        self.file_name2 = ""
+        self.neurons1 = 0
+        self.neurons2 = 0
 
-        command = """
-        reset
-        max=200.
-        min=0.
-        n=200
-        width=(max-min)/n
-        hist(x,width)=width*floor(x/width)+width/2.0
-        set term pngcairo font "OpenSans, 28" size 1920,1028
-        set output "histogram-{}-{}-{}.png"
-        set xrange[min:max]
-        set yrange[0:]
-        set offset graph 0.05,0.05,0.05,0.0
-        set xtics min,20,max
-        set boxwidth width*0.9
-        set style fill transparent solid 0.5 #fillstyle
-        set tics out nomirror
-        set xlabel "Firing rate"
-        set ylabel "Frequency"
-        """.format(data1, data2, time)
-        plot_command = (
-            """set title "histogram for {} and {} at {}"\n""".format(
-                data1, data2, time
-            ) +
-            """plot "firing-rate-{}-{}.gdf" """.format(data1, time) +
-            """u (hist($1,width)):(1.0) smooth freq """ +
-            """w boxes title "{}", """.format(data1) +
-            """ "firing-rate-{}-{}.gdf" """.format(data2, time) +
-            """u (hist($1,width)):(1.0) smooth """ +
-            """freq w boxes title "{}" """.format(data2))
+    def set_data(self, data1, data2):
+        """Set data names."""
+        self.data1 = data1
+        self.data2 = data2
+        self.file_name1 = "spikes-{}.gdf".format(data1)
+        self.file_name2 = "spikes-{}.gdf".format(data2)
 
-        output_file = open("plot-histogram-{}-{}-{}.plt".format(
-            data1, data2, time), 'w')
-        print(dedent(command), file=output_file)
-        print(plot_command, file=output_file)
-        output_file.close()
+    def set_neurons(self, neurons1, neurons2):
+        """Set neuron numbers."""
+        self.neurons1 = neurons1
+        self.neurons2 = neurons2
 
     def run(self, data1, data2, time_start, time_end):
         """Main runner method."""
@@ -77,15 +63,18 @@ class plotHistogram:
         time_end = float(time_end)
 
         if time_start == time_end:
-            self.print_plt_file(data1, data2, time_start)
+            self._plot_histogram(data1, data2, time_start)
         else:
             for time in numpy.arange(time_start + 1., time_end + 1., 1.0,
                                      dtype=float):
-                self.print_plt_file(data1, data2, time)
+                self._plot_histogram(data1, data2, time)
+
+    def __plot_histogram(self, data1, data2, time)
 
     def usage(self):
         """Print usage."""
         usage = ("Usage: \npython3 plot-histograms-time.py data1 data2" +
+                 " num_neuron1 num_neurons2 " +
                  " time_start time_end")
         print(usage, file=sys.stderr)
 

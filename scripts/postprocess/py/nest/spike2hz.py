@@ -2,7 +2,7 @@
 """
 Take a nest gdf file with spike times and calculate mean firing rates.
 
-File: nest-spike2hz.py
+File: spike2hz.py
 
 Copyright 2016 Ankur Sinha
 Author: Ankur Sinha <sanjay DOT ankur AT gmail DOT com>
@@ -65,9 +65,12 @@ class spike2hz:
             os.stat(self.input_filename).st_size > 0
         ):
             spikesDF = pandas.read_csv(self.input_filename, sep='\s+',
-                                       dtype=float, lineterminator="\n",
+                                       names=["neuronID", "spike_time"],
+                                       dtype={'neuronID': numpy.uint16,
+                                              'spike_time': numpy.float32},
+                                       lineterminator="\n",
                                        skipinitialspace=True, header=None,
-                                       index_col=None, names=None)
+                                       index_col=None)
             self.spikes = spikesDF.values
             self.output_file = open(self.output_filename, 'w')
 

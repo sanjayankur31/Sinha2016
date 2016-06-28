@@ -75,34 +75,34 @@ mv spikes-E.gdf $HISTOGRAMS_DIR
 mv spikes-I.gdf $HISTOGRAMS_DIR
 
     pushd "$HISTOGRAMS_DIR"
-        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-E.gdf E $NE 1. 30. )
-        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-E.gdf E $NE 85. 100. )
-        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-E.gdf E $NE 850. 870. )
+        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-E.gdf E $NE 1000. 30000. )
+        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-E.gdf E $NE 85000. 100000. )
+        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-E.gdf E $NE 850000. 870000. )
 
         wait
 
-        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-E.gdf E $NE 2000. 2005. )
-        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-E.gdf E $NE 4000. 4005. )
-        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-E.gdf E $NE 5000. 5005. )
-        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-E.gdf E $NE 5990. 5995. )
+        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-E.gdf E $NE 2000000. 2005000. )
+        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-E.gdf E $NE 4000000. 4005000. )
+        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-E.gdf E $NE 5000000. 5005000. )
+        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-E.gdf E $NE 5990000. 5995000. )
 
         wait
 
-        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-I.gdf I $NI 1. 30. )
-        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-I.gdf I $NI 85. 100. )
-        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-I.gdf I $NI 850. 870. )
+        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-I.gdf I $NI 1000. 30000. )
+        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-I.gdf I $NI 85000. 100000. )
+        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-I.gdf I $NI 850000. 870000. )
 
         wait
 
-        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-I.gdf I $NI 2000. 2005. )
-        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-I.gdf I $NI 4000. 4005. )
-        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-I.gdf I $NI 5000. 5005. )
-        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-I.gdf I $NI 5990. 5995. )
+        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-I.gdf I $NI 2000000. 2005000. )
+        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-I.gdf I $NI 4000000. 4005000. )
+        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-I.gdf I $NI 5000000. 5005000. )
+        ( python3 $SRC_DIR/scripts/postprocess/nest-getFiringRates.py spikes-I.gdf I $NI 5990000. 5995000. )
 
         wait
 
-        python3 $SRC_DIR/scripts/postprocess/plot-histograms-time.py E I  1. 30.
-        python3 $SRC_DIR/scripts/postprocess/plot-histograms-time.py E I  85. 100.
+        python3 $SRC_DIR/scripts/postprocess/plot-histograms-time.py E I  1000. 30000.
+        python3 $SRC_DIR/scripts/postprocess/plot-histograms-time.py E I  85000. 100000.
         python3 $SRC_DIR/scripts/postprocess/plot-histograms-time.py E I  850. 870.
         python3 $SRC_DIR/scripts/postprocess/plot-histograms-time.py E I  2000. 2005.
         python3 $SRC_DIR/scripts/postprocess/plot-histograms-time.py E I  4000. 4005.

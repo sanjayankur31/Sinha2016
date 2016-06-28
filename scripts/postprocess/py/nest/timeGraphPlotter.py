@@ -34,6 +34,7 @@ class timeGraphPlotter:
     def __init__(self, config):
         """Initialise."""
         self.config = config
+        # Lets check to see if Gnuplot works
         try:
             __import__('Gnuplot')
         except ImportError:
@@ -47,9 +48,12 @@ class timeGraphPlotter:
                 os.stat(self.config.filenameRatesE).st_size != 0
             ):
                 ratesE = pandas.load_csv(self.config.filenameRatesE, sep='\s+',
-                                         dtype=float, lineterminator="\n",
+                                         names=["neuronID", "spike_time"],
+                                         dtype={'neuronID': numpy.uint16,
+                                                'spike_time': numpy.float32},
+                                         lineterminator="\n",
                                          skipinitialspace=True, header=None,
-                                         index_col=None, names=None)
+                                         index_col=None)
                 self.lineE = Gnuplot.data(ratesE.values[:0], ratesE.values[:1],
                                           title="E", with_="lines lw 4")
             else:
@@ -60,9 +64,12 @@ class timeGraphPlotter:
                 os.stat(self.config.filenameRatesI).st_size != 0
             ):
                 ratesI = pandas.load_csv(self.config.filenameRatesI, sep='\s+',
-                                         dtype=float, lineterminator="\n",
+                                         names=["neuronID", "spike_time"],
+                                         dtype={'neuronID': numpy.uint16,
+                                                'spike_time': numpy.float32},
+                                         lineterminator="\n",
                                          skipinitialspace=True, header=None,
-                                         index_col=None, names=None)
+                                         index_col=None)
                 self.lineI = Gnuplot.data(ratesI.values[:0], ratesI.values[:1],
                                           title="I", with_="lines lw 4")
             else:
@@ -73,9 +80,12 @@ class timeGraphPlotter:
                 os.stat(self.config.filenameRatesR).st_size != 0
             ):
                 ratesR = pandas.load_csv(self.config.filenameRatesR, sep='\s+',
-                                         dtype=float, lineterminator="\n",
+                                         names=["neuronID", "spike_time"],
+                                         dtype={'neuronID': numpy.uint16,
+                                                'spike_time': numpy.float32},
+                                         lineterminator="\n",
                                          skipinitialspace=True, header=None,
-                                         index_col=None, names=None)
+                                         index_col=None)
                 self.lineR = Gnuplot.data(ratesR.values[:0], ratesR.values[:1],
                                           title="R", with_="lines lw 4")
             else:
@@ -86,9 +96,12 @@ class timeGraphPlotter:
                 os.stat(self.config.filenameBatesB).st_size != 0
             ):
                 ratesB = pandas.load_csv(self.config.filenameBatesB, sep='\s+',
-                                         dtype=float, lineterminator="\n",
+                                         names=["neuronID", "spike_time"],
+                                         dtype={'neuronID': numpy.uint16,
+                                                'spike_time': numpy.float32},
+                                         lineterminator="\n",
                                          skipinitialspace=True, header=None,
-                                         index_col=None, names=None)
+                                         index_col=None)
                 self.lineB = Gnuplot.data(ratesB.values[:0], ratesB.values[:1],
                                           title="B", with_="lines lw 4")
             else:
@@ -99,22 +112,28 @@ class timeGraphPlotter:
                 os.stat(self.config.filenameSatesS).st_size != 0
             ):
                 ratesS = pandas.load_csv(self.config.filenameSatesS, sep='\s+',
-                                         dtype=float, lineterminator="\n",
+                                         names=["neuronID", "spike_time"],
+                                         dtype={'neuronID': numpy.uint16,
+                                                'spike_time': numpy.float32},
+                                         lineterminator="\n",
                                          skipinitialspace=True, header=None,
-                                         index_col=None, names=None)
+                                         index_col=None)
                 self.lineS = Gnuplot.data(ratesS.values[:0], ratesS.values[:1],
                                           title="S", with_="lines lw 4")
             else:
                 self.lineS = [0, 0]
 
             if (
-                os.path.isfile(self.config.filenameLatesL) and
-                os.stat(self.config.filenameLatesL).st_size != 0
+                os.path.isfile(self.config.filenameRatesL) and
+                os.stat(self.config.filenameRatesL).st_size != 0
             ):
-                ratesL = pandas.load_csv(self.config.filenameLatesL, sep='\s+',
-                                         dtype=float, lineterminator="\n",
+                ratesL = pandas.load_csv(self.config.filenameRatesL, sep='\s+',
+                                         names=["neuronID", "spike_time"],
+                                         dtype={'neuronID': numpy.uint16,
+                                                'spike_time': numpy.float32},
+                                         lineterminator="\n",
                                          skipinitialspace=True, header=None,
-                                         index_col=None, names=None)
+                                         index_col=None)
                 self.lineL = Gnuplot.data(ratesL.values[:0], ratesL.values[:1],
                                           title="L", with_="lines lw 4")
             else:
@@ -125,9 +144,12 @@ class timeGraphPlotter:
                 os.stat(self.config.filenamePatesP).st_size != 0
             ):
                 ratesP = pandas.load_csv(self.config.filenamePatesP, sep='\s+',
-                                         dtype=float, lineterminator="\n",
+                                         names=["neuronID", "spike_time"],
+                                         dtype={'neuronID': numpy.uint16,
+                                                'spike_time': numpy.float32},
+                                         lineterminator="\n",
                                          skipinitialspace=True, header=None,
-                                         index_col=None, names=None)
+                                         index_col=None)
                 self.lineP = Gnuplot.data(ratesP.values[:0], ratesP.values[:1],
                                           title="P", with_="lines lw 4")
             else:
@@ -174,20 +196,102 @@ class timeGraphPlotter:
         self.plotter.plot(self.lineP, self.lineB)
         self.hardcopy(filename="firing-rate-P-B.png")
 
+    def __get_firing_rates_from_spikes(self):
+        """Get firing rate files from spikes."""
+        from nest.spike2hz import spike2hz
+        if (
+            os.path.isfile(self.config.filenameE) and
+            os.stat(self.config.filenameE).st_size != 0
+        ):
+            spikeconverter = spike2hz()
+            spikeconverter.setup(self.config.filenameE,
+                                 self.config.filenameRatesE,
+                                 self.config.neuronsE)
+            spikeconverter.run()
+            del spikeconverter
+
+        if (
+            os.path.isfile(self.config.filenameI) and
+            os.stat(self.config.filenameI).st_size != 0
+        ):
+            spikeconverter = spike2hz()
+            spikeconverter.setup(self.config.filenameI,
+                                 self.config.filenameRatesI,
+                                 self.config.neuronsI)
+            spikeconverter.run()
+            del spikeconverter
+
+        if (
+            os.path.isfile(self.config.filenameR) and
+            os.stat(self.config.filenameR).st_size != 0
+        ):
+            spikeconverter = spike2hz()
+            spikeconverter.setup(self.config.filenameR,
+                                 self.config.filenameRatesR,
+                                 self.config.neuronsR)
+            spikeconverter.run()
+            del spikeconverter
+
+        if (
+            os.path.isfile(self.config.filenameB) and
+            os.stat(self.config.filenameB).st_size != 0
+        ):
+            spikeconverter = spike2hz()
+            spikeconverter.setup(self.config.filenameB,
+                                 self.config.filenameRatesB,
+                                 self.config.neuronsB)
+            spikeconverter.run()
+            del spikeconverter
+
+        if (
+            os.path.isfile(self.config.filenameS) and
+            os.stat(self.config.filenameS).st_size != 0
+        ):
+            spikeconverter = spike2hz()
+            spikeconverter.setup(self.config.filenameS,
+                                 self.config.filenameRatesS,
+                                 self.config.neuronsS)
+            spikeconverter.run()
+            del spikeconverter
+
+        if (
+            os.path.isfile(self.config.filenameL) and
+            os.stat(self.config.filenameL).st_size != 0
+        ):
+            spikeconverter = spike2hz()
+            spikeconverter.setup(self.config.filenameL,
+                                 self.config.filenameRatesL,
+                                 self.config.neuronsL)
+            spikeconverter.run()
+            del spikeconverter
+
+        if (
+            os.path.isfile(self.config.filenameP) and
+            os.stat(self.config.filenameP).st_size != 0
+        ):
+            spikeconverter = spike2hz()
+            spikeconverter.setup(self.config.filenameP,
+                                 self.config.filenameRatesP,
+                                 self.config.neuronsP)
+            spikeconverter.run()
+            del spikeconverter
+
     def plot_all(self):
         """Plot them all."""
+        self.__get_firing_rates_from_spikes()
         try:
             __import__('Gnuplot')
         except ImportError:
             print("Could not import Gnuplot. Using binary and plotting file.",
                   file=sys.stderr)
+            self.__plot_using_gnuplot_binary()
         else:
             self.__plot_main()
             self.__plot_individuals()
             self.__plot_I_E()
             self.__plot_P_B()
 
-    def plot_using_gnuplot_binary(self):
+    def __plot_using_gnuplot_binary(self):
         """Use the binary because it doesnt support py3."""
         args = ('/home/asinha/Documents/02_Code/00_repos/00_mine/Sinha2016/' +
                 'scripts/postprocess/py/nest/plot-firing-rates.plt')
