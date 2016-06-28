@@ -28,7 +28,7 @@ class Config:
 
     """Config post process globals."""
 
-    def __init__(self, taskfile='tasklist.ini'):
+    def __init__(self, taskfile='config.ini'):
         """Initialise."""
         self.timegraphs = True
         self.snr = False

@@ -33,16 +33,17 @@ class Postprocess:
     def __init__(self, simulator):
         """Initialise."""
         self.simulator = simulator
-        self.tasklist = "tasklist-{}.ini".format(simulator)
+        self.configfile = "config-{}.ini".format(simulator)
 
     def __load_config(self):
         """Load configuration file."""
-        if os.path.isfile(self.tasklist):
-            self.config = Config(self.tasklist)
-            print("Config file {} loaded successfully.".format(self.tasklist))
+        if os.path.isfile(self.configfile):
+            self.config = Config(self.configfile)
+            print("Config file {} loaded successfully.".format(
+                self.configfile))
         else:
-            sys.exit("Could not find tasklist file: {}. Exiting.".format(
-                self.tasklist))
+            sys.exit("Could not find config file: {}. Exiting.".format(
+                self.configfile))
 
     def __nest_postprocess(self):
         """Nest postprocessing."""
