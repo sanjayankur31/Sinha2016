@@ -16,9 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# File : scripts/cluster/start-job.sh
+# File : start-nest-job.sh
 #
-# Queue's up a new job for me.
+# Queue's up a new nest job for me.
 
 SOURCE_PATH="/home/asinha/Documents/02_Code/00_repos/00_mine/Sinha2016/"
 GIT_COMMIT=""
@@ -72,6 +72,9 @@ function setup_env
 
         mkdir -v result
         touch result/"00-GIT-COMMIT-""$GIT_COMMIT"
+
+        mkdir -v result/consolidated_files/
+        cp -v "Sinha2016/src/config-nest.ini" consolidated_files/
     popd
 }
 
