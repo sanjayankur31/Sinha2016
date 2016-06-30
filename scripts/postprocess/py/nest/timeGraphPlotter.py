@@ -206,7 +206,8 @@ class timeGraphPlotter:
             spikeconverter = spike2hz()
             spikeconverter.setup(self.config.filenameE,
                                  self.config.filenameRatesE,
-                                 self.config.neuronsE)
+                                 self.config.neuronsE,
+                                 self.config.rows_per_read)
             spikeconverter.run()
             del spikeconverter
 
@@ -217,7 +218,8 @@ class timeGraphPlotter:
             spikeconverter = spike2hz()
             spikeconverter.setup(self.config.filenameI,
                                  self.config.filenameRatesI,
-                                 self.config.neuronsI)
+                                 self.config.neuronsI,
+                                 self.config.rows_per_read)
             spikeconverter.run()
             del spikeconverter
 
@@ -228,7 +230,8 @@ class timeGraphPlotter:
             spikeconverter = spike2hz()
             spikeconverter.setup(self.config.filenameR,
                                  self.config.filenameRatesR,
-                                 self.config.neuronsR)
+                                 self.config.neuronsR,
+                                 self.config.rows_per_read)
             spikeconverter.run()
             del spikeconverter
 
@@ -239,7 +242,8 @@ class timeGraphPlotter:
             spikeconverter = spike2hz()
             spikeconverter.setup(self.config.filenameB,
                                  self.config.filenameRatesB,
-                                 self.config.neuronsB)
+                                 self.config.neuronsB,
+                                 self.config.rows_per_read)
             spikeconverter.run()
             del spikeconverter
 
@@ -250,7 +254,8 @@ class timeGraphPlotter:
             spikeconverter = spike2hz()
             spikeconverter.setup(self.config.filenameS,
                                  self.config.filenameRatesS,
-                                 self.config.neuronsS)
+                                 self.config.neuronsS,
+                                 self.config.rows_per_read)
             spikeconverter.run()
             del spikeconverter
 
@@ -261,7 +266,8 @@ class timeGraphPlotter:
             spikeconverter = spike2hz()
             spikeconverter.setup(self.config.filenameL,
                                  self.config.filenameRatesL,
-                                 self.config.neuronsL)
+                                 self.config.neuronsL,
+                                 self.config.rows_per_read)
             spikeconverter.run()
             del spikeconverter
 
@@ -272,7 +278,8 @@ class timeGraphPlotter:
             spikeconverter = spike2hz()
             spikeconverter.setup(self.config.filenameP,
                                  self.config.filenameRatesP,
-                                 self.config.neuronsP)
+                                 self.config.neuronsP,
+                                 self.config.rows_per_read)
             spikeconverter.run()
             del spikeconverter
 
