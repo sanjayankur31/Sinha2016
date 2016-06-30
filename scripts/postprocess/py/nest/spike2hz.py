@@ -47,73 +47,98 @@ class spike2hz:
         self.usage = ("nest-spike2hz.py: generate mean firing rate file " +
                       "from spike file\n\n" +
                       "Usage: \npython3 nest-spike2hz.py " +
-                      "input_filename output_filename number_neurons")
+                      "input_filename output_filename number_neurons" +
+                      " rows")
 
         # Initial indices
         self.left = 0.
         self.right = 0.
         self.dt = 1.  # ms
         self.num_neurons = 8000.
+        self.rows = 0.
 
-    def setup(self, input_filename, output_filename, num_neurons=8000.):
+    def setup(self, input_filename, output_filename, num_neurons=8000.,
+              rows=0.):
         """Setup various things."""
         self.input_filename = input_filename
         self.output_filename = output_filename
+        self.rows = rows
+        self.output_file = open(self.output_filename, 'w')
+        self.num_neurons = int(num_neurons)
 
-        if (
+        if not (
             os.path.exists(self.input_filename) and
             os.stat(self.input_filename).st_size > 0
         ):
-            spikesDF = pandas.read_csv(self.input_filename, sep='\s+',
-                                       names=["neuronID", "spike_time"],
-                                       dtype={'neuronID': numpy.uint16,
-                                              'spike_time': numpy.float32},
-                                       lineterminator="\n",
-                                       skipinitialspace=True, header=None,
-                                       index_col=None)
-            self.spikes = spikesDF.values
-            self.output_file = open(self.output_filename, 'w')
+            os.exit("File not found. Exiting.")
 
-            self.num_neurons = int(num_neurons)
-
-            return self.__validate_input()
-        else:
-            print("File not found. Exiting.", file=sys.stderr)
-            return False
-
-    def __validate_input(self):
+    def __validate_input(self, dataframe):
         """Check to see the input file is a two column file."""
-        if self.spikes.shape[1] != 2:
+        if dataframe.shape[1] != 2:
             print("Data seems incorrect - should have 2 columns. " +
                   "Please check and re-run", file=sys.stderr)
             return False
         else:
-            print("Read " + str(self.spikes.shape[0]) +
+            print("Read " + str(dataframe.shape[0]) +
                   " rows.")
             return True
 
     def run(self):
         """Do the work."""
-        self.times = self.spikes[:, 1]
+        start_row = 0
         current_time = 0.
-        while current_time <= math.ceil(self.times[-1] - 1000.):
-            self.left += numpy.searchsorted(self.times[self.left:],
-                                            current_time,
-                                            side='left')
-            self.right = self.left + numpy.searchsorted(self.times[self.left:],
-                                                        (current_time + 1000.),
-                                                        side='right')
+        if self.rows != 0:
+            while True:
+                print("Reading chunk from {} to {} rows..".format(
+                    start_row, start_row + self.rows))
+                spikesDF = pandas.read_csv(self.input_filename, sep='\s+',
+                                           names=["neuronID",
+                                                  "spike_time"],
+                                           dtype={'neuronID': numpy.uint16,
+                                                  'spike_time': float},
+                                           lineterminator="\n",
+                                           skipinitialspace=True,
+                                           header=None, index_col=None,
+                                           skiprows=start_row,
+                                           nrows=self.rows)
+                if not self.__validate_input(spikesDF):
+                    os.exit("Error in file. Exiting.")
 
-            statement = ("{}\t{}\n".format(
-                (current_time + 1000.)/1000.,
-                (len(self.spikes[self.left:self.right, 0])/self.num_neurons)))
+                spikes = numpy.array(spikesDF.values[:, 0])
+                times = numpy.array(spikesDF.values[:, 1])
 
-            self.output_file.write(statement)
-            self.output_file.flush()
+                # Give me back my RAM!
+                del spikesDF
 
-            current_time += self.dt
+                if len(spikes) == 0:
+                    self.output_file.close()
+                    break
 
-        self.output_file.close()
+                while (current_time <= math.ceil((times[-1] - 1000.))):
+                    self.left += numpy.searchsorted(times[self.left:],
+                                                    current_time,
+                                                    side='left')
+                    self.right = self.left + numpy.searchsorted(
+                        times[self.left:], (current_time + 1000.),
+                        side='right')
+
+                    statement = ("{}\t{}\n".format(
+                        (current_time + 1000.)/1000.,
+                        (
+                            len(
+                                spikes[self.left:self.right]
+                            )/self.num_neurons)))
+
+                    self.output_file.write(statement)
+                    self.output_file.flush()
+
+                    current_time += self.dt
+
+                # Yeah - more free RAM
+                del spikes
+                del times
+
+                start_row += (self.rows - 10000)
 
     def print_usage(self):
         """Print usage."""
@@ -121,13 +146,22 @@ class spike2hz:
 
 if __name__ == "__main__":
     converter = spike2hz()
-    if len(sys.argv) == 4:
-        valid = converter.setup(str(sys.argv[1]), str(sys.argv[2]),
-                                int(sys.argv[3]))
-        if valid:
-            print("Processing ...")
-            converter.run()
-            print("Finished ...")
+    if len(sys.argv) == 3:
+        converter.setup(str(sys.argv[1]), str(sys.argv[2]))
+        print("Processing ...")
+        converter.run()
+        print("Finished ...")
+    elif len(sys.argv) == 4:
+        converter.setup(str(sys.argv[1]), str(sys.argv[2]),
+                        int(sys.argv[3]))
+        converter.run()
+        print("Finished ...")
+    elif len(sys.argv) == 5:
+        converter.setup(str(sys.argv[1]), str(sys.argv[2]),
+                        int(sys.argv[3]), int(sys.argv[4]))
+        print("Processing ...")
+        converter.run()
+        print("Finished ...")
     else:
         print("Incorrect arguments.", file=sys.stderr)
         print(file=sys.stderr)
