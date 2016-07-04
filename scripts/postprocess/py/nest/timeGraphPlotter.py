@@ -204,11 +204,11 @@ class timeGraphPlotter:
             os.stat(self.config.filenameE).st_size != 0
         ):
             spikeconverter = spike2hz()
-            spikeconverter.setup(self.config.filenameE,
-                                 self.config.filenameRatesE,
-                                 self.config.neuronsE,
-                                 self.config.rows_per_read)
-            spikeconverter.run()
+            if spikeconverter.setup(self.config.filenameE,
+                                    self.config.filenameRatesE,
+                                    self.config.neuronsE,
+                                    self.config.rows_per_read):
+                spikeconverter.run()
             del spikeconverter
 
         if (
@@ -216,11 +216,11 @@ class timeGraphPlotter:
             os.stat(self.config.filenameI).st_size != 0
         ):
             spikeconverter = spike2hz()
-            spikeconverter.setup(self.config.filenameI,
-                                 self.config.filenameRatesI,
-                                 self.config.neuronsI,
-                                 self.config.rows_per_read)
-            spikeconverter.run()
+            if spikeconverter.setup(self.config.filenameI,
+                                    self.config.filenameRatesI,
+                                    self.config.neuronsI,
+                                    self.config.rows_per_read):
+                spikeconverter.run()
             del spikeconverter
 
         if (
@@ -228,11 +228,11 @@ class timeGraphPlotter:
             os.stat(self.config.filenameR).st_size != 0
         ):
             spikeconverter = spike2hz()
-            spikeconverter.setup(self.config.filenameR,
-                                 self.config.filenameRatesR,
-                                 self.config.neuronsR,
-                                 self.config.rows_per_read)
-            spikeconverter.run()
+            if spikeconverter.setup(self.config.filenameR,
+                                    self.config.filenameRatesR,
+                                    self.config.neuronsR,
+                                    self.config.rows_per_read):
+                spikeconverter.run()
             del spikeconverter
 
         if (
@@ -240,11 +240,11 @@ class timeGraphPlotter:
             os.stat(self.config.filenameB).st_size != 0
         ):
             spikeconverter = spike2hz()
-            spikeconverter.setup(self.config.filenameB,
-                                 self.config.filenameRatesB,
-                                 self.config.neuronsB,
-                                 self.config.rows_per_read)
-            spikeconverter.run()
+            if spikeconverter.setup(self.config.filenameB,
+                                    self.config.filenameRatesB,
+                                    self.config.neuronsB,
+                                    self.config.rows_per_read):
+                spikeconverter.run()
             del spikeconverter
 
         if (
@@ -252,11 +252,11 @@ class timeGraphPlotter:
             os.stat(self.config.filenameS).st_size != 0
         ):
             spikeconverter = spike2hz()
-            spikeconverter.setup(self.config.filenameS,
-                                 self.config.filenameRatesS,
-                                 self.config.neuronsS,
-                                 self.config.rows_per_read)
-            spikeconverter.run()
+            if spikeconverter.setup(self.config.filenameS,
+                                    self.config.filenameRatesS,
+                                    self.config.neuronsS,
+                                    self.config.rows_per_read):
+                spikeconverter.run()
             del spikeconverter
 
         if (
@@ -264,11 +264,11 @@ class timeGraphPlotter:
             os.stat(self.config.filenameL).st_size != 0
         ):
             spikeconverter = spike2hz()
-            spikeconverter.setup(self.config.filenameL,
-                                 self.config.filenameRatesL,
-                                 self.config.neuronsL,
-                                 self.config.rows_per_read)
-            spikeconverter.run()
+            if spikeconverter.setup(self.config.filenameL,
+                                    self.config.filenameRatesL,
+                                    self.config.neuronsL,
+                                    self.config.rows_per_read):
+                spikeconverter.run()
             del spikeconverter
 
         if (
@@ -276,11 +276,11 @@ class timeGraphPlotter:
             os.stat(self.config.filenameP).st_size != 0
         ):
             spikeconverter = spike2hz()
-            spikeconverter.setup(self.config.filenameP,
-                                 self.config.filenameRatesP,
-                                 self.config.neuronsP,
-                                 self.config.rows_per_read)
-            spikeconverter.run()
+            if spikeconverter.setup(self.config.filenameP,
+                                    self.config.filenameRatesP,
+                                    self.config.neuronsP,
+                                    self.config.rows_per_read):
+                spikeconverter.run()
             del spikeconverter
 
     def plot_all(self):
