@@ -26,6 +26,8 @@ import numpy
 import sys
 import math
 import collections
+import os
+import gc
 
 
 class getFiringRates:
@@ -37,65 +39,39 @@ class getFiringRates:
         self.spikes_filename = ""
         self.neurons_set_name = ""
         self.num_neurons = 0
+        self.rows = 0.
+        self.start = 0
+        self.end = 0
 
-    def __setup(self, filename, neuron_set_name, num_neurons):
+    def setup(self, filename, neuron_set_name, num_neurons, rows=0.):
         """Setup."""
         self.spikes_filename = filename
         self.neurons_set_name = neuron_set_name
         self.num_neurons = int(num_neurons)
+        self.rows = rows
 
-    def __read_file(self):
-        """Read the file."""
-        print("Reading spikes file {}".format(self.spikes_filename))
-        spikesDF = pandas.read_csv(self.spikes_filename,
-                                   sep='\s+', dtype=float,
-                                   lineterminator="\n",
-                                   skipinitialspace=True, header=None,
-                                   index_col=None, names=None)
-        self.spikes = spikesDF.values
+        if not (
+            os.path.exists(self.spikes_filename) and
+            os.stat(self.spikes_filename).st_size > 0
+        ):
+            print("{} not found. Skipping.".format(self.spikes_filename),
+                  file=sys.stderr)
+            return False
 
-        return self.__validate_spike_input()
+        return True
 
-    def __validate_spike_input(self):
+    def __validate_input(self, dataframe):
         """Check to see the input file is a two column file."""
-        if self.spikes.shape[1] != 2:
-            print("Pattern seems incorrect - should have 2 columns. " +
+        if dataframe.shape[1] != 2:
+            print("Data seems incorrect - should have 2 columns. " +
                   "Please check and re-run", file=sys.stderr)
             return False
         else:
-            print("Read " + str(self.spikes.shape[0]) +
+            print("Read " + str(dataframe.shape[0]) +
                   " rows.")
             return True
 
-    def __get_spikes(self, time):
-        """Get spikes for this period."""
-        print("Getting spikes for {} - {}".format(time - 1., time))
-        times = self.spikes[:, 1]
-        start = numpy.searchsorted(times,
-                                   time - 1000.,
-                                   side='left')
-        end = numpy.searchsorted(times,
-                                 time,
-                                 side='right')
-        self.neurons = self.spikes[start:end, 0]
-
-    def __get_firing_rates(self):
-        """Get firing rates for the specified neurons."""
-        counts = dict(collections.Counter(self.neurons))
-        self.rates = list(counts.values())
-
-        missing_neurons = self.num_neurons - len(self.rates)
-
-        print("Neurons found: {}".format(len(self.rates)))
-
-        # Add missing entries - affects the mean and std calculations. They
-        # have to be the right number
-        for entries in range(0, missing_neurons):
-            self.rates.append(0)
-
-        print("Neurons after appending zeros: {}".format(len(self.rates)))
-
-    def __print_firing_rates(self, time):
+    def print_firing_rates(self, time):
         """Print the file."""
         output_filename = "firing-rate-{}-{}.gdf".format(
             self.neurons_set_name, time)
@@ -107,26 +83,97 @@ class getFiringRates:
             print(rate, file=output_file)
         output_file.close()
 
-    def run(self, filename, neuron_set_name, num_neurons,
-            time_start, time_end):
+    def run(self, timelist):
         """Main runner method."""
-        time_start = round(float(time_start))
-        time_end = round(float(time_end))
-        self.__setup(filename, neuron_set_name, num_neurons)
-        if not self.__read_file():
-            print("Files not valid. Exiting.", file=sys.stderr)
-            return
-        else:
-            if time_start == time_end:
-                self.__get_spikes(time_start)
-                self.__get_firing_rates()
-                self.__print_firing_rates(time_start)
-            else:
-                for time in numpy.arange(time_start + 1., time_end + 1., 1.0,
-                                         dtype=float):
-                    self.__get_spikes(time)
-                    self.__get_firing_rates()
-                    self.__print_firing_rates(time)
+        # remember to convert to ms!
+        sorted_timelist = numpy.sort(timelist)
+
+        current = 0
+        old_spikes = numpy.array([])
+        old_times = numpy.array([])
+
+        print("Reading spikes file {}".format(self.spikes_filename))
+        for chunk in pandas.read_csv(self.spikes_filename, sep='\s+',
+                                     names=["neuronID",
+                                            "spike_time"],
+                                     dtype={'neuronID': numpy.uint16,
+                                            'spike_time': float},
+                                     lineterminator="\n",
+                                     skipinitialspace=True,
+                                     header=None, index_col=None,
+                                     chunksize=self.rows):
+
+            if not self.__validate_input(chunk):
+                print("Error in file. Skipping.", file=sys.stderr)
+                return False
+
+            # Only if you find the item do you print, else you read the next
+            # chunk. Now, if all chunks are read and the item wasn't found, the
+            # next items cannot be in the file either, since we're sorting the
+            # file
+            spikes = numpy.array(chunk.values[:, 0])
+            times = numpy.array(chunk.values[:, 1])
+
+            # 200 spikes per second = 2 spikes per 0.01 second (dt) per neuron
+            # this implies 2 * 10000 spikes for 10000 neurons need to be kept
+            # to make sure I have a proper sliding window of chunks
+            if len(old_spikes) > 0:
+                spikes = numpy.append(old_spikes, spikes)
+                times = numpy.append(old_times, times)
+
+            print(
+                "Times from {} to {} being analysed containing {} rows".format(
+                    times[0], times[-1], len(times)))
+
+            while True:
+                time = sorted_timelist[current]
+                print("Looking for {}.".format(time))
+                time *= 1000.
+
+                # Find our values
+                self.start = numpy.searchsorted(times,
+                                                time - 1000.,
+                                                side='left')
+                self.end = numpy.searchsorted(times,
+                                              time,
+                                              side='right')
+                # Not found at all, don't process anything
+                if self.start == len(times):
+                    print("Neurons not found, reading next chunk.")
+                    break
+                elif self.start < len(times) and self.end == len(times):
+                    print("Found a boundary - reading another chunk.")
+                    break
+                else:
+                    self.neurons = spikes[self.start:self.end]
+                    counts = dict(collections.Counter(self.neurons))
+                    self.rates = list(counts.values())
+
+                    missing_neurons = self.num_neurons - len(self.rates)
+
+                    print("Neurons found: {}".format(len(self.rates)))
+
+                    # Add missing entries - affects the mean and std
+                    # calculations. They have to be the right number
+                    for entries in range(0, missing_neurons):
+                        self.rates.append(0)
+
+                    print("Neurons after appending zeros: {}".format(
+                        len(self.rates)))
+
+                    self.print_firing_rates(sorted_timelist[current])
+
+                    current += 1
+                    if current == len(sorted_timelist):
+                        break
+
+            if self.start < len(times):
+                old_times = numpy.array(times[(self.start - len(times)):])
+                old_spikes = numpy.array(spikes[(self.start - len(spikes)):])
+
+            del spikes
+            del times
+            gc.collect()
 
     def usage(self):
         """Print usage."""
