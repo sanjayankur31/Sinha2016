@@ -71,7 +71,10 @@ class spike2hz:
             os.path.exists(self.input_filename) and
             os.stat(self.input_filename).st_size > 0
         ):
-            os.exit("File not found. Exiting.")
+            print("File not found. Skipping.", file=sys.stderr)
+            return False
+
+        return True
 
     def __validate_input(self, dataframe):
         """Check to see the input file is a two column file."""
@@ -101,7 +104,8 @@ class spike2hz:
                                      chunksize=self.rows):
 
             if not self.__validate_input(chunk):
-                os.exit("Error in file. Exiting.")
+                print("Error in file. Skipping.", file=sys.stderr)
+                return False
 
             spikes = numpy.array(chunk.values[:, 0])
             times = numpy.array(chunk.values[:, 1])
