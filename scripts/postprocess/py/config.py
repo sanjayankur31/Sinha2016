@@ -78,6 +78,7 @@ class Config:
         self.filenameRatesP = parser['default']['filenameRatesP']
 
         self.timegraphs = parser['default'].getboolean('timegraphs')
+        self.rows_per_read = int(parser['default']['rows_per_read'])
 
         # histograms and rasters
         self.histograms = parser['default'].getboolean('histograms')
