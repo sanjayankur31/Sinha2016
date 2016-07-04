@@ -26,6 +26,7 @@ import sys
 import math
 import pandas
 import os.path
+import gc
 
 
 class spike2hz:
@@ -86,59 +87,70 @@ class spike2hz:
     def run(self):
         """Do the work."""
         start_row = 0
-        current_time = 0.
-        if self.rows != 0:
-            while True:
-                print("Reading chunk from {} to {} rows..".format(
-                    start_row, start_row + self.rows))
-                spikesDF = pandas.read_csv(self.input_filename, sep='\s+',
-                                           names=["neuronID",
-                                                  "spike_time"],
-                                           dtype={'neuronID': numpy.uint16,
-                                                  'spike_time': float},
-                                           lineterminator="\n",
-                                           skipinitialspace=True,
-                                           header=None, index_col=None,
-                                           skiprows=start_row,
-                                           nrows=self.rows)
-                if not self.__validate_input(spikesDF):
-                    os.exit("Error in file. Exiting.")
+        current_time = 1000.
+        old_spikes = numpy.array([])
+        old_times = numpy.array([])
+        for chunk in pandas.read_csv(self.input_filename, sep='\s+',
+                                     names=["neuronID",
+                                            "spike_time"],
+                                     dtype={'neuronID': numpy.uint16,
+                                            'spike_time': float},
+                                     lineterminator="\n",
+                                     skipinitialspace=True,
+                                     header=None, index_col=None,
+                                     chunksize=self.rows):
 
-                spikes = numpy.array(spikesDF.values[:, 0])
-                times = numpy.array(spikesDF.values[:, 1])
+            if not self.__validate_input(chunk):
+                os.exit("Error in file. Exiting.")
 
-                # Give me back my RAM!
-                del spikesDF
+            spikes = numpy.array(chunk.values[:, 0])
+            times = numpy.array(chunk.values[:, 1])
 
-                if len(spikes) == 0:
-                    self.output_file.close()
-                    break
+            # 200 spikes per second = 2 spikes per 0.01 second (dt) per neuron
+            # this implies 2 * 10000 spikes for 10000 neurons need to be kept
+            # to make sure I have a proper sliding window of chunks
+            if len(old_spikes) > 0:
+                spikes = numpy.append(old_spikes, spikes)
+                times = numpy.append(old_times, times)
 
-                while (current_time <= math.ceil((times[-1] - 1000.))):
-                    self.left += numpy.searchsorted(times[self.left:],
-                                                    current_time,
-                                                    side='left')
-                    self.right = self.left + numpy.searchsorted(
-                        times[self.left:], (current_time + 1000.),
-                        side='right')
+            print(
+                "Times from {} to {} being analysed containing {} rows".format(
+                    times[0], times[-1], len(times)))
+            print("Current time is {}".format(current_time))
 
-                    statement = ("{}\t{}\n".format(
-                        (current_time + 1000.)/1000.,
-                        (
-                            len(
-                                spikes[self.left:self.right]
-                            )/self.num_neurons)))
+            # Reset chunks
+            self.left = 0
+            self.right = 0
 
-                    self.output_file.write(statement)
-                    self.output_file.flush()
+            while (current_time < math.floor(times[-1])):
+                self.left += numpy.searchsorted(times[self.left:],
+                                                (current_time - 1000.),
+                                                side='left')
+                self.right = self.left + numpy.searchsorted(
+                    times[self.left:], current_time,
+                    side='right')
 
-                    current_time += self.dt
+                statement = ("{}\t{}\n".format(
+                    current_time/1000.,
+                    (
+                        len(
+                            spikes[self.left:self.right]
+                        )/self.num_neurons)))
 
-                # Yeah - more free RAM
-                del spikes
-                del times
+                self.output_file.write(statement)
+                self.output_file.flush()
 
-                start_row += (self.rows - 10000)
+                current_time += self.dt
+
+            print("Printed till {}".format(current_time))
+            old_times = numpy.array(times[(self.left - len(times)):])
+            old_spikes = numpy.array(spikes[(self.left - len(spikes)):])
+
+            del spikes
+            del times
+            gc.collect()
+
+        self.output_file.close()
 
     def print_usage(self):
         """Print usage."""
