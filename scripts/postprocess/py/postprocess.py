@@ -47,12 +47,50 @@ class Postprocess:
 
     def __nest_postprocess(self):
         """Nest postprocessing."""
-        import nest.timeGraphPlotter as TGP
         if self.config.timegraphs:
+            import nest.timeGraphPlotter as TGP
             tgp = TGP.timeGraphPlotter(self.config)
             tgp.plot_all()
 
-        # if self.config.histograms
+        if self.config.histograms:
+            import nest.dualHistogramPlotter as pltH
+            import nest.getFiringRates as rg
+            rateGetterE = rg.getFiringRates()
+            if rateGetterE.setup(self.config.filenameE, 'E',
+                                 self.config.neuronsE,
+                                 self.config.rows_per_read):
+                rateGetterE.run(self.config.histogram_timelist)
+
+            rateGetterI = rg.getFiringRates()
+            if rateGetterI.setup(self.config.filenameI, 'I',
+                                 self.config.neuronsI,
+                                 self.config.rows_per_read):
+                rateGetterI.run(self.config.histogram_timelist)
+
+            plotterEI = pltH.dualHistogramPlotter()
+            if plotterEI.setup('E', 'I', self.config.neuronsE,
+                               self.config.neuronsI):
+                plotterEI.run()
+
+            rateGetterB = rg.getFiringRates()
+            if rateGetterB.setup(self.config.filenameB, 'B',
+                                 self.config.neuronsB,
+                                 self.config.rows_per_read):
+                rateGetterB.run(self.config.histogram_timelist)
+
+            rateGetterS = rg.getFiringRates()
+            if rateGetterS.setup(self.config.filenameS, 'S',
+                                 self.config.neuronsS,
+                                 self.config.rows_per_read):
+                rateGetterS.run(self.config.histogram_timelist)
+
+            plotterBS = pltH.dualHistogramPlotter()
+            if plotterBS.setup('B', 'S', self.config.neuronsB,
+                               self.config.neuronsS):
+                plotterBS.run()
+
+        if self.config.rasters:
+            import nest.rasterPlotter as pltR
 
     def __auryn_postprocess(self):
         """Auryn postprocessing."""
