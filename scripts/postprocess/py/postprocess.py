@@ -90,7 +90,13 @@ class Postprocess:
                 plotterBS.run()
 
         if self.config.rasters:
-            import nest.rasterPlotter as pltR
+            import nest.dualRasterPlotter as pltR
+            rasterPlotterEI = pltR.dualRasterPlotter()
+            if rasterPlotterEI.setup('E', 'I', self.config.neuronsE,
+                                     self.config.neuronsI,
+                                     self.config.rows_per_read):
+                # rasterPlotterEI.run(self.config.histogram_timelist)
+                rasterPlotterEI.plot_rasters(self.config.histogram_timelist)
 
     def __auryn_postprocess(self):
         """Auryn postprocessing."""
