@@ -48,8 +48,8 @@ class dualHistogramPlotter:
         self.num_neurons1 = num_neurons1
         self.num_neurons2 = num_neurons2
 
-        self.filelist1 = glob.glob("firing-rate-" + set1 + "*.gdf")
-        self.filelist2 = glob.glob("firing-rate-" + set2 + "*.gdf")
+        self.filelist1 = glob.glob("firing-rate-" + set1 + "-*.gdf")
+        self.filelist2 = glob.glob("firing-rate-" + set2 + "-*.gdf")
 
         # sort them
         self.filelist1.sort()
