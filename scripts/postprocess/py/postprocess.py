@@ -95,7 +95,7 @@ class Postprocess:
             if rasterPlotterEI.setup('E', 'I', self.config.neuronsE,
                                      self.config.neuronsI,
                                      self.config.rows_per_read):
-                # rasterPlotterEI.run(self.config.histogram_timelist)
+                rasterPlotterEI.run(self.config.histogram_timelist)
                 rasterPlotterEI.plot_rasters(self.config.histogram_timelist)
 
     def __auryn_postprocess(self):
