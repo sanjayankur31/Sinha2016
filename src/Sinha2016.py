@@ -85,11 +85,11 @@ class Sinha2016:
         self.synDictII = {"weight": -20.}
 
         self.synDictIE = {"weight": 0., "Wmax": -30000.,
-                          'alpha': .32, 'eta': -0.0001,
+                          'alpha': .32, 'eta': -0.001,
                           'tau': 20.}
 
         # see the aif source for symbol definitions
-        self.neuronDict = {'I_e': 250.0, 'V_m': -60.,
+        self.neuronDict = {'I_e': 200.0, 'V_m': -60.,
                            't_ref': 5.0, 'V_reset': -60.,
                            'V_th': -50., 'C_m': 200.,
                            'E_L': -60., 'g_L': 10.,
