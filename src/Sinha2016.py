@@ -266,7 +266,7 @@ class Sinha2016:
             'synaptic_elements': self.synaptic_elements_E})
         self.neuronsI = nest.Create('tif_neuronI', self.populations['I'], {
             'synaptic_elements': self.synaptic_elements_I})
-        self.currentExt = nest.Create('noise_generator', self.currentExtDict)
+        self.currentExt = nest.Create('noise_generator', params=self.currentExtDict)
 
         nest.SetStatus(self.neuronsE, 'synaptic_elements',
                        self.synaptic_elements_E)
