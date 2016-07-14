@@ -74,7 +74,7 @@ function setup_env
         touch result/"00-GIT-COMMIT-""$GIT_COMMIT"
 
         mkdir -v result/consolidated_files/
-        cp -v "Sinha2016/src/config-nest.ini" consolidated_files/
+        cp -v "Sinha2016/src/config-nest.ini" result/consolidated_files/
     popd
 }
 
