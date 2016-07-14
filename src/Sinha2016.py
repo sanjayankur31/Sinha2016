@@ -89,12 +89,15 @@ class Sinha2016:
                           'tau': 20.}
 
         # see the aif source for symbol definitions
-        self.neuronDict = {'I_e': 150.0, 'V_m': -60.,
+        self.neuronDict = {'I_e': 0.0, 'V_m': -60.,
                            't_ref': 5.0, 'V_reset': -60.,
                            'V_th': -50., 'C_m': 200.,
                            'E_L': -60., 'g_L': 10.,
                            'E_ex': 0., 'E_in': -80.,
                            'tau_syn_ex': 5., 'tau_syn_in': 10.}
+
+        # external current
+        self.currentExtDict = {'mean': 250., 'std': 50.}
 
         self.rank = nest.Rank()
 
@@ -263,6 +266,7 @@ class Sinha2016:
             'synaptic_elements': self.synaptic_elements_E})
         self.neuronsI = nest.Create('tif_neuronI', self.populations['I'], {
             'synaptic_elements': self.synaptic_elements_I})
+        self.currentExt = nest.Create('noise_generator', self.currentExtDict)
 
         nest.SetStatus(self.neuronsE, 'synaptic_elements',
                        self.synaptic_elements_E)
@@ -277,6 +281,8 @@ class Sinha2016:
         nest.Connect(self.neuronsE, self.sdE)
         nest.Connect(self.neuronsI, self.sdI)
 
+        nest.Connect(self.currentExt, self.neuronsE)
+        nest.Connect(self.currentExt, self.neuronsI)
         nest.Connect(self.neuronsE, self.neuronsE, conn_spec=self.connDictEE,
                      syn_spec="excitatory_static")
         nest.Connect(self.neuronsE, self.neuronsI, conn_spec=self.connDictEI,
