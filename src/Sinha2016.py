@@ -282,8 +282,8 @@ class Sinha2016:
         nest.Connect(self.neuronsE, self.sdE)
         nest.Connect(self.neuronsI, self.sdI)
 
-        nest.Connect(self.poissonExt, self.neuronsE, 'one_to_one')
-        nest.Connect(self.poissonExt, self.neuronsI, 'one_to_one')
+        nest.Connect(self.poissonExt, self.neuronsE)
+        nest.Connect(self.poissonExt, self.neuronsI)
         nest.Connect(self.neuronsE, self.neuronsE, conn_spec=self.connDictEE,
                      syn_spec="excitatory_static")
         nest.Connect(self.neuronsE, self.neuronsI, conn_spec=self.connDictEI,
