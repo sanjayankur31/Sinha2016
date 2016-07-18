@@ -25,31 +25,31 @@ echo "Combining files for NEST simulation"
 mkdir consolidated_files
 
 echo "Combining recall files"
-sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*recall*.gdf > spikes-recall.gdf
+LC_ALL=C sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*recall*.gdf > spikes-recall.gdf
 mv spikes-recall.gdf consolidated_files
 
 echo "Combining pattern files"
-sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*pattern*.gdf > spikes-pattern.gdf
+LC_ALL=C sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*pattern*.gdf > spikes-pattern.gdf
 mv spikes-pattern.gdf consolidated_files
 
 echo "Combining deaff files"
-sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*deaffed*.gdf > spikes-deaffed.gdf
+LC_ALL=C sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*deaffed*.gdf > spikes-deaffed.gdf
 mv spikes-deaffed.gdf consolidated_files
 
 echo "Combining background files"
-sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*background*.gdf > spikes-background.gdf
+LC_ALL=C sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*background*.gdf > spikes-background.gdf
 mv spikes-background.gdf consolidated_files
 
 echo "Combining E files"
-sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*E*.gdf > spikes-E.gdf
+LC_ALL=C sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*E*.gdf > spikes-E.gdf
 mv spikes-E.gdf consolidated_files
 
 echo "Combining I files"
-sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*I*.gdf > spikes-I.gdf
+LC_ALL=C sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*I*.gdf > spikes-I.gdf
 mv spikes-I.gdf consolidated_files
 
 echo "Combining Stim files"
-sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*Stim*.gdf > spikes-Stim.gdf
+LC_ALL=C sort -k "2" -n --parallel=16 -T $SORTTMPDIR spikes-*Stim*.gdf > spikes-Stim.gdf
 mv spikes-Stim.gdf consolidated_files
 
 echo "Copying over settings file"
