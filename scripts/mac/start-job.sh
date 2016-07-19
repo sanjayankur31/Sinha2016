@@ -22,7 +22,7 @@
 
 SOURCE_PATH="/home/asinha/Documents/02_Code/00_repos/00_mine/Sinha2016/"
 GIT_COMMIT=""
-SIM_PATH="/home/asinha/dump/cluster-data/"
+SIM_PATH="/home/asinha/cluster-data/"
 SIM_TIME=$(date +%Y%m%d%H%M)
 RUN_SCRIPT="scripts/mac/nest-runsim.sh"
 RUN_NEW=""

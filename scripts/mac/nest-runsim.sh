@@ -21,7 +21,7 @@
 
 module load mpi/openmpi-x86_64
 
-SIM_PATH="/home/asinha/dump/cluster-data/"
+SIM_PATH="/home/asinha/cluster-data/"
 SIM_TIME=""
 PROGRAM_PATH="$SIM_PATH""$SIM_TIME""/Sinha2016/src/Sinha2016.py"
 RESULT_PATH="$SIM_PATH""$SIM_TIME""/result/"
