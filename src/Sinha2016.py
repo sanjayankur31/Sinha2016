@@ -63,6 +63,12 @@ class Sinha2016:
         self.connectionNumberIE = int((self.populations['I'] *
                                        self.populations['E']) * self.sparsity)
         self.connectionNumberEI = self.connectionNumberIE
+        self.connectionNumberExtE = int((self.populations['E'] *
+                                         self.populations['E']) *
+                                        self.sparsityStim)
+        self.connectionNumberExtI = int((self.populations['I'] *
+                                         self.populations['I']) *
+                                        self.sparsityStim)
         self.connectionNumberStim = int((self.populations['STIM'] *
                                          self.populations['R'])
                                         * self.sparsityStim)
@@ -76,6 +82,10 @@ class Sinha2016:
                            "N": self.connectionNumberII}
         self.connDictIE = {"rule": "fixed_total_number",
                            "N": self.connectionNumberIE}
+        self.connDictExtE = {"rule": "fixed_total_number",
+                             "N": self.connectionNumberExtE}
+        self.connDictExtI = {"rule": "fixed_total_number",
+                             "N": self.connectionNumberExtI}
         self.connDictStim = {"rule": "fixed_total_number",
                              "N": self.connectionNumberStim}
 
@@ -266,8 +276,12 @@ class Sinha2016:
             'synaptic_elements': self.synaptic_elements_E})
         self.neuronsI = nest.Create('tif_neuronI', self.populations['I'], {
             'synaptic_elements': self.synaptic_elements_I})
-        self.poissonExt = nest.Create('poisson_generator',
-                                      params=self.poissonExtDict)
+        self.poissonExtE = nest.Create('poisson_generator',
+                                       self.populations['E'],
+                                       params=self.poissonExtDict)
+        self.poissonExtI = nest.Create('poisson_generator',
+                                       self.populations['I'],
+                                       params=self.poissonExtDict)
 
         nest.SetStatus(self.neuronsE, 'synaptic_elements',
                        self.synaptic_elements_E)
@@ -282,8 +296,11 @@ class Sinha2016:
         nest.Connect(self.neuronsE, self.sdE)
         nest.Connect(self.neuronsI, self.sdI)
 
-        nest.Connect(self.poissonExt, self.neuronsE)
-        nest.Connect(self.poissonExt, self.neuronsI)
+        nest.Connect(self.poissonExtE, self.neuronsE,
+                     conn_spec=self.connDictExtE)
+        nest.Connect(self.poissonExtI, self.neuronsI,
+                     conn_spec=self.connDictExtI)
+
         nest.Connect(self.neuronsE, self.neuronsE, conn_spec=self.connDictEE,
                      syn_spec="excitatory_static")
         nest.Connect(self.neuronsE, self.neuronsI, conn_spec=self.connDictEI,
