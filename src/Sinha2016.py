@@ -46,7 +46,7 @@ class Sinha2016:
         self.recall_time = 1000.  # ms
         # populations
         self.populations = {'E': 8000, 'I': 2000, 'P': 800, 'R': 400,
-                            'D': 200, 'STIM': 1000}
+                            'D': 200, 'STIM': 1000, 'Poisson': 100.}
         # Number of patterns we store
         self.numpats = 0
         # Global sparsity
@@ -60,15 +60,14 @@ class Sinha2016:
         self.connectionNumberIE = int((self.populations['I'] *
                                        self.populations['E']) * self.sparsity)
         self.connectionNumberEI = self.connectionNumberIE
-        self.connectionNumberExtE = int((self.populations['E'] *
-                                         self.populations['E']) *
-                                        self.sparsityStim)
-        self.connectionNumberExtI = int((self.populations['I'] *
-                                         self.populations['I']) *
-                                        self.sparsityStim)
         self.connectionNumberStim = int((self.populations['STIM'] *
                                          self.populations['R'])
                                         * self.sparsityStim)
+
+        # indegree, not total number of connections
+        # From the butz paper
+        self.connectionNumberExtE = 100.
+        self.connectionNumberExtI = 100.
 
         # connection dictionaries
         self.connDictEE = {"rule": "fixed_total_number",
@@ -79,9 +78,9 @@ class Sinha2016:
                            "N": self.connectionNumberII}
         self.connDictIE = {"rule": "fixed_total_number",
                            "N": self.connectionNumberIE}
-        self.connDictExtE = {"rule": "fixed_total_number",
+        self.connDictExtE = {"rule": "fixed_indegree",
                              "N": self.connectionNumberExtE}
-        self.connDictExtI = {"rule": "fixed_total_number",
+        self.connDictExtI = {"rule": "fixed_indegree",
                              "N": self.connectionNumberExtI}
         self.connDictStim = {"rule": "fixed_total_number",
                              "N": self.connectionNumberStim}
@@ -104,7 +103,7 @@ class Sinha2016:
                            'tau_syn_ex': 5., 'tau_syn_in': 10.}
 
         # external current
-        self.poissonExtDict = {'rate': 250., 'origin': 0., 'start': 0.}
+        self.poissonExtDict = {'rate': 10., 'origin': 0., 'start': 0.}
 
         self.rank = nest.Rank()
 
@@ -274,10 +273,10 @@ class Sinha2016:
         self.neuronsI = nest.Create('tif_neuronI', self.populations['I'], {
             'synaptic_elements': self.synaptic_elements_I})
         self.poissonExtE = nest.Create('poisson_generator',
-                                       self.populations['E'],
+                                       self.populations['Poisson'],
                                        params=self.poissonExtDict)
         self.poissonExtI = nest.Create('poisson_generator',
-                                       self.populations['I'],
+                                       self.populations['Poisson'],
                                        params=self.poissonExtDict)
 
         nest.SetStatus(self.neuronsE, 'synaptic_elements',
