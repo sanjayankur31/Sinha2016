@@ -24,9 +24,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import print_function
 import sys
 sys.argv.append('--quiet')
-import matplotlib
-matplotlib.use('Agg')
-from matplotlib import pyplot as plt
 import nest
 import numpy
 import math
