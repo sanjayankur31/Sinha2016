@@ -91,8 +91,8 @@ class Sinha2016:
         self.synDictE = {"weight": 3.}
         self.synDictII = {"weight": -30.}
 
-        self.synDictIE = {"weight": 0., "Wmax": -30000.,
-                          'alpha': .32, 'eta': -0.001,
+        self.synDictIE = {"weight": -0.0001, "Wmax": -30000.,
+                          'alpha': .32, 'eta': 0.001,
                           'tau': 20.}
 
         # see the aif source for symbol definitions
