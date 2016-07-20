@@ -46,7 +46,7 @@ class Sinha2016:
         self.recall_time = 1000.  # ms
         # populations
         self.populations = {'E': 8000, 'I': 2000, 'P': 800, 'R': 400,
-                            'D': 200, 'STIM': 1000, 'Poisson': 100}
+                            'D': 200, 'STIM': 1000, 'Poisson': 1}
         # Number of patterns we store
         self.numpats = 0
         # Global sparsity
@@ -66,8 +66,8 @@ class Sinha2016:
 
         # indegree, not total number of connections
         # From the butz paper
-        self.connectionNumberExtE = 100
-        self.connectionNumberExtI = 100
+        self.connectionNumberExtE = 1
+        self.connectionNumberExtI = 1
 
         # connection dictionaries
         self.connDictEE = {"rule": "fixed_total_number",
@@ -103,7 +103,7 @@ class Sinha2016:
                            'tau_syn_ex': 5., 'tau_syn_in': 10.}
 
         # external current
-        self.poissonExtDict = {'rate': 10., 'origin': 0., 'start': 0.}
+        self.poissonExtDict = {'rate': 50., 'origin': 0., 'start': 0.}
 
         self.rank = nest.Rank()
 
