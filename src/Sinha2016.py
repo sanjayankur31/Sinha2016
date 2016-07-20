@@ -46,7 +46,7 @@ class Sinha2016:
         self.recall_time = 1000.  # ms
         # populations
         self.populations = {'E': 8000, 'I': 2000, 'P': 800, 'R': 400,
-                            'D': 200, 'STIM': 1000, 'Poisson': 100.}
+                            'D': 200, 'STIM': 1000, 'Poisson': 100}
         # Number of patterns we store
         self.numpats = 0
         # Global sparsity
@@ -66,8 +66,8 @@ class Sinha2016:
 
         # indegree, not total number of connections
         # From the butz paper
-        self.connectionNumberExtE = 100.
-        self.connectionNumberExtI = 100.
+        self.connectionNumberExtE = 100
+        self.connectionNumberExtI = 100
 
         # connection dictionaries
         self.connDictEE = {"rule": "fixed_total_number",
@@ -79,9 +79,9 @@ class Sinha2016:
         self.connDictIE = {"rule": "fixed_total_number",
                            "N": self.connectionNumberIE}
         self.connDictExtE = {"rule": "fixed_indegree",
-                             "N": self.connectionNumberExtE}
+                             "indegree": self.connectionNumberExtE}
         self.connDictExtI = {"rule": "fixed_indegree",
-                             "N": self.connectionNumberExtI}
+                             "indegree": self.connectionNumberExtI}
         self.connDictStim = {"rule": "fixed_total_number",
                              "N": self.connectionNumberStim}
 
@@ -103,7 +103,7 @@ class Sinha2016:
                            'tau_syn_ex': 5., 'tau_syn_in': 10.}
 
         # external current
-        self.poissonExtDict = {'rate': 100., 'origin': 0., 'start': 0.}
+        self.poissonExtDict = {'rate': 10., 'origin': 0., 'start': 0.}
 
         self.rank = nest.Rank()
 
