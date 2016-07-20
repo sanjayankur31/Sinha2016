@@ -293,11 +293,9 @@ class Sinha2016:
         nest.Connect(self.neuronsI, self.sdI)
 
         nest.Connect(self.poissonExtE, self.neuronsE,
-                     conn_spec=self.connDictExtE,
-                     syn_spec="excitatory_static")
+                     conn_spec=self.connDictExtE)
         nest.Connect(self.poissonExtI, self.neuronsI,
-                     conn_spec=self.connDictExtI,
-                     syn_spec="excitatory_static")
+                     conn_spec=self.connDictExtI)
 
         nest.Connect(self.neuronsE, self.neuronsE, conn_spec=self.connDictEE,
                      syn_spec="excitatory_static")
