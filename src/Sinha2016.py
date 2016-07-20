@@ -103,7 +103,7 @@ class Sinha2016:
                            'tau_syn_ex': 5., 'tau_syn_in': 10.}
 
         # external current
-        self.poissonExtDict = {'rate': 10., 'origin': 0., 'start': 0.}
+        self.poissonExtDict = {'rate': 100., 'origin': 0., 'start': 0.}
 
         self.rank = nest.Rank()
 
@@ -293,9 +293,11 @@ class Sinha2016:
         nest.Connect(self.neuronsI, self.sdI)
 
         nest.Connect(self.poissonExtE, self.neuronsE,
-                     conn_spec=self.connDictExtE)
+                     conn_spec=self.connDictExtE,
+                     syn_spec="excitatory_static")
         nest.Connect(self.poissonExtI, self.neuronsI,
-                     conn_spec=self.connDictExtI)
+                     conn_spec=self.connDictExtI,
+                     syn_spec="excitatory_static")
 
         nest.Connect(self.neuronsE, self.neuronsE, conn_spec=self.connDictEE,
                      syn_spec="excitatory_static")
