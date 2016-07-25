@@ -148,7 +148,7 @@ class Sinha2016:
                             str(self.rank) + ".txt")
         self.ca_file_handle = open(self.ca_filename, 'w')
 
-        self.syn_filename = ("synaptic-" +
+        self.syn_filename = ("00-synaptic-connections" +
                              str(self.rank) + ".txt")
         self.syn_file_handle = open(self.syn_filename, 'w')
 
