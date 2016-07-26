@@ -24,9 +24,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import print_function
 import sys
 sys.argv.append('--quiet')
-import matplotlib
-matplotlib.use('Agg')
-from matplotlib import pyplot as plt
 import nest
 import numpy
 import math
@@ -48,7 +45,7 @@ class Sinha2016:
         self.recall_time = 1000.  # ms
         # populations
         self.populations = {'E': 8000, 'I': 2000, 'P': 800, 'R': 400,
-                            'D': 200, 'STIM': 1000}
+                            'D': 200, 'STIM': 1000, 'Poisson': 1}
         # Number of patterns we store
         self.numpats = 0
         # Global sparsity
@@ -89,7 +86,7 @@ class Sinha2016:
                           'tau': 20.}
 
         # see the aif source for symbol definitions
-        self.neuronDict = {'I_e': 200.0, 'V_m': -60.,
+        self.neuronDict = {'V_m': -60.,
                            't_ref': 5.0, 'V_reset': -60.,
                            'V_th': -50., 'C_m': 200.,
                            'E_L': -60., 'g_L': 10.,
@@ -139,6 +136,19 @@ class Sinha2016:
                             str(self.rank) + ".txt")
         self.ca_file_handle = open(self.ca_filename, 'w')
 
+        self.poissonExtDict = {'rate': 50., 'origin': 0., 'start': 0.}
+
+        # indegree, not total number of connections
+        # From the butz paper
+        self.connectionNumberExtE = 1
+        self.connectionNumberExtI = 1
+
+        # connection dictionaries
+        self.connDictExtE = {'rule': 'fixed_indegree',
+                             'indegree': self.connectionNumberExtE}
+        self.connDictExtI = {'rule': 'fixed_indegree',
+                             'indegree': self.connectionNumberExtI}
+
     def setup_simulation(self):
         """Set up simulation."""
         # Nest stuff
@@ -169,7 +179,12 @@ class Sinha2016:
 
         self.neuronsE = nest.Create('tif_neuronE', self.populations['E'])
         self.neuronsI = nest.Create('tif_neuronI', self.populations['I'])
-
+        self.poissonExtE = nest.Create('poisson_generator',
+                                       self.populations['Poisson'],
+                                       params=self.poissonExtDict)
+        self.poissonExtI = nest.Create('poisson_generator',
+                                       self.populations['Poisson'],
+                                       params=self.poissonExtDict)
         # set up synapses
         nest.CopyModel("vogels_sprekeler_synapse", "inhibitory_plastic",
                        self.synDictIE)
@@ -180,6 +195,14 @@ class Sinha2016:
         nest.CopyModel("static_synapse", "excitatory_static_EI",
                        self.synDictEI)
 
+        nest.Connect(self.poissonExtE, self.neuronsE,
+                     conn_spec=self.connDictExtE,
+                     syn_spec={'model': 'static_synapse',
+                               'weight': 3.})
+        nest.Connect(self.poissonExtI, self.neuronsI,
+                     conn_spec=self.connDictExtI,
+                     syn_spec={'model': 'static_synapse',
+                               'weight': 3.})
         nest.Connect(self.neuronsE, self.neuronsE, conn_spec=self.connDictEE,
                      syn_spec="excitatory_static_EE")
         nest.Connect(self.neuronsE, self.neuronsI, conn_spec=self.connDictEI,
