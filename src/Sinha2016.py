@@ -40,7 +40,7 @@ class Sinha2016:
         # http://www.nest-simulator.org/scheduling-and-simulation-flow/
         self.dt = 0.1
         # time to stabilise network after pattern storage etc.
-        self.stabilisation_time = 6000.  # seconds
+        self.stabilisation_time = 2000.  # seconds
         # time recall stimulus is enabled for
         self.recall_time = 1000.  # ms
         # populations
@@ -81,8 +81,8 @@ class Sinha2016:
         self.synDictEI = {"weight": 2.}
         self.synDictII = {"weight": -20.}
 
-        self.synDictIE = {"weight": 0., "Wmax": -30000.,
-                          'alpha': .32, 'eta': -0.001,
+        self.synDictIE = {"weight": -0.0001, "Wmax": -30000.,
+                          'alpha': .32, 'eta': 0.001,
                           'tau': 20.}
 
         # see the aif source for symbol definitions
@@ -483,12 +483,12 @@ if __name__ == "__main__":
     simulation.dump_ca_concentration()
 
     # store and stabilise patterns
-    for i in range(0, simulation.numpats):
-        simulation.store_pattern()
-        simulation.stabilise(step)
-        simulation.dump_all_IE_weights("pattern_stabilisation")
-        simulation.dump_all_EE_weights("pattern_stabilisation")
-        simulation.dump_ca_concentration()
+    # for i in range(0, simulation.numpats):
+    #     simulation.store_pattern()
+    #     simulation.stabilise(step)
+    #     simulation.dump_all_IE_weights("pattern_stabilisation")
+    #     simulation.dump_all_EE_weights("pattern_stabilisation")
+    #     simulation.dump_ca_concentration()
 
     # Only recall the last pattern because nest doesn't do snapshots
     # simulation.deaff_last_pattern()
