@@ -42,88 +42,16 @@ class Sinha2016:
         # time to stabilise network after pattern storage etc.
         self.stabilisation_time = 2000.  # seconds
         self.sp_recording_interval = 1000.  # seconds
+        # structural plasticity bits
+        self.sp_update_interval = 100  # ms
         # time recall stimulus is enabled for
         self.recall_time = 1000.  # ms
-        # populations
-        self.populations = {'E': 8000, 'I': 2000, 'P': 800, 'R': 400,
-                            'D': 200, 'STIM': 1000, 'Poisson': 1}
         # Number of patterns we store
         self.numpats = 0
-        # Global sparsity
-        self.sparsity = 0.02
-        self.sparsityStim = 0.05
-        # Calculate connectivity - must be an integer
-        self.connectionNumberEE = int((self.populations['E']**2) *
-                                      self.sparsity)
-        self.connectionNumberII = int((self.populations['I']**2) *
-                                      self.sparsity)
-        self.connectionNumberIE = int((self.populations['I'] *
-                                       self.populations['E']) * self.sparsity)
-        self.connectionNumberEI = self.connectionNumberIE
-        self.connectionNumberStim = int((self.populations['STIM'] *
-                                         self.populations['R'])
-                                        * self.sparsityStim)
 
-        # indegree, not total number of connections
-        # From the butz paper
-        self.connectionNumberExtE = 1
-        self.connectionNumberExtI = 1
-
-        # connection dictionaries
-        self.connDictEE = {"rule": "fixed_total_number",
-                           "N": self.connectionNumberEE}
-        self.connDictEI = {"rule": "fixed_total_number",
-                           "N": self.connectionNumberEI}
-        self.connDictII = {"rule": "fixed_total_number",
-                           "N": self.connectionNumberII}
-        self.connDictIE = {"rule": "fixed_total_number",
-                           "N": self.connectionNumberIE}
-        self.connDictExtE = {"rule": "fixed_indegree",
-                             "indegree": self.connectionNumberExtE}
-        self.connDictExtI = {"rule": "fixed_indegree",
-                             "indegree": self.connectionNumberExtI}
-        self.connDictStim = {"rule": "fixed_total_number",
-                             "N": self.connectionNumberStim}
-
-        # Documentation says things are normalised in the iaf neuron so that
-        # weight of 1 translates to 1nS
-        self.synDictE = {"weight": 3.}
-        self.synDictII = {"weight": -30.}
-
-        self.synDictIE = {"weight": -0.0001, "Wmax": -30000.,
-                          'alpha': .32, 'eta': 0.001,
-                          'tau': 20.}
-
-        # see the aif source for symbol definitions
-        self.neuronDict = {'V_m': -60.,
-                           't_ref': 5.0, 'V_reset': -60.,
-                           'V_th': -50., 'C_m': 200.,
-                           'E_L': -60., 'g_L': 10.,
-                           'E_ex': 0., 'E_in': -80.,
-                           'tau_syn_ex': 5., 'tau_syn_in': 10.}
-
-        # external current
-        self.poissonExtDict = {'rate': 50., 'origin': 0., 'start': 0.}
+        self.recall_ext_i = 3000.
 
         self.rank = nest.Rank()
-
-        # Get the number of spikes in these files and then post-process them to
-        # get the firing rate and so on
-        self.spike_detector_paramsE = {
-            'to_file': True,
-            'label': 'spikes-' + str(self.rank) + '-E'
-        }
-        self.spike_detector_paramsI = {
-            'to_file': True,
-            'label': 'spikes-' + str(self.rank) + '-I'
-        }
-        self.spike_detector_paramsD = {
-            'to_file': True,
-            'label': 'spikes-' + str(self.rank) + '-deaffed'
-        }
-
-        self.synaptic_weights_file_name = ("00-synaptic-weights-" +
-                                           str(self.rank) + ".txt")
 
         self.patterns = []
         self.neuronsStim = []
@@ -137,21 +65,13 @@ class Sinha2016:
         self.pattern_spike_count_files = []
         self.pattern_count = 0
 
-        self.synaptic_weights_file = open(self.synaptic_weights_file_name, 'w')
-        self.recall_ext_i = 3000.
-
         random.seed(42)
 
-        # structural plasticity bits
-        self.sp_update_interval = 100  # ms
-        self.ca_filename = ("calcium-" +
-                            str(self.rank) + ".txt")
-        self.ca_file_handle = open(self.ca_filename, 'w')
-
-        self.syn_filename = ("00-synaptic-connections" +
-                             str(self.rank) + ".txt")
-        self.syn_file_handle = open(self.syn_filename, 'w')
-
+    def __setup_neurons(self):
+        """Setup neuron sets."""
+        # populations
+        self.populations = {'E': 8000, 'I': 2000, 'P': 800, 'R': 400,
+                            'D': 200, 'STIM': 1000, 'Poisson': 1}
         # Growth curves
         # eta is the minimum calcium concentration
         # epsilon is the target mean calcium concentration
@@ -191,6 +111,176 @@ class Sinha2016:
             'eps': self.growth_curve_IE['eps']
         }
 
+        self.synaptic_elements_E = {
+            'Den_ex': self.growth_curve_EE,
+            'Den_in': self.growth_curve_IE,
+            'Axon_ex': self.growth_curve_EE
+        }
+
+        self.synaptic_elements_I = {
+            'Den_ex': self.growth_curve_IE,
+            'Den_in': self.growth_curve_II,
+            'Axon_in': self.growth_curve_II
+        }
+
+        # see the aif source for symbol definitions
+        self.neuronDict = {'V_m': -60.,
+                           't_ref': 5.0, 'V_reset': -60.,
+                           'V_th': -50., 'C_m': 200.,
+                           'E_L': -60., 'g_L': 10.,
+                           'E_ex': 0., 'E_in': -80.,
+                           'tau_syn_ex': 5., 'tau_syn_in': 10.}
+        # Set up TIF neurons
+        # Setting up two models because then it makes it easier for me to get
+        # them when I need to set up patterns
+        nest.CopyModel("iaf_cond_exp", "tif_neuronE")
+        nest.SetDefaults("tif_neuronE", self.neuronDict)
+        nest.CopyModel("iaf_cond_exp", "tif_neuronI")
+        nest.SetDefaults("tif_neuronI", self.neuronDict)
+
+        # external current
+        self.poissonExtDict = {'rate': 50., 'origin': 0., 'start': 0.}
+
+    def __create_neurons(self):
+        """Create our neurons."""
+        self.neuronsE = nest.Create('tif_neuronE', self.populations['E'], {
+            'synaptic_elements': self.synaptic_elements_E})
+        self.neuronsI = nest.Create('tif_neuronI', self.populations['I'], {
+            'synaptic_elements': self.synaptic_elements_I})
+        self.poissonExtE = nest.Create('poisson_generator',
+                                       self.populations['Poisson'],
+                                       params=self.poissonExtDict)
+        self.poissonExtI = nest.Create('poisson_generator',
+                                       self.populations['Poisson'],
+                                       params=self.poissonExtDict)
+
+    def __setup_connections(self):
+        """Setup connections."""
+        # Global sparsity
+        self.sparsity = 0.02
+        self.sparsityStim = 0.05
+        # Calculate connectivity - must be an integer
+        self.connectionNumberEE = int((self.populations['E']**2) *
+                                      self.sparsity)
+        self.connectionNumberII = int((self.populations['I']**2) *
+                                      self.sparsity)
+        self.connectionNumberIE = int((self.populations['I'] *
+                                       self.populations['E']) * self.sparsity)
+        self.connectionNumberEI = self.connectionNumberIE
+        self.connectionNumberStim = int((self.populations['STIM'] *
+                                         self.populations['R'])
+                                        * self.sparsityStim)
+
+        # indegree, not total number of connections
+        # From the butz paper
+        self.connectionNumberExtE = 1
+        self.connectionNumberExtI = 1
+
+        # connection dictionaries
+        self.connDictEE = {'rule': 'fixed_total_number',
+                           'N': self.connectionNumberEE}
+        self.connDictEI = {'rule': 'fixed_total_number',
+                           'N': self.connectionNumberEI}
+        self.connDictII = {'rule': 'fixed_total_number',
+                           'N': self.connectionNumberII}
+        self.connDictIE = {'rule': 'fixed_total_number',
+                           'N': self.connectionNumberIE}
+        self.connDictExtE = {'rule': 'fixed_indegree',
+                             'indegree': self.connectionNumberExtE}
+        self.connDictExtI = {'rule': 'fixed_indegree',
+                             'indegree': self.connectionNumberExtI}
+        self.connDictStim = {'rule': 'fixed_total_number',
+                             'N': self.connectionNumberStim}
+
+        # Documentation says things are normalised in the iaf neuron so that
+        # weight of 1 translates to 1nS
+        self.synDictE = {'model': 'static_synapse',  # 'weight': 3.,
+                         'pre_synaptic_element': 'Axon_ex',
+                         'post_synaptic_element': 'Den_ex'}
+
+        self.synDictII = {'model': 'static_synapse',
+                          'weight': -30., 'pre_synaptic_element': 'Axon_in',
+                          'post_synaptic_element': 'Den_in'}
+
+        self.synDictIE = {'model': 'vogels_sprekeler_synapse',
+                          'weight': -0.0001, 'Wmax': -30000.,
+                          'alpha': .32, 'eta': 0.001,
+                          'tau': 20., 'pre_synaptic_element': 'Axon_in',
+                          'post_synaptic_element': 'Den_in'}
+
+    def __connect_neurons(self):
+        """Connect the neuron sets up."""
+        nest.Connect(self.poissonExtE, self.neuronsE,
+                     conn_spec=self.connDictExtE,
+                     syn_spec={'model': 'static_synapse',
+                               'weight': 3.})
+        nest.Connect(self.poissonExtI, self.neuronsI,
+                     conn_spec=self.connDictExtI,
+                     syn_spec={'model': 'static_synapse',
+                               'weight': 3.})
+
+        # all to all
+        nest.Connect(self.neuronsE, self.neuronsE,  # conn_spec=self.connDictEE,
+                     syn_spec=self.synDictE)
+        nest.Connect(self.neuronsE, self.neuronsI,  # conn_spec=self.connDictEI,
+                     syn_spec=self.synDictE)
+        nest.Connect(self.neuronsI, self.neuronsI,  # conn_spec=self.connDictII,
+                     syn_spec=self.synDictII)
+        nest.Connect(self.neuronsI, self.neuronsE,  # conn_spec=self.connDictIE,
+                     syn_spec=self.synDictIE)
+
+    def __setup_detectors(self):
+        """Setup spike detectors."""
+        self.spike_detector_paramsE = {
+            'to_file': True,
+            'label': 'spikes-' + str(self.rank) + '-E'
+        }
+        self.spike_detector_paramsI = {
+            'to_file': True,
+            'label': 'spikes-' + str(self.rank) + '-I'
+        }
+        self.spike_detector_paramsD = {
+            'to_file': True,
+            'label': 'spikes-' + str(self.rank) + '-deaffed'
+        }
+
+        self.sdE = nest.Create('spike_detector',
+                               params=self.spike_detector_paramsE)
+        self.sdI = nest.Create('spike_detector',
+                               params=self.spike_detector_paramsI)
+
+        nest.Connect(self.neuronsE, self.sdE)
+        nest.Connect(self.neuronsI, self.sdI)
+
+    def __setup_files(self):
+        """Set up the filenames and handles."""
+        # Get the number of spikes in these files and then post-process them to
+        # get the firing rate and so on
+
+        self.synaptic_weights_file_name = ("00-synaptic-weights-" +
+                                           str(self.rank) + ".txt")
+
+        self.synaptic_weights_file = open(self.synaptic_weights_file_name, 'w')
+
+        self.ca_filename = ("calcium-" +
+                            str(self.rank) + ".txt")
+        self.ca_file_handle = open(self.ca_filename, 'w')
+
+        self.syn_filename = ("00-synaptic-connections-" +
+                             str(self.rank) + ".txt")
+        self.syn_file_handle = open(self.syn_filename, 'w')
+        print(
+            "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}".format
+            (
+                "axons_ex_total", "axons_ex_connected",
+                "dendrites_ex_ex_total", "dendrites_ex_ex_connected",
+                "dendrites_ex_in_total", "dendrites_ex_in_connected",
+                "axons_in_total", "axons_in_connected",
+                "dendrites_in_ex_total", "dendrites_in_ex_connected",
+                "dendrites_in_in_total", "dendrites_in_in_connected"
+            ),
+            file=self.syn_file_handle)
+
     def setup_simulation(self):
         """Set up simulation."""
         # Nest stuff
@@ -214,99 +304,15 @@ class Sinha2016:
         nest.SetStructuralPlasticityStatus({
             'structural_plasticity_update_interval': self.sp_update_interval,
         })
-        # Enable SP
-        # set up synapses
-        nest.CopyModel("vogels_sprekeler_synapse", "inhibitory_plastic",
-                       self.synDictIE)
-        nest.CopyModel("static_synapse", "inhibitory_static",
-                       self.synDictII)
-        nest.CopyModel("static_synapse", "excitatory_static",
-                       self.synDictE)
 
-        # Set up structural plasticity
-        nest.SetStructuralPlasticityStatus({
-            'structural_plasticity_synapses': {
-                'synapse_EE': {
-                    'model': 'excitatory_static',
-                    'pre_synaptic_element': 'Axon_ex',
-                    'post_synaptic_element': 'Den_ex',
-                },
-                'synapse_EI': {
-                    'model': 'excitatory_static',
-                    'pre_synaptic_element': 'Axon_ex',
-                    'post_synaptic_element': 'Den_ex',
-                },
-                'synapse_II': {
-                    'model': 'inhibitory_static',
-                    'pre_synaptic_element': 'Axon_in',
-                    'post_synaptic_element': 'Den_in',
-                },
-                'synapse_IE': {
-                    'model': 'inhibitory_plastic',
-                    'pre_synaptic_element': 'Axon_in',
-                    'post_synaptic_element': 'Den_in',
-                },
-            }
-        })
+        self.__setup_neurons()
+        self.__create_neurons()
+        self.__setup_detectors()
 
-        self.synaptic_elements_E = {
-            'Den_ex': self.growth_curve_EE,
-            'Den_in': self.growth_curve_IE,
-            'Axon_ex': self.growth_curve_EE
-        }
+        self.__setup_connections()
+        self.__connect_neurons()
 
-        self.synaptic_elements_I = {
-            'Den_ex': self.growth_curve_IE,
-            'Den_in': self.growth_curve_II,
-            'Axon_in': self.growth_curve_II
-        }
-        # Set up TIF neurons
-        # Setting up two models because then it makes it easier for me to get
-        # them when I need to set up patterns
-        nest.CopyModel("iaf_cond_exp", "tif_neuronE")
-        nest.SetDefaults("tif_neuronE", self.neuronDict)
-        nest.CopyModel("iaf_cond_exp", "tif_neuronI")
-        nest.SetDefaults("tif_neuronI", self.neuronDict)
-
-        self.neuronsE = nest.Create('tif_neuronE', self.populations['E'], {
-            'synaptic_elements': self.synaptic_elements_E})
-        self.neuronsI = nest.Create('tif_neuronI', self.populations['I'], {
-            'synaptic_elements': self.synaptic_elements_I})
-        self.poissonExtE = nest.Create('poisson_generator',
-                                       self.populations['Poisson'],
-                                       params=self.poissonExtDict)
-        self.poissonExtI = nest.Create('poisson_generator',
-                                       self.populations['Poisson'],
-                                       params=self.poissonExtDict)
-
-        nest.SetStatus(self.neuronsE, 'synaptic_elements',
-                       self.synaptic_elements_E)
-        nest.SetStatus(self.neuronsI, 'synaptic_elements',
-                       self.synaptic_elements_I)
-
-        self.sdE = nest.Create('spike_detector',
-                               params=self.spike_detector_paramsE)
-        self.sdI = nest.Create('spike_detector',
-                               params=self.spike_detector_paramsI)
-
-        nest.Connect(self.neuronsE, self.sdE)
-        nest.Connect(self.neuronsI, self.sdI)
-
-        nest.Connect(self.poissonExtE, self.neuronsE,
-                     conn_spec=self.connDictExtE,
-                     syn_spec="excitatory_static")
-        nest.Connect(self.poissonExtI, self.neuronsI,
-                     conn_spec=self.connDictExtI,
-                     syn_spec="excitatory_static")
-
-        nest.Connect(self.neuronsE, self.neuronsE, conn_spec=self.connDictEE,
-                     syn_spec="excitatory_static")
-        nest.Connect(self.neuronsE, self.neuronsI, conn_spec=self.connDictEI,
-                     syn_spec="excitatory_static")
-        nest.Connect(self.neuronsI, self.neuronsI, conn_spec=self.connDictII,
-                     syn_spec="inhibitory_static")
-        nest.Connect(self.neuronsI, self.neuronsE, conn_spec=self.connDictIE,
-                     syn_spec="inhibitory_plastic")
+        self.__setup_files()
 
     def stabilise(self, step=False):
         """Stabilise network."""
@@ -615,6 +621,7 @@ class Sinha2016:
 if __name__ == "__main__":
     step = False
     simulation = Sinha2016()
+    nest.EnableStructuralPlasticity()
     simulation.setup_simulation()
 
     simulation.dump_all_IE_weights("initial")
@@ -628,12 +635,11 @@ if __name__ == "__main__":
     simulation.dump_ca_concentration()
     simulation.dump_synaptic_elements()
 
-    nest.EnableStructuralPlasticity()
-    simulation.stabilise(step)
-    simulation.dump_all_IE_weights("initial_stabilisation_msp")
-    simulation.dump_all_EE_weights("initial_stabilisation_msp")
-    simulation.dump_ca_concentration()
-    simulation.dump_synaptic_elements()
+    # simulation.stabilise(step)
+    # simulation.dump_all_IE_weights("initial_stabilisation_msp")
+    # simulation.dump_all_EE_weights("initial_stabilisation_msp")
+    # simulation.dump_ca_concentration()
+    # simulation.dump_synaptic_elements()
 
     # store and stabilise patterns
     for i in range(0, simulation.numpats):
