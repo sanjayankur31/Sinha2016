@@ -177,14 +177,6 @@ class Sinha2016:
         self.connectionNumberExtI = 1
 
         # connection dictionaries
-        self.connDictEE = {'rule': 'fixed_total_number',
-                           'N': self.connectionNumberEE}
-        self.connDictEI = {'rule': 'fixed_total_number',
-                           'N': self.connectionNumberEI}
-        self.connDictII = {'rule': 'fixed_total_number',
-                           'N': self.connectionNumberII}
-        self.connDictIE = {'rule': 'fixed_total_number',
-                           'N': self.connectionNumberIE}
         self.connDictExtE = {'rule': 'fixed_indegree',
                              'indegree': self.connectionNumberExtE}
         self.connDictExtI = {'rule': 'fixed_indegree',
@@ -220,13 +212,13 @@ class Sinha2016:
                                'weight': 3.})
 
         # all to all
-        nest.Connect(self.neuronsE, self.neuronsE,  # conn_spec=self.connDictEE,
+        nest.Connect(self.neuronsE, self.neuronsE,
                      syn_spec=self.synDictE)
-        nest.Connect(self.neuronsE, self.neuronsI,  # conn_spec=self.connDictEI,
+        nest.Connect(self.neuronsE, self.neuronsI,
                      syn_spec=self.synDictE)
-        nest.Connect(self.neuronsI, self.neuronsI,  # conn_spec=self.connDictII,
+        nest.Connect(self.neuronsI, self.neuronsI,
                      syn_spec=self.synDictII)
-        nest.Connect(self.neuronsI, self.neuronsE,  # conn_spec=self.connDictIE,
+        nest.Connect(self.neuronsI, self.neuronsE,
                      syn_spec=self.synDictIE)
 
     def __setup_detectors(self):
