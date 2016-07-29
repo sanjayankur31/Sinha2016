@@ -264,12 +264,12 @@ class Sinha2016:
         print(
             "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}".format
             (
-                "axons_ex_total", "axons_ex_connected",
-                "dendrites_ex_ex_total", "dendrites_ex_ex_connected",
-                "dendrites_ex_in_total", "dendrites_ex_in_connected",
-                "axons_in_total", "axons_in_connected",
-                "dendrites_in_ex_total", "dendrites_in_ex_connected",
-                "dendrites_in_in_total", "dendrites_in_in_connected"
+                "a_ex_total", "a_ex_connected",
+                "d_ex_ex_total", "d_ex_ex_connected",
+                "d_ex_in_total", "d_ex_in_connected",
+                "a_in_total", "a_in_connected",
+                "d_in_ex_total", "d_in_ex_connected",
+                "d_in_in_total", "d_in_in_connected"
             ),
             file=self.syn_file_handle)
 
