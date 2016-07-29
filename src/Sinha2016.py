@@ -528,7 +528,9 @@ class Sinha2016:
     def dump_all_IE_weights(self, annotation):
         """Dump all IE weights to a file."""
         file_name = ("synaptic-weight-IE-" + annotation +
-                     "-{}".format(nest.GetKernelStatus()['time']) +
+                     "-{}-{}".format(
+                         self.rank,
+                         nest.GetKernelStatus()['time']) +
                      ".txt")
         file_handle = open(file_name, 'w')
         connections = nest.GetConnections(source=self.neuronsI,
@@ -540,7 +542,9 @@ class Sinha2016:
     def dump_all_EE_weights(self, annotation):
         """Dump all EE weights to a file."""
         file_name = ("synaptic-weight-EE-" + annotation +
-                     "-{}".format(nest.GetKernelStatus()['time']) +
+                     "-{}-{}".format(
+                         self.rank,
+                         nest.GetKernelStatus()['time']) +
                      ".txt")
         file_handle = open(file_name, 'w')
         connections = nest.GetConnections(source=self.neuronsE,
