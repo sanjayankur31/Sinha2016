@@ -154,24 +154,46 @@ class Sinha2016:
                                        self.populations['Poisson'],
                                        params=self.poissonExtDict)
 
+    def __fill_weight_matrix(self, weightlist, static_w, sparsity):
+        """Create a weight matrix to use in syn dict."""
+        weights = []
+        for row in weightlist:
+            rowlen = len(row)
+            valid_values = int(rowlen * sparsity)
+
+            arow = (
+                ([float(static_w), ] * valid_values) +
+                ([0., ] * int(rowlen - valid_values))
+            )
+            random.shuffle(arow)
+            weights.append(arow)
+
+        return weights
+
+    def __setup_weight_matrix(self, pre_dim, post_dim, static_w, sparsity):
+        """Create a weight matrix to use in syn dict."""
+        weights = []
+        valid_values = int(post_dim * sparsity)
+        for i in range(0, pre_dim):
+            arow = (
+                ([float(static_w), ] * valid_values) +
+                ([0., ] * int(post_dim - valid_values))
+            )
+            random.shuffle(arow)
+            weights.append(arow)
+
+        return weights
+
     def __setup_connections(self):
         """Setup connections."""
         # Global sparsity
         self.sparsity = 0.02
         self.sparsityStim = 0.05
-        # Calculate connectivity - must be an integer
-        self.connectionNumberEE = int((self.populations['E']**2) *
-                                      self.sparsity)
-        self.connectionNumberII = int((self.populations['I']**2) *
-                                      self.sparsity)
-        self.connectionNumberIE = int((self.populations['I'] *
-                                       self.populations['E']) * self.sparsity)
-        self.connectionNumberEI = self.connectionNumberIE
+
+        # Other connection numbers
         self.connectionNumberStim = int((self.populations['STIM'] *
                                          self.populations['R'])
                                         * self.sparsityStim)
-
-        # indegree, not total number of connections
         # From the butz paper
         self.connectionNumberExtE = 1
         self.connectionNumberExtI = 1
@@ -186,12 +208,23 @@ class Sinha2016:
 
         # Documentation says things are normalised in the iaf neuron so that
         # weight of 1 translates to 1nS
-        self.synDictE = {'model': 'static_synapse',  # 'weight': 3.,
-                         'pre_synaptic_element': 'Axon_ex',
-                         'post_synaptic_element': 'Den_ex'}
+        # Leave them at 0 to begin with and let Nest for the connections
+        # Then, I'll get these and set them individually later
+        # I've got to do this because while using MPI etc, each thread has
+        # different numbers of connections and I cannot ascertain these numbers
+        # before hand.
+        self.synDictEE = {'model': 'static_synapse',
+                          'weight': 0.,
+                          'pre_synaptic_element': 'Axon_ex',
+                          'post_synaptic_element': 'Den_ex'}
+        self.synDictEI = {'model': 'static_synapse',
+                          'weight': 0.,
+                          'pre_synaptic_element': 'Axon_ex',
+                          'post_synaptic_element': 'Den_ex'}
 
         self.synDictII = {'model': 'static_synapse',
-                          'weight': -30., 'pre_synaptic_element': 'Axon_in',
+                          'weight': 0.,
+                          'pre_synaptic_element': 'Axon_in',
                           'post_synaptic_element': 'Den_in'}
 
         self.synDictIE = {'model': 'vogels_sprekeler_synapse',
@@ -213,13 +246,33 @@ class Sinha2016:
 
         # all to all
         nest.Connect(self.neuronsE, self.neuronsE,
-                     syn_spec=self.synDictE)
+                     syn_spec=self.synDictEE)
+        conns = nest.GetConnections(source=self.neuronsE, target=self.neuronsE)
+        weights = nest.GetStatus(conns, 'weight')
+        self.weightsEE = self.__fill_weight_matrix(weights, 3., self.sparsity)
+        nest.SetStatus(conns, {'weight': self.weightsEE})
+        print("EE weights set up.")
+
         nest.Connect(self.neuronsE, self.neuronsI,
-                     syn_spec=self.synDictE)
+                     syn_spec=self.synDictEI)
+        conns = nest.GetConnections(source=self.neuronsE, target=self.neuronsI)
+        weights = nest.GetStatus(conns, 'weight')
+        self.weightsEI = self.__fill_weight_matrix(weights, 3., self.sparsity)
+        nest.SetStatus(conns, {'weight': self.weightsEI})
+        print("EI weights set up.")
+
         nest.Connect(self.neuronsI, self.neuronsI,
                      syn_spec=self.synDictII)
+        conns = nest.GetConnections(source=self.neuronsI, target=self.neuronsI)
+        weights = nest.GetStatus(conns, 'weight')
+        self.weightsII = self.__fill_weight_matrix(weights, -30.,
+                                                   self.sparsity)
+        nest.SetStatus(conns, {'weight': self.weightsII})
+        print("II weights set up.")
+
         nest.Connect(self.neuronsI, self.neuronsE,
                      syn_spec=self.synDictIE)
+        print("IE weights set up.")
 
     def __setup_detectors(self):
         """Setup spike detectors."""
@@ -625,11 +678,11 @@ if __name__ == "__main__":
     simulation.dump_ca_concentration()
     simulation.dump_synaptic_elements()
 
-    simulation.stabilise(step)
-    simulation.dump_all_IE_weights("initial_stabilisation_sp")
-    simulation.dump_all_EE_weights("initial_stabilisation_sp")
-    simulation.dump_ca_concentration()
-    simulation.dump_synaptic_elements()
+    # simulation.stabilise(step)
+    # simulation.dump_all_IE_weights("initial_stabilisation_sp")
+    # simulation.dump_all_EE_weights("initial_stabilisation_sp")
+    # simulation.dump_ca_concentration()
+    # simulation.dump_synaptic_elements()
 
     # simulation.stabilise(step)
     # simulation.dump_all_IE_weights("initial_stabilisation_msp")
