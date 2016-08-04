@@ -377,14 +377,14 @@ class Sinha2016:
 
         self.__setup_files()
 
-    def stabilise(self, step=False):
+    def stabilise(self, step=False, annotation=""):
         """Stabilise network."""
         sim_steps = numpy.arange(0, self.stabilisation_time,
                                  self.sp_recording_interval)
         for i, j in enumerate(sim_steps):
             self.run_simulation(self.sp_recording_interval, step)
 
-    def run_simulation(self, simtime=2000, step=False):
+    def run_simulation(self, simtime=2000, step=False, annotation=""):
         """Run the simulation."""
         sim_steps = numpy.arange(0, simtime)
         if step:
@@ -423,9 +423,14 @@ class Sinha2016:
         else:
             print("Not stepping through it one second at a time")
             nest.Simulate(simtime*1000)
+            current_simtime = (
+                str(nest.GetKernelStatus()['time'] * 1000) + "sec")
+            self.dump_ca_concentration()
+            self.dump_synaptic_elements()
+            self.dump_all_IE_weights(annotation + "-" + current_simtime)
+            self.dump_all_EE_weights(annotation + "-" + current_simtime)
 
-            print("Simulation time: "
-                  "{} ms".format(nest.GetKernelStatus()['time']))
+            print("Simulation time: " "{}".format(current_simtime))
 
     def store_pattern(self):
         """ Store a pattern and set up spike detectors."""
@@ -691,36 +696,14 @@ if __name__ == "__main__":
     nest.EnableStructuralPlasticity()
     simulation.setup_simulation()
 
-    simulation.dump_all_IE_weights("initial")
-    simulation.dump_all_EE_weights("initial")
-    simulation.dump_ca_concentration()
-    simulation.dump_synaptic_elements()
-
-    # simulation.stabilise(step)
-    # simulation.dump_all_IE_weights("initial_stabilisation_sp")
-    # simulation.dump_all_EE_weights("initial_stabilisation_sp")
-    # simulation.dump_ca_concentration()
-    # simulation.dump_synaptic_elements()
-
-    # simulation.stabilise(step)
-    # simulation.dump_all_IE_weights("initial_stabilisation_msp")
-    # simulation.dump_all_EE_weights("initial_stabilisation_msp")
-    # simulation.dump_ca_concentration()
-    # simulation.dump_synaptic_elements()
+    simulation.stabilise(step, "initial_stabilisation")
 
     # store and stabilise patterns
     for i in range(0, simulation.numpats):
         simulation.store_pattern()
-        simulation.stabilise(step)
-        simulation.dump_all_IE_weights("pattern_stabilisation")
-        simulation.dump_all_EE_weights("pattern_stabilisation")
-        simulation.dump_ca_concentration()
-        simulation.dump_synaptic_elements()
+        simulation.stabilise(step, "pattern_stabilisation" + str(i))
 
     # Only recall the last pattern because nest doesn't do snapshots
     # simulation.deaff_last_pattern()
-    # simulation.stabilise(step)
-    # simulation.dump_all_IE_weights("deaff_repair")
-    # simulation.dump_ca_concentration()
-    # simulation.dump_synaptic_elements()
+    # simulation.stabilise(step, "deaffed_last_pattern")
     # simulation.recall_last_pattern(50, step)
