@@ -154,20 +154,30 @@ class Sinha2016:
                                        self.populations['Poisson'],
                                        params=self.poissonExtDict)
 
+    def __create_sparse_weight_list(self, length, static_w, sparsity):
+        """Create one list to use with SetStatus."""
+        weights = []
+        valid_values = int(length * sparsity)
+        weights = (
+            ([float(static_w), ] * valid_values) +
+            ([0., ] * int(length - valid_values)))
+
+        random.shuffle(weights)
+        return weights
+
     def __fill_weight_matrix(self, weightlist, static_w, sparsity):
         """Create a weight matrix to use in syn dict."""
         weights = []
         for row in weightlist:
-            rowlen = len(row)
-            valid_values = int(rowlen * sparsity)
-
-            arow = (
-                ([float(static_w), ] * valid_values) +
-                ([0., ] * int(rowlen - valid_values))
-            )
-            random.shuffle(arow)
-            weights.append(arow)
-
+            if isinstance(row, (list, tuple)):
+                rowlen = len(row)
+                valid_values = int(rowlen * sparsity)
+                arow = (
+                    ([float(static_w), ] * valid_values) +
+                    ([0., ] * int(rowlen - valid_values))
+                )
+                random.shuffle(arow)
+                weights.append(arow)
         return weights
 
     def __setup_weight_matrix(self, pre_dim, post_dim, static_w, sparsity):
@@ -248,26 +258,34 @@ class Sinha2016:
         nest.Connect(self.neuronsE, self.neuronsE,
                      syn_spec=self.synDictEE)
         conns = nest.GetConnections(source=self.neuronsE, target=self.neuronsE)
-        weights = nest.GetStatus(conns, 'weight')
-        self.weightsEE = self.__fill_weight_matrix(weights, 3., self.sparsity)
-        nest.SetStatus(conns, {'weight': self.weightsEE})
+        weights = self.__create_sparse_weight_list(
+            len(conns), 3., self.sparsity)
+        i = 0
+        for conn in conns:
+            nest.SetStatus([conn], {'weight': weights[i]})
+            i = i+1
         print("EE weights set up.")
 
         nest.Connect(self.neuronsE, self.neuronsI,
                      syn_spec=self.synDictEI)
         conns = nest.GetConnections(source=self.neuronsE, target=self.neuronsI)
-        weights = nest.GetStatus(conns, 'weight')
-        self.weightsEI = self.__fill_weight_matrix(weights, 3., self.sparsity)
-        nest.SetStatus(conns, {'weight': self.weightsEI})
+        weights = self.__create_sparse_weight_list(
+            len(conns), 3., self.sparsity)
+        i = 0
+        for conn in conns:
+            nest.SetStatus([conn], {'weight': weights[i]})
+            i = i+1
         print("EI weights set up.")
 
         nest.Connect(self.neuronsI, self.neuronsI,
                      syn_spec=self.synDictII)
         conns = nest.GetConnections(source=self.neuronsI, target=self.neuronsI)
-        weights = nest.GetStatus(conns, 'weight')
-        self.weightsII = self.__fill_weight_matrix(weights, -30.,
-                                                   self.sparsity)
-        nest.SetStatus(conns, {'weight': self.weightsII})
+        weights = self.__create_sparse_weight_list(
+            len(conns), -30., self.sparsity)
+        i = 0
+        for conn in conns:
+            nest.SetStatus([conn], {'weight': weights[i]})
+            i = i+1
         print("II weights set up.")
 
         nest.Connect(self.neuronsI, self.neuronsE,
