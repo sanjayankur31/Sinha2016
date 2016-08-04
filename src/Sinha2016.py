@@ -43,7 +43,7 @@ class Sinha2016:
         self.stabilisation_time = 2000.  # seconds
         self.sp_recording_interval = 1000.  # seconds
         # structural plasticity bits
-        self.sp_update_interval = 100  # ms
+        self.sp_update_interval = 1000  # ms
         # time recall stimulus is enabled for
         self.recall_time = 1000.  # ms
         # Number of patterns we store
