@@ -139,7 +139,7 @@ class Sinha2016:
         nest.SetDefaults("tif_neuronI", self.neuronDict)
 
         # external current
-        self.poissonExtDict = {'rate': 50., 'origin': 0., 'start': 0.}
+        self.poissonExtDict = {'rate': 10., 'origin': 0., 'start': 0.}
 
     def __create_neurons(self):
         """Create our neurons."""
