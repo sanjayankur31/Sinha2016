@@ -136,7 +136,7 @@ class Sinha2016:
                             str(self.rank) + ".txt")
         self.ca_file_handle = open(self.ca_filename, 'w')
 
-        self.poissonExtDict = {'rate': 50., 'origin': 0., 'start': 0.}
+        self.poissonExtDict = {'rate': 25., 'origin': 0., 'start': 0.}
 
         # indegree, not total number of connections
         # From the butz paper
