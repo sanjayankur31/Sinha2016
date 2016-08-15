@@ -77,9 +77,9 @@ class Sinha2016:
 
         # Documentation says things are normalised in the iaf neuron so that
         # weight of 1 translates to 1nS
-        self.synDictEE = {"weight": 1.}
-        self.synDictEI = {"weight": 1.}
-        self.synDictII = {"weight": -10.}
+        self.synDictEE = {"weight": 3.}
+        self.synDictEI = {"weight": 3.}
+        self.synDictII = {"weight": -30.}
 
         self.synDictIE = {"weight": -0.0001, "Wmax": -30000.,
                           'alpha': .32, 'eta': 0.001,
@@ -136,7 +136,7 @@ class Sinha2016:
                             str(self.rank) + ".txt")
         self.ca_file_handle = open(self.ca_filename, 'w')
 
-        self.poissonExtDict = {'rate': 50., 'origin': 0., 'start': 0.}
+        self.poissonExtDict = {'rate': 10., 'origin': 0., 'start': 0.}
 
         # indegree, not total number of connections
         # From the butz paper
@@ -198,11 +198,11 @@ class Sinha2016:
         nest.Connect(self.poissonExtE, self.neuronsE,
                      conn_spec=self.connDictExtE,
                      syn_spec={'model': 'static_synapse',
-                               'weight': 3.})
+                               'weight': 6.})
         nest.Connect(self.poissonExtI, self.neuronsI,
                      conn_spec=self.connDictExtI,
                      syn_spec={'model': 'static_synapse',
-                               'weight': 3.})
+                               'weight': 6.})
         nest.Connect(self.neuronsE, self.neuronsE, conn_spec=self.connDictEE,
                      syn_spec="excitatory_static_EE")
         nest.Connect(self.neuronsE, self.neuronsI, conn_spec=self.connDictEI,
