@@ -40,7 +40,7 @@ class Sinha2016:
         # http://www.nest-simulator.org/scheduling-and-simulation-flow/
         self.dt = 0.1
         # time to stabilise network after pattern storage etc.
-        self.stabilisation_time = 2000.  # seconds
+        self.stabilisation_time = 6000.  # seconds
         # time recall stimulus is enabled for
         self.recall_time = 1000.  # ms
         # populations
@@ -198,11 +198,11 @@ class Sinha2016:
         nest.Connect(self.poissonExtE, self.neuronsE,
                      conn_spec=self.connDictExtE,
                      syn_spec={'model': 'static_synapse',
-                               'weight': 6.})
+                               'weight': 5.})
         nest.Connect(self.poissonExtI, self.neuronsI,
                      conn_spec=self.connDictExtI,
                      syn_spec={'model': 'static_synapse',
-                               'weight': 6.})
+                               'weight': 5.})
         nest.Connect(self.neuronsE, self.neuronsE, conn_spec=self.connDictEE,
                      syn_spec="excitatory_static_EE")
         nest.Connect(self.neuronsE, self.neuronsI, conn_spec=self.connDictEI,
