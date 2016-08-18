@@ -95,17 +95,17 @@ class GridSearch:
                 for weightII in numpy.arange(self.II_min, self.II_max, self.increment):
 
                     sed_args_EE = ['sed', '-i',
-                                "s/weightEE = .*$/weightEE = {}".format(self.weightEE),
+                                "s/weightEE = .*$/weightEE = {}".format(weightEE),
                                 self.source]
                     subprocess.call(sed_args_EE)
 
                     sed_args_EI = ['sed', '-i',
-                                "s/weightEI = .*$/weightEI = {}".format(self.weightEI),
+                                "s/weightEI = .*$/weightEI = {}".format(weightEI),
                                 self.source]
                     subprocess.call(sed_args_EI)
 
                     sed_args_II = ['sed', '-i',
-                                "s/weightII = .*$/weightII = {}".format(self.weightII),
+                                "s/weightII = .*$/weightII = {}".format(weightII),
                                 self.source]
                     subprocess.call(sed_args_II)
 
