@@ -40,10 +40,10 @@ class Sinha2016:
         # http://www.nest-simulator.org/scheduling-and-simulation-flow/
         self.dt = 0.1
         # time to stabilise network after pattern storage etc.
-        self.stabilisation_time = 2000.  # seconds
-        self.sp_recording_interval = 1000.  # seconds
+        self.stabilisation_time = 6000.  # seconds
+        self.sp_recording_interval = 3000.  # seconds
         # structural plasticity bits
-        self.sp_update_interval = 1000  # ms
+        self.sp_update_interval = 2000.  # ms
         # time recall stimulus is enabled for
         self.recall_time = 1000.  # ms
         # Number of patterns we store
@@ -388,7 +388,7 @@ class Sinha2016:
         sim_steps = numpy.arange(0, self.stabilisation_time,
                                  self.sp_recording_interval)
         for i, j in enumerate(sim_steps):
-            self.run_simulation(self.sp_recording_interval, step)
+            self.run_simulation(self.sp_recording_interval, step, annotation)
 
     def run_simulation(self, simtime=2000, step=False, annotation=""):
         """Run the simulation."""
