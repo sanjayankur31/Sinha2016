@@ -81,6 +81,8 @@ class GridSearch:
             print("II not found in dict. Exiting.", file=sys.stderr)
             return False
 
+        return True
+
     def run(self):
         """Run."""
         # checkout the branch
