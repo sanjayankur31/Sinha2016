@@ -120,7 +120,7 @@ if __name__ == "__main__":
         # specify min, max if want a grid search, else specify only one value
         setup_dict = {
             'EE': [5.],
-            'EI': [0.5, 3.]
+            'EI': [0.5, 3.],
             'II': [-30.],
             'increment' = 0.5
         }
