@@ -91,20 +91,20 @@ class GridSearch:
             for weightEI in numpy.arange(self.EI_min, self.EI_max, self.increment):
                 for weightII in numpy.arange(self.II_min, self.II_max, self.increment):
 
-                sed_args_EE = ['sed', '-i',
-                               "s/weightEE = .*$/weightEE = {}".format(self.weightEE),
-                               self.source]
-                subprocess.call(sed_args_EE)
+                    sed_args_EE = ['sed', '-i',
+                                "s/weightEE = .*$/weightEE = {}".format(self.weightEE),
+                                self.source]
+                    subprocess.call(sed_args_EE)
 
-                sed_args_EI = ['sed', '-i',
-                               "s/weightEI = .*$/weightEI = {}".format(self.weightEI),
-                               self.source]
-                subprocess.call(sed_args_EI)
+                    sed_args_EI = ['sed', '-i',
+                                "s/weightEI = .*$/weightEI = {}".format(self.weightEI),
+                                self.source]
+                    subprocess.call(sed_args_EI)
 
-                sed_args_II = ['sed', '-i',
-                               "s/weightII = .*$/weightII = {}".format(self.weightII),
-                               self.source]
-                subprocess.call(sed_args_II)
+                    sed_args_II = ['sed', '-i',
+                                "s/weightII = .*$/weightII = {}".format(self.weightII),
+                                self.source]
+                    subprocess.call(sed_args_II)
 
         git_args = "add " + self.source
         subprocess.call(['git', git_args])
