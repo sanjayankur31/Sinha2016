@@ -65,6 +65,12 @@ class Sinha2016:
         self.pattern_spike_count_files = []
         self.pattern_count = 0
 
+        self.weightEE = 3.
+        self.weightII = -30.
+        self.weightEI = 3.
+        self.weightExtE = 3.
+        self.weightExtI = 3.
+
         random.seed(42)
 
     def __setup_neurons(self):
@@ -248,18 +254,18 @@ class Sinha2016:
         nest.Connect(self.poissonExtE, self.neuronsE,
                      conn_spec=self.connDictExtE,
                      syn_spec={'model': 'static_synapse',
-                               'weight': 3.})
+                               'weight': self.weightExtE})
         nest.Connect(self.poissonExtI, self.neuronsI,
                      conn_spec=self.connDictExtI,
                      syn_spec={'model': 'static_synapse',
-                               'weight': 3.})
+                               'weight': self.weightExtI})
 
         # all to all
         nest.Connect(self.neuronsE, self.neuronsE,
                      syn_spec=self.synDictEE)
         conns = nest.GetConnections(source=self.neuronsE, target=self.neuronsE)
         weights = self.__create_sparse_weight_list(
-            len(conns), 3., self.sparsity)
+            len(conns), self.weightEE, self.sparsity)
         i = 0
         for conn in conns:
             nest.SetStatus([conn], {'weight': weights[i]})
@@ -270,7 +276,7 @@ class Sinha2016:
                      syn_spec=self.synDictEI)
         conns = nest.GetConnections(source=self.neuronsE, target=self.neuronsI)
         weights = self.__create_sparse_weight_list(
-            len(conns), 3., self.sparsity)
+            len(conns), self.weightEI, self.sparsity)
         i = 0
         for conn in conns:
             nest.SetStatus([conn], {'weight': weights[i]})
@@ -281,7 +287,7 @@ class Sinha2016:
                      syn_spec=self.synDictII)
         conns = nest.GetConnections(source=self.neuronsI, target=self.neuronsI)
         weights = self.__create_sparse_weight_list(
-            len(conns), -30., self.sparsity)
+            len(conns), self.weightII, self.sparsity)
         i = 0
         for conn in conns:
             nest.SetStatus([conn], {'weight': weights[i]})
