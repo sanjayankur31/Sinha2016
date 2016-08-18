@@ -111,7 +111,17 @@ class GridSearch:
                                 self.source]
                     subprocess.call(sed_args_II)
 
-        git_args = ["add", self.source]
+                    git_args = ["add", self.source]
+                    subprocess.call(['git'] + git_args)
+
+                    commit_msg = """{} {} {} {}""".format(
+                        str(datetime.date.today()), weightEE,
+                        weightEI, weightII)
+
+                    git_args = ["commit", "-m", commit_msg]
+                    subprocess.call(['git'] + git_args)
+
+        git_args = ["checkout", self.branch]
         subprocess.call(['git'] + git_args)
 
 if __name__ == "__main__":
