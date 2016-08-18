@@ -87,30 +87,30 @@ class GridSearch:
     def run(self):
         """Run."""
         # checkout the branch
-        git_args = "checkout " + self.branch
-        subprocess.call(['git', git_args])
+        git_args = ["checkout ", self.branch]
+        subprocess.call(['git'] + git_args])
 
         for weightEE in numpy.arange(self.EE_min, self.EE_max, self.increment):
             for weightEI in numpy.arange(self.EI_min, self.EI_max, self.increment):
                 for weightII in numpy.arange(self.II_min, self.II_max, self.increment):
 
                     sed_args_EE = ['sed', '-i',
-                                "s/weightEE = .*$/weightEE = {}".format(weightEE),
+                                "s/weightEE = .*$/weightEE = {}/".format(weightEE),
                                 self.source]
                     subprocess.call(sed_args_EE)
 
                     sed_args_EI = ['sed', '-i',
-                                "s/weightEI = .*$/weightEI = {}".format(weightEI),
+                                "s/weightEI = .*$/weightEI = {}/".format(weightEI),
                                 self.source]
                     subprocess.call(sed_args_EI)
 
                     sed_args_II = ['sed', '-i',
-                                "s/weightII = .*$/weightII = {}".format(weightII),
+                                "s/weightII = .*$/weightII = {}/".format(weightII),
                                 self.source]
                     subprocess.call(sed_args_II)
 
-        git_args = "add " + self.source
-        subprocess.call(['git', git_args])
+        git_args = ["add " + self.source]
+        subprocess.call(['git'] + git_args)
 
 if __name__ == "__main__":
     search = GridSearch()
