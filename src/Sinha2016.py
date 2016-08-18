@@ -77,9 +77,15 @@ class Sinha2016:
 
         # Documentation says things are normalised in the iaf neuron so that
         # weight of 1 translates to 1nS
-        self.synDictEE = {"weight": 2.}
-        self.synDictEI = {"weight": 2.}
-        self.synDictII = {"weight": -30.}
+        self.weightEE = 3.
+        self.weightEI = 3.
+        self.weightII = -30.
+        self.weightExtE = 5.
+        self.weightExtI = 5.
+
+        self.synDictEE = {"weight": self.weightEE}
+        self.synDictEI = {"weight": self.weightEI}
+        self.synDictII = {"weight": self.weightII}
 
         self.synDictIE = {"weight": -0.0001, "Wmax": -30000.,
                           'alpha': .32, 'eta': 0.001,
@@ -198,11 +204,11 @@ class Sinha2016:
         nest.Connect(self.poissonExtE, self.neuronsE,
                      conn_spec=self.connDictExtE,
                      syn_spec={'model': 'static_synapse',
-                               'weight': 5.})
+                               'weight': self.weightExtE})
         nest.Connect(self.poissonExtI, self.neuronsI,
                      conn_spec=self.connDictExtI,
                      syn_spec={'model': 'static_synapse',
-                               'weight': 5.})
+                               'weight': self.weightExtI})
         nest.Connect(self.neuronsE, self.neuronsE, conn_spec=self.connDictEE,
                      syn_spec="excitatory_static_EE")
         nest.Connect(self.neuronsE, self.neuronsI, conn_spec=self.connDictEI,
