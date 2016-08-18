@@ -399,34 +399,7 @@ class Sinha2016:
             for i, step in enumerate(sim_steps):
 
                 nest.Simulate(1000)
-
-                conns = nest.GetConnections(target=self.neuronsE,
-                                            source=self.neuronsI)
-                weightsIE = nest.GetStatus(conns, "weight")
-                mean_weightsIE = numpy.mean(weightsIE)
-
-                conns = nest.GetConnections(target=self.neuronsI,
-                                            source=self.neuronsI)
-                weightsII = nest.GetStatus(conns, "weight")
-                mean_weightsII = numpy.mean(weightsII)
-
-                conns = nest.GetConnections(target=self.neuronsI,
-                                            source=self.neuronsE)
-                weightsEI = nest.GetStatus(conns, "weight")
-                mean_weightsEI = numpy.mean(weightsEI)
-
-                conns = nest.GetConnections(target=self.neuronsE,
-                                            source=self.neuronsE)
-                weightsEE = nest.GetStatus(conns, "weight")
-                mean_weightsEE = numpy.mean(weightsEE)
-
-                statement_w = "{0}\t{1}\t{2}\t{3}\n".format(mean_weightsEE,
-                                                            mean_weightsEI,
-                                                            mean_weightsII,
-                                                            mean_weightsIE)
-
-                self.synaptic_weights_file.write(statement_w)
-                self.synaptic_weights_file.flush()
+                self.dump_synaptic_weights()
         else:
             print("Not stepping through it one second at a time")
             nest.Simulate(simtime*1000)
@@ -434,6 +407,7 @@ class Sinha2016:
                 str(nest.GetKernelStatus()['time'] * 1000) + "sec")
             self.dump_ca_concentration()
             self.dump_synaptic_elements()
+            self.dump_synaptic_weights()
             self.dump_all_IE_weights(annotation + "-" + current_simtime)
             self.dump_all_EE_weights(annotation + "-" + current_simtime)
 
@@ -696,6 +670,35 @@ class Sinha2016:
             ),
             file=self.syn_file_handle)
 
+    def dump_synaptic_weights(self):
+        """Dump synaptic weights."""
+        conns = nest.GetConnections(target=self.neuronsE,
+                                    source=self.neuronsI)
+        weightsIE = nest.GetStatus(conns, "weight")
+        mean_weightsIE = numpy.mean(weightsIE)
+
+        conns = nest.GetConnections(target=self.neuronsI,
+                                    source=self.neuronsI)
+        weightsII = nest.GetStatus(conns, "weight")
+        mean_weightsII = numpy.mean(weightsII)
+
+        conns = nest.GetConnections(target=self.neuronsI,
+                                    source=self.neuronsE)
+        weightsEI = nest.GetStatus(conns, "weight")
+        mean_weightsEI = numpy.mean(weightsEI)
+
+        conns = nest.GetConnections(target=self.neuronsE,
+                                    source=self.neuronsE)
+        weightsEE = nest.GetStatus(conns, "weight")
+        mean_weightsEE = numpy.mean(weightsEE)
+
+        statement_w = "{0}\t{1}\t{2}\t{3}\n".format(mean_weightsEE,
+                                                    mean_weightsEI,
+                                                    mean_weightsII,
+                                                    mean_weightsIE)
+
+        self.synaptic_weights_file.write(statement_w)
+        self.synaptic_weights_file.flush()
 
 if __name__ == "__main__":
     step = False
