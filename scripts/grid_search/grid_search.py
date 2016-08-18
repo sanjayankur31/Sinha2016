@@ -87,7 +87,7 @@ class GridSearch:
     def run(self):
         """Run."""
         # checkout the branch
-        git_args = ["checkout ", self.branch]
+        git_args = ["checkout", self.branch]
         subprocess.call(['git'] + git_args)
 
         for weightEE in numpy.arange(self.EE_min, self.EE_max, self.increment):
@@ -109,7 +109,7 @@ class GridSearch:
                                 self.source]
                     subprocess.call(sed_args_II)
 
-        git_args = ["add " + self.source]
+        git_args = ["add" + self.source]
         subprocess.call(['git'] + git_args)
 
 if __name__ == "__main__":
