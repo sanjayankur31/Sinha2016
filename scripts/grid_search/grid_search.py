@@ -122,7 +122,7 @@ if __name__ == "__main__":
             'EE': [5.],
             'EI': [0.5, 3.],
             'II': [-30.],
-            'increment' = 0.5
+            'increment': 0.5
         }
         if search.setup(branch, setup_dict):
             search.run()
