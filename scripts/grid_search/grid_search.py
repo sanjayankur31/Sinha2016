@@ -50,35 +50,40 @@ class GridSearch:
 
     def setup(self, branch, range_dict):
         """Set it up."""
-        self.increment = range_dict['increment']
         self.branch = branch
 
         if len(range_dict['EE']) == 1:
+            self.EE_increment = 0.5
             self.EE_min = range_dict['EE'][0]
-            self.EE_max = range_dict['EE'][0] + self.increment
-        elif len(range_dict['EE']) == 2:
+            self.EE_max = range_dict['EE'][0] + self.EE_increment
+        elif len(range_dict['EE']) == 3:
+            self.EE_increment = range_dict['EE'][2]
             self.EE_min = range_dict['EE'][0]
-            self.EE_max = range_dict['EE'][1] + self.increment
+            self.EE_max = range_dict['EE'][1] + self.EE_increment
         else:
             print("EE not found in dict. Exiting.", file=sys.stderr)
             return False
 
         if len(range_dict['EI']) == 1:
+            self.EI_increment = 0.5
             self.EI_min = range_dict['EI'][0]
-            self.EI_max = range_dict['EI'][0] + self.increment
-        elif len(range_dict['EI']) == 2:
+            self.EI_max = range_dict['EI'][0] + self.EI_increment
+        elif len(range_dict['EI']) == 3:
+            self.EI_increment = range_dict['EI'][2]
             self.EI_min = range_dict['EI'][0]
-            self.EI_max = range_dict['EI'][1] + self.increment
+            self.EI_max = range_dict['EI'][1] + self.EI_increment
         else:
             print("EI not found in dict. Exiting.", file=sys.stderr)
             return False
 
         if len(range_dict['II']) == 1:
+            self.II_increment = 0.5
             self.II_min = range_dict['II'][0]
-            self.II_max = range_dict['II'][0] + self.increment
-        elif len(range_dict['II']) == 2:
+            self.II_max = range_dict['II'][0] + self.II_increment
+        elif len(range_dict['II']) == 3:
+            self.II_increment = range_dict['II'][2]
             self.II_min = range_dict['II'][0]
-            self.II_max = range_dict['II'][1] + self.increment
+            self.II_max = range_dict['II'][1] + self.II_increment
         else:
             print("II not found in dict. Exiting.", file=sys.stderr)
             return False
@@ -92,9 +97,9 @@ class GridSearch:
             str(datetime.date.today())), self.branch]
         subprocess.call(['git'] + git_args)
 
-        for weightEE in numpy.arange(self.EE_min, self.EE_max, self.increment):
-            for weightEI in numpy.arange(self.EI_min, self.EI_max, self.increment):
-                for weightII in numpy.arange(self.II_min, self.II_max, self.increment):
+        for weightEE in numpy.arange(self.EE_min, self.EE_max, self.EE_increment):
+            for weightEI in numpy.arange(self.EI_min, self.EI_max, self.EI_increment):
+                for weightII in numpy.arange(self.II_min, self.II_max, self.II_increment):
 
                     sed_args_EE = ['sed', '-i',
                                 "s/weightEE = .*$/weightEE = {}/".format(weightEE),
@@ -133,11 +138,11 @@ if __name__ == "__main__":
         branch = sys.argv[1]
         # dictionary that holds the required grid ranges
         # specify min, max if want a grid search, else specify only one value
+        # if you specify max, min, you must specify increment
         setup_dict = {
             'EE': [3.],
-            'EI': [0.5, 3.],
-            'II': [-30.],
-            'increment': 0.5
+            'EI': [0.5, 3., 0.5],
+            'II': [-5., -30., -5.],
         }
         if search.setup(branch, setup_dict):
             search.run()
