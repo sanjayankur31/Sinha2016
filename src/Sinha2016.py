@@ -78,8 +78,8 @@ class Sinha2016:
         # Documentation says things are normalised in the iaf neuron so that
         # weight of 1 translates to 1nS
         self.weightEE = 3.0
-        self.weightEI = 2.5
-        self.weightII = -30.0
+        self.weightEI = 3.0
+        self.weightII = -5.0
         self.weightExtE = 5.
         self.weightExtI = 5.
 
