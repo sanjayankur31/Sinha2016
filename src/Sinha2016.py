@@ -40,11 +40,15 @@ class Sinha2016:
         # http://www.nest-simulator.org/scheduling-and-simulation-flow/
         self.dt = 0.1
         # time to stabilise network after pattern storage etc.
-        self.stabilisation_time = 6000.  # seconds
-        self.sp_recording_interval = 3000.  # seconds
+        self.stabilisation_time = 200.  # seconds
+        self.sp_recording_interval = 200.  # seconds
+
+        if self.stabilisation_time % self.sp_recording_interval != 0.0:
+            self.sp_recording_interval = self.stabilisation_time/2.
+
         # structural plasticity bits
         # must be an integer
-        self.sp_update_interval = 2000  # ms
+        self.sp_update_interval = 2000000  # ms
         # time recall stimulus is enabled for
         self.recall_time = 1000.  # ms
         # Number of patterns we store
@@ -69,8 +73,8 @@ class Sinha2016:
         self.weightEE = 3.
         self.weightII = -30.
         self.weightEI = 3.
-        self.weightExtE = 3.
-        self.weightExtI = 3.
+        self.weightExtE = 5.
+        self.weightExtI = 5.
 
         random.seed(42)
 
@@ -161,7 +165,7 @@ class Sinha2016:
                                        self.populations['Poisson'],
                                        params=self.poissonExtDict)
 
-    def __create_sparse_weight_list(self, length, static_w, sparsity):
+    def __create_sparse_list(self, length, static_w, sparsity):
         """Create one list to use with SetStatus."""
         weights = []
         valid_values = int(length * sparsity)
@@ -172,7 +176,7 @@ class Sinha2016:
         random.shuffle(weights)
         return weights
 
-    def __fill_weight_matrix(self, weightlist, static_w, sparsity):
+    def __fill_matrix(self, weightlist, static_w, sparsity):
         """Create a weight matrix to use in syn dict."""
         weights = []
         for row in weightlist:
@@ -187,7 +191,7 @@ class Sinha2016:
                 weights.append(arow)
         return weights
 
-    def __setup_weight_matrix(self, pre_dim, post_dim, static_w, sparsity):
+    def __setup_matrix(self, pre_dim, post_dim, static_w, sparsity):
         """Create a weight matrix to use in syn dict."""
         weights = []
         valid_values = int(post_dim * sparsity)
@@ -245,7 +249,7 @@ class Sinha2016:
                           'post_synaptic_element': 'Den_in'}
 
         self.synDictIE = {'model': 'vogels_sprekeler_synapse',
-                          'weight': -0.0001, 'Wmax': -30000.,
+                          'weight': -0.0000001, 'Wmax': -30000.,
                           'alpha': .32, 'eta': 0.001,
                           'tau': 20., 'pre_synaptic_element': 'Axon_in',
                           'post_synaptic_element': 'Den_in'}
@@ -265,7 +269,7 @@ class Sinha2016:
         nest.Connect(self.neuronsE, self.neuronsE,
                      syn_spec=self.synDictEE)
         conns = nest.GetConnections(source=self.neuronsE, target=self.neuronsE)
-        weights = self.__create_sparse_weight_list(
+        weights = self.__create_sparse_list(
             len(conns), self.weightEE, self.sparsity)
         i = 0
         for conn in conns:
@@ -276,7 +280,7 @@ class Sinha2016:
         nest.Connect(self.neuronsE, self.neuronsI,
                      syn_spec=self.synDictEI)
         conns = nest.GetConnections(source=self.neuronsE, target=self.neuronsI)
-        weights = self.__create_sparse_weight_list(
+        weights = self.__create_sparse_list(
             len(conns), self.weightEI, self.sparsity)
         i = 0
         for conn in conns:
@@ -287,7 +291,7 @@ class Sinha2016:
         nest.Connect(self.neuronsI, self.neuronsI,
                      syn_spec=self.synDictII)
         conns = nest.GetConnections(source=self.neuronsI, target=self.neuronsI)
-        weights = self.__create_sparse_weight_list(
+        weights = self.__create_sparse_list(
             len(conns), self.weightII, self.sparsity)
         i = 0
         for conn in conns:
@@ -297,6 +301,14 @@ class Sinha2016:
 
         nest.Connect(self.neuronsI, self.neuronsE,
                      syn_spec=self.synDictIE)
+        conns = nest.GetConnections(source=self.neuronsI, target=self.neuronsE)
+        # Use this to set eta of 98% synapses to 0 so that they're static
+        etas = self.__create_sparse_list(
+            len(conns), 0.001, self.sparsity)
+        i = 0
+        for conn in conns:
+            nest.SetStatus([conn], {'eta': etas[i]})
+            i = i+1
         print("IE weights set up.")
 
     def __setup_detectors(self):
@@ -383,6 +395,11 @@ class Sinha2016:
         self.__connect_neurons()
 
         self.__setup_files()
+
+        current_simtime = (
+            str(nest.GetKernelStatus()['time'] * 1000) + "sec")
+        self.dump_all_IE_weights("initial_setup-" + current_simtime)
+        self.dump_all_EE_weights("initial_setup-" + current_simtime)
 
     def stabilise(self, step=False, annotation=""):
         """Stabilise network."""
