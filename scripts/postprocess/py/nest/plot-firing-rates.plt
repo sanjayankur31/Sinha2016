@@ -50,6 +50,12 @@ set title "Firing rate for neurons"
 plot "firing-rate-I.gdf" with lines lw 4 title "I", "firing-rate-E.gdf" with lines lw 4 title "E", 8 with lines lw 2 title "T";
 
 unset xrange
+set yrange [0:40]
+set output "firing-rate-all-clipped.png"
+set title "Firing rate for various neuron sets clipped to 20Hz"
+plot "firing-rate-I.gdf" with lines lw 4 title "I", "firing-rate-E.gdf" with lines lw 4 title "E" , "firing-rate-pattern.gdf" with lines lw 4 title "P", "firing-rate-background.gdf" with lines lw 4 title "N", "firing-rate-recall.gdf" with lines lw 4 title "R", "firing-rate-deaffed.gdf" with lines lw 4 title "D", 8 with lines lw 2 title "T";
+
+unset xrange
 set yrange [0:200]
 set output "firing-rate-all.png"
 set title "Firing rate for various neuron sets"
