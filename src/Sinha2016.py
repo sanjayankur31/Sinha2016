@@ -301,15 +301,16 @@ class Sinha2016:
 
         nest.Connect(self.neuronsI, self.neuronsE,
                      syn_spec=self.synDictIE)
-        conns = nest.GetConnections(source=self.neuronsI, target=self.neuronsE)
+        # conns = nest.GetConnections(source=self.neuronsI,
+        #     target=self.neuronsE)
         # Use this to set eta of 98% synapses to 0 so that they're static
-        etas = self.__create_sparse_list(
-            len(conns), 0.001, self.sparsity)
-        i = 0
-        for conn in conns:
-            nest.SetStatus([conn], {'eta': etas[i]})
-            i = i+1
-        print("IE weights set up.")
+        # etas = self.__create_sparse_list(
+        #     len(conns), 0.001, self.sparsity)
+        # i = 0
+        # for conn in conns:
+        #     nest.SetStatus([conn], {'eta': etas[i]})
+        #     i = i+1
+        # print("IE weights set up.")
 
     def __setup_detectors(self):
         """Setup spike detectors."""
