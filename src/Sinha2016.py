@@ -383,6 +383,7 @@ class Sinha2016:
             }
         )
         # Update the SP interval
+        nest.EnableStructuralPlasticity()
         nest.SetStructuralPlasticityStatus({
             'structural_plasticity_update_interval': self.sp_update_interval,
         })
@@ -720,7 +721,6 @@ class Sinha2016:
 if __name__ == "__main__":
     step = False
     simulation = Sinha2016()
-    nest.EnableStructuralPlasticity()
     simulation.setup_simulation()
 
     simulation.stabilise(step, "initial_stabilisation")
