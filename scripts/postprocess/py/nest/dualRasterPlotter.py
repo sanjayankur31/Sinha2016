@@ -83,6 +83,10 @@ class dualRasterPlotter:
                                      header=None, index_col=None,
                                      chunksize=self.rows):
 
+            if current == len(timelist):
+                print("Processed all time values. Done.")
+                break
+
             if not self.__validate_input(chunk):
                 print("Error in file. Skipping.", file=sys.stderr)
                 return False
@@ -107,7 +111,7 @@ class dualRasterPlotter:
 
             while True:
                 time = sorted_timelist[current]
-                print("Looking for {}.".format(time))
+                print("Looking for #{} - {}.".format(current, time))
                 output_filename = ("spikes-" + setname + "-" + str(time) +
                                    ".gdf")
                 time *= 1000.
