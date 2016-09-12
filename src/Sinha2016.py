@@ -340,18 +340,19 @@ class Sinha2016:
         # Get the number of spikes in these files and then post-process them to
         # get the firing rate and so on
 
-        self.synaptic_weights_file_name = ("00-synaptic-weights-" +
-                                           str(self.rank) + ".txt")
+        self.mean_synaptic_weights_file_name = (
+            "00-synaptic-weights-" + str(self.rank) + ".txt")
 
-        self.synaptic_weights_file = open(self.synaptic_weights_file_name, 'w')
+        self.mean_synaptic_weights_file = open(
+            self.mean_synaptic_weights_file_name, 'w')
 
         self.ca_filename = ("calcium-" +
                             str(self.rank) + ".txt")
         self.ca_file_handle = open(self.ca_filename, 'w')
 
-        self.syn_filename = ("00-synaptic-connections-" +
-                             str(self.rank) + ".txt")
-        self.syn_file_handle = open(self.syn_filename, 'w')
+        self.syn_elms_filename = ("00-synaptic-elements-" +
+                                  str(self.rank) + ".txt")
+        self.syn_elms_file_handle = open(self.syn_elms_filename, 'w')
         print(
             "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}".format
             (
@@ -362,7 +363,7 @@ class Sinha2016:
                 "d_in_ex_total", "d_in_ex_connected",
                 "d_in_in_total", "d_in_in_connected"
             ),
-            file=self.syn_file_handle)
+            file=self.syn_elms_file_handle)
 
     def setup_simulation(self):
         """Set up simulation."""
@@ -399,9 +400,13 @@ class Sinha2016:
         self.__setup_files()
 
         current_simtime = (
-            str(nest.GetKernelStatus()['time'] * 1000) + "sec")
-        self.dump_all_IE_weights("initial_setup-" + current_simtime)
-        self.dump_all_EE_weights("initial_setup-" + current_simtime)
+            str(nest.GetKernelStatus()['time'] * 1000) + "msec")
+
+        self.dump_ca_concentration()
+        self.dump_synaptic_elements()
+        self.dump_mean_synaptic_weights()
+        self.dump_all_IE_weights("initial_setup-")
+        self.dump_all_EE_weights("initial_setup-")
 
     def stabilise(self, step=False, annotation=""):
         """Stabilise network."""
@@ -418,17 +423,17 @@ class Sinha2016:
             for i, step in enumerate(sim_steps):
 
                 nest.Simulate(1000)
-                self.dump_synaptic_weights()
+                self.dump_mean_synaptic_weights()
         else:
             print("Not stepping through it one second at a time")
             nest.Simulate(simtime*1000)
             current_simtime = (
-                str(nest.GetKernelStatus()['time'] * 1000) + "sec")
+                str(nest.GetKernelStatus()['time'] * 1000) + "msec")
             self.dump_ca_concentration()
             self.dump_synaptic_elements()
-            self.dump_synaptic_weights()
-            self.dump_all_IE_weights(annotation + "-" + current_simtime)
-            self.dump_all_EE_weights(annotation + "-" + current_simtime)
+            self.dump_mean_synaptic_weights()
+            self.dump_all_IE_weights(annotation)
+            self.dump_all_EE_weights(annotation)
 
             print("Simulation time: " "{}".format(current_simtime))
 
@@ -689,7 +694,7 @@ class Sinha2016:
             ),
             file=self.syn_file_handle)
 
-    def dump_synaptic_weights(self):
+    def dump_mean_synaptic_weights(self):
         """Dump synaptic weights."""
         conns = nest.GetConnections(target=self.neuronsE,
                                     source=self.neuronsI)
@@ -716,8 +721,8 @@ class Sinha2016:
                                                     mean_weightsII,
                                                     mean_weightsIE)
 
-        self.synaptic_weights_file.write(statement_w)
-        self.synaptic_weights_file.flush()
+        self.mean_synaptic_weights_file.write(statement_w)
+        self.mean_synaptic_weights_file.flush()
 
 if __name__ == "__main__":
     step = False
