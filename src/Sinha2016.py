@@ -87,51 +87,33 @@ class Sinha2016:
         # eta is the minimum calcium concentration
         # epsilon is the target mean calcium concentration
         # Excitatory synaptic elements of excitatory neurons
-        self.growth_curve_EE = {
+        self.growth_curve_axonal = {
             'growth_curve': "gaussian",
             'growth_rate': 0.0001,  # (elements/ms)
             'continuous': False,
-            'eta': 0.0,
-            'eps': 0.05,
+            'eta': 0.4,
+            'eps': 0.7,
         }
 
         # Inhibitory synaptic elements of excitatory neurons
-        self.growth_curve_EI = {
+        self.growth_curve_dendritic = {
             'growth_curve': "gaussian",
             'growth_rate': 0.0001,  # (elements/ms)
             'continuous': False,
-            'eta': 0.0,
-            'eps': self.growth_curve_EE['eps'],
-        }
-
-        # Excitatory synaptic elements of inhibitory neurons
-        self.growth_curve_IE = {
-            'growth_curve': "gaussian",
-            'growth_rate': 0.0004,  # (elements/ms)
-            'continuous': False,
-            'eta': 0.0,
-            'eps': 0.2,
-        }
-
-        # Inhibitory synaptic elements of inhibitory neurons
-        self.growth_curve_II = {
-            'growth_curve': "gaussian",
-            'growth_rate': 0.0001,  # (elements/ms)
-            'continuous': False,
-            'eta': 0.0,
-            'eps': self.growth_curve_IE['eps']
+            'eta': 0.1,
+            'eps': self.growth_curve_axonal['eps'],
         }
 
         self.synaptic_elements_E = {
-            'Den_ex': self.growth_curve_EE,
-            'Den_in': self.growth_curve_IE,
-            'Axon_ex': self.growth_curve_EE
+            'Den_ex': self.growth_curve_dendritic,
+            'Den_in': self.growth_curve_dendritic,
+            'Axon_ex': self.growth_curve_axonal
         }
 
         self.synaptic_elements_I = {
-            'Den_ex': self.growth_curve_IE,
-            'Den_in': self.growth_curve_II,
-            'Axon_in': self.growth_curve_II
+            'Den_ex': self.growth_curve_dendritic,
+            'Den_in': self.growth_curve_dendritic,
+            'Axon_in': self.growth_curve_axonal
         }
 
         # see the aif source for symbol definitions
