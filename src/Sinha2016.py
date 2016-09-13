@@ -674,7 +674,7 @@ class Sinha2016:
                 dendrites_in_ex_total, dendrites_in_ex_connected,
                 dendrites_in_in_total, dendrites_in_in_connected,
             ),
-            file=self.syn_file_handle)
+            file=self.syn_elms_file_handle)
 
     def dump_mean_synaptic_weights(self):
         """Dump synaptic weights."""
