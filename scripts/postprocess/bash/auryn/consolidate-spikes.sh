@@ -56,10 +56,12 @@ mv spikes-auryn-Stim.gdf consolidated_files
 echo "Converting to nest spikes format.."
 cd consolidated_files
 
+# doesn't matter for neuron ID - it's an integer, so there's no loss of decimal places
 cat spikes-auryn-E.gdf | awk '{printf "%s\t%f\n",$2, $1*1000}' > spikes-E.gdf
 rm -f spikes-auryn-E.gdf
 
-cat spikes-auryn-I.gdf | awk '{printf "%s\t%f\n",$2, $1*1000}' > spikes-I.gdf
+# add 8000 to the neuron ID for my rasters
+cat spikes-auryn-I.gdf | awk '{printf "%d\t%f\n",$2+8000, $1*1000}' > spikes-I.gdf
 rm -f spikes-auryn-I.gdf 
 
 cat spikes-auryn-recall.gdf | awk '{printf "%s\t%f\n",$2, $1*1000}' > spikes-recall.gdf
