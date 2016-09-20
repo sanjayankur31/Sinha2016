@@ -97,27 +97,17 @@ class Postprocess:
                                      self.config.rows_per_read):
                 rasterPlotterEI.run(self.config.histogram_timelist)
 
-    def __auryn_postprocess(self):
-        """Auryn postprocessing."""
-        import auryn
 
     def main(self):
         """Do everything."""
         self.__load_config()
-        if self.simulator == "nest":
-            self.__nest_postprocess()
-        elif self.simulator == "auryn":
-            self.__auryn_postprocess()
-        else:
-            sys.exit("Postprocessing for {} not yet implemented.".format(
-                self.simulator))
-
+        self.__nest_postprocess()
 
 def usage():
     """Print usage."""
     print("Wrong arguments.", file=sys.stderr)
     print("Usage:", file=sys.stderr)
-    sys.exit("\t{} auryn|nest".format(sys.argv[0]))
+    sys.exit("\t{} nest".format(sys.argv[0]))
 
 if __name__ == "__main__":
     if len(sys.argv) == 2:
