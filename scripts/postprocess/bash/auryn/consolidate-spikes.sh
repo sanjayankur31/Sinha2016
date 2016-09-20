@@ -25,34 +25,54 @@ echo "Combining files for Auryn simulation"
 mkdir consolidated_files
 
 echo "Combining recall files"
-sort -n --parallel=16 -T $SORTTMPDIR spikes-*recall*.gdf > spikes-recall.gdf
-mv spikes-recall.gdf consolidated_files
+sort -n --parallel=16 -T $SORTTMPDIR spikes-*recall*.gdf > spikes-auryn-recall.gdf
+mv spikes-auryn-recall.gdf consolidated_files
 
 echo "Combining pattern files"
-sort -n --parallel=16 -T $SORTTMPDIR spikes-*pattern*.gdf > spikes-pattern.gdf
-mv spikes-pattern.gdf consolidated_files
+sort -n --parallel=16 -T $SORTTMPDIR spikes-*pattern*.gdf > spikes-auryn-pattern.gdf
+mv spikes-auryn-pattern.gdf consolidated_files
 
 
 echo "Combining deaff files"
-sort -n --parallel=16 -T $SORTTMPDIR spikes-*deaffed*.gdf > spikes-deaffed.gdf
-mv spikes-deaffed.gdf consolidated_files
+sort -n --parallel=16 -T $SORTTMPDIR spikes-*deaffed*.gdf > spikes-auryn-deaffed.gdf
+mv spikes-auryn-deaffed.gdf consolidated_files
 
 echo "Combining background files"
-sort -n --parallel=16 -T $SORTTMPDIR spikes-*background*.gdf > spikes-background.gdf
-mv spikes-background.gdf consolidated_files
+sort -n --parallel=16 -T $SORTTMPDIR spikes-*background*.gdf > spikes-auryn-background.gdf
+mv spikes-auryn-background.gdf consolidated_files
 
 echo "Combining E files"
-sort -n --parallel=16 -T $SORTTMPDIR spikes-*E*.gdf > spikes-E.gdf
-mv spikes-E.gdf consolidated_files
+sort -n --parallel=16 -T $SORTTMPDIR spikes-*E*.gdf > spikes-auryn-E.gdf
+mv spikes-auryn-E.gdf consolidated_files
 
 echo "Combining I files"
-sort -n --parallel=16 -T $SORTTMPDIR spikes-*I*.gdf > spikes-I.gdf
-mv spikes-I.gdf consolidated_files
+sort -n --parallel=16 -T $SORTTMPDIR spikes-*I*.gdf > spikes-auryn-I.gdf
+mv spikes-auryn-I.gdf consolidated_files
 
 echo "Combining Stim files"
-sort -n --parallel=16 -T $SORTTMPDIR spikes-*Stim*.gdf > spikes-Stim.gdf
-mv spikes-Stim.gdf consolidated_files
+sort -n --parallel=16 -T $SORTTMPDIR spikes-*Stim*.gdf > spikes-auryn-Stim.gdf
+mv spikes-auryn-Stim.gdf consolidated_files
 
+echo "Converting to nest spikes format.."
+cd consolidated_files
+
+cat spikes-auryn-E.gdf | awk '{printf "%s\t%f\n",$2, $1*1000}' > spikes-E.gdf
+rm -f spikes-auryn-E.gdf
+
+cat spikes-auryn-I.gdf | awk '{printf "%s\t%f\n",$2, $1*1000}' > spikes-I.gdf
+rm -f spikes-auryn-I.gdf 
+
+cat spikes-auryn-recall.gdf | awk '{printf "%s\t%f\n",$2, $1*1000}' > spikes-recall.gdf
+rm -f spikes-auryn-recall.gdf 
+
+cat spikes-auryn-pattern.gdf | awk '{printf "%s\t%f\n",$2, $1*1000}' > spikes-pattern.gdf
+rm -f spikes-auryn-pattern.gdf 
+
+cat spikes-auryn-deaffed.gdf | awk '{printf "%s\t%f\n",$2, $1*1000}' > spikes-deaffed.gdf
+rm -f spikes-auryn-deaffed.gdf 
+
+cat spikes-auryn-Stim.gdf | awk '{printf "%s\t%f\n",$2, $1*1000}' > spikes-Stim.gdf
+rm -f spikes-auryn-Stim.gdf 
 
 echo "All files combined."
 exit 0
