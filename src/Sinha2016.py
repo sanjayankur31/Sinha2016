@@ -382,9 +382,6 @@ class Sinha2016:
 
         self.__setup_files()
 
-        current_simtime = (
-            str(nest.GetKernelStatus()['time'] * 1000) + "msec")
-
         self.dump_ca_concentration()
         self.dump_synaptic_elements()
         self.dump_mean_synaptic_weights()
