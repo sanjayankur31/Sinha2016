@@ -368,10 +368,10 @@ class Sinha2016:
             }
         )
         # Update the SP interval
-        nest.EnableStructuralPlasticity()
-        nest.SetStructuralPlasticityStatus({
-            'structural_plasticity_update_interval': self.sp_update_interval,
-        })
+        # nest.EnableStructuralPlasticity()
+        # nest.SetStructuralPlasticityStatus({
+        #     'structural_plasticity_update_interval': self.sp_update_interval,
+        # })
 
         self.__setup_neurons()
         self.__create_neurons()
