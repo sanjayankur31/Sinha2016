@@ -36,6 +36,7 @@ class Sinha2016:
 
     def __init__(self):
         """Initialise variables."""
+        self.step = False
         # default resolution in nest is 0.1ms. Using the same value
         # http://www.nest-simulator.org/scheduling-and-simulation-flow/
         self.dt = 0.1
@@ -324,7 +325,6 @@ class Sinha2016:
 
         self.mean_synaptic_weights_file_name = (
             "00-synaptic-weights-" + str(self.rank) + ".txt")
-
         self.mean_synaptic_weights_file = open(
             self.mean_synaptic_weights_file_name, 'w')
 
@@ -347,8 +347,9 @@ class Sinha2016:
             ),
             file=self.syn_elms_file_handle)
 
-    def setup_simulation(self):
+    def setup_simulation(self, step):
         """Set up simulation."""
+        self.step = step
         # Nest stuff
         nest.ResetKernel()
         # http://www.nest-simulator.org/sli/setverbosity/
@@ -390,17 +391,17 @@ class Sinha2016:
         self.dump_all_IE_weights("initial_setup-")
         self.dump_all_EE_weights("initial_setup-")
 
-    def stabilise(self, step=False, annotation=""):
+    def stabilise(self, annotation=""):
         """Stabilise network."""
         sim_steps = numpy.arange(0, self.stabilisation_time,
                                  self.sp_recording_interval)
         for i, j in enumerate(sim_steps):
-            self.run_simulation(self.sp_recording_interval, step, annotation)
+            self.run_simulation(self.sp_recording_interval, annotation)
 
-    def run_simulation(self, simtime=2000, step=False, annotation=""):
+    def run_simulation(self, simtime=2000, annotation=""):
         """Run the simulation."""
         sim_steps = numpy.arange(0, simtime)
-        if step:
+        if self.step:
             print("Stepping through the simulation one second at a time")
             for i, step in enumerate(sim_steps):
 
@@ -551,18 +552,18 @@ class Sinha2016:
         self.sdR.append(recall_spike_detector)
         # nest.SetStatus(recall_neurons, {'I_e': self.recall_ext_i})
 
-    def recall_last_pattern(self, time, step):
+    def recall_last_pattern(self, time):
         """
         Only setup the last pattern.
 
         An extra helper method, since we'll be doing this most.
         """
-        self.recall_pattern(time, step, self.pattern_count)
+        self.recall_pattern(time, self.pattern_count)
 
-    def recall_pattern(self, time, step, pattern_number):
+    def recall_pattern(self, time, pattern_number):
         """Recall a pattern."""
         self.setup_pattern_for_recall(pattern_number)
-        self.run_simulation(time, step)
+        self.run_simulation(time)
 
     def deaff_last_pattern(self):
         """
@@ -592,8 +593,8 @@ class Sinha2016:
         """Dump all IE weights to a file."""
         file_name = ("synaptic-weight-IE-" + annotation +
                      "-{}-{}".format(
-                         self.rank,
-                         nest.GetKernelStatus()['time']) +
+                         nest.GetKernelStatus()['time'],
+                         self.rank) +
                      ".txt")
         file_handle = open(file_name, 'w')
         connections = nest.GetConnections(source=self.neuronsI,
@@ -606,8 +607,8 @@ class Sinha2016:
         """Dump all EE weights to a file."""
         file_name = ("synaptic-weight-EE-" + annotation +
                      "-{}-{}".format(
-                         self.rank,
-                         nest.GetKernelStatus()['time']) +
+                         nest.GetKernelStatus()['time'],
+                         self.rankt) +
                      ".txt")
         file_handle = open(file_name, 'w')
         connections = nest.GetConnections(source=self.neuronsE,
@@ -709,16 +710,16 @@ class Sinha2016:
 if __name__ == "__main__":
     step = False
     simulation = Sinha2016()
-    simulation.setup_simulation()
+    simulation.setup_simulation(step)
 
-    simulation.stabilise(step, "initial_stabilisation")
+    simulation.stabilise("initial_stabilisation")
 
     # store and stabilise patterns
     for i in range(0, simulation.numpats):
         simulation.store_pattern()
-        simulation.stabilise(step, "pattern_stabilisation" + str(i))
+        simulation.stabilise("pattern_stabilisation" + str(i))
 
     # Only recall the last pattern because nest doesn't do snapshots
     # simulation.deaff_last_pattern()
-    # simulation.stabilise(step, "deaffed_last_pattern")
-    # simulation.recall_last_pattern(50, step)
+    # simulation.stabilise("deaffed_last_pattern")
+    # simulation.recall_last_pattern(50)
