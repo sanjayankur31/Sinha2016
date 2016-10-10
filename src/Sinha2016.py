@@ -41,7 +41,7 @@ class Sinha2016:
         # http://www.nest-simulator.org/scheduling-and-simulation-flow/
         self.dt = 0.1
         # time to stabilise network after pattern storage etc.
-        self.stabilisation_time = 12000.  # seconds
+        self.stabilisation_time = 3600.  # seconds
         self.sp_recording_interval = 1000.  # seconds
 
         if self.stabilisation_time % self.sp_recording_interval != 0.0:
@@ -233,7 +233,7 @@ class Sinha2016:
 
         self.synDictIE = {'model': 'vogels_sprekeler_synapse',
                           'weight': -0.0000001, 'Wmax': -30000.,
-                          'alpha': .32, 'eta': 0.001,
+                          'alpha': .12, 'eta': 0.01,
                           'tau': 20., 'pre_synaptic_element': 'Axon_in',
                           'post_synaptic_element': 'Den_in'}
 
