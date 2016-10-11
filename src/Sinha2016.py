@@ -605,7 +605,7 @@ class Sinha2016:
         file_name = ("synaptic-weight-EE-" + annotation +
                      "-{}-{}".format(
                          nest.GetKernelStatus()['time'],
-                         self.rankt) +
+                         self.rank) +
                      ".txt")
         file_handle = open(file_name, 'w')
         connections = nest.GetConnections(source=self.neuronsE,
