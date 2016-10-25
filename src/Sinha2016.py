@@ -74,8 +74,8 @@ class Sinha2016:
         self.weightEE = 3.
         self.weightII = -30.
         self.weightEI = 3.
-        self.weightExtE = 5.
-        self.weightExtI = 5.
+        self.weightExtE = 50.
+        self.weightExtI = 50.
 
         random.seed(42)
 
