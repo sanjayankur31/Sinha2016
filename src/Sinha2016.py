@@ -233,7 +233,7 @@ class Sinha2016:
 
         self.synDictIE = {'model': 'vogels_sprekeler_synapse',
                           'weight': -0.0000001, 'Wmax': -30000.,
-                          'alpha': .12, 'eta': 0.01,
+                          'alpha': .12, 'eta': 0.001,
                           'tau': 20., 'pre_synaptic_element': 'Axon_in',
                           'post_synaptic_element': 'Den_in'}
 
@@ -288,7 +288,7 @@ class Sinha2016:
                                     target=self.neuronsE)
         # Use this to set eta of 98% synapses to 0 so that they're static
         etas = self.__create_sparse_list(
-            len(conns), 0.01, self.sparsity)
+            len(conns), 0.001, self.sparsity)
         i = 0
         for conn in conns:
             nest.SetStatus([conn], {'eta': etas[i]})
