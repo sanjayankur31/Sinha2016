@@ -41,7 +41,7 @@ class Sinha2016:
         # http://www.nest-simulator.org/scheduling-and-simulation-flow/
         self.dt = 0.1
         # time to stabilise network after pattern storage etc.
-        self.stabilisation_time = 3600.  # seconds
+        self.stabilisation_time = 12000.  # seconds
         self.sp_recording_interval = 1000.  # seconds
 
         if self.stabilisation_time % self.sp_recording_interval != 0.0:
