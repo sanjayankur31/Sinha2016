@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-NEST implementation of Vogels et al. model.
+NEST simulation code for my PhD research.
 
 File: Sinha2016.py
 
