@@ -622,7 +622,10 @@ class Sinha2016:
                  if stat['local']]
         ca_e = numpy.mean(nest.GetStatus(loc_e, 'Ca'))
         ca_i = numpy.mean(nest.GetStatus(loc_i, 'Ca'))
-        print("{}\t{}".format(ca_e, ca_i), file=self.ca_file_handle)
+        current_simtime = (
+            str(nest.GetKernelStatus()['time'] * 1000) + "msec")
+        print("{}\t{}\t{}".format(current_simtime, ca_e, ca_i),
+              file=self.ca_file_handle)
 
     def dump_synaptic_elements(self):
         """Dump number of synaptic elements."""
