@@ -730,7 +730,7 @@ if __name__ == "__main__":
     simulation.stabilise("initial_stabilisation-0")
     nest.EnableStructuralPlasticity()
     nest.SetStructuralPlasticityStatus({
-        'structural_plasticity_update_interval': self.sp_update_interval,
+        'structural_plasticity_update_interval': simulation.sp_update_interval,
     })
     simulation.stabilise("initial_stabilisation-1")
     simulation.stabilise("initial_stabilisation-2")
