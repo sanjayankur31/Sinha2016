@@ -336,12 +336,16 @@ class Sinha2016:
 
         self.mean_synaptic_weights_file_name = (
             "00-synaptic-weights-" + str(self.rank) + ".txt")
-        self.mean_synaptic_weights_file = open(
+        self.mean_weights_file_handle = open(
             self.mean_synaptic_weights_file_name, 'w')
+        print("{}\t{}\t{}\t{}".format(
+            "EE", "EI", "II", "IE"), file=self.mean_weights_file_handle)
 
         self.ca_filename = ("calcium-" +
                             str(self.rank) + ".txt")
         self.ca_file_handle = open(self.ca_filename, 'w')
+        print("{}\t{}\t{}".format(
+            "time (ms)", "cal_E", "cal_I"), file=self.ca_file_handle)
 
         self.syn_elms_filename = ("00-synaptic-elements-" +
                                   str(self.rank) + ".txt")
@@ -634,7 +638,7 @@ class Sinha2016:
         ca_e = numpy.mean(nest.GetStatus(loc_e, 'Ca'))
         ca_i = numpy.mean(nest.GetStatus(loc_i, 'Ca'))
         current_simtime = (
-            str(nest.GetKernelStatus()['time'] * 1000) + "msec")
+            str(nest.GetKernelStatus()['time'] * 1000))
         print("{}\t{}\t{}".format(current_simtime, ca_e, ca_i),
               file=self.ca_file_handle)
 
@@ -715,8 +719,8 @@ class Sinha2016:
                                                     mean_weightsII,
                                                     mean_weightsIE)
 
-        self.mean_synaptic_weights_file.write(statement_w)
-        self.mean_synaptic_weights_file.flush()
+        self.mean_weights_file_handle.write(statement_w)
+        self.mean_weights_file_handle.flush()
 
 if __name__ == "__main__":
     step = False
