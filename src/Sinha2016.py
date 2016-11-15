@@ -415,7 +415,7 @@ class Sinha2016:
         self.__setup_files()
 
         self.dump_ca_concentration()
-        self.dump_synaptic_elements()
+        self.dump_total_synaptic_elements()
         self.dump_mean_synaptic_weights()
         self.dump_all_IE_weights("initial_setup-")
         self.dump_all_EE_weights("initial_setup-")
@@ -442,7 +442,7 @@ class Sinha2016:
             current_simtime = (
                 str(nest.GetKernelStatus()['time'] * 1000) + "msec")
             self.dump_ca_concentration()
-            self.dump_synaptic_elements()
+            self.dump_total_synaptic_elements()
             self.dump_mean_synaptic_weights()
             self.dump_all_IE_weights(annotation)
             self.dump_all_EE_weights(annotation)
@@ -652,14 +652,19 @@ class Sinha2016:
                  if stat['local']]
         loc_i = [stat['global_id'] for stat in nest.GetStatus(self.neuronsI)
                  if stat['local']]
-        ca_e = numpy.mean(nest.GetStatus(loc_e, 'Ca'))
-        ca_i = numpy.mean(nest.GetStatus(loc_i, 'Ca'))
-        current_simtime = (
-            str(nest.GetKernelStatus()['time'] * 1000))
-        print("{}\t{}\t{}".format(current_simtime, ca_e, ca_i),
-              file=self.ca_file_handle)
+        ca_e = nest.GetStatus(loc_e, 'Ca')
+        ca_i = nest.GetStatus(loc_i, 'Ca')
 
-    def dump_synaptic_elements(self):
+        current_simtime = (str(nest.GetKernelStatus()['time'] * 1000))
+        print("{}, {}".format(current_simtime,
+                              str(ca_e).strip('[]').strip('()')),
+              file=self.ca_file_handle_E)
+
+        print("{}, {}".format(current_simtime,
+                              str(ca_i).strip('[]').strip('()')),
+              file=self.ca_file_handle_I)
+
+    def dump_total_synaptic_elements(self):
         """Dump number of synaptic elements."""
         loc_e = [stat['global_id'] for stat in nest.GetStatus(self.neuronsE)
                  if stat['local']]
@@ -667,6 +672,8 @@ class Sinha2016:
                  if stat['local']]
         syn_elems_e = nest.GetStatus(loc_e, 'synaptic_elements')
         syn_elems_i = nest.GetStatus(loc_i, 'synaptic_elements')
+
+        current_simtime = (str(nest.GetKernelStatus()['time'] * 1000))
 
         # Only need presynaptic elements to find number of synapses
         # Excitatory neuron set
