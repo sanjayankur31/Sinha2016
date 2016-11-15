@@ -341,26 +341,43 @@ class Sinha2016:
         print("{}\t{}\t{}\t{}".format(
             "EE", "EI", "II", "IE"), file=self.mean_weights_file_handle)
 
-        self.ca_filename = ("calcium-" +
-                            str(self.rank) + ".txt")
-        self.ca_file_handle = open(self.ca_filename, 'w')
-        print("{}\t{}\t{}".format(
-            "time (ms)", "cal_E", "cal_I"), file=self.ca_file_handle)
+        self.ca_filename_E = ("01-calcium-E-" +
+                              str(self.rank) + ".txt")
+        self.ca_file_handle_E = open(self.ca_filename_E, 'w')
+        print("{}, {}".format(
+            "time (ms)", "cal_E values"), file=self.ca_file_handle_E)
 
-        self.syn_elms_filename = ("00-synaptic-elements-" +
-                                  str(self.rank) + ".txt")
-        self.syn_elms_file_handle = open(self.syn_elms_filename, 'w')
+        self.ca_filename_I = ("01-calcium-I-" +
+                              str(self.rank) + ".txt")
+        self.ca_file_handle_I = open(self.ca_filename_I, 'w')
+        print("{}, {}".format(
+            "time (ms)", "cal_I values"), file=self.ca_file_handle_I)
+
+        self.syn_elms_filename_E = ("02-synaptic-elements-E-" +
+                                    str(self.rank) + ".txt")
+        self.syn_elms_file_handle_E = open(self.syn_elms_filename_E, 'w')
         print(
-            "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}".format
+            "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
             (
+                "time (ms)",
                 "a_ex_total", "a_ex_connected",
                 "d_ex_ex_total", "d_ex_ex_connected",
                 "d_ex_in_total", "d_ex_in_connected",
+            ),
+            file=self.syn_elms_file_handle_E)
+
+        self.syn_elms_filename_I = ("02-synaptic-elements-I-" +
+                                    str(self.rank) + ".txt")
+        self.syn_elms_file_handle_I = open(self.syn_elms_filename_I, 'w')
+        print(
+            "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
+            (
+                "time (ms)",
                 "a_in_total", "a_in_connected",
                 "d_in_ex_total", "d_in_ex_connected",
                 "d_in_in_total", "d_in_in_connected"
             ),
-            file=self.syn_elms_file_handle)
+            file=self.syn_elms_file_handle_I)
 
     def setup_simulation(self, step):
         """Set up simulation."""
@@ -681,16 +698,24 @@ class Sinha2016:
                                         neuron in syn_elems_i)
 
         print(
-            "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}".format
+            "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
             (
+                current_simtime,
                 axons_ex_total, axons_ex_connected,
                 dendrites_ex_ex_total, dendrites_ex_ex_connected,
                 dendrites_ex_in_total, dendrites_ex_in_connected,
+            ),
+            file=self.syn_elms_file_handle_E)
+
+        print(
+            "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
+            (
+                current_simtime,
                 axons_in_total, axons_in_connected,
                 dendrites_in_ex_total, dendrites_in_ex_connected,
                 dendrites_in_in_total, dendrites_in_in_connected,
             ),
-            file=self.syn_elms_file_handle)
+            file=self.syn_elms_file_handle_I)
 
     def dump_mean_synaptic_weights(self):
         """Dump synaptic weights."""
