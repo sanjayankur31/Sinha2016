@@ -334,13 +334,37 @@ class Sinha2016:
         # Get the number of spikes in these files and then post-process them to
         # get the firing rate and so on
 
-        self.mean_synaptic_weights_file_name = (
-            "00-mean-synaptic-weights-" + str(self.rank) + ".txt")
-        self.mean_weights_file_handle = open(
-            self.mean_synaptic_weights_file_name, 'w')
-        print("{}\t{}\t{}\t{}\t{}".format(
-            "time(ms)", "EE", "EI", "II", "IE"),
-            file=self.mean_weights_file_handle)
+        self.synaptic_weights_file_name_EE = (
+            "00-synaptic-weights-EE-" + str(self.rank) + ".txt")
+        self.weights_file_handle_EE = open(
+            self.synaptic_weights_file_name_EE, 'w')
+        print("{},{}".format(
+            "time(ms)", "EE(nS)"),
+            file=self.weights_file_handle_EE)
+
+        self.synaptic_weights_file_name_EI = (
+            "00-synaptic-weights-EI-" + str(self.rank) + ".txt")
+        self.weights_file_handle_EI = open(
+            self.synaptic_weights_file_name_EI, 'w')
+        print("{},{}".format(
+            "time(ms)", "EI(nS)"),
+            file=self.weights_file_handle_EI)
+
+        self.synaptic_weights_file_name_II = (
+            "00-synaptic-weights-II-" + str(self.rank) + ".txt")
+        self.weights_file_handle_II = open(
+            self.synaptic_weights_file_name_II, 'w')
+        print("{},{}".format(
+            "time(ms)", "II(nS)"),
+            file=self.weights_file_handle_II)
+
+        self.synaptic_weights_file_name_IE = (
+            "00-synaptic-weights-IE-" + str(self.rank) + ".txt")
+        self.weights_file_handle_IE = open(
+            self.synaptic_weights_file_name_IE, 'w')
+        print("{},{}".format(
+            "time(ms)", "IE(nS)"),
+            file=self.weights_file_handle_IE)
 
         self.ca_filename_E = ("01-calcium-E-" +
                               str(self.rank) + ".txt")
@@ -417,18 +441,16 @@ class Sinha2016:
 
         self.dump_ca_concentration()
         self.dump_total_synaptic_elements()
-        self.dump_mean_synaptic_weights()
-        self.dump_all_IE_weights("initial_setup-")
-        self.dump_all_EE_weights("initial_setup-")
+        self.dump_total_synaptic_weights()
 
-    def stabilise(self, annotation=""):
+    def stabilise(self):
         """Stabilise network."""
         sim_steps = numpy.arange(0, self.stabilisation_time,
                                  self.sp_recording_interval)
         for i, j in enumerate(sim_steps):
-            self.run_simulation(self.sp_recording_interval, annotation)
+            self.run_simulation(self.sp_recording_interval)
 
-    def run_simulation(self, simtime=2000, annotation=""):
+    def run_simulation(self, simtime=2000):
         """Run the simulation."""
         sim_steps = numpy.arange(0, simtime)
         if self.step:
@@ -436,7 +458,7 @@ class Sinha2016:
             for i, step in enumerate(sim_steps):
 
                 nest.Simulate(1000)
-                self.dump_mean_synaptic_weights()
+                self.dump_total_synaptic_weights()
         else:
             print("Not stepping through it one second at a time")
             nest.Simulate(simtime*1000)
@@ -444,9 +466,7 @@ class Sinha2016:
                 str(nest.GetKernelStatus()['time'] * 1000) + "msec")
             self.dump_ca_concentration()
             self.dump_total_synaptic_elements()
-            self.dump_mean_synaptic_weights()
-            self.dump_all_IE_weights(annotation)
-            self.dump_all_EE_weights(annotation)
+            self.dump_total_synaptic_weights()
 
             print("Simulation time: " "{}".format(current_simtime))
 
@@ -619,34 +639,6 @@ class Sinha2016:
         # save the detector
         self.sdL.append(deaff_spike_detector)
 
-    def dump_all_IE_weights(self, annotation):
-        """Dump all IE weights to a file."""
-        file_name = ("synaptic-weight-IE-" + annotation +
-                     "-{}-{}".format(
-                         nest.GetKernelStatus()['time'],
-                         self.rank) +
-                     ".txt")
-        file_handle = open(file_name, 'w')
-        connections = nest.GetConnections(source=self.neuronsI,
-                                          target=self.neuronsE)
-        weights = nest.GetStatus(connections, "weight")
-        print(weights, file=file_handle)
-        file_handle.close()
-
-    def dump_all_EE_weights(self, annotation):
-        """Dump all EE weights to a file."""
-        file_name = ("synaptic-weight-EE-" + annotation +
-                     "-{}-{}".format(
-                         nest.GetKernelStatus()['time'],
-                         self.rank) +
-                     ".txt")
-        file_handle = open(file_name, 'w')
-        connections = nest.GetConnections(source=self.neuronsE,
-                                          target=self.neuronsE)
-        weights = nest.GetStatus(connections, "weight")
-        print(weights, file=file_handle)
-        file_handle.close()
-
     def dump_ca_concentration(self):
         """Dump calcium concentration."""
         loc_e = [stat['global_id'] for stat in nest.GetStatus(self.neuronsE)
@@ -725,38 +717,42 @@ class Sinha2016:
             ),
             file=self.syn_elms_file_handle_I)
 
-    def dump_mean_synaptic_weights(self):
+    def dump_synaptic_weights(self):
         """Dump synaptic weights."""
+        current_simtime = (str(nest.GetKernelStatus()['time'] * 1000))
+
         conns = nest.GetConnections(target=self.neuronsE,
                                     source=self.neuronsI)
         weightsIE = nest.GetStatus(conns, "weight")
-        mean_weightsIE = numpy.mean(weightsIE)
+        print("{}, {}".format(
+            current_simtime,
+            str(weightsIE).strip('[]').strip('()')),
+            file=self.weights_file_handle_IE)
 
         conns = nest.GetConnections(target=self.neuronsI,
                                     source=self.neuronsI)
         weightsII = nest.GetStatus(conns, "weight")
-        mean_weightsII = numpy.mean(weightsII)
+        print("{}, {}".format(
+            current_simtime,
+            str(weightsII).strip('[]').strip('()')),
+            file=self.weights_file_handle_II)
 
         conns = nest.GetConnections(target=self.neuronsI,
                                     source=self.neuronsE)
         weightsEI = nest.GetStatus(conns, "weight")
-        mean_weightsEI = numpy.mean(weightsEI)
+        print("{}, {}".format(
+            current_simtime,
+            str(weightsEI).strip('[]').strip('()')),
+            file=self.weights_file_handle_EI)
 
         conns = nest.GetConnections(target=self.neuronsE,
                                     source=self.neuronsE)
         weightsEE = nest.GetStatus(conns, "weight")
-        mean_weightsEE = numpy.mean(weightsEE)
+        print("{}, {}".format(
+            current_simtime,
+            str(weightsEE).strip('[]').strip('()')),
+            file=self.weights_file_handle_EE)
 
-        current_simtime = (str(nest.GetKernelStatus()['time'] * 1000))
-
-        statement_w = "{0}\t{1}\t{2}\t{3}\t{4}\n".format(
-            mean_weightsEE,
-            mean_weightsEI,
-            mean_weightsII,
-            mean_weightsIE)
-
-        self.mean_weights_file_handle.write(statement_w)
-        self.mean_weights_file_handle.flush()
 
 if __name__ == "__main__":
     step = False
