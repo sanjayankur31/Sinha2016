@@ -441,7 +441,7 @@ class Sinha2016:
 
         self.dump_ca_concentration()
         self.dump_total_synaptic_elements()
-        self.dump_total_synaptic_weights()
+        self.dump_synaptic_weights()
 
     def stabilise(self):
         """Stabilise network."""
@@ -458,7 +458,7 @@ class Sinha2016:
             for i, step in enumerate(sim_steps):
 
                 nest.Simulate(1000)
-                self.dump_total_synaptic_weights()
+                self.dump_synaptic_weights()
         else:
             print("Not stepping through it one second at a time")
             nest.Simulate(simtime*1000)
@@ -466,7 +466,7 @@ class Sinha2016:
                 str(nest.GetKernelStatus()['time'] * 1000) + "msec")
             self.dump_ca_concentration()
             self.dump_total_synaptic_elements()
-            self.dump_total_synaptic_weights()
+            self.dump_synaptic_weights()
 
             print("Simulation time: " "{}".format(current_simtime))
 
