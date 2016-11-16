@@ -335,23 +335,24 @@ class Sinha2016:
         # get the firing rate and so on
 
         self.mean_synaptic_weights_file_name = (
-            "00-synaptic-weights-" + str(self.rank) + ".txt")
+            "00-mean-synaptic-weights-" + str(self.rank) + ".txt")
         self.mean_weights_file_handle = open(
             self.mean_synaptic_weights_file_name, 'w')
-        print("{}\t{}\t{}\t{}".format(
-            "EE", "EI", "II", "IE"), file=self.mean_weights_file_handle)
+        print("{}\t{}\t{}\t{}\t{}".format(
+            "time(ms)", "EE", "EI", "II", "IE"),
+            file=self.mean_weights_file_handle)
 
         self.ca_filename_E = ("01-calcium-E-" +
                               str(self.rank) + ".txt")
         self.ca_file_handle_E = open(self.ca_filename_E, 'w')
         print("{}, {}".format(
-            "time (ms)", "cal_E values"), file=self.ca_file_handle_E)
+            "time(ms)", "cal_E values"), file=self.ca_file_handle_E)
 
         self.ca_filename_I = ("01-calcium-I-" +
                               str(self.rank) + ".txt")
         self.ca_file_handle_I = open(self.ca_filename_I, 'w')
         print("{}, {}".format(
-            "time (ms)", "cal_I values"), file=self.ca_file_handle_I)
+            "time(ms)", "cal_I values"), file=self.ca_file_handle_I)
 
         self.syn_elms_filename_E = ("02-synaptic-elements-E-" +
                                     str(self.rank) + ".txt")
@@ -359,7 +360,7 @@ class Sinha2016:
         print(
             "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
             (
-                "time (ms)",
+                "time(ms)",
                 "a_ex_total", "a_ex_connected",
                 "d_ex_ex_total", "d_ex_ex_connected",
                 "d_ex_in_total", "d_ex_in_connected",
@@ -372,7 +373,7 @@ class Sinha2016:
         print(
             "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
             (
-                "time (ms)",
+                "time(ms)",
                 "a_in_total", "a_in_connected",
                 "d_in_ex_total", "d_in_ex_connected",
                 "d_in_in_total", "d_in_in_connected"
@@ -746,10 +747,13 @@ class Sinha2016:
         weightsEE = nest.GetStatus(conns, "weight")
         mean_weightsEE = numpy.mean(weightsEE)
 
-        statement_w = "{0}\t{1}\t{2}\t{3}\n".format(mean_weightsEE,
-                                                    mean_weightsEI,
-                                                    mean_weightsII,
-                                                    mean_weightsIE)
+        current_simtime = (str(nest.GetKernelStatus()['time'] * 1000))
+
+        statement_w = "{0}\t{1}\t{2}\t{3}\t{4}\n".format(
+            mean_weightsEE,
+            mean_weightsEI,
+            mean_weightsII,
+            mean_weightsIE)
 
         self.mean_weights_file_handle.write(statement_w)
         self.mean_weights_file_handle.flush()
