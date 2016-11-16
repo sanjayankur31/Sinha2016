@@ -41,11 +41,8 @@ class Sinha2016:
         # http://www.nest-simulator.org/scheduling-and-simulation-flow/
         self.dt = 0.1
         # time to stabilise network after pattern storage etc.
-        self.stabilisation_time = 4000.  # seconds
-        self.sp_recording_interval = 1000.  # seconds
-
-        if self.stabilisation_time % self.sp_recording_interval != 0.0:
-            self.sp_recording_interval = self.stabilisation_time/2.
+        self.stabilisation_time = 12000.  # seconds
+        self.sp_recording_interval = 500.  # seconds
 
         # structural plasticity bits
         # must be an integer
@@ -404,9 +401,13 @@ class Sinha2016:
             ),
             file=self.syn_elms_file_handle_I)
 
-    def setup_simulation(self, step):
+    def setup_simulation(self, step=False,
+                         stabilisation_time=12000., recording_interval=500.):
         """Set up simulation."""
         self.step = step
+        self.stabilisation_time = stabilisation_time
+        self.sp_recording_interval = recording_interval
+
         # Nest stuff
         nest.ResetKernel()
         # http://www.nest-simulator.org/sli/setverbosity/
@@ -756,27 +757,22 @@ class Sinha2016:
 
 if __name__ == "__main__":
     step = False
+    test = False
     simulation = Sinha2016()
-    simulation.setup_simulation(step)
 
-    # Break the initial 12000 stabilisation into three parts, so that I can
-    # enable structural plasticity after 4000 seconds.
-    # Shouldn't make too much difference since my simulation stops every 1000
-    # seconds anyway to record values.
-    simulation.stabilise("initial_stabilisation-0")
-    nest.EnableStructuralPlasticity()
-    nest.SetStructuralPlasticityStatus({
-        'structural_plasticity_update_interval': simulation.sp_update_interval,
-    })
-    simulation.stabilise("initial_stabilisation-1")
-    simulation.stabilise("initial_stabilisation-2")
+    if test:
+        simulation.setup_simulation(step, 100., 10.)
+        simulation.stabilise()
+    else:
+        simulation.setup_simulation()
+        simulation.stabilise()
 
-    # store and stabilise patterns
-    for i in range(0, simulation.numpats):
-        simulation.store_pattern()
-        simulation.stabilise("pattern_stabilisation" + str(i))
+        # store and stabilise patterns
+        for i in range(0, simulation.numpats):
+            simulation.store_pattern()
+            simulation.stabilise("pattern_stabilisation" + str(i))
 
-    # Only recall the last pattern because nest doesn't do snapshots
-    # simulation.deaff_last_pattern()
-    # simulation.stabilise("deaffed_last_pattern")
-    # simulation.recall_last_pattern(50)
+        # Only recall the last pattern because nest doesn't do snapshots
+        # simulation.deaff_last_pattern()
+        # simulation.stabilise()
+        # simulation.recall_last_pattern(50)
