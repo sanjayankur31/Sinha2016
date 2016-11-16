@@ -43,7 +43,7 @@ Synaptic weight files
 
 .. code:: text
 
-    time(ms) conductances(nS)
+    time(ms), comma separated conductances(nS)
 
 - Name format: :code:`00-synaptic-weights-{synapse-group}-{rank}.txt`
 - Collected at particular times - set by the recording period in the simulation
