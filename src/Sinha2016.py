@@ -42,7 +42,11 @@ class Sinha2016:
         self.dt = 0.1
         # time to stabilise network after pattern storage etc.
         self.stabilisation_time = 12000.  # seconds
-        self.sp_recording_interval = 500.  # seconds
+        self.recording_interval = 500.  # seconds
+
+        # plasticities
+        self.structural_p = True
+        self.synaptic_p = True
 
         # populations
         self.populations = {'E': 8000, 'I': 2000, 'P': 800, 'R': 400,
@@ -82,49 +86,51 @@ class Sinha2016:
 
     def __setup_neurons(self):
         """Setup properties of neurons."""
+        # if structural plasticity is enabled
         # Growth curves
         # eta is the minimum calcium concentration
         # epsilon is the target mean calcium concentration
-        self.growth_curve_axonal_E = {
-            'growth_curve': "gaussian",
-            'growth_rate': 0.0001,  # Beta (elements/ms)
-            'continuous': False,
-            'eta': 0.01,
-            'eps': 0.04,
-        }
-        self.growth_curve_axonal_I = {
-            'growth_curve': "gaussian",
-            'growth_rate': 0.0001,  # Beta (elements/ms)
-            'continuous': False,
-            'eta': 0.015,
-            'eps': 0.06,
-        }
-        self.growth_curve_dendritic_E = {
-            'growth_curve': "gaussian",
-            'growth_rate': 0.0001,  # Beta (elements/ms)
-            'continuous': False,
-            'eta': 0.005,
-            'eps': self.growth_curve_axonal_E['eps'],
-        }
-        self.growth_curve_dendritic_I = {
-            'growth_curve': "gaussian",
-            'growth_rate': 0.0001,  # Beta (elements/ms)
-            'continuous': False,
-            'eta': 0.0075,
-            'eps': self.growth_curve_axonal_I['eps'],
-        }
+        if self.structural_p:
+            self.growth_curve_axonal_E = {
+                'growth_curve': "gaussian",
+                'growth_rate': 0.0001,  # Beta (elements/ms)
+                'continuous': False,
+                'eta': 0.01,
+                'eps': 0.04,
+            }
+            self.growth_curve_axonal_I = {
+                'growth_curve': "gaussian",
+                'growth_rate': 0.0001,  # Beta (elements/ms)
+                'continuous': False,
+                'eta': 0.015,
+                'eps': 0.06,
+            }
+            self.growth_curve_dendritic_E = {
+                'growth_curve': "gaussian",
+                'growth_rate': 0.0001,  # Beta (elements/ms)
+                'continuous': False,
+                'eta': 0.005,
+                'eps': self.growth_curve_axonal_E['eps'],
+            }
+            self.growth_curve_dendritic_I = {
+                'growth_curve': "gaussian",
+                'growth_rate': 0.0001,  # Beta (elements/ms)
+                'continuous': False,
+                'eta': 0.0075,
+                'eps': self.growth_curve_axonal_I['eps'],
+            }
 
-        self.synaptic_elements_E = {
-            'Den_ex': self.growth_curve_dendritic_E,
-            'Den_in': self.growth_curve_dendritic_I,
-            'Axon_ex': self.growth_curve_axonal_E
-        }
+            self.synaptic_p_elements_E = {
+                'Den_ex': self.growth_curve_dendritic_E,
+                'Den_in': self.growth_curve_dendritic_I,
+                'Axon_ex': self.growth_curve_axonal_E
+            }
 
-        self.synaptic_elements_I = {
-            'Den_ex': self.growth_curve_dendritic_I,
-            'Den_in': self.growth_curve_dendritic_I,
-            'Axon_in': self.growth_curve_axonal_I
-        }
+            self.synaptic_p_elements_I = {
+                'Den_ex': self.growth_curve_dendritic_I,
+                'Den_in': self.growth_curve_dendritic_I,
+                'Axon_in': self.growth_curve_axonal_I
+            }
 
         # see the aif source for symbol definitions
         self.neuronDict = {'V_m': -60.,
@@ -146,10 +152,15 @@ class Sinha2016:
 
     def __create_neurons(self):
         """Create our neurons."""
-        self.neuronsE = nest.Create('tif_neuronE', self.populations['E'], {
-            'synaptic_elements': self.synaptic_elements_E})
-        self.neuronsI = nest.Create('tif_neuronI', self.populations['I'], {
-            'synaptic_elements': self.synaptic_elements_I})
+        if self.structural_p:
+            self.neuronsE = nest.Create('tif_neuronE', self.populations['E'], {
+                'synaptic_elements': self.synaptic_p_elements_E})
+            self.neuronsI = nest.Create('tif_neuronI', self.populations['I'], {
+                'synaptic_elements': self.synaptic_p_elements_I})
+        else:
+            self.neuronsE = nest.Create('tif_neuronE', self.populations['E'])
+            self.neuronsI = nest.Create('tif_neuronI', self.populations['I'])
+
         self.poissonExtE = nest.Create('poisson_generator',
                                        self.populations['Poisson'],
                                        params=self.poissonExtDict)
@@ -241,30 +252,73 @@ class Sinha2016:
 
         # Documentation says things are normalised in the iaf neuron so that
         # weight of 1 translates to 1nS
-        # Leave them at 0 to begin with and let Nest for the connections
-        # Then, I'll get these and set them individually later
-        # I've got to do this because while using MPI etc, each thread has
-        # different numbers of connections and I cannot ascertain these numbers
-        # before hand.
-        self.synDictEE = {'model': 'static_synapse',
-                          'weight': self.weightEE,
-                          'pre_synaptic_element': 'Axon_ex',
-                          'post_synaptic_element': 'Den_ex'}
-        self.synDictEI = {'model': 'static_synapse',
-                          'weight': self.weightEI,
-                          'pre_synaptic_element': 'Axon_ex',
-                          'post_synaptic_element': 'Den_ex'}
 
-        self.synDictII = {'model': 'static_synapse',
-                          'weight': self.weightII,
-                          'pre_synaptic_element': 'Axon_in',
-                          'post_synaptic_element': 'Den_in'}
+        # Only structural plasticity - if synapses are formed, give them
+        # constant conductances
+        if self.structural_p and not self.synaptic_p:
+            self.synDictEE = {'model': 'static_synapse',
+                              'weight': 1.,
+                              'pre_synaptic_element': 'Axon_ex',
+                              'post_synaptic_element': 'Den_ex'}
 
-        self.synDictIE = {'model': 'vogels_sprekeler_synapse',
-                          'weight': -0.0000001, 'Wmax': -30000.,
-                          'alpha': .12, 'eta': 0.01,
-                          'tau': 20., 'pre_synaptic_element': 'Axon_in',
-                          'post_synaptic_element': 'Den_in'}
+            self.synDictEI = {'model': 'static_synapse',
+                              'weight': 1.,
+                              'pre_synaptic_element': 'Axon_ex',
+                              'post_synaptic_element': 'Den_ex'}
+
+            self.synDictII = {'model': 'static_synapse',
+                              'weight': 1.,
+                              'pre_synaptic_element': 'Axon_in',
+                              'post_synaptic_element': 'Den_in'}
+
+            self.synDictIE = {'model': 'static_synapse',
+                              'weight': -1.,
+                              'pre_synaptic_element': 'Axon_in',
+                              'post_synaptic_element': 'Den_in'}
+
+        # Only synaptic plasticity - do not define synaptic elements
+        elif not self.structural_p and self.synaptic_p:
+            self.synDictEE = {'model': 'static_synapse',
+                              'weight': self.weightEE}
+            self.synDictEI = {'model': 'static_synapse',
+                              'weight': self.weightEI}
+
+            self.synDictII = {'model': 'static_synapse',
+                              'weight': self.weightII}
+
+            self.synDictIE = {'model': 'vogels_sprekeler_synapse',
+                              'weight': -0.0000001, 'Wmax': -30000.,
+                              'alpha': .12, 'eta': 0.01,
+                              'tau': 20.}
+
+        # both enabled
+        elif self.structural_p and self.synaptic_p:
+            self.synDictEE = {'model': 'static_synapse',
+                              'weight': self.weightEE,
+                              'pre_synaptic_element': 'Axon_ex',
+                              'post_synaptic_element': 'Den_ex'}
+
+            self.synDictEI = {'model': 'static_synapse',
+                              'weight': self.weightEI,
+                              'pre_synaptic_element': 'Axon_ex',
+                              'post_synaptic_element': 'Den_ex'}
+
+            self.synDictII = {'model': 'static_synapse',
+                              'weight': self.weightII,
+                              'pre_synaptic_element': 'Axon_in',
+                              'post_synaptic_element': 'Den_in'}
+
+            self.synDictIE = {'model': 'vogels_sprekeler_synapse',
+                              'weight': -0.0000001, 'Wmax': -30000.,
+                              'alpha': .12, 'eta': 0.01,
+                              'tau': 20.,
+                              'pre_synaptic_element': 'Axon_in',
+                              'post_synaptic_element': 'Den_in'}
+
+        # Should not reach this part - I have a check before
+        else:
+            print("Neither plasticity is enabled. Exiting.")
+            sys.exit()
 
     def __connect_neurons(self):
         """Connect the neuron sets up."""
@@ -277,43 +331,83 @@ class Sinha2016:
                      syn_spec={'model': 'static_synapse',
                                'weight': self.weightExtI})
 
-        # manually set up initial connections
-        conndict = {'rule': 'one_to_one'}
-        print("Setting up EE connections.")
-        synapses_to_create = self.__get_synapses_to_form(
-            self.neuronsE, self.neuronsE, self.sparsity)
-        for source, destination in synapses_to_create:
-            nest.Connect([source], [destination],
+        # only structural plasticity
+        if self.structural_p and not self.synaptic_p:
+            print("Only structural plasticity enabled" +
+                  "Not setting up any synapses.")
+        # only synaptic plasticity
+        # setup connections using Nest methods
+        elif self.synaptic_p and not self.structural_p:
+            conndict = {'rule': 'pairwise_bernoulli',
+                        'p': self.sparsity}
+            print("Setting up EE connections.")
+            nest.Connect(self.neuronsE, self.neuronsE,
                          syn_spec=self.synDictEE,
                          conn_spec=conndict)
-        print("{} EE connections set up.".format(len(synapses_to_create)))
+            print("EE connections set up.")
 
-        print("Setting up EI connections.")
-        synapses_to_create = self.__get_synapses_to_form(
-            self.neuronsE, self.neuronsI, self.sparsity)
-        for source, destination in synapses_to_create:
-            nest.Connect([source], [destination],
+            print("Setting up EI connections.")
+            nest.Connect(self.neuronsE, self.neuronsI,
                          syn_spec=self.synDictEI,
                          conn_spec=conndict)
-        print("{} EI connections set up.".format(len(synapses_to_create)))
+            print("EI connections set up.")
 
-        print("Setting up II connections.")
-        synapses_to_create = self.__get_synapses_to_form(
-            self.neuronsI, self.neuronsI, self.sparsity)
-        for source, destination in synapses_to_create:
-            nest.Connect([source], [destination],
+            print("Setting up II connections.")
+            nest.Connect(self.neuronsI, self.neuronsI,
                          syn_spec=self.synDictII,
                          conn_spec=conndict)
-        print("{} II connections set up.".format(len(synapses_to_create)))
+            print("II connections set up.")
 
-        print("Setting up IE connections.")
-        synapses_to_create = self.__get_synapses_to_form(
-            self.neuronsI, self.neuronsE, self.sparsity)
-        for source, destination in synapses_to_create:
-            nest.Connect([source], [destination],
+            print("Setting up IE connections.")
+            nest.Connect(self.neuronsI, self.neuronsE,
                          syn_spec=self.synDictIE,
                          conn_spec=conndict)
-        print("{} IE weights set up.".format(len(synapses_to_create)))
+            print("IE connections set up.")
+        # manually set up initial connections if structural plasticity and
+        # synaptic plasticity are both enabled
+        # This is because you can only either have all-all or one-one
+        # connections when structural plasticity is enabled
+        elif self.structural_p and self.synaptic_p:
+            conndict = {'rule': 'one_to_one'}
+            print("Setting up EE connections.")
+            synapses_to_create = self.__get_synapses_to_form(
+                self.neuronsE, self.neuronsE, self.sparsity)
+            for source, destination in synapses_to_create:
+                nest.Connect([source], [destination],
+                             syn_spec=self.synDictEE,
+                             conn_spec=conndict)
+            print("{} EE connections set up.".format(
+                len(synapses_to_create)))
+
+            print("Setting up EI connections.")
+            synapses_to_create = self.__get_synapses_to_form(
+                self.neuronsE, self.neuronsI, self.sparsity)
+            for source, destination in synapses_to_create:
+                nest.Connect([source], [destination],
+                             syn_spec=self.synDictEI,
+                             conn_spec=conndict)
+            print("{} EI connections set up.".format(
+                len(synapses_to_create)))
+
+            print("Setting up II connections.")
+            synapses_to_create = self.__get_synapses_to_form(
+                self.neuronsI, self.neuronsI, self.sparsity)
+            for source, destination in synapses_to_create:
+                nest.Connect([source], [destination],
+                             syn_spec=self.synDictII,
+                             conn_spec=conndict)
+            print("{} II connections set up.".format(
+                len(synapses_to_create)))
+
+            print("Setting up IE connections.")
+            synapses_to_create = self.__get_synapses_to_form(
+                self.neuronsI, self.neuronsE, self.sparsity)
+            for source, destination in synapses_to_create:
+                nest.Connect([source], [destination],
+                             syn_spec=self.synDictIE,
+                             conn_spec=conndict)
+            print("{} IE weights set up.".format(
+                len(synapses_to_create)))
 
     def __setup_detectors(self):
         """Setup spike detectors."""
@@ -343,34 +437,34 @@ class Sinha2016:
         # Get the number of spikes in these files and then post-process them to
         # get the firing rate and so on
 
-        self.synaptic_weights_file_name_EE = (
+        self.synaptic_p_weights_file_name_EE = (
             "00-synaptic-weights-EE-" + str(self.rank) + ".txt")
         self.weights_file_handle_EE = open(
-            self.synaptic_weights_file_name_EE, 'w')
+            self.synaptic_p_weights_file_name_EE, 'w')
         print("{},{}".format(
             "time(ms)", "EE(nS)"),
             file=self.weights_file_handle_EE)
 
-        self.synaptic_weights_file_name_EI = (
+        self.synaptic_p_weights_file_name_EI = (
             "00-synaptic-weights-EI-" + str(self.rank) + ".txt")
         self.weights_file_handle_EI = open(
-            self.synaptic_weights_file_name_EI, 'w')
+            self.synaptic_p_weights_file_name_EI, 'w')
         print("{},{}".format(
             "time(ms)", "EI(nS)"),
             file=self.weights_file_handle_EI)
 
-        self.synaptic_weights_file_name_II = (
+        self.synaptic_p_weights_file_name_II = (
             "00-synaptic-weights-II-" + str(self.rank) + ".txt")
         self.weights_file_handle_II = open(
-            self.synaptic_weights_file_name_II, 'w')
+            self.synaptic_p_weights_file_name_II, 'w')
         print("{},{}".format(
             "time(ms)", "II(nS)"),
             file=self.weights_file_handle_II)
 
-        self.synaptic_weights_file_name_IE = (
+        self.synaptic_p_weights_file_name_IE = (
             "00-synaptic-weights-IE-" + str(self.rank) + ".txt")
         self.weights_file_handle_IE = open(
-            self.synaptic_weights_file_name_IE, 'w')
+            self.synaptic_p_weights_file_name_IE, 'w')
         print("{},{}".format(
             "time(ms)", "IE(nS)"),
             file=self.weights_file_handle_IE)
@@ -387,38 +481,54 @@ class Sinha2016:
         print("{}, {}".format(
             "time(ms)", "cal_I values"), file=self.ca_file_handle_I)
 
-        self.syn_elms_filename_E = ("02-synaptic-elements-E-" +
-                                    str(self.rank) + ".txt")
-        self.syn_elms_file_handle_E = open(self.syn_elms_filename_E, 'w')
-        print(
-            "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
-            (
-                "time(ms)",
-                "a_ex_total", "a_ex_connected",
-                "d_ex_ex_total", "d_ex_ex_connected",
-                "d_ex_in_total", "d_ex_in_connected",
-            ),
-            file=self.syn_elms_file_handle_E)
+        if self.structural_p:
+            self.syn_elms_filename_E = ("02-synaptic-elements-E-" +
+                                        str(self.rank) + ".txt")
+            self.syn_elms_file_handle_E = open(self.syn_elms_filename_E, 'w')
+            print(
+                "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
+                (
+                    "time(ms)",
+                    "a_ex_total", "a_ex_connected",
+                    "d_ex_ex_total", "d_ex_ex_connected",
+                    "d_ex_in_total", "d_ex_in_connected",
+                ),
+                file=self.syn_elms_file_handle_E)
 
-        self.syn_elms_filename_I = ("02-synaptic-elements-I-" +
-                                    str(self.rank) + ".txt")
-        self.syn_elms_file_handle_I = open(self.syn_elms_filename_I, 'w')
-        print(
-            "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
-            (
-                "time(ms)",
-                "a_in_total", "a_in_connected",
-                "d_in_ex_total", "d_in_ex_connected",
-                "d_in_in_total", "d_in_in_connected"
-            ),
-            file=self.syn_elms_file_handle_I)
+            self.syn_elms_filename_I = ("02-synaptic-elements-I-" +
+                                        str(self.rank) + ".txt")
+            self.syn_elms_file_handle_I = open(self.syn_elms_filename_I, 'w')
+            print(
+                "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
+                (
+                    "time(ms)",
+                    "a_in_total", "a_in_connected",
+                    "d_in_ex_total", "d_in_ex_connected",
+                    "d_in_in_total", "d_in_in_connected"
+                ),
+                file=self.syn_elms_file_handle_I)
+
+    def setup_plasticity(self, structural_p=True, synaptic_p=True):
+        """Control plasticities."""
+        self.structural_p = structural_p
+        self.synaptic_p = synaptic_p
+
+        if self.structural_p and self.synaptic_p:
+            print("BOTH PLASTICITIES ENABLED")
+        elif self.structural_p and not self.synaptic_p:
+            print("ONLY STRUCTURAL PLASTICITY ENABLED")
+        elif self.synaptic_p and not self.structural_p:
+            print("ONLY SYNAPTIC PLASTICITY ENABLED")
+        else:
+            print("Both plasticities cannot be disabled. Exiting.")
+            sys.exit()
 
     def setup_test_simulation(self, step=False,
                               stabilisation_time=100., recording_interval=10.):
         """Set up a test simulation."""
         self.step = step
         self.stabilisation_time = stabilisation_time
-        self.sp_recording_interval = recording_interval
+        self.recording_interval = recording_interval
 
         # a much smaller simulation
         self.populations = {'E': 80, 'I': 20, 'P': 8, 'R': 4,
@@ -442,10 +552,12 @@ class Sinha2016:
             }
         )
         # Update the SP interval
-        nest.EnableStructuralPlasticity()
-        nest.SetStructuralPlasticityStatus({
-            'structural_plasticity_update_interval': self.sp_update_interval,
-        })
+        if self.structural_p:
+            nest.EnableStructuralPlasticity()
+            nest.SetStructuralPlasticityStatus({
+                'structural_plasticity_update_interval':
+                self.sp_update_interval,
+            })
 
         self.__setup_neurons()
         self.__create_neurons()
@@ -465,7 +577,7 @@ class Sinha2016:
         """Set up simulation."""
         self.step = step
         self.stabilisation_time = stabilisation_time
-        self.sp_recording_interval = recording_interval
+        self.recording_interval = recording_interval
 
         # Nest stuff
         nest.ResetKernel()
@@ -485,10 +597,12 @@ class Sinha2016:
             }
         )
         # Update the SP interval
-        nest.EnableStructuralPlasticity()
-        nest.SetStructuralPlasticityStatus({
-            'structural_plasticity_update_interval': self.sp_update_interval,
-        })
+        if self.structural_p:
+            nest.EnableStructuralPlasticity()
+            nest.SetStructuralPlasticityStatus({
+                'structural_plasticity_update_interval':
+                self.sp_update_interval,
+            })
 
         self.__setup_neurons()
         self.__create_neurons()
@@ -506,9 +620,9 @@ class Sinha2016:
     def stabilise(self):
         """Stabilise network."""
         sim_steps = numpy.arange(0, self.stabilisation_time,
-                                 self.sp_recording_interval)
+                                 self.recording_interval)
         for i, j in enumerate(sim_steps):
-            self.run_simulation(self.sp_recording_interval)
+            self.run_simulation(self.recording_interval)
 
     def run_simulation(self, simtime=2000):
         """Run the simulation."""
@@ -719,63 +833,66 @@ class Sinha2016:
 
     def dump_total_synaptic_elements(self):
         """Dump number of synaptic elements."""
-        loc_e = [stat['global_id'] for stat in nest.GetStatus(self.neuronsE)
-                 if stat['local']]
-        loc_i = [stat['global_id'] for stat in nest.GetStatus(self.neuronsI)
-                 if stat['local']]
-        syn_elems_e = nest.GetStatus(loc_e, 'synaptic_elements')
-        syn_elems_i = nest.GetStatus(loc_i, 'synaptic_elements')
+        if self.structural_p:
+            loc_e = [stat['global_id'] for stat
+                     in nest.GetStatus(self.neuronsE)
+                     if stat['local']]
+            loc_i = [stat['global_id'] for stat
+                     in nest.GetStatus(self.neuronsI)
+                     if stat['local']]
+            syn_elems_e = nest.GetStatus(loc_e, 'synaptic_elements')
+            syn_elems_i = nest.GetStatus(loc_i, 'synaptic_elements')
 
-        current_simtime = (str(nest.GetKernelStatus()['time']))
+            current_simtime = (str(nest.GetKernelStatus()['time']))
 
-        # Only need presynaptic elements to find number of synapses
-        # Excitatory neuron set
-        axons_ex_total = sum(neuron['Axon_ex']['z'] for neuron in
-                             syn_elems_e)
-        axons_ex_connected = sum(neuron['Axon_ex']['z_connected'] for neuron in
+            # Only need presynaptic elements to find number of synapses
+            # Excitatory neuron set
+            axons_ex_total = sum(neuron['Axon_ex']['z'] for neuron in
                                  syn_elems_e)
-        dendrites_ex_ex_total = sum(neuron['Den_ex']['z'] for neuron in
-                                    syn_elems_e)
-        dendrites_ex_ex_connected = sum(neuron['Den_ex']['z_connected'] for
-                                        neuron in syn_elems_e)
-        dendrites_ex_in_total = sum(neuron['Den_in']['z'] for neuron in
-                                    syn_elems_e)
-        dendrites_ex_in_connected = sum(neuron['Den_in']['z_connected'] for
-                                        neuron in syn_elems_e)
+            axons_ex_connected = sum(neuron['Axon_ex']['z_connected']
+                                     for neuron in syn_elems_e)
+            dendrites_ex_ex_total = sum(neuron['Den_ex']['z'] for neuron in
+                                        syn_elems_e)
+            dendrites_ex_ex_connected = sum(neuron['Den_ex']['z_connected'] for
+                                            neuron in syn_elems_e)
+            dendrites_ex_in_total = sum(neuron['Den_in']['z'] for neuron in
+                                        syn_elems_e)
+            dendrites_ex_in_connected = sum(neuron['Den_in']['z_connected'] for
+                                            neuron in syn_elems_e)
 
-        # Inhibitory neuron set
-        axons_in_total = sum(neuron['Axon_in']['z'] for neuron in
-                             syn_elems_i)
-        axons_in_connected = sum(neuron['Axon_in']['z_connected'] for neuron in
+            # Inhibitory neuron set
+            axons_in_total = sum(neuron['Axon_in']['z'] for neuron in
                                  syn_elems_i)
-        dendrites_in_ex_total = sum(neuron['Den_ex']['z'] for neuron in
-                                    syn_elems_i)
-        dendrites_in_ex_connected = sum(neuron['Den_ex']['z_connected'] for
-                                        neuron in syn_elems_i)
-        dendrites_in_in_total = sum(neuron['Den_in']['z'] for neuron in
-                                    syn_elems_i)
-        dendrites_in_in_connected = sum(neuron['Den_in']['z_connected'] for
-                                        neuron in syn_elems_i)
+            axons_in_connected = sum(neuron['Axon_in']['z_connected']
+                                     for neuron in syn_elems_i)
+            dendrites_in_ex_total = sum(neuron['Den_ex']['z'] for neuron in
+                                        syn_elems_i)
+            dendrites_in_ex_connected = sum(neuron['Den_ex']['z_connected'] for
+                                            neuron in syn_elems_i)
+            dendrites_in_in_total = sum(neuron['Den_in']['z'] for neuron in
+                                        syn_elems_i)
+            dendrites_in_in_connected = sum(neuron['Den_in']['z_connected'] for
+                                            neuron in syn_elems_i)
 
-        print(
-            "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
-            (
-                current_simtime,
-                axons_ex_total, axons_ex_connected,
-                dendrites_ex_ex_total, dendrites_ex_ex_connected,
-                dendrites_ex_in_total, dendrites_ex_in_connected,
-            ),
-            file=self.syn_elms_file_handle_E)
+            print(
+                "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
+                (
+                    current_simtime,
+                    axons_ex_total, axons_ex_connected,
+                    dendrites_ex_ex_total, dendrites_ex_ex_connected,
+                    dendrites_ex_in_total, dendrites_ex_in_connected,
+                ),
+                file=self.syn_elms_file_handle_E)
 
-        print(
-            "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
-            (
-                current_simtime,
-                axons_in_total, axons_in_connected,
-                dendrites_in_ex_total, dendrites_in_ex_connected,
-                dendrites_in_in_total, dendrites_in_in_connected,
-            ),
-            file=self.syn_elms_file_handle_I)
+            print(
+                "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
+                (
+                    current_simtime,
+                    axons_in_total, axons_in_connected,
+                    dendrites_in_ex_total, dendrites_in_ex_connected,
+                    dendrites_in_in_total, dendrites_in_in_connected,
+                ),
+                file=self.syn_elms_file_handle_I)
 
     def dump_synaptic_weights(self):
         """Dump synaptic weights."""
@@ -816,20 +933,22 @@ class Sinha2016:
 
 if __name__ == "__main__":
     step = False
-    test = False
+    test = True
     simulation = Sinha2016()
 
     if test:
+        simulation.setup_plasticity(True, True)
         simulation.setup_test_simulation()
         simulation.stabilise()
     else:
+        simulation.setup_plasticity(True, True)
         simulation.setup_simulation()
-        # simulation.stabilise()
+        simulation.stabilise()
 
         # store and stabilise patterns
         for i in range(0, simulation.numpats):
             simulation.store_pattern()
-            simulation.stabilise("pattern_stabilisation" + str(i))
+            simulation.stabilise()
 
         # Only recall the last pattern because nest doesn't do snapshots
         # simulation.deaff_last_pattern()
