@@ -197,6 +197,26 @@ class Sinha2016:
 
         return weights
 
+    def __get_synapses_to_form(self, sources, destinations, sparsity):
+        """
+        Find prospective synaptic connections between sets of neurons.
+
+        Since structural plasticity does not permit sparse connections, I'm
+        going to try to manually find the right number of syapses and connect
+        neurons to get a certain sparsity.
+        """
+        possible_synapses = []
+        required_synapses = int(float(len(sources)) * float(len(destinations))
+                                * sparsity)
+        chosen_synapses = []
+
+        for sourceid in sources:
+            for destinationid in destinations:
+                possible_synapses.append([sourceid, destinationid])
+
+        chosen_synapses = random.sample(possible_synapses, required_synapses)
+        return chosen_synapses
+
     def __setup_connections(self):
         """Setup connections."""
         # Global sparsity
@@ -227,16 +247,16 @@ class Sinha2016:
         # different numbers of connections and I cannot ascertain these numbers
         # before hand.
         self.synDictEE = {'model': 'static_synapse',
-                          'weight': 0.,
+                          'weight': self.weightEE,
                           'pre_synaptic_element': 'Axon_ex',
                           'post_synaptic_element': 'Den_ex'}
         self.synDictEI = {'model': 'static_synapse',
-                          'weight': 0.,
+                          'weight': self.weightEI,
                           'pre_synaptic_element': 'Axon_ex',
                           'post_synaptic_element': 'Den_ex'}
 
         self.synDictII = {'model': 'static_synapse',
-                          'weight': 0.,
+                          'weight': self.weightII,
                           'pre_synaptic_element': 'Axon_in',
                           'post_synaptic_element': 'Den_in'}
 
@@ -257,52 +277,43 @@ class Sinha2016:
                      syn_spec={'model': 'static_synapse',
                                'weight': self.weightExtI})
 
-        # all to all
-        nest.Connect(self.neuronsE, self.neuronsE,
-                     syn_spec=self.synDictEE)
-        conns = nest.GetConnections(source=self.neuronsE, target=self.neuronsE)
-        weights = self.__create_sparse_list(
-            len(conns), self.weightEE, self.sparsity)
-        i = 0
-        for conn in conns:
-            nest.SetStatus([conn], {'weight': weights[i]})
-            i = i+1
-        print("EE weights set up.")
+        # manually set up initial connections
+        conndict = {'rule': 'one_to_one'}
+        print("Setting up EE connections.")
+        synapses_to_create = self.__get_synapses_to_form(
+            self.neuronsE, self.neuronsE, self.sparsity)
+        for source, destination in synapses_to_create:
+            nest.Connect([source], [destination],
+                         syn_spec=self.synDictEE,
+                         conn_spec=conndict)
+        print("{} EE connections set up.".format(len(synapses_to_create)))
 
-        nest.Connect(self.neuronsE, self.neuronsI,
-                     syn_spec=self.synDictEI)
-        conns = nest.GetConnections(source=self.neuronsE, target=self.neuronsI)
-        weights = self.__create_sparse_list(
-            len(conns), self.weightEI, self.sparsity)
-        i = 0
-        for conn in conns:
-            nest.SetStatus([conn], {'weight': weights[i]})
-            i = i+1
-        print("EI weights set up.")
+        print("Setting up EI connections.")
+        synapses_to_create = self.__get_synapses_to_form(
+            self.neuronsE, self.neuronsI, self.sparsity)
+        for source, destination in synapses_to_create:
+            nest.Connect([source], [destination],
+                         syn_spec=self.synDictEI,
+                         conn_spec=conndict)
+        print("{} EI connections set up.".format(len(synapses_to_create)))
 
-        nest.Connect(self.neuronsI, self.neuronsI,
-                     syn_spec=self.synDictII)
-        conns = nest.GetConnections(source=self.neuronsI, target=self.neuronsI)
-        weights = self.__create_sparse_list(
-            len(conns), self.weightII, self.sparsity)
-        i = 0
-        for conn in conns:
-            nest.SetStatus([conn], {'weight': weights[i]})
-            i = i+1
-        print("II weights set up.")
+        print("Setting up II connections.")
+        synapses_to_create = self.__get_synapses_to_form(
+            self.neuronsI, self.neuronsI, self.sparsity)
+        for source, destination in synapses_to_create:
+            nest.Connect([source], [destination],
+                         syn_spec=self.synDictII,
+                         conn_spec=conndict)
+        print("{} II connections set up.".format(len(synapses_to_create)))
 
-        nest.Connect(self.neuronsI, self.neuronsE,
-                     syn_spec=self.synDictIE)
-        conns = nest.GetConnections(source=self.neuronsI,
-                                    target=self.neuronsE)
-        # Use this to set eta of 98% synapses to 0 so that they're static
-        etas = self.__create_sparse_list(
-            len(conns), 0.01, self.sparsity)
-        i = 0
-        for conn in conns:
-            nest.SetStatus([conn], {'eta': etas[i]})
-            i = i+1
-        print("IE weights set up.")
+        print("Setting up IE connections.")
+        synapses_to_create = self.__get_synapses_to_form(
+            self.neuronsI, self.neuronsE, self.sparsity)
+        for source, destination in synapses_to_create:
+            nest.Connect([source], [destination],
+                         syn_spec=self.synDictIE,
+                         conn_spec=conndict)
+        print("{} IE weights set up.".format(len(synapses_to_create)))
 
     def __setup_detectors(self):
         """Setup spike detectors."""
