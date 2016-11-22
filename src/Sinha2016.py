@@ -44,6 +44,10 @@ class Sinha2016:
         self.stabilisation_time = 12000.  # seconds
         self.sp_recording_interval = 500.  # seconds
 
+        # populations
+        self.populations = {'E': 8000, 'I': 2000, 'P': 800, 'R': 400,
+                            'D': 200, 'STIM': 1000, 'Poisson': 1}
+
         # structural plasticity bits
         # must be an integer
         self.sp_update_interval = 100  # ms
@@ -77,10 +81,7 @@ class Sinha2016:
         random.seed(42)
 
     def __setup_neurons(self):
-        """Setup neuron sets."""
-        # populations
-        self.populations = {'E': 8000, 'I': 2000, 'P': 800, 'R': 400,
-                            'D': 200, 'STIM': 1000, 'Poisson': 1}
+        """Setup properties of neurons."""
         # Growth curves
         # eta is the minimum calcium concentration
         # epsilon is the target mean calcium concentration
