@@ -413,6 +413,53 @@ class Sinha2016:
             ),
             file=self.syn_elms_file_handle_I)
 
+    def setup_test_simulation(self, step=False,
+                              stabilisation_time=100., recording_interval=10.):
+        """Set up a test simulation."""
+        self.step = step
+        self.stabilisation_time = stabilisation_time
+        self.sp_recording_interval = recording_interval
+
+        # a much smaller simulation
+        self.populations = {'E': 80, 'I': 20, 'P': 8, 'R': 4,
+                            'D': 2, 'STIM': 10, 'Poisson': 1}
+
+        # Nest stuff
+        nest.ResetKernel()
+        # http://www.nest-simulator.org/sli/setverbosity/
+        nest.set_verbosity('M_DEBUG')
+        # unless using the cluster, just use 24 local threads
+        # still gives out different spike files because they're different
+        # virtual processes
+        # Using 1 thread per core, and 24 MPI processes because I want 24
+        # different firing rate files - if I don't use MPI, I only get one
+        # firing rate file and I'm not sure how the 24 processes each will
+        # write to it
+        nest.SetKernelStatus(
+            {
+                'resolution': self.dt,
+                'local_num_threads': 1
+            }
+        )
+        # Update the SP interval
+        nest.EnableStructuralPlasticity()
+        nest.SetStructuralPlasticityStatus({
+            'structural_plasticity_update_interval': self.sp_update_interval,
+        })
+
+        self.__setup_neurons()
+        self.__create_neurons()
+        self.__setup_detectors()
+
+        self.__setup_connections()
+        self.__connect_neurons()
+
+        self.__setup_files()
+
+        self.dump_ca_concentration()
+        self.dump_total_synaptic_elements()
+        self.dump_synaptic_weights()
+
     def setup_simulation(self, step=False,
                          stabilisation_time=12000., recording_interval=500.):
         """Set up simulation."""
@@ -769,15 +816,15 @@ class Sinha2016:
 
 if __name__ == "__main__":
     step = False
-    test = False
+    test = True
     simulation = Sinha2016()
 
     if test:
-        simulation.setup_simulation(step, 100., 10.)
+        simulation.setup_test_simulation()
         simulation.stabilise()
     else:
         simulation.setup_simulation()
-        simulation.stabilise()
+        # simulation.stabilise()
 
         # store and stabilise patterns
         for i in range(0, simulation.numpats):
