@@ -816,7 +816,7 @@ class Sinha2016:
 
 if __name__ == "__main__":
     step = False
-    test = True
+    test = False
     simulation = Sinha2016()
 
     if test:
