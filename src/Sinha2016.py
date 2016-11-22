@@ -523,7 +523,7 @@ class Sinha2016:
             print("Not stepping through it one second at a time")
             nest.Simulate(simtime*1000)
             current_simtime = (
-                str(nest.GetKernelStatus()['time'] * 1000) + "msec")
+                str(nest.GetKernelStatus()['time']) + "msec")
             self.dump_ca_concentration()
             self.dump_total_synaptic_elements()
             self.dump_synaptic_weights()
@@ -708,7 +708,7 @@ class Sinha2016:
         ca_e = nest.GetStatus(loc_e, 'Ca')
         ca_i = nest.GetStatus(loc_i, 'Ca')
 
-        current_simtime = (str(nest.GetKernelStatus()['time'] * 1000))
+        current_simtime = (str(nest.GetKernelStatus()['time']))
         print("{}, {}".format(current_simtime,
                               str(ca_e).strip('[]').strip('()')),
               file=self.ca_file_handle_E)
@@ -726,7 +726,7 @@ class Sinha2016:
         syn_elems_e = nest.GetStatus(loc_e, 'synaptic_elements')
         syn_elems_i = nest.GetStatus(loc_i, 'synaptic_elements')
 
-        current_simtime = (str(nest.GetKernelStatus()['time'] * 1000))
+        current_simtime = (str(nest.GetKernelStatus()['time']))
 
         # Only need presynaptic elements to find number of synapses
         # Excitatory neuron set
@@ -779,7 +779,7 @@ class Sinha2016:
 
     def dump_synaptic_weights(self):
         """Dump synaptic weights."""
-        current_simtime = (str(nest.GetKernelStatus()['time'] * 1000))
+        current_simtime = (str(nest.GetKernelStatus()['time']))
 
         conns = nest.GetConnections(target=self.neuronsE,
                                     source=self.neuronsI)
