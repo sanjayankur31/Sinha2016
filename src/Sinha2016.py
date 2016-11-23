@@ -482,7 +482,7 @@ class Sinha2016:
             "time(ms)", "cal_I values"), file=self.ca_file_handle_I)
 
         if self.structural_p:
-            self.syn_elms_filename_E = ("02-synaptic-elements-E-" +
+            self.syn_elms_filename_E = ("02-synaptic-elements-totals-E-" +
                                         str(self.rank) + ".txt")
             self.syn_elms_file_handle_E = open(self.syn_elms_filename_E, 'w')
             print(
@@ -495,7 +495,7 @@ class Sinha2016:
                 ),
                 file=self.syn_elms_file_handle_E)
 
-            self.syn_elms_filename_I = ("02-synaptic-elements-I-" +
+            self.syn_elms_filename_I = ("02-synaptic-elements-totals-I-" +
                                         str(self.rank) + ".txt")
             self.syn_elms_file_handle_I = open(self.syn_elms_filename_I, 'w')
             print(
@@ -568,9 +568,7 @@ class Sinha2016:
 
         self.__setup_files()
 
-        self.dump_ca_concentration()
-        self.dump_total_synaptic_elements()
-        self.dump_synaptic_weights()
+        self.dump_data()
 
     def setup_simulation(self, step=False,
                          stabilisation_time=12000., recording_interval=500.):
@@ -613,9 +611,7 @@ class Sinha2016:
 
         self.__setup_files()
 
-        self.dump_ca_concentration()
-        self.dump_total_synaptic_elements()
-        self.dump_synaptic_weights()
+        self.dump_data()
 
     def stabilise(self):
         """Stabilise network."""
@@ -632,16 +628,14 @@ class Sinha2016:
             for i, step in enumerate(sim_steps):
 
                 nest.Simulate(1000)
-                self.dump_synaptic_weights()
+                self.__dump_synaptic_weights()
         else:
             print("Not stepping through it one second at a time")
             nest.Simulate(simtime*1000)
+            self.dump_data()
+
             current_simtime = (
                 str(nest.GetKernelStatus()['time']) + "msec")
-            self.dump_ca_concentration()
-            self.dump_total_synaptic_elements()
-            self.dump_synaptic_weights()
-
             print("Simulation time: " "{}".format(current_simtime))
 
     def store_pattern(self):
@@ -813,7 +807,7 @@ class Sinha2016:
         # save the detector
         self.sdL.append(deaff_spike_detector)
 
-    def dump_ca_concentration(self):
+    def __dump_ca_concentration(self):
         """Dump calcium concentration."""
         loc_e = [stat['global_id'] for stat in nest.GetStatus(self.neuronsE)
                  if stat['local']]
@@ -831,8 +825,72 @@ class Sinha2016:
                               str(ca_i).strip('[]').strip('()')),
               file=self.ca_file_handle_I)
 
-    def dump_total_synaptic_elements(self):
-        """Dump number of synaptic elements."""
+    def __dump_synaptic_elements_per_neurons(self):
+        """
+        Dump synaptic elements for each neuron for a time.
+
+        neuronid    ax_total    ax_connected    den_ex_total ...
+        """
+        if self.structural_p:
+            loc_e = [stat['global_id'] for stat
+                     in nest.GetStatus(self.neuronsE)
+                     if stat['local']]
+            loc_i = [stat['global_id'] for stat
+                     in nest.GetStatus(self.neuronsI)
+                     if stat['local']]
+
+            current_simtime = (str(nest.GetKernelStatus()['time']))
+
+            synaptic_element_file_E = (
+                "03-synaptic-elements-E-" + str(self.rank) + "-" +
+                current_simtime + ".txt")
+            with open(synaptic_element_file_E, 'w') as filehandle_E:
+                print("neuronID\tAxon_ex\tAxon_ex_connected" +
+                      "\tDend_ex\tDend_ex_con\t" +
+                      "Dend_in\tDend_in_con", file=filehandle_E)
+
+                for neuron in loc_e:
+                    syn_elms = nest.GetStatus([neuron], 'synaptic_elements')[0]
+                    axons = syn_elms['Axon_ex']['z']
+                    axons_conn = syn_elms['Axon_ex']['z_connected']
+                    dendrites_ex = syn_elms['Den_ex']['z']
+                    dendrites_ex_conn = syn_elms['Den_ex']['z_connected']
+                    dendrites_in = syn_elms['Den_in']['z']
+                    dendrites_in_conn = syn_elms['Den_in']['z_connected']
+
+                    print("{}\t{}\t{}\t{}\t{}\t{}\t{}".format(
+                        neuron,
+                        axons, axons_conn,
+                        dendrites_ex, dendrites_ex_conn,
+                        dendrites_in, dendrites_in_conn
+                    ), file=filehandle_E)
+
+            synaptic_element_file_I = (
+                "03-synaptic-elements-I-" + str(self.rank) + "-" +
+                current_simtime + ".txt")
+            with open(synaptic_element_file_I, 'w') as filehandle_I:
+                print("neuronID\tAxon_in\tAxon_in_connected" +
+                      "\tDend_ex\tDend_ex_con\t" +
+                      "Dend_in\tDend_in_con", file=filehandle_I)
+
+                for neuron in loc_i:
+                    syn_elms = nest.GetStatus([neuron], 'synaptic_elements')[0]
+                    axons = syn_elms['Axon_in']['z']
+                    axons_conn = syn_elms['Axon_in']['z_connected']
+                    dendrites_ex = syn_elms['Den_ex']['z']
+                    dendrites_ex_conn = syn_elms['Den_ex']['z_connected']
+                    dendrites_in = syn_elms['Den_in']['z']
+                    dendrites_in_conn = syn_elms['Den_in']['z_connected']
+
+                    print("{}\t{}\t{}\t{}\t{}\t{}\t{}".format(
+                        neuron,
+                        axons, axons_conn,
+                        dendrites_ex, dendrites_ex_conn,
+                        dendrites_in, dendrites_in_conn
+                    ), file=filehandle_I)
+
+    def __dump_total_synaptic_elements(self):
+        """Dump total number of synaptic elements."""
         if self.structural_p:
             loc_e = [stat['global_id'] for stat
                      in nest.GetStatus(self.neuronsE)
@@ -894,7 +952,7 @@ class Sinha2016:
                 ),
                 file=self.syn_elms_file_handle_I)
 
-    def dump_synaptic_weights(self):
+    def __dump_synaptic_weights(self):
         """Dump synaptic weights."""
         current_simtime = (str(nest.GetKernelStatus()['time']))
 
@@ -930,6 +988,13 @@ class Sinha2016:
             str(weightsEE).strip('[]').strip('()')),
             file=self.weights_file_handle_EE)
 
+    def dump_data(self):
+        """Master datadump function."""
+        self.__dump_synaptic_weights()
+        self.__dump_ca_concentration()
+        self.__dump_synaptic_elements_per_neurons()
+        self.__dump_total_synaptic_elements()
+
 
 if __name__ == "__main__":
     step = False
@@ -937,7 +1002,7 @@ if __name__ == "__main__":
     simulation = Sinha2016()
 
     if test:
-        simulation.setup_plasticity(True, True)
+        simulation.setup_plasticity(True, False)
         simulation.setup_test_simulation()
         simulation.stabilise()
     else:

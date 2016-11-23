@@ -84,14 +84,14 @@ Used to generate:
 - Plots showing means + STDs of calcium concentrations
 
 
-Synaptic elements files
-~~~~~~~~~~~~~~~~~~~~~~~
+Total synaptic elements files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: text
 
     time(ms) a_total a_connected d_ex_total d_ex_connected d_in_total d_in_connected
 
-- Name format: :code:`02-synaptic-elements-{neuron-set}-{rank}.txt`
+- Name format: :code:`02-synaptic-elements-totals-{neuron-set}-{rank}.txt`
 - Collected at particular times - set by the recording period in the simulation
 - One file per MPI rank
 - Will need to be merged, again using pandas dataframes
@@ -104,3 +104,26 @@ For the following neuron sets:
 Used to generate:
 
 - Plots showing evolution of various synaptic elements
+
+Per neuron synaptic element files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: text
+
+    neuronID  a_total a_connected d_ex_total d_ex_connected d_in_total d_in_connected
+
+- Name format: :code:`03-synaptic-elements-{neuron-set}-{rank}-{time}.txt`
+- Collected at particular times
+- New file at each collection time
+- One file per MPI rank
+- Will need to be merged and sorted - I'll use pandas
+
+For the following neuron sets:
+
+- E neurons
+- I neurons
+
+Used to generate:
+
+- Plots showing a snapshot of the network
+- Will also come in handy later when we want to look at synaptic elements of particular neurons and particular regions
