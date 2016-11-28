@@ -41,8 +41,8 @@ class Sinha2016:
         # http://www.nest-simulator.org/scheduling-and-simulation-flow/
         self.dt = 0.1
         # time to stabilise network after pattern storage etc.
-        self.stabilisation_time = 2000.  # seconds
-        self.recording_interval = 200.  # seconds
+        self.stabilisation_time = 12000.  # seconds
+        self.recording_interval = 500.  # seconds
 
         # plasticities
         self.structural_p = True
@@ -530,13 +530,21 @@ class Sinha2016:
             print("Both plasticities cannot be disabled. Exiting.")
             sys.exit()
 
-    def setup_test_simulation(self, step=False,
-                              stabilisation_time=100., recording_interval=10.):
+    def setup_test_simulation(self, step=None,
+                              stabilisation_time=None.,
+                              recording_interval=None.):
         """Set up a test simulation."""
-        self.step = step
-        self.stabilisation_time = stabilisation_time
-        self.recording_interval = recording_interval
+        if step:
+            self.step = step
+        if stabilisation_time:
+            self.stabilisation_time = stabilisation_time
+        if recording_interval:
+            self.recording_interval = recording_interval
 
+        self.__setup_test_simulation()
+
+    def __setup_test_simulation(self):
+        """Setup the test simulation."""
         # a much smaller simulation
         self.populations = {'E': 80, 'I': 20, 'P': 8, 'R': 4,
                             'D': 2, 'STIM': 10, 'Poisson': 1}
@@ -578,12 +586,17 @@ class Sinha2016:
         self.dump_data()
 
     def setup_simulation(self, step=False,
-                         stabilisation_time=12000., recording_interval=500.):
+                         stabilisation_time=None., recording_interval=None.):
         """Set up simulation."""
-        self.step = step
-        self.stabilisation_time = stabilisation_time
-        self.recording_interval = recording_interval
+        if step:
+            self.step = step
+        if stabilisation_time:
+            self.stabilisation_time = stabilisation_time
+        if recording_interval:
+            self.recording_interval = recording_interval
 
+    def __setup_simulation(self):
+        """Setup the simulation."""
         # Nest stuff
         nest.ResetKernel()
         # http://www.nest-simulator.org/sli/setverbosity/
@@ -1010,11 +1023,13 @@ if __name__ == "__main__":
 
     if test:
         simulation.setup_plasticity(True, False)
-        simulation.setup_test_simulation()
+        simulation.setup_test_simulation(
+            stabilisation_time=100., recording_interval=10.)
         simulation.stabilise()
     else:
         simulation.setup_plasticity(True, True)
-        simulation.setup_simulation()
+        simulation.setup_simulation(
+            stabilisation_time=2000., recording_interval=200.)
         simulation.stabilise()
 
         # store and stabilise patterns
