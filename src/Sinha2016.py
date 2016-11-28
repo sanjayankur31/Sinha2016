@@ -221,11 +221,18 @@ class Sinha2016:
                                 * sparsity)
         chosen_synapses = []
 
-        for sourceid in sources:
-            for destinationid in destinations:
-                possible_synapses.append([sourceid, destinationid])
+        chosen_sources = numpy.random.choice(
+            sources, size=required_synapses, replace=True)
+        chosen_destinations = numpy.random.choice(
+            destinations, size=required_synapses, replace=True)
 
-        chosen_synapses = random.sample(possible_synapses, required_synapses)
+        # There is a possibility of autapses, but given the high number of
+        # options, it is unlikely. We'll also test multiple simulations and
+        # average our results, so in reality, we'll get a sparsity of 2% on
+        # average, which is OK.
+        for i in range(0, required_synapses):
+            chosen_synapses.append([chosen_sources[i], chosen_destinations[i]])
+
         return chosen_synapses
 
     def __setup_connections(self):
