@@ -41,8 +41,8 @@ class Sinha2016:
         # http://www.nest-simulator.org/scheduling-and-simulation-flow/
         self.dt = 0.1
         # time to stabilise network after pattern storage etc.
-        self.stabilisation_time = 12000.  # seconds
-        self.recording_interval = 500.  # seconds
+        self.stabilisation_time = 2000.  # seconds
+        self.recording_interval = 200.  # seconds
 
         # plasticities
         self.structural_p = True
@@ -998,7 +998,7 @@ class Sinha2016:
 
 if __name__ == "__main__":
     step = False
-    test = True
+    test = False
     simulation = Sinha2016()
 
     if test:
