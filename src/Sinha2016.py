@@ -1013,7 +1013,7 @@ if __name__ == "__main__":
         simulation.setup_test_simulation()
         simulation.stabilise()
     else:
-        simulation.setup_plasticity(True, False)
+        simulation.setup_plasticity(True, True)
         simulation.setup_simulation()
         simulation.stabilise()
 
