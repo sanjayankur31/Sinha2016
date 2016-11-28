@@ -1027,7 +1027,7 @@ if __name__ == "__main__":
             stabilisation_time=100., recording_interval=10.)
         simulation.stabilise()
     else:
-        simulation.setup_plasticity(True, True)
+        simulation.setup_plasticity(True, False)
         simulation.setup_simulation(
             stabilisation_time=2000., recording_interval=200.)
         simulation.stabilise()
