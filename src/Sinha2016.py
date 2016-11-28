@@ -531,8 +531,8 @@ class Sinha2016:
             sys.exit()
 
     def setup_test_simulation(self, step=None,
-                              stabilisation_time=None.,
-                              recording_interval=None.):
+                              stabilisation_time=None,
+                              recording_interval=None):
         """Set up a test simulation."""
         if step:
             self.step = step
@@ -586,7 +586,7 @@ class Sinha2016:
         self.dump_data()
 
     def setup_simulation(self, step=False,
-                         stabilisation_time=None., recording_interval=None.):
+                         stabilisation_time=None, recording_interval=None):
         """Set up simulation."""
         if step:
             self.step = step
@@ -1021,13 +1021,14 @@ if __name__ == "__main__":
     test = False
     simulation = Sinha2016()
 
+    # Enable plasticities
+    simulation.setup_plasticity(True, True)
+
     if test:
-        simulation.setup_plasticity(True, False)
         simulation.setup_test_simulation(
             stabilisation_time=100., recording_interval=10.)
         simulation.stabilise()
     else:
-        simulation.setup_plasticity(True, False)
         simulation.setup_simulation(
             stabilisation_time=2000., recording_interval=200.)
         simulation.stabilise()
