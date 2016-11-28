@@ -541,53 +541,21 @@ class Sinha2016:
         if recording_interval:
             self.recording_interval = recording_interval
 
-        self.__setup_test_simulation()
-
-    def __setup_test_simulation(self):
-        """Setup the test simulation."""
-        # a much smaller simulation
-        self.populations = {'E': 80, 'I': 20, 'P': 8, 'R': 4,
-                            'D': 2, 'STIM': 10, 'Poisson': 1}
-
         # Nest stuff
         nest.ResetKernel()
         # http://www.nest-simulator.org/sli/setverbosity/
         nest.set_verbosity('M_DEBUG')
-        # unless using the cluster, just use 24 local threads
-        # still gives out different spike files because they're different
-        # virtual processes
-        # Using 1 thread per core, and 24 MPI processes because I want 24
-        # different firing rate files - if I don't use MPI, I only get one
-        # firing rate file and I'm not sure how the 24 processes each will
-        # write to it
-        nest.SetKernelStatus(
-            {
-                'resolution': self.dt,
-                'local_num_threads': 1
-            }
-        )
-        # Update the SP interval
-        if self.structural_p:
-            nest.EnableStructuralPlasticity()
-            nest.SetStructuralPlasticityStatus({
-                'structural_plasticity_update_interval':
-                self.sp_update_interval,
-            })
 
-        self.__setup_neurons()
-        self.__create_neurons()
-        self.__setup_detectors()
+        # a much smaller simulation
+        self.populations = {'E': 80, 'I': 20, 'P': 8, 'R': 4,
+                            'D': 2, 'STIM': 10, 'Poisson': 1}
 
-        self.__setup_connections()
-        self.__connect_neurons()
-
-        self.__setup_files()
-
-        self.dump_data()
+        self.__setup_simulation()
 
     def setup_simulation(self, step=False,
-                         stabilisation_time=None, recording_interval=None):
-        """Set up simulation."""
+                         stabilisation_time=None,
+                         recording_interval=None):
+        """Set up non test simulation."""
         if step:
             self.step = step
         if stabilisation_time:
@@ -595,12 +563,15 @@ class Sinha2016:
         if recording_interval:
             self.recording_interval = recording_interval
 
-    def __setup_simulation(self):
-        """Setup the simulation."""
-        # Nest stuff
         nest.ResetKernel()
         # http://www.nest-simulator.org/sli/setverbosity/
         nest.set_verbosity('M_INFO')
+
+        self.__setup_simulation()
+
+    def __setup_simulation(self):
+        """Setup the common simulation things."""
+        # Nest stuff
         # unless using the cluster, just use 24 local threads
         # still gives out different spike files because they're different
         # virtual processes
@@ -1022,7 +993,7 @@ if __name__ == "__main__":
     simulation = Sinha2016()
 
     # Enable plasticities
-    simulation.setup_plasticity(False, True)
+    simulation.setup_plasticity(True, True)
 
     if test:
         simulation.setup_test_simulation(
