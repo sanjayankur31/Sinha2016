@@ -993,7 +993,7 @@ if __name__ == "__main__":
     simulation = Sinha2016()
 
     # Enable plasticities
-    simulation.setup_plasticity(True, True)
+    simulation.setup_plasticity(True, False)
 
     if test:
         simulation.setup_test_simulation(
