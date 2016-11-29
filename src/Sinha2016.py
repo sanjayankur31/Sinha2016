@@ -95,38 +95,38 @@ class Sinha2016:
                 'growth_curve': "gaussian",
                 'growth_rate': 0.0001,  # Beta (elements/ms)
                 'continuous': False,
-                'eta': 0.01,
-                'eps': 0.04,
+                'eta': 0.4,
+                'eps': 0.7,
             }
             self.growth_curve_axonal_I = {
                 'growth_curve': "gaussian",
                 'growth_rate': 0.0001,  # Beta (elements/ms)
                 'continuous': False,
-                'eta': 0.015,
-                'eps': 0.06,
+                'eta': 0.4,
+                'eps': 0.7,
             }
             self.growth_curve_dendritic_E = {
                 'growth_curve': "gaussian",
                 'growth_rate': 0.0001,  # Beta (elements/ms)
                 'continuous': False,
-                'eta': 0.005,
-                'eps': self.growth_curve_axonal_E['eps'],
+                'eta': 0.1,
+                'eps': 0.7,
             }
             self.growth_curve_dendritic_I = {
                 'growth_curve': "gaussian",
                 'growth_rate': 0.0001,  # Beta (elements/ms)
                 'continuous': False,
-                'eta': 0.0075,
-                'eps': self.growth_curve_axonal_I['eps'],
+                'eta': 0.1,
+                'eps': 0.7,
             }
 
-            self.synaptic_p_elements_E = {
+            self.structural_p_elements_E = {
                 'Den_ex': self.growth_curve_dendritic_E,
                 'Den_in': self.growth_curve_dendritic_I,
                 'Axon_ex': self.growth_curve_axonal_E
             }
 
-            self.synaptic_p_elements_I = {
+            self.structural_p_elements_I = {
                 'Den_ex': self.growth_curve_dendritic_I,
                 'Den_in': self.growth_curve_dendritic_I,
                 'Axon_in': self.growth_curve_axonal_I
@@ -154,9 +154,9 @@ class Sinha2016:
         """Create our neurons."""
         if self.structural_p:
             self.neuronsE = nest.Create('tif_neuronE', self.populations['E'], {
-                'synaptic_elements': self.synaptic_p_elements_E})
+                'synaptic_elements': self.structural_p_elements_E})
             self.neuronsI = nest.Create('tif_neuronI', self.populations['I'], {
-                'synaptic_elements': self.synaptic_p_elements_I})
+                'synaptic_elements': self.structural_p_elements_I})
         else:
             self.neuronsE = nest.Create('tif_neuronE', self.populations['E'])
             self.neuronsI = nest.Create('tif_neuronI', self.populations['I'])
@@ -993,11 +993,11 @@ if __name__ == "__main__":
     simulation = Sinha2016()
 
     # Enable plasticities
-    simulation.setup_plasticity(False, True)
+    simulation.setup_plasticity(True, False)
 
     if test:
         simulation.setup_test_simulation(
-            stabilisation_time=100., recording_interval=10.)
+            stabilisation_time=200., recording_interval=10.)
         simulation.stabilise()
     else:
         simulation.setup_simulation(
