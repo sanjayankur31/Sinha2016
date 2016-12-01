@@ -257,34 +257,63 @@ class Sinha2016:
         self.connDictStim = {'rule': 'fixed_total_number',
                              'N': self.connectionNumberStim}
 
+        # If neither, we've messed up
+        if not self.structural_p and not self.synaptic_p:
+            print("Neither plasticity is enabled. Exiting.")
+            sys.exit()
+
         # Documentation says things are normalised in the iaf neuron so that
         # weight of 1 translates to 1nS
-
         # Only structural plasticity - if synapses are formed, give them
         # constant conductances
-        if self.structural_p and not self.synaptic_p:
-            self.synDictEE = {'model': 'static_synapse',
-                              'weight': 1.,
-                              'pre_synaptic_element': 'Axon_ex',
-                              'post_synaptic_element': 'Den_ex'}
+        if self.structural_p:
+            if not self.synaptic_p:
+                self.synDictEE = {'model': 'static_synapse',
+                                  'weight': 1.,
+                                  'pre_synaptic_element': 'Axon_ex',
+                                  'post_synaptic_element': 'Den_ex'}
 
-            self.synDictEI = {'model': 'static_synapse',
-                              'weight': 1.,
-                              'pre_synaptic_element': 'Axon_ex',
-                              'post_synaptic_element': 'Den_ex'}
+                self.synDictEI = {'model': 'static_synapse',
+                                  'weight': 1.,
+                                  'pre_synaptic_element': 'Axon_ex',
+                                  'post_synaptic_element': 'Den_ex'}
 
-            self.synDictII = {'model': 'static_synapse',
-                              'weight': 1.,
-                              'pre_synaptic_element': 'Axon_in',
-                              'post_synaptic_element': 'Den_in'}
+                self.synDictII = {'model': 'static_synapse',
+                                  'weight': 1.,
+                                  'pre_synaptic_element': 'Axon_in',
+                                  'post_synaptic_element': 'Den_in'}
 
-            self.synDictIE = {'model': 'static_synapse',
-                              'weight': -1.,
-                              'pre_synaptic_element': 'Axon_in',
-                              'post_synaptic_element': 'Den_in'}
+                self.synDictIE = {'model': 'static_synapse',
+                                  'weight': -1.,
+                                  'pre_synaptic_element': 'Axon_in',
+                                  'post_synaptic_element': 'Den_in'}
+
+            # both enabled
+            else:
+                self.synDictEE = {'model': 'static_synapse',
+                                  'weight': self.weightEE,
+                                  'pre_synaptic_element': 'Axon_ex',
+                                  'post_synaptic_element': 'Den_ex'}
+
+                self.synDictEI = {'model': 'static_synapse',
+                                  'weight': self.weightEI,
+                                  'pre_synaptic_element': 'Axon_ex',
+                                  'post_synaptic_element': 'Den_ex'}
+
+                self.synDictII = {'model': 'static_synapse',
+                                  'weight': self.weightII,
+                                  'pre_synaptic_element': 'Axon_in',
+                                  'post_synaptic_element': 'Den_in'}
+
+                self.synDictIE = {'model': 'vogels_sprekeler_synapse',
+                                  'weight': -0.0000001, 'Wmax': -30000.,
+                                  'alpha': .12, 'eta': 0.01,
+                                  'tau': 20.,
+                                  'pre_synaptic_element': 'Axon_in',
+                                  'post_synaptic_element': 'Den_in'}
 
         # Only synaptic plasticity - do not define synaptic elements
-        elif not self.structural_p and self.synaptic_p:
+        else:
             self.synDictEE = {'model': 'static_synapse',
                               'weight': self.weightEE}
             self.synDictEI = {'model': 'static_synapse',
@@ -297,35 +326,6 @@ class Sinha2016:
                               'weight': -0.0000001, 'Wmax': -30000.,
                               'alpha': .12, 'eta': 0.01,
                               'tau': 20.}
-
-        # both enabled
-        elif self.structural_p and self.synaptic_p:
-            self.synDictEE = {'model': 'static_synapse',
-                              'weight': self.weightEE,
-                              'pre_synaptic_element': 'Axon_ex',
-                              'post_synaptic_element': 'Den_ex'}
-
-            self.synDictEI = {'model': 'static_synapse',
-                              'weight': self.weightEI,
-                              'pre_synaptic_element': 'Axon_ex',
-                              'post_synaptic_element': 'Den_ex'}
-
-            self.synDictII = {'model': 'static_synapse',
-                              'weight': self.weightII,
-                              'pre_synaptic_element': 'Axon_in',
-                              'post_synaptic_element': 'Den_in'}
-
-            self.synDictIE = {'model': 'vogels_sprekeler_synapse',
-                              'weight': -0.0000001, 'Wmax': -30000.,
-                              'alpha': .12, 'eta': 0.01,
-                              'tau': 20.,
-                              'pre_synaptic_element': 'Axon_in',
-                              'post_synaptic_element': 'Den_in'}
-
-        # Should not reach this part - I have a check before
-        else:
-            print("Neither plasticity is enabled. Exiting.")
-            sys.exit()
 
     def __connect_neurons(self):
         """Connect the neuron sets up."""
