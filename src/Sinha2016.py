@@ -312,6 +312,15 @@ class Sinha2016:
                                   'pre_synaptic_element': 'Axon_in',
                                   'post_synaptic_element': 'Den_in'}
 
+            nest.SetStructuralPlasticityStatus({
+                'structural_plasticity_synapses': {
+                    'synapseEE': self.synDictEE,
+                    'synapseEI': self.synDictEI,
+                    'synapseII': self.synDictII,
+                    'synapseIE': self.synDictIE,
+                }
+            })
+
         # Only synaptic plasticity - do not define synaptic elements
         else:
             self.synDictEE = {'model': 'static_synapse',
