@@ -267,42 +267,40 @@ class Sinha2016:
         # Only structural plasticity - if synapses are formed, give them
         # constant conductances
         if self.structural_p:
-            # to stop SP from trying to delete normal static synapses
-            nest.CopyModel("static_synapse", "my_static_synapse")
             if not self.synaptic_p:
-                self.synDictEE = {'model': 'my_static_synapse',
+                self.synDictEE = {'model': 'static_synapse',
                                   'weight': 1.,
                                   'pre_synaptic_element': 'Axon_ex',
                                   'post_synaptic_element': 'Den_ex'}
 
-                self.synDictEI = {'model': 'my_static_synapse',
+                self.synDictEI = {'model': 'static_synapse',
                                   'weight': 1.,
                                   'pre_synaptic_element': 'Axon_ex',
                                   'post_synaptic_element': 'Den_ex'}
 
-                self.synDictII = {'model': 'my_static_synapse',
+                self.synDictII = {'model': 'static_synapse',
                                   'weight': 1.,
                                   'pre_synaptic_element': 'Axon_in',
                                   'post_synaptic_element': 'Den_in'}
 
-                self.synDictIE = {'model': 'my_static_synapse',
+                self.synDictIE = {'model': 'static_synapse',
                                   'weight': -1.,
                                   'pre_synaptic_element': 'Axon_in',
                                   'post_synaptic_element': 'Den_in'}
 
             # both enabled
             else:
-                self.synDictEE = {'model': 'my_static_synapse',
+                self.synDictEE = {'model': 'static_synapse',
                                   'weight': self.weightEE,
                                   'pre_synaptic_element': 'Axon_ex',
                                   'post_synaptic_element': 'Den_ex'}
 
-                self.synDictEI = {'model': 'my_static_synapse',
+                self.synDictEI = {'model': 'static_synapse',
                                   'weight': self.weightEI,
                                   'pre_synaptic_element': 'Axon_ex',
                                   'post_synaptic_element': 'Den_ex'}
 
-                self.synDictII = {'model': 'my_static_synapse',
+                self.synDictII = {'model': 'static_synapse',
                                   'weight': self.weightII,
                                   'pre_synaptic_element': 'Axon_in',
                                   'post_synaptic_element': 'Den_in'}
