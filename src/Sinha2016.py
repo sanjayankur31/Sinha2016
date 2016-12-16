@@ -147,8 +147,15 @@ class Sinha2016:
         nest.CopyModel("iaf_cond_exp", "tif_neuronI")
         nest.SetDefaults("tif_neuronI", self.neuronDict)
 
-        # external current
-        self.poissonExtDict = {'rate': 10., 'origin': 0., 'start': 0.}
+        # external stimulus
+        # if synaptic plasticity is enabled, we have an initial set of
+        # connections, so we don't need so many connections
+        if self.synaptic_p:
+            self.poissonExtDict = {'rate': 10., 'origin': 0., 'start': 0.}
+        # else, if no synaptic plasticity, only structural, so we need more
+        # input stimulus to get the connections to form
+        else:
+            self.poissonExtDict = {'rate': 50., 'origin': 0., 'start': 0.}
 
     def __create_neurons(self):
         """Create our neurons."""
