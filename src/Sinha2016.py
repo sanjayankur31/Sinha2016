@@ -84,6 +84,15 @@ class Sinha2016:
 
         random.seed(42)
 
+        # used to track how many comma separated values each line will have
+        # when I store synaptic conductances.
+        # Required in post processing, so that I know what the size of my
+        # dataframe should be
+        self.num_synapses_EE = 0
+        self.num_synapses_EI = 0
+        self.num_synapses_II = 0
+        self.num_synapses_IE = 0
+
     def __setup_neurons(self):
         """Setup properties of neurons."""
         # if structural plasticity is enabled
@@ -970,6 +979,8 @@ class Sinha2016:
             current_simtime,
             str(weightsIE).strip('[]').strip('()')),
             file=self.weights_file_handle_IE)
+        if len(weightsIE) > self.num_synapses_IE:
+            self.num_synapses_IE = len(weightsIE)
 
         conns = nest.GetConnections(target=self.neuronsI,
                                     source=self.neuronsI)
@@ -978,6 +989,8 @@ class Sinha2016:
             current_simtime,
             str(weightsII).strip('[]').strip('()')),
             file=self.weights_file_handle_II)
+        if len(weightsII) > self.num_synapses_II:
+            self.num_synapses_II = len(weightsII)
 
         conns = nest.GetConnections(target=self.neuronsI,
                                     source=self.neuronsE)
@@ -986,6 +999,8 @@ class Sinha2016:
             current_simtime,
             str(weightsEI).strip('[]').strip('()')),
             file=self.weights_file_handle_EI)
+        if len(weightsEI) > self.num_synapses_EI:
+            self.num_synapses_EI = len(weightsEI)
 
         conns = nest.GetConnections(target=self.neuronsE,
                                     source=self.neuronsE)
@@ -994,6 +1009,8 @@ class Sinha2016:
             current_simtime,
             str(weightsEE).strip('[]').strip('()')),
             file=self.weights_file_handle_EE)
+        if len(weightsEE) > self.num_synapses_EE:
+            self.num_synapses_EE = len(weightsEE)
 
     def dump_data(self):
         """Master datadump function."""
@@ -1002,10 +1019,34 @@ class Sinha2016:
         self.__dump_synaptic_elements_per_neurons()
         self.__dump_total_synaptic_elements()
 
+    def close_files(self):
+        """Close all files when the simulation is finished."""
+        # Comma printed so that pandas can read it as a dataframe point
+        print("{},".format(self.num_synapses_EE),
+              file=self.weights_file_handle_EE)
+        self.weights_file_handle_EE.close()
+
+        print("{},".format(self.num_synapses_EI),
+              file=self.weights_file_handle_EI)
+        self.weights_file_handle_EI.close()
+        print("{},".format(self.num_synapses_II),
+              file=self.weights_file_handle_II)
+        self.weights_file_handle_II.close()
+
+        print("{},".format(self.num_synapses_IE),
+              file=self.weights_file_handle_IE)
+        self.weights_file_handle_IE.close()
+
+        self.ca_file_handle_I.close()
+        self.ca_file_handle_E.close()
+
+        self.syn_elms_file_handle_E.close()
+        self.syn_elms_file_handle_I.close()
+
 
 if __name__ == "__main__":
     step = False
-    test = False
+    test = True
     simulation = Sinha2016()
 
     # Enable plasticities
@@ -1029,3 +1070,5 @@ if __name__ == "__main__":
         # simulation.deaff_last_pattern()
         # simulation.stabilise()
         # simulation.recall_last_pattern(50)
+
+    simulation.close_files()
