@@ -45,6 +45,8 @@ Synaptic weight files
 
     time(ms), comma separated conductances(nS)
 
+    Last line specifies max number of conductance columns
+
 - Name format: :code:`00-synaptic-weights-{synapse-group}-{rank}.txt`
 - Collected at particular times - set by the recording period in the simulation
 - One file per MPI rank
@@ -62,12 +64,17 @@ Used to generate:
 - Plots with Means and STDs of synaptic conductances
 - Also gives an idea of the number of synaptic connections (to compare with synaptic elements to confirm correctness)
 
+
+
+
 Calcium concentration files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: text
 
     time(ms), comma separated calcium values(unit less)
+
+    Last line specifies number of neurons which is the same as the number of calcium values in each line
 
 - Name format: :code:`01-calcium-{neuron-set}-{rank}.txt`
 - Collected at particular times - set by the recording period in the simulation

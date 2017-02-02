@@ -1037,7 +1037,9 @@ class Sinha2016:
               file=self.weights_file_handle_IE)
         self.weights_file_handle_IE.close()
 
+        print("{},".format(len(self.neuronsE)), file=self.ca_file_handle_E)
         self.ca_file_handle_I.close()
+        print("{},".format(len(self.neuronsI)), file=self.ca_file_handle_I)
         self.ca_file_handle_E.close()
 
         self.syn_elms_file_handle_E.close()
