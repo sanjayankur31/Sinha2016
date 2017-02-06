@@ -1051,26 +1051,34 @@ if __name__ == "__main__":
     test = False
     simulation = Sinha2016()
 
-    # Enable plasticities
-    simulation.setup_plasticity(True, True)
+    # Setup network to handle plasticities
+    # nest.EnableStructuralPlasticity() must be called to enable the actual
+    # update of the network
+    simulation.setup_plasticity(False, True)
 
+    print("STAGE ONE - STABILISATION")
     if test:
         simulation.setup_test_simulation(
             stabilisation_time=200., recording_interval=10.)
-        simulation.stabilise()
     else:
         simulation.setup_simulation(
             stabilisation_time=2000., recording_interval=200.)
+    simulation.stabilise()
+
+    print("STAGE TWO - PATTERN STORAGE AND STABILISATION")
+    # store and stabilise patterns
+    for i in range(0, simulation.numpats):
+        simulation.store_pattern()
         simulation.stabilise()
 
-        # store and stabilise patterns
-        for i in range(0, simulation.numpats):
-            simulation.store_pattern()
-            simulation.stabilise()
-
-        # Only recall the last pattern because nest doesn't do snapshots
-        # simulation.deaff_last_pattern()
-        # simulation.stabilise()
-        # simulation.recall_last_pattern(50)
+    # print("STAGE THREE - PATTERN DEAFFERENTATION and STABILISATION")
+    # Only recall the last pattern because nest doesn't do snapshots
+    # simulation.deaff_last_pattern()
+    # nest.EnableStructuralPlasticity()
+    # simulation.stabilise()
+    if simulation.numpats > 0:
+        print("STAGE FOUR - PATTERN RECALL")
+        simulation.recall_last_pattern(50)
 
     simulation.close_files()
+    print("SIMULATION FINISHED SUCCESSFULLY")
