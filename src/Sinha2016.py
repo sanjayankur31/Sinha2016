@@ -58,7 +58,7 @@ class Sinha2016:
         # time recall stimulus is enabled for
         self.recall_time = 1000.  # ms
         # Number of patterns we store
-        self.numpats = 0
+        self.numpats = 1
 
         self.recall_ext_i = 3000.
 
