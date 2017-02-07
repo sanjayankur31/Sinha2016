@@ -102,7 +102,8 @@ class Sinha2016:
         # used to track how many comma separated values each line will have
         # when I store synaptic conductances.
         # Required in post processing, so that I know what the size of my
-        # dataframe should be
+        # dataframe should be. Pandas cannot figure this out on its own. See
+        # postprocessing scripts for more information.
         self.num_synapses_EE = 0
         self.num_synapses_EI = 0
         self.num_synapses_II = 0
@@ -466,9 +467,9 @@ class Sinha2016:
             'to_file': True,
             'label': 'spikes-' + str(self.rank) + '-I'
         }
-        self.spike_detector_paramsD = {
+        self.spike_detector_paramsDP = {
             'to_file': True,
-            'label': 'spikes-' + str(self.rank) + '-deaffed'
+            'label': 'spikes-' + str(self.rank) + '-deaffed-pattern'
         }
 
         self.sdE = nest.Create('spike_detector',
@@ -758,6 +759,7 @@ class Sinha2016:
 
         stim = nest.Create('poisson_generator', 1,
                            neuronDictStim)
+        # TODO: Do I need a parrot neuron?
         stim_neurons = nest.Create('parrot_neuron',
                                    self.populations['STIM'])
         nest.Connect(stim, stim_neurons)
@@ -819,22 +821,61 @@ class Sinha2016:
         An extra helper method, since we'll be doing this most.
         """
         self.deaff_pattern(self.pattern_count - 1)
+        self.__deaff_bg_E(self.pattern_count - 1)
+        self.__deaff_bg_I()
 
     def deaff_pattern(self, pattern_number):
-        """Deaff the network."""
+        """Deaff the pattern."""
         pattern_neurons = self.patterns[pattern_number - 1]
         deaffed_neurons = random.sample(
             pattern_neurons, int(math.ceil(len(pattern_neurons) *
                                            self.deaff_pattern_percent)))
         print("ANKUR>> Number of deaff pattern neurons: "
               "{}".format(len(deaffed_neurons)))
-        nest.SetStatus(deaffed_neurons, {'I_e': 0.})
+
+        conns = nest.GetConnections(source=self.poissonExtE,
+                                    target=deaffed_neurons)
+        for conn in conns:
+            nest.DisconnectOneToOne(conn[0], conn[1],
+                                    syn_spec={'model': 'static_synapse'})
 
         deaff_spike_detector = nest.Create(
-            'spike_detector', params=self.spike_detector_paramsD)
+            'spike_detector', params=self.spike_detector_paramsDP)
         nest.Connect(deaffed_neurons, deaff_spike_detector)
         # save the detector
         self.sdL.append(deaff_spike_detector)
+
+    def __deaff_bg_E(self, pattern_number):
+        """Deaff background E neurons."""
+        pattern_neurons = self.patterns[pattern_number - 1]
+        local_neurons = [stat['global_id'] for stat in
+                         nest.GetStatus(self.neuronsE) if stat['local']]
+        bg_neurons = list(set(local_neurons) - set(pattern_neurons))
+        deaffed_neurons = random.sample(
+            bg_neurons, int(math.ceil(len(bg_neurons) *
+                                      self.deaff_bg_percent)))
+        print("ANKUR>> Number of deaff bg neurons: "
+              "{}".format(len(deaffed_neurons)))
+        conns = nest.GetConnections(source=self.poissonExtE,
+                                    target=deaffed_neurons)
+        for conn in conns:
+            nest.DisconnectOneToOne(conn[0], conn[1],
+                                    syn_spec={'model': 'static_synapse'})
+
+    def __deaff_bg_I(self):
+        """Deaff background I neurons."""
+        local_neurons = [stat['global_id'] for stat in
+                         nest.GetStatus(self.neuronsI) if stat['local']]
+        deaffed_neurons = random.sample(
+            local_neurons, int(math.ceil(len(local_neurons) *
+                                         self.deaff_bg_percent)))
+        print("ANKUR>> Number of deaff bg neurons: "
+              "{}".format(len(deaffed_neurons)))
+        conns = nest.GetConnections(source=self.poissonExtI,
+                                    target=deaffed_neurons)
+        for conn in conns:
+            nest.DisconnectOneToOne(conn[0], conn[1],
+                                    syn_spec={'model': 'static_synapse'})
 
     def __dump_ca_concentration(self):
         """Dump calcium concentration."""
@@ -1089,11 +1130,11 @@ if __name__ == "__main__":
         simulation.store_pattern()
         simulation.stabilise()
 
-    # print("STAGE THREE - PATTERN DEAFFERENTATION and STABILISATION")
     # Only recall the last pattern because nest doesn't do snapshots
-    # simulation.deaff_last_pattern()
+    print("STAGE THREE - PATTERN DEAFFERENTATION and STABILISATION")
+    simulation.deaff_last_pattern()
     # nest.EnableStructuralPlasticity()
-    # simulation.stabilise()
+    simulation.stabilise()
     if simulation.numpats > 0:
         print("STAGE FOUR - PATTERN RECALL")
         simulation.recall_last_pattern(50)
