@@ -49,8 +49,23 @@ class Sinha2016:
         self.setup_syn_p = True
 
         # populations
-        self.populations = {'E': 8000, 'I': 2000, 'P': 800, 'R': 400,
-                            'D': 200, 'STIM': 1000, 'Poisson': 1}
+        self.populations = {'E': 8000, 'I': 2000, 'STIM': 1000, 'Poisson': 1}
+        # pattern percent of E neurons
+        self.pattern_percent = .1
+        # recall percent of pattern
+        self.recall_percent = .25
+        # deafferentation percent of pattern
+        self.deaff_pattern_percent = .50
+        # deafferentation percent of background
+        self.deaff_bg_percent = .50
+
+        self.populations['P'] = self.pattern_percent * self.populations['E']
+        self.populations['R'] = self.recall_percent * self.populations['P']
+        self.populations['DP'] = (self.deaff_pattern_percent *
+                                  self.populations['P'])
+        self.populations['DBG'] = (self.deaff_bg_percent *
+                                   (self.populations['E'] -
+                                    self.populations['P']))
 
         # structural plasticity bits
         # must be an integer
@@ -666,13 +681,12 @@ class Sinha2016:
                       str(self.pattern_count))
         }
 
-        local_neurons = nest.GetNodes(
-            nest.CurrentSubnet(), {'model': 'tif_neuronE'},
-            local_only=False)[0]
-
+        local_neurons = [stat['global_id'] for stat in
+                         nest.GetStatus(self.neuronsE) if stat['local']]
+        print("Local neurons found: {}".format(local_neurons))
         pattern_neurons = random.sample(
-            local_neurons,
-            self.populations['P'])
+            local_neurons, int(math.ceil(len(local_neurons) *
+                                         self.pattern_percent)))
         print("ANKUR>> Number of pattern neurons: "
               "{}".format(len(pattern_neurons)))
 
@@ -755,8 +769,8 @@ class Sinha2016:
 
         pattern_neurons = self.patterns[pattern_number - 1]
         recall_neurons = random.sample(
-            pattern_neurons,
-            self.populations['R'])
+            pattern_neurons, int(math.ceil(len(pattern_neurons) *
+                                           self.recall_percent)))
         print("ANKUR>> Number of recall neurons: "
               "{}".format(len(recall_neurons)))
 
@@ -810,9 +824,9 @@ class Sinha2016:
         """Deaff the network."""
         pattern_neurons = self.patterns[pattern_number - 1]
         deaffed_neurons = random.sample(
-            pattern_neurons,
-            self.populations['D'])
-        print("ANKUR>> Number of deaff neurons: "
+            pattern_neurons, int(math.ceil(len(pattern_neurons) *
+                                           self.deaff_pattern_percent)))
+        print("ANKUR>> Number of deaff pattern neurons: "
               "{}".format(len(deaffed_neurons)))
         nest.SetStatus(deaffed_neurons, {'I_e': 0.})
 
@@ -1036,9 +1050,13 @@ class Sinha2016:
               file=self.weights_file_handle_IE)
         self.weights_file_handle_IE.close()
 
-        print("{},".format(len(self.neuronsE)), file=self.ca_file_handle_E)
+        local_neurons = [stat['global_id'] for stat in
+                         nest.GetStatus(self.neuronsE) if stat['local']]
+        print("{},".format(len(local_neurons)), file=self.ca_file_handle_E)
         self.ca_file_handle_E.close()
-        print("{},".format(len(self.neuronsI)), file=self.ca_file_handle_I)
+        local_neurons = [stat['global_id'] for stat in
+                         nest.GetStatus(self.neuronsI) if stat['local']]
+        print("{},".format(len(local_neurons)), file=self.ca_file_handle_I)
         self.ca_file_handle_I.close()
 
         if self.setup_str_p:
