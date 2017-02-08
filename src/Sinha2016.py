@@ -72,8 +72,6 @@ class Sinha2016:
         self.sp_update_interval = 100  # ms
         # time recall stimulus is enabled for
         self.recall_time = 1000.  # ms
-        # Number of patterns we store
-        self.numpats = 1
 
         self.recall_ext_i = 3000.
 
@@ -1142,6 +1140,7 @@ class Sinha2016:
 if __name__ == "__main__":
     step = False
     test = True
+    numpats = 1
     simulation = Sinha2016()
 
     # Setup network to handle plasticities
@@ -1160,7 +1159,7 @@ if __name__ == "__main__":
 
     print("STAGE TWO - PATTERN STORAGE AND STABILISATION")
     # store and stabilise patterns
-    for i in range(0, simulation.numpats):
+    for i in range(0, numpats):
         simulation.store_pattern()
         simulation.stabilise()
 
@@ -1169,7 +1168,7 @@ if __name__ == "__main__":
     simulation.deaff_last_pattern()
     # nest.EnableStructuralPlasticity()
     simulation.stabilise()
-    if simulation.numpats > 0:
+    if numpats > 0:
         print("STAGE FOUR - PATTERN RECALL")
         simulation.recall_last_pattern(50)
 
