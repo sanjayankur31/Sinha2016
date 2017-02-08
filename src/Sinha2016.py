@@ -469,11 +469,11 @@ class Sinha2016:
         }
         self.spike_detector_paramsP = {
             'to_file': True,
-            'label': 'spikes-pattern-'
+            'label': 'spikes-pattern'
         }
         self.spike_detector_paramsB = {
             'to_file': True,
-            'label': 'spikes-background-'
+            'label': 'spikes-background'
         }
         self.spike_detector_paramsR = {
             'to_file': True,
@@ -491,7 +491,7 @@ class Sinha2016:
             'to_file': True,
             'label': 'spikes-deaffed-bg-I'
         }
-        spike_detector_paramsStim = {
+        self.spike_detector_paramsStim = {
             'to_file': True,
             'label': 'spikes-stim'
         }
@@ -695,6 +695,8 @@ class Sinha2016:
 
     def store_pattern(self):
         """ Store a pattern and set up spike detectors."""
+        # Keep track of how many patterns are stored
+        self.pattern_count += 1
         local_neurons = [stat['global_id'] for stat in
                          nest.GetStatus(self.neuronsE) if stat['local']]
         print("Local neurons found: {}".format(local_neurons))
@@ -730,8 +732,10 @@ class Sinha2016:
                 print(neuron, file=file_handle)
 
         # set up spike detectors
-        sd_params = self.spike_detector_paramsP
-        sd_params['label'] = sd_params['label'] + "-{}".format(pattern_count)
+        sd_params = self.spike_detector_paramsP.copy()
+        sd_params['label'] = (sd_params['label'] +
+                              "-{}".format(self.pattern_count))
+        print(sd_params)
         # pattern
         pattern_spike_detector = nest.Create(
             'spike_detector', params=sd_params)
@@ -740,16 +744,15 @@ class Sinha2016:
         self.sdP.append(pattern_spike_detector)
 
         # background
-        sd_params = self.spike_detector_paramsB
-        sd_params['label'] = sd_params['label'] + "-{}".format(pattern_count)
+        sd_params = self.spike_detector_paramsB.copy()
+        sd_params['label'] = (sd_params['label'] +
+                              "-{}".format(self.pattern_count))
         background_spike_detector = nest.Create(
             'spike_detector', params=sd_params)
         nest.Connect(background_neurons, background_spike_detector)
         # save the detector
         self.sdB.append(background_spike_detector)
 
-        # Increment count after it's all been set up
-        self.pattern_count += 1
         print("Number of patterns stored: {}".format(self.pattern_count))
 
     def setup_pattern_for_recall(self, pattern_number):
@@ -766,7 +769,7 @@ class Sinha2016:
                           'origin': stim_time,
                           'start': 0., 'stop': self.recall_time}
 
-        sd_params = self.spike_detector_paramsStim
+        sd_params = self.spike_detector_paramsStim.copy()
         sd_params['label'] = sd_params['label'] + "-{}".format(pattern_number)
 
         stim = nest.Create('poisson_generator', 1,
@@ -776,7 +779,7 @@ class Sinha2016:
                                    self.populations['STIM'])
         nest.Connect(stim, stim_neurons)
         sd = nest.Create('spike_detector',
-                         params=spike_detector_paramsStim)
+                         params=sd_params)
         nest.Connect(stim_neurons, sd)
         self.sdStim.append(sd)
         self.neuronsStim.append(stim_neurons)
@@ -800,14 +803,13 @@ class Sinha2016:
             for neuron in recall_neurons:
                 print(neuron, file=file_handle)
 
-        sd_params = self.spike_detector_paramsR
+        sd_params = self.spike_detector_paramsR.copy()
         sd_params['label'] = sd_params['label'] + "-{}".format(pattern_number)
         recall_spike_detector = nest.Create(
             'spike_detector', params=sd_params)
         nest.Connect(recall_neurons, recall_spike_detector)
         # save the detector
         self.sdR.append(recall_spike_detector)
-        # nest.SetStatus(recall_neurons, {'I_e': self.recall_ext_i})
 
     def recall_last_pattern(self, time):
         """
@@ -828,9 +830,9 @@ class Sinha2016:
 
         An extra helper method, since we'll be doing this most.
         """
-        self.__deaff_pattern(self.pattern_count - 1)
-        self.__deaff_bg_E(self.pattern_count - 1)
-        self.__deaff_bg_I(self.pattern_count - 1)
+        self.__deaff_pattern(self.pattern_count)
+        self.__deaff_bg_E(self.pattern_count)
+        self.__deaff_bg_I(self.pattern_count)
 
     def deaff_a_pattern(self, pattern_number):
         """Deaff a pattern."""
@@ -840,6 +842,7 @@ class Sinha2016:
 
     def __deaff_pattern(self, pattern_number):
         """Deaff the pattern neuron set."""
+        print("ANKUR>> Deaffing pattern {}".format(pattern_number))
         pattern_neurons = self.patterns[pattern_number - 1]
         deaffed_neurons = random.sample(
             pattern_neurons, int(math.ceil(len(pattern_neurons) *
@@ -853,7 +856,7 @@ class Sinha2016:
             nest.DisconnectOneToOne(conn[0], conn[1],
                                     syn_spec={'model': 'static_synapse'})
 
-        sd_params = self.spike_detector_paramsDP
+        sd_params = self.spike_detector_paramsDP.copy()
         sd_params['label'] = sd_params['label'] + "-{}".format(pattern_number)
         deaff_spike_detector = nest.Create(
             'spike_detector', params=sd_params)
@@ -878,7 +881,7 @@ class Sinha2016:
             nest.DisconnectOneToOne(conn[0], conn[1],
                                     syn_spec={'model': 'static_synapse'})
 
-        sd_params = self.spike_detector_paramsDBG_E
+        sd_params = self.spike_detector_paramsDBG_E.copy()
         sd_params['label'] = sd_params['label'] + "-{}".format(pattern_number)
         deaff_spike_detector = nest.Create(
             'spike_detector', params=sd_params)
@@ -901,7 +904,7 @@ class Sinha2016:
             nest.DisconnectOneToOne(conn[0], conn[1],
                                     syn_spec={'model': 'static_synapse'})
 
-        sd_params = self.spike_detector_paramsDBG_I
+        sd_params = self.spike_detector_paramsDBG_I.copy()
         sd_params['label'] = sd_params['label'] + "-{}".format(pattern_number)
         deaff_spike_detector = nest.Create(
             'spike_detector', params=sd_params)
@@ -1139,14 +1142,14 @@ class Sinha2016:
 
 if __name__ == "__main__":
     step = False
-    test = True
+    test = False
     numpats = 1
     simulation = Sinha2016()
 
     # Setup network to handle plasticities
     # nest.EnableStructuralPlasticity() must be called to enable the actual
     # update of the network
-    simulation.setup_plasticity(False, True)
+    simulation.setup_plasticity(True, True)
 
     print("STAGE ONE - STABILISATION")
     if test:
