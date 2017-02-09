@@ -670,6 +670,8 @@ class Sinha2016:
 
     def stabilise(self):
         """Stabilise network."""
+        print("SIMULATION: STABILISING for {} seconds".format(
+            self.stabilisation_time))
         sim_steps = numpy.arange(0, self.stabilisation_time,
                                  self.recording_interval)
         for i, j in enumerate(sim_steps):
@@ -695,6 +697,7 @@ class Sinha2016:
 
     def store_pattern(self):
         """ Store a pattern and set up spike detectors."""
+        print("SIMULATION: Storing pattern {}".format(self.pattern_count + 1))
         # Keep track of how many patterns are stored
         self.pattern_count += 1
         local_neurons = [stat['global_id'] for stat in
@@ -817,6 +820,7 @@ class Sinha2016:
 
         An extra helper method, since we'll be doing this most.
         """
+        print("SIMULATION: RECALLING LAST PATTERN")
         self.recall_pattern(time, self.pattern_count)
 
     def recall_pattern(self, time, pattern_number):
@@ -830,6 +834,8 @@ class Sinha2016:
 
         An extra helper method, since we'll be doing this most.
         """
+        print("SIMULATION: deaffing last pattern ({})".format(
+            self.pattern_count))
         self.__deaff_pattern(self.pattern_count)
         self.__deaff_bg_E(self.pattern_count)
         self.__deaff_bg_I(self.pattern_count)
@@ -1149,9 +1155,10 @@ if __name__ == "__main__":
     # Setup network to handle plasticities
     # nest.EnableStructuralPlasticity() must be called to enable the actual
     # update of the network
+    print("SIMULATION STARTED")
     simulation.setup_plasticity(True, True)
 
-    print("STAGE ONE - STABILISATION")
+    # Intial stabilisation #
     if test:
         simulation.setup_test_simulation(
             stabilisation_time=200., recording_interval=10.)
@@ -1160,19 +1167,21 @@ if __name__ == "__main__":
             stabilisation_time=2000., recording_interval=200.)
     simulation.stabilise()
 
-    print("STAGE TWO - PATTERN STORAGE AND STABILISATION")
+    # Pattern storage #
     # store and stabilise patterns
     for i in range(0, numpats):
         simulation.store_pattern()
         simulation.stabilise()
 
-    # Only recall the last pattern because nest doesn't do snapshots
-    print("STAGE THREE - PATTERN DEAFFERENTATION and STABILISATION")
+    # Deaff last pattern #
     simulation.deaff_last_pattern()
+    # Enable structural plasticity for repair #
     # nest.EnableStructuralPlasticity()
+    # Stabilise for repair #
     simulation.stabilise()
+
+    # Recall last pattern #
     if numpats > 0:
-        print("STAGE FOUR - PATTERN RECALL")
         simulation.recall_last_pattern(50)
 
     simulation.close_files()
