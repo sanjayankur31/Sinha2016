@@ -1140,7 +1140,7 @@ class Sinha2016:
 
 if __name__ == "__main__":
     step = False
-    test = True
+    test = False
     numpats = 1
     simulation = Sinha2016()
 
