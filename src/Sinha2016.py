@@ -1165,15 +1165,15 @@ if __name__ == "__main__":
         simulation.store_pattern()
         simulation.stabilise()
 
-    # Deaff last pattern #
-    simulation.deaff_last_pattern()
-    # Enable structural plasticity for repair #
-    # nest.EnableStructuralPlasticity()
-    # Stabilise for repair #
-    simulation.stabilise()
-
     # Recall last pattern #
     if numpats > 0:
+        # Deaff last pattern #
+        simulation.deaff_last_pattern()
+        # Enable structural plasticity for repair #
+        # nest.EnableStructuralPlasticity()
+        # Stabilise for repair #
+        simulation.stabilise()
+
         simulation.recall_last_pattern(50)
 
     simulation.close_files()
