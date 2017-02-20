@@ -700,11 +700,8 @@ class Sinha2016:
         print("SIMULATION: Storing pattern {}".format(self.pattern_count + 1))
         # Keep track of how many patterns are stored
         self.pattern_count += 1
-        local_neurons = [stat['global_id'] for stat in
-                         nest.GetStatus(self.neuronsE) if stat['local']]
-        print("Local neurons found: {}".format(local_neurons))
         pattern_neurons = random.sample(
-            local_neurons, int(math.ceil(len(local_neurons) *
+            self.neuronsE, int(math.ceil(len(self.neuronsE) *
                                          self.pattern_percent)))
         print("ANKUR>> Number of pattern neurons: "
               "{}".format(len(pattern_neurons)))
@@ -726,7 +723,7 @@ class Sinha2016:
                 print(neuron, file=file_handle)
 
         # background neurons
-        background_neurons = list(set(local_neurons) - set(pattern_neurons))
+        background_neurons = list(set(self.neuronsE) - set(pattern_neurons))
         file_name = "backgroundneurons-{}-rank-{}.txt".format(
             self.pattern_count, self.rank)
 
@@ -738,7 +735,6 @@ class Sinha2016:
         sd_params = self.spike_detector_paramsP.copy()
         sd_params['label'] = (sd_params['label'] +
                               "-{}".format(self.pattern_count))
-        print(sd_params)
         # pattern
         pattern_spike_detector = nest.Create(
             'spike_detector', params=sd_params)
@@ -873,9 +869,7 @@ class Sinha2016:
     def __deaff_bg_E(self, pattern_number):
         """Deaff background E neurons."""
         pattern_neurons = self.patterns[pattern_number - 1]
-        local_neurons = [stat['global_id'] for stat in
-                         nest.GetStatus(self.neuronsE) if stat['local']]
-        bg_neurons = list(set(local_neurons) - set(pattern_neurons))
+        bg_neurons = list(set(self.neuronsE) - set(pattern_neurons))
         deaffed_neurons = random.sample(
             bg_neurons, int(math.ceil(len(bg_neurons) *
                                       self.deaff_bg_percent)))
@@ -897,10 +891,8 @@ class Sinha2016:
 
     def __deaff_bg_I(self, pattern_number):
         """Deaff background I neurons."""
-        local_neurons = [stat['global_id'] for stat in
-                         nest.GetStatus(self.neuronsI) if stat['local']]
         deaffed_neurons = random.sample(
-            local_neurons, int(math.ceil(len(local_neurons) *
+            self.neuronsI, int(math.ceil(len(self.neuronsI) *
                                          self.deaff_bg_percent)))
         print("ANKUR>> Number of deaff bg neurons: "
               "{}".format(len(deaffed_neurons)))
@@ -1148,7 +1140,7 @@ class Sinha2016:
 
 if __name__ == "__main__":
     step = False
-    test = False
+    test = True
     numpats = 1
     simulation = Sinha2016()
 
