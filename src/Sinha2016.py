@@ -163,7 +163,9 @@ class Sinha2016:
                            'V_th': -50., 'C_m': 200.,
                            'E_L': -60., 'g_L': 10.,
                            'E_ex': 0., 'E_in': -80.,
-                           'tau_syn_ex': 5., 'tau_syn_in': 10.}
+                           'tau_syn_ex': 5., 'tau_syn_in': 10.,
+                           'beta_Ca': 0.012
+                           }
         # Set up TIF neurons
         # Setting up two models because then it makes it easier for me to get
         # them when I need to set up patterns
@@ -1172,6 +1174,8 @@ if __name__ == "__main__":
         # Enable structural plasticity for repair #
         # nest.EnableStructuralPlasticity()
         # Stabilise for repair #
+        simulation.stabilise()
+        simulation.stabilise()
         simulation.stabilise()
 
         simulation.recall_last_pattern(50)
