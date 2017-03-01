@@ -60,6 +60,9 @@ class Sinha2016:
         self.deaff_bg_percentE = .50
         self.deaff_bg_percentI = .50
 
+        self.populations['P'] = self.pattern_percent * self.populations['E']
+        self.populations['R'] = self.recall_percent * self.populations['P']
+
         # structural plasticity bits
         # must be an integer
         self.sp_update_interval = 100  # ms
