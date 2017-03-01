@@ -57,15 +57,8 @@ class Sinha2016:
         # deafferentation percent of pattern
         self.deaff_pattern_percent = .50
         # deafferentation percent of background
-        self.deaff_bg_percent = .50
-
-        self.populations['P'] = self.pattern_percent * self.populations['E']
-        self.populations['R'] = self.recall_percent * self.populations['P']
-        self.populations['DP'] = (self.deaff_pattern_percent *
-                                  self.populations['P'])
-        self.populations['DBG'] = (self.deaff_bg_percent *
-                                   (self.populations['E'] -
-                                    self.populations['P']))
+        self.deaff_bg_percentE = .50
+        self.deaff_bg_percentI = .50
 
         # structural plasticity bits
         # must be an integer
@@ -874,7 +867,7 @@ class Sinha2016:
         bg_neurons = list(set(self.neuronsE) - set(pattern_neurons))
         deaffed_neurons = random.sample(
             bg_neurons, int(math.ceil(len(bg_neurons) *
-                                      self.deaff_bg_percent)))
+                                      self.deaff_bg_percentE)))
         print("ANKUR>> Number of deaff bg neurons: "
               "{}".format(len(deaffed_neurons)))
         conns = nest.GetConnections(source=self.poissonExtE,
@@ -895,7 +888,7 @@ class Sinha2016:
         """Deaff background I neurons."""
         deaffed_neurons = random.sample(
             self.neuronsI, int(math.ceil(len(self.neuronsI) *
-                                         self.deaff_bg_percent)))
+                                         self.deaff_bg_percentI)))
         print("ANKUR>> Number of deaff bg neurons: "
               "{}".format(len(deaffed_neurons)))
         conns = nest.GetConnections(source=self.poissonExtI,
