@@ -871,7 +871,7 @@ class Sinha2016:
         deaffed_neurons = random.sample(
             bg_neurons, int(math.ceil(len(bg_neurons) *
                                       self.deaff_bg_percentE)))
-        print("ANKUR>> Number of deaff bg neurons: "
+        print("ANKUR>> Number of deaff bg E neurons: "
               "{}".format(len(deaffed_neurons)))
         conns = nest.GetConnections(source=self.poissonExtE,
                                     target=deaffed_neurons)
@@ -892,7 +892,7 @@ class Sinha2016:
         deaffed_neurons = random.sample(
             self.neuronsI, int(math.ceil(len(self.neuronsI) *
                                          self.deaff_bg_percentI)))
-        print("ANKUR>> Number of deaff bg neurons: "
+        print("ANKUR>> Number of deaff bg I neurons: "
               "{}".format(len(deaffed_neurons)))
         conns = nest.GetConnections(source=self.poissonExtI,
                                     target=deaffed_neurons)
