@@ -873,40 +873,43 @@ class Sinha2016:
                                       self.deaff_bg_percentE)))
         print("ANKUR>> Number of deaff bg E neurons: "
               "{}".format(len(deaffed_neurons)))
-        conns = nest.GetConnections(source=self.poissonExtE,
-                                    target=deaffed_neurons)
-        for conn in conns:
-            nest.DisconnectOneToOne(conn[0], conn[1],
-                                    syn_spec={'model': 'static_synapse'})
+        if len(deaffed_neurons) > 0:
+            conns = nest.GetConnections(source=self.poissonExtE,
+                                        target=deaffed_neurons)
+            for conn in conns:
+                nest.DisconnectOneToOne(conn[0], conn[1],
+                                        syn_spec={'model': 'static_synapse'})
 
-        sd_params = self.spike_detector_paramsDBG_E.copy()
-        sd_params['label'] = sd_params['label'] + "-{}".format(pattern_number)
-        deaff_spike_detector = nest.Create(
-            'spike_detector', params=sd_params)
-        nest.Connect(deaffed_neurons, deaff_spike_detector)
-        # save the detector
-        self.sdDBG_E.append(deaff_spike_detector)
+            sd_params = self.spike_detector_paramsDBG_E.copy()
+            sd_params['label'] = sd_params['label'] + "-{}".format(pattern_number)
+            deaff_spike_detector = nest.Create(
+                'spike_detector', params=sd_params)
+            nest.Connect(deaffed_neurons, deaff_spike_detector)
+            # save the detector
+            self.sdDBG_E.append(deaff_spike_detector)
 
     def __deaff_bg_I(self, pattern_number):
         """Deaff background I neurons."""
         deaffed_neurons = random.sample(
             self.neuronsI, int(math.ceil(len(self.neuronsI) *
                                          self.deaff_bg_percentI)))
+
         print("ANKUR>> Number of deaff bg I neurons: "
               "{}".format(len(deaffed_neurons)))
-        conns = nest.GetConnections(source=self.poissonExtI,
-                                    target=deaffed_neurons)
-        for conn in conns:
-            nest.DisconnectOneToOne(conn[0], conn[1],
-                                    syn_spec={'model': 'static_synapse'})
+        if len(deaffed_neurons) > 0:
+            conns = nest.GetConnections(source=self.poissonExtI,
+                                        target=deaffed_neurons)
+            for conn in conns:
+                nest.DisconnectOneToOne(conn[0], conn[1],
+                                        syn_spec={'model': 'static_synapse'})
 
-        sd_params = self.spike_detector_paramsDBG_I.copy()
-        sd_params['label'] = sd_params['label'] + "-{}".format(pattern_number)
-        deaff_spike_detector = nest.Create(
-            'spike_detector', params=sd_params)
-        nest.Connect(deaffed_neurons, deaff_spike_detector)
-        # save the detector
-        self.sdDBG_I.append(deaff_spike_detector)
+            sd_params = self.spike_detector_paramsDBG_I.copy()
+            sd_params['label'] = sd_params['label'] + "-{}".format(pattern_number)
+            deaff_spike_detector = nest.Create(
+                'spike_detector', params=sd_params)
+            nest.Connect(deaffed_neurons, deaff_spike_detector)
+            # save the detector
+            self.sdDBG_I.append(deaff_spike_detector)
 
     def __dump_ca_concentration(self):
         """Dump calcium concentration."""
