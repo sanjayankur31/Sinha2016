@@ -92,6 +92,7 @@ class Sinha2016:
         self.weightEI = 3.
         self.weightExtE = 50.
         self.weightExtI = 50.
+        self.weightPatternEE = 24.
 
         random.seed(42)
 
@@ -709,7 +710,7 @@ class Sinha2016:
                                           target=pattern_neurons)
         print("ANKUR>> Number of connections strengthened: "
               "{}".format(len(connections)))
-        nest.SetStatus(connections, {"weight": 24.})
+        nest.SetStatus(connections, {"weight": self.weightPatternEE})
 
         # store these neurons
         self.patterns.append(pattern_neurons)
