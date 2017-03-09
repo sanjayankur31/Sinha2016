@@ -711,6 +711,7 @@ class Sinha2016:
         print("ANKUR>> Number of connections strengthened: "
               "{}".format(len(connections)))
         nest.SetStatus(connections, {"weight": self.weightPatternEE})
+        print("ANKUR>> New weight: {}nS".format(self.weightPatternEE))
 
         # store these neurons
         self.patterns.append(pattern_neurons)
