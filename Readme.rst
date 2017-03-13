@@ -3,6 +3,11 @@ Sinha2016
 
 My Ph.D. simulations
 
+Requirements
+============
+
+- NEST
+- python-nose for testing
 
 Outputs from the simulation
 ============================

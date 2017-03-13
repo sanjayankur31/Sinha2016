@@ -594,55 +594,35 @@ class Sinha2016:
             print("Both plasticities cannot be disabled. Exiting.")
             sys.exit()
 
-    def setup_test_simulation(self, step=None,
-                              stabilisation_time=None,
-                              recording_interval=None):
-        """Set up a test simulation."""
+    def prerun_setup(self, step=False,
+                     stabilisation_time=None,
+                     recording_interval=None):
+        """Pre reun configuration."""
+        # Cannot be changed mid simulation
+        if step:
+            self.step = step
+
+        self.setup_stabilisation_time(stabilisation_time, recording_interval)
+        self.__setup_simulation()
+
+    def set_stabilisation_time(self,
+                               stabilisation_time=None,
+                               recording_interval=None):
+        """Set up stabilisation time."""
         if step:
             self.step = step
         if stabilisation_time:
             self.stabilisation_time = stabilisation_time
         if recording_interval:
             self.recording_interval = recording_interval
-
-        # Nest stuff
-        nest.ResetKernel()
-        # http://www.nest-simulator.org/sli/setverbosity/
-        nest.set_verbosity('M_DEBUG')
-
-        # a much smaller simulation
-        self.populations = {'E': 80, 'I': 20, 'P': 8, 'R': 4,
-                            'D': 2, 'STIM': 10, 'Poisson': 1}
-
-        self.__setup_simulation()
-
-    def setup_simulation(self, step=False,
-                         stabilisation_time=None,
-                         recording_interval=None):
-        """Set up non test simulation."""
-        if step:
-            self.step = step
-        if stabilisation_time:
-            self.stabilisation_time = stabilisation_time
-        if recording_interval:
-            self.recording_interval = recording_interval
-
-        nest.ResetKernel()
-        # http://www.nest-simulator.org/sli/setverbosity/
-        nest.set_verbosity('M_INFO')
-
-        self.__setup_simulation()
 
     def __setup_simulation(self):
         """Setup the common simulation things."""
         # Nest stuff
-        # unless using the cluster, just use 24 local threads
-        # still gives out different spike files because they're different
-        # virtual processes
-        # Using 1 thread per core, and 24 MPI processes because I want 24
-        # different firing rate files - if I don't use MPI, I only get one
-        # firing rate file and I'm not sure how the 24 processes each will
-        # write to it
+        nest.ResetKernel()
+        # http://www.nest-simulator.org/sli/setverbosity/
+        nest.set_verbosity('M_INFO')
+
         nest.SetKernelStatus(
             {
                 'resolution': self.dt,
@@ -1146,7 +1126,6 @@ class Sinha2016:
 
 if __name__ == "__main__":
     step = False
-    test = False
     numpats = 1
     simulation = Sinha2016()
 
@@ -1157,12 +1136,8 @@ if __name__ == "__main__":
     simulation.setup_plasticity(True, True)
 
     # Intial stabilisation #
-    if test:
-        simulation.setup_test_simulation(
-            stabilisation_time=200., recording_interval=10.)
-    else:
-        simulation.setup_simulation(
-            stabilisation_time=2000., recording_interval=200.)
+    simulation.prerun_setup(
+        stabilisation_time=2000., recording_interval=200.)
     simulation.stabilise()
 
     # Pattern storage #

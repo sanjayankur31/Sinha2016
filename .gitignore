@@ -62,6 +62,3 @@ target/
 *.pyc
 *.swo
 *.swp
-
-tests/
-
