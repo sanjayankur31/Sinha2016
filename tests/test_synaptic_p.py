@@ -44,12 +44,6 @@ class TestSynapticPlasticity(unittest.TestCase):
         self.sim.prerun_setup(step=False, stabilisation_time=200.,
                               recording_interval=10.)
         nest.set_verbosity('M_FATAL')
-        filelist = os.listdir('.')
-        for f in filelist:
-            if ".gdf" in f:
-                os.unlink(f)
-            if ".txt" in f:
-                os.unlink(f)
 
     def tearDown(self):
         """Tear down."""

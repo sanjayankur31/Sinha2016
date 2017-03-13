@@ -624,7 +624,8 @@ class Sinha2016:
         nest.SetKernelStatus(
             {
                 'resolution': self.dt,
-                'local_num_threads': 1
+                'local_num_threads': 1,
+                'overwrite_files': True
             }
         )
         # Update the SP interval
