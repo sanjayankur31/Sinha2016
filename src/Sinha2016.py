@@ -602,15 +602,13 @@ class Sinha2016:
         if step:
             self.step = step
 
-        self.setup_stabilisation_time(stabilisation_time, recording_interval)
+        self.set_stabilisation_time(stabilisation_time, recording_interval)
         self.__setup_simulation()
 
     def set_stabilisation_time(self,
                                stabilisation_time=None,
                                recording_interval=None):
         """Set up stabilisation time."""
-        if step:
-            self.step = step
         if stabilisation_time:
             self.stabilisation_time = stabilisation_time
         if recording_interval:
@@ -621,7 +619,7 @@ class Sinha2016:
         # Nest stuff
         nest.ResetKernel()
         # http://www.nest-simulator.org/sli/setverbosity/
-        nest.set_verbosity('M_INFO')
+        nest.set_verbosity('M_FATAL')
 
         nest.SetKernelStatus(
             {
