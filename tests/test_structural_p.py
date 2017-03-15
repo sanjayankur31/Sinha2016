@@ -2,7 +2,7 @@
 """
 Unittests.
 
-File: test_synaptic_p.py
+File: test_structural_p.py
 
 Copyright 2016 Ankur Sinha
 Author: Ankur Sinha <sanjay DOT ankur AT gmail DOT com>
@@ -32,7 +32,7 @@ import nest
 import re
 
 
-class TestSynapticPlasticity(unittest.TestCase):
+class TestStructuralPlasticity(unittest.TestCase):
 
     """Tests for Sinha 2016."""
 
@@ -43,7 +43,7 @@ class TestSynapticPlasticity(unittest.TestCase):
         cls.sim = Sinha2016()
         cls.sim.populations = {'E': 80, 'I': 20, 'P': 8, 'R': 4,
                                'STIM': 10, 'Poisson': 1}
-        cls.sim.setup_plasticity(False, True)
+        cls.sim.setup_plasticity(True, True)
         cls.sim.prerun_setup(step=False, stabilisation_time=cls.stabtime,
                              recording_interval=10.)
         nest.set_verbosity('M_FATAL')
@@ -63,6 +63,10 @@ class TestSynapticPlasticity(unittest.TestCase):
                         'deaffed-Ineurons',
                         'non-deaffed-Ineurons',
                         'recallneurons',
+                        '02-synaptic-elements-totals-E',
+                        '02-synaptic-elements-totals-I',
+                        '03-synaptic-elements-E',
+                        '03-synaptic-elements-I',
                         ]
 
     @classmethod
@@ -109,7 +113,6 @@ class TestSynapticPlasticity(unittest.TestCase):
                     break
 
         self.assertEqual(set(checklist), set(self.__class__.prefixes))
-
 
 if __name__ == '__main__':
     unitttest.main()

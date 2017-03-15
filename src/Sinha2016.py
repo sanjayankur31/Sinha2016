@@ -27,6 +27,7 @@ sys.argv.append('--quiet')
 import nest
 import numpy
 import math
+# use random.sample instead of numpy.random - faster
 import random
 
 
@@ -650,6 +651,9 @@ class Sinha2016:
         """Stabilise network."""
         print("SIMULATION: STABILISING for {} seconds".format(
             self.stabilisation_time))
+        # Just for the sake of correctness
+        if self.stabilisation_time < self.recording_interval:
+            self.recording_interval = 0.5 * self.stabilisation_time
         sim_steps = numpy.arange(0, self.stabilisation_time,
                                  self.recording_interval)
         for i, j in enumerate(sim_steps):
@@ -846,6 +850,16 @@ class Sinha2016:
             # save the detector
             self.sdDP.append(deaff_spike_detector)
 
+            file_name = "deaffed-patternneurons-{}-rank-{}.txt".format(
+                pattern_number, self.rank)
+            self.__dump_neuron_set(file_name, deaffed_neurons)
+
+            file_name = "non-deaffed-patternneurons-{}-rank-{}.txt".format(
+                pattern_number, self.rank)
+            non_deaffed_neurons = list(set(pattern_neurons) -
+                                       set(deaffed_neurons))
+            self.__dump_neuron_set(file_name, non_deaffed_neurons)
+
     def __deaff_bg_E(self, pattern_number):
         """Deaff background E neurons."""
         pattern_neurons = self.patterns[pattern_number - 1]
@@ -871,6 +885,16 @@ class Sinha2016:
             # save the detector
             self.sdDBG_E.append(deaff_spike_detector)
 
+            file_name = "deaffed-backgroundneurons-{}-rank-{}.txt".format(
+                pattern_number, self.rank)
+            self.__dump_neuron_set(file_name, deaffed_neurons)
+
+            file_name = "non-deaffed-backgroundneurons-{}-rank-{}.txt".format(
+                pattern_number, self.rank)
+            non_deaffed_neurons = list(set(bg_neurons) -
+                                       set(deaffed_neurons))
+            self.__dump_neuron_set(file_name, non_deaffed_neurons)
+
     def __deaff_bg_I(self, pattern_number):
         """Deaff background I neurons."""
         deaffed_neurons = random.sample(
@@ -894,6 +918,22 @@ class Sinha2016:
             nest.Connect(deaffed_neurons, deaff_spike_detector)
             # save the detector
             self.sdDBG_I.append(deaff_spike_detector)
+
+            file_name = "deaffed-Ineurons-{}-rank-{}.txt".format(
+                pattern_number, self.rank)
+            self.__dump_neuron_set(file_name, deaffed_neurons)
+
+            file_name = "non-deaffed-Ineurons-{}-rank-{}.txt".format(
+                pattern_number, self.rank)
+            non_deaffed_neurons = list(set(self.neuronsI) -
+                                       set(deaffed_neurons))
+            self.__dump_neuron_set(file_name, non_deaffed_neurons)
+
+    def __dump_neuron_set(self, file_name, neurons):
+        """Dump a set of neuronIDs to a text file."""
+        with open(file_name, 'w') as file_handle:
+            for neuron in neurons:
+                print(neuron, file=file_handle)
 
     def __dump_ca_concentration(self):
         """Dump calcium concentration."""
