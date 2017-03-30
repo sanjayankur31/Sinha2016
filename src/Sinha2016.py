@@ -43,11 +43,14 @@ class Sinha2016:
         self.dt = 0.1
         # time to stabilise network after pattern storage etc.
         self.stabilisation_time = 12000.  # seconds
+        # keep this a divisor of the structural plasticity update interval, and
+        # the stabilisation time for simplicity
         self.recording_interval = 500.  # seconds
 
         # what plasticity should the network be setup to handle
         self.setup_str_p = True
         self.setup_syn_p = True
+        self.rewiring_enabled = False
 
         # populations
         self.populations = {'E': 8000, 'I': 2000, 'STIM': 1000, 'Poisson': 1}
@@ -65,8 +68,9 @@ class Sinha2016:
         self.populations['R'] = self.recall_percent * self.populations['P']
 
         # structural plasticity bits
-        # must be an integer
-        self.sp_update_interval = 100  # ms
+        # not steps since we're not using it in NEST. This is for our manual
+        # updates
+        self.sp_update_interval = 1000.  # seconds
         # time recall stimulus is enabled for
         self.recall_time = 1000.  # ms
 
@@ -597,21 +601,24 @@ class Sinha2016:
 
     def prerun_setup(self, step=False,
                      stabilisation_time=None,
+                     sp_update_interval=None,
                      recording_interval=None):
         """Pre reun configuration."""
         # Cannot be changed mid simulation
         if step:
             self.step = step
-
-        self.set_stabilisation_time(stabilisation_time, recording_interval)
+        self.update_windows(stabilisation_time, recording_interval)
         self.__setup_simulation()
 
-    def set_stabilisation_time(self,
-                               stabilisation_time=None,
-                               recording_interval=None):
+    def update_windows(self,
+                       stabilisation_time=None,
+                       sp_update_interval=None,
+                       recording_interval=None):
         """Set up stabilisation time."""
         if stabilisation_time:
             self.stabilisation_time = stabilisation_time
+        if sp_update_interval:
+            self.sp_update_interval = sp_update_interval
         if recording_interval:
             self.recording_interval = recording_interval
 
@@ -629,13 +636,6 @@ class Sinha2016:
                 'overwrite_files': True
             }
         )
-        # Update the SP interval
-        if self.setup_str_p:
-            nest.SetStructuralPlasticityStatus({
-                'structural_plasticity_update_interval':
-                self.sp_update_interval,
-            })
-
         self.__setup_neurons()
         self.__create_neurons()
         self.__setup_detectors()
@@ -645,34 +645,39 @@ class Sinha2016:
 
         self.__setup_files()
 
+        # Since I've patched NEST, this doesn't actually update connectivity
+        # But, it's required to ensure that synaptic elements are connected
+        # correctly when I form or delete new connections
+        nest.EnableStructuralPlasticity()
+        nest.Prepare()
+
         self.dump_data()
 
     def stabilise(self):
         """Stabilise network."""
         print("SIMULATION: STABILISING for {} seconds".format(
             self.stabilisation_time))
-        # Just for the sake of correctness
-        if self.stabilisation_time < self.recording_interval:
-            self.recording_interval = 0.5 * self.stabilisation_time
-        sim_steps = numpy.arange(0, self.stabilisation_time,
-                                 self.recording_interval)
-        for i, j in enumerate(sim_steps):
-            self.run_simulation(self.recording_interval)
+        update_steps = numpy.arange(0, self.stabilisation_time,
+                                    self.sp_update_interval)
+        for i, j in enumerate(update_steps):
+            sim_steps = numpy.arange(0, self.sp_update_interval,
+                                     self.recording_interval)
+            for j, k in enumerate(sim_steps):
+                self.run_simulation(self.recording_interval)
+            self.update_connectivity()
 
     def run_simulation(self, simtime=2000):
         """Run the simulation."""
-        sim_steps = numpy.arange(0, simtime)
         if self.step:
             print("Stepping through the simulation one second at a time")
+            sim_steps = numpy.arange(0, simtime)
             for i, step in enumerate(sim_steps):
-
-                nest.Simulate(1000)
+                nest.Run(1000)
                 self.__dump_synaptic_weights()
         else:
             print("Not stepping through it one second at a time")
-            nest.Simulate(simtime*1000)
+            nest.Run(simtime*1000)
             self.dump_data()
-
             current_simtime = (
                 str(nest.GetKernelStatus()['time']) + "msec")
             print("Simulation time: " "{}".format(current_simtime))
@@ -1162,6 +1167,13 @@ class Sinha2016:
             self.syn_elms_file_handle_E.close()
             self.syn_elms_file_handle_I.close()
 
+    def enable_rewiring(self):
+        """Enable the rewiring."""
+        self.rewiring_enabled = True
+
+    def disable_rewiring(self):
+        """Disable the rewiring."""
+        self.rewiring_enabled = False
 
 if __name__ == "__main__":
     step = False
@@ -1176,7 +1188,9 @@ if __name__ == "__main__":
 
     # Intial stabilisation #
     simulation.prerun_setup(
-        stabilisation_time=2000., recording_interval=200.)
+        stabilisation_time=2000.,
+        sp_update_interval=1000.,
+        recording_interval=200.)
     simulation.stabilise()
 
     # Pattern storage #
@@ -1190,7 +1204,7 @@ if __name__ == "__main__":
         # Deaff last pattern #
         simulation.deaff_last_pattern()
         # Enable structural plasticity for repair #
-        # nest.EnableStructuralPlasticity()
+        # simulation.enable_rewiring()
         # Stabilise for repair #
         simulation.stabilise()
         simulation.stabilise()
@@ -1199,4 +1213,5 @@ if __name__ == "__main__":
         simulation.recall_last_pattern(50)
 
     simulation.close_files()
+    nest.Cleanup()
     print("SIMULATION FINISHED SUCCESSFULLY")
