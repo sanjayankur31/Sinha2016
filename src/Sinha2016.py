@@ -372,8 +372,8 @@ class Sinha2016:
                               'alpha': .12, 'eta': 0.01,
                               'tau': 20.}
 
-    def __connect_neurons(self):
-        """Connect the neuron sets up."""
+    def __setup_initial_connections(self):
+        """Initially connect various neuron sets."""
         nest.Connect(self.poissonExtE, self.neuronsE,
                      conn_spec=self.connDictExtE,
                      syn_spec={'model': 'static_synapse',
@@ -607,7 +607,8 @@ class Sinha2016:
         # Cannot be changed mid simulation
         if step:
             self.step = step
-        self.update_windows(stabilisation_time, recording_interval)
+        self.update_windows(stabilisation_time, sp_update_interval,
+                            recording_interval)
         self.__setup_simulation()
 
     def update_windows(self,
@@ -641,7 +642,7 @@ class Sinha2016:
         self.__setup_detectors()
 
         self.__setup_connections()
-        self.__connect_neurons()
+        self.__setup_initial_connections()
 
         self.__setup_files()
 
@@ -681,6 +682,69 @@ class Sinha2016:
             current_simtime = (
                 str(nest.GetKernelStatus()['time']) + "msec")
             print("Simulation time: " "{}".format(current_simtime))
+
+    def __get_syn_elms(self):
+        """Get synaptic elements all neurons."""
+        # Holds the deltas, not the actual numbers
+        synaptic_elms = []
+        neurons = nest.GetStatus(self.neuronsE + self.neuronsI,
+                                 ['global_id', 'synaptic_elements'])
+
+        for neuron in neurons:
+            gid = neuron[0]
+            synelms = neuron[1]
+
+            if 'Axon_in' in synelms:
+                source_elms_con = synelms['Axon_in']['z_connected']
+                source_elms_total = synelms['Axon_in']['z']
+            elif 'Axon_ex' in synelms:
+                source_elms_con = synelms['Axon_ex']['z_connected']
+                source_elms_total = synelms['Axon_ex']['z']
+
+            target_elms_con_ex = synelms['Den_ex']['z_connected']
+            target_elms_con_in = synelms['Den_in']['z_connected']
+            target_elms_total_ex = synelms['Den_ex']['z']
+            target_elms_total_in = synelms['Den_in']['z']
+            delta_z_ax = (math.floor(source_elms_total) -
+                          source_elms_con)
+            delta_z_d_ex = (math.floor(target_elms_total_ex) -
+                            target_elms_con_ex)
+            delta_z_d_in = (math.floor(target_elms_total_in) -
+                            target_elms_con_in)
+
+            if 'Axon_in' in synelms:
+                synaptic_elms.append({
+                    'gid': gid,
+                    'Axon_in': (delta_z_ax),
+                    'Den_ex': (delta_z_d_ex),
+                    'Den_in': (delta_z_d_in),
+                }
+                )
+            elif 'Axon_ex' in synelms:
+                synaptic_elms.append({
+                    'gid': gid,
+                    'Axon_ex': (delta_z_ax),
+                    'Den_ex': (delta_z_d_ex),
+                    'Den_in': (delta_z_d_in),
+                }
+                )
+
+        return synaptic_elms
+
+    def __delete_connections(self, synelms):
+        """Delete required connections."""
+
+    def __create_connections(self, synelms):
+        """Create connections from vacant elements."""
+
+    def update_connectivity(self):
+        """Our implementation of structural plasticity."""
+        if not self.rewiring_enabled:
+            return
+        syn_elems = self.__get_syn_elms()
+        self.__delete_connections(syn_elms)
+        syn_elems = self.__get_syn_elms()
+        self.__create_connections(syn_elms)
 
     def store_pattern(self):
         """ Store a pattern and set up spike detectors."""
