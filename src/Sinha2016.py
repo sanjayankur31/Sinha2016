@@ -302,41 +302,43 @@ class Sinha2016:
         # weight of 1 translates to 1nS
         # Only structural plasticity - if synapses are formed, give them
         # constant conductances
+        nest.CopyModel('static_synapse', 'static_synapse_ex')
+        nest.CopyModel('static_synapse', 'static_synapse_in')
         if self.setup_str_p:
             if not self.setup_syn_p:
-                self.synDictEE = {'model': 'static_synapse',
+                self.synDictEE = {'model': 'static_synapse_ex',
                                   'weight': 1.,
                                   'pre_synaptic_element': 'Axon_ex',
                                   'post_synaptic_element': 'Den_ex'}
 
-                self.synDictEI = {'model': 'static_synapse',
+                self.synDictEI = {'model': 'static_synapse_ex',
                                   'weight': 1.,
                                   'pre_synaptic_element': 'Axon_ex',
                                   'post_synaptic_element': 'Den_ex'}
 
-                self.synDictII = {'model': 'static_synapse',
+                self.synDictII = {'model': 'static_synapse_in',
                                   'weight': 1.,
                                   'pre_synaptic_element': 'Axon_in',
                                   'post_synaptic_element': 'Den_in'}
 
-                self.synDictIE = {'model': 'static_synapse',
+                self.synDictIE = {'model': 'static_synapse_in',
                                   'weight': -1.,
                                   'pre_synaptic_element': 'Axon_in',
                                   'post_synaptic_element': 'Den_in'}
 
             # both enabled
             else:
-                self.synDictEE = {'model': 'static_synapse',
+                self.synDictEE = {'model': 'static_synapse_ex',
                                   'weight': self.weightEE,
                                   'pre_synaptic_element': 'Axon_ex',
                                   'post_synaptic_element': 'Den_ex'}
 
-                self.synDictEI = {'model': 'static_synapse',
+                self.synDictEI = {'model': 'static_synapse_ex',
                                   'weight': self.weightEI,
                                   'pre_synaptic_element': 'Axon_ex',
                                   'post_synaptic_element': 'Den_ex'}
 
-                self.synDictII = {'model': 'static_synapse',
+                self.synDictII = {'model': 'static_synapse_in',
                                   'weight': self.weightII,
                                   'pre_synaptic_element': 'Axon_in',
                                   'post_synaptic_element': 'Den_in'}
@@ -359,12 +361,12 @@ class Sinha2016:
 
         # Only synaptic plasticity - do not define synaptic elements
         else:
-            self.synDictEE = {'model': 'static_synapse',
+            self.synDictEE = {'model': 'static_synapse_ex',
                               'weight': self.weightEE}
-            self.synDictEI = {'model': 'static_synapse',
+            self.synDictEI = {'model': 'static_synapse_ex',
                               'weight': self.weightEI}
 
-            self.synDictII = {'model': 'static_synapse',
+            self.synDictII = {'model': 'static_synapse_in',
                               'weight': self.weightII}
 
             self.synDictIE = {'model': 'vogels_sprekeler_synapse',
@@ -733,6 +735,127 @@ class Sinha2016:
 
     def __delete_connections(self, synelms):
         """Delete required connections."""
+        # the order in which these are removed should not matter - whether we
+        # remove connections using axons first or dendrites first, the end
+        # state of the network should be the same.
+        for nrn in synelms:
+            # excitatory neurons as sources
+            if 'Axon_ex' in nrn and nrn['Axon_ex'] < 0.0:
+                conns = nest.GetConnections(source=[nrn['gid']],
+                                            synapse_model='static_synapse_ex')
+                targets = []
+                chosen_targets = []
+
+                for acon in connections:
+                    targets.append(acon[1])
+
+                if len(targets) > 0:
+                    # this is where the selection logic is
+                    if len(targets) > int(abs(nrn['Axon_ex'])):
+                        chosen_targets = random.sample(
+                            targets, int(abs(nrn['Axon_ex'])))
+                    else:
+                        chosen_targets = targets
+
+                    nest.Disconnect(
+                        pre=nrn['gid'], post=chosen_targets, syn_spec={
+                            'model': 'static_synapse_ex',
+                            'pre_synaptic_element': 'Axon_ex',
+                            'post_synaptic_element': 'Den_ex',
+                        }, conn_spec={
+                            'rule': 'all_to_all'}
+                    )
+                    nrn['Axon_ex'] += len(chosen_targets)
+                    for t in chosen_targets:
+                        synelms[t - 1]['Den_ex'] += 1
+
+            # inhibitory neurons as sources
+            elif 'Axon_in' in nrn and nrn['Axon_in'] < 0.0:
+                conns = nest.GetConnections(source=[nrn['gid']],
+                                            synapse_model='static_synapse_in')
+                targets = []
+                chosen_targets = []
+
+                for acon in conns:
+                    targets.append(acon[1])
+
+                if len(targets) > 0:
+                    # this is where the selection logic is
+                    if len(targets) > int(abs(nrn['Axon_in'])):
+                        chosen_targets = random.sample(
+                            targets, int(abs(nrn['Axon_in'])))
+                    else:
+                        chosen_targets = targets
+
+                    nest.Disconnect(
+                        pre=nrn['gid'], post=chosen_targets, syn_spec={
+                            'model': 'static_synapse',
+                            'pre_synaptic_element': 'Axon_in',
+                            'post_synaptic_element': 'Den_in',
+                        }, conn_spec={
+                            'rule': 'all_to_all'}
+                    )
+                    nrn['Axon_in'] += len(chosen_targets)
+                    for t in chosen_targets:
+                        synelms[t - 1]['Den_in'] += 1
+
+            # excitatory dendrites as targets
+            if 'Den_ex' in nrn and nrn['Den_ex'] < 0.0:
+                conns = nest.GetConnections(target=[nrn['gid']],
+                                            synapse_model='static_synapse_ex')
+                sources = []
+                chosen_sources = []
+
+                for acon in conns:
+                    sources.append(acon[0])
+
+                if len(sources) > 0:
+                    if len(sources) > int(abs(nrn['Den_ex'])):
+                        chosen_sources = random.sample(
+                            sources, int(abs(nrn['Den_ex'])))
+                    else:
+                        chosen_sources = sources
+
+                    nest.Disconnect(
+                        pre=chosen_sources, post=nrn['gid'], syn_spec={
+                            'model': 'static_synapse_ex',
+                            'pre_synaptic_element': 'Axon_ex',
+                            'post_synaptic_element': 'Den_ex',
+                        }, conn_spec={
+                            'rule': 'all_to_all'}
+                    )
+                    nrn['Den_ex'] += len(chosen_sources)
+                    for s in chosen_sources:
+                        synelms[s - 1]['Axon_ex'] += 1
+
+            # inhibitory dendrites as targets
+            if 'Den_in' in nrn and nrn['Den_in'] < 0.0:
+                conns = nest.GetConnections(target=[nrn['gid']],
+                                            synapse_model='static_synapse_in')
+                sources = []
+                chosen_sources = []
+
+                for acon in conns:
+                    sources.append(acon[0])
+
+                if len(sources) > 0:
+                    if len(sources) > int(abs(nrn['Den_in'])):
+                        chosen_sources = random.sample(
+                            sources, int(abs(nrn['Den_in'])))
+                    else:
+                        chosen_sources = sources
+
+                    nest.Disconnect(
+                        pre=chosen_sources, post=nrn['gid'], syn_spec={
+                            'model': 'static_synapse_in',
+                            'pre_synaptic_element': 'Axon_in',
+                            'post_synaptic_element': 'Den_in',
+                        }, conn_spec={
+                            'rule': 'all_to_all'}
+                    )
+                    nrn['Den_in'] += len(chosen_sources)
+                    for s in chosen_sources:
+                        synelms[s - 1]['Axon_in'] += 1
 
     def __create_connections(self, synelms):
         """Create connections from vacant elements."""
@@ -741,9 +864,9 @@ class Sinha2016:
         """Our implementation of structural plasticity."""
         if not self.rewiring_enabled:
             return
-        syn_elems = self.__get_syn_elms()
+        syn_elms = self.__get_syn_elms()
         self.__delete_connections(syn_elms)
-        syn_elems = self.__get_syn_elms()
+        syn_elms = self.__get_syn_elms()
         self.__create_connections(syn_elms)
 
     def store_pattern(self):
@@ -1095,39 +1218,39 @@ class Sinha2016:
             loc_i = [stat['global_id'] for stat
                      in nest.GetStatus(self.neuronsI)
                      if stat['local']]
-            syn_elems_e = nest.GetStatus(loc_e, 'synaptic_elements')
-            syn_elems_i = nest.GetStatus(loc_i, 'synaptic_elements')
+            syn_elms_e = nest.GetStatus(loc_e, 'synaptic_elements')
+            syn_elms_i = nest.GetStatus(loc_i, 'synaptic_elements')
 
             current_simtime = (str(nest.GetKernelStatus()['time']))
 
             # Only need presynaptic elements to find number of synapses
             # Excitatory neuron set
             axons_ex_total = sum(neuron['Axon_ex']['z'] for neuron in
-                                 syn_elems_e)
+                                 syn_elms_e)
             axons_ex_connected = sum(neuron['Axon_ex']['z_connected']
-                                     for neuron in syn_elems_e)
+                                     for neuron in syn_elms_e)
             dendrites_ex_ex_total = sum(neuron['Den_ex']['z'] for neuron in
-                                        syn_elems_e)
+                                        syn_elms_e)
             dendrites_ex_ex_connected = sum(neuron['Den_ex']['z_connected'] for
-                                            neuron in syn_elems_e)
+                                            neuron in syn_elms_e)
             dendrites_ex_in_total = sum(neuron['Den_in']['z'] for neuron in
-                                        syn_elems_e)
+                                        syn_elms_e)
             dendrites_ex_in_connected = sum(neuron['Den_in']['z_connected'] for
-                                            neuron in syn_elems_e)
+                                            neuron in syn_elms_e)
 
             # Inhibitory neuron set
             axons_in_total = sum(neuron['Axon_in']['z'] for neuron in
-                                 syn_elems_i)
+                                 syn_elms_i)
             axons_in_connected = sum(neuron['Axon_in']['z_connected']
-                                     for neuron in syn_elems_i)
+                                     for neuron in syn_elms_i)
             dendrites_in_ex_total = sum(neuron['Den_ex']['z'] for neuron in
-                                        syn_elems_i)
+                                        syn_elms_i)
             dendrites_in_ex_connected = sum(neuron['Den_ex']['z_connected'] for
-                                            neuron in syn_elems_i)
+                                            neuron in syn_elms_i)
             dendrites_in_in_total = sum(neuron['Den_in']['z'] for neuron in
-                                        syn_elems_i)
+                                        syn_elms_i)
             dendrites_in_in_connected = sum(neuron['Den_in']['z_connected'] for
-                                            neuron in syn_elems_i)
+                                            neuron in syn_elms_i)
 
             print(
                 "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
