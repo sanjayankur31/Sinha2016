@@ -652,6 +652,10 @@ class Sinha2016:
         # But, it's required to ensure that synaptic elements are connected
         # correctly when I form or delete new connections
         nest.EnableStructuralPlasticity()
+        nest.SetStructuralPlasticityStatus({
+            'structural_plasticity_update_interval':
+            int(self.sp_update_interval),
+        })
         nest.Prepare()
 
         self.dump_data()
@@ -746,7 +750,7 @@ class Sinha2016:
                 targets = []
                 chosen_targets = []
 
-                for acon in connections:
+                for acon in conns:
                     targets.append(acon[1])
 
                 if len(targets) > 0:
@@ -758,7 +762,7 @@ class Sinha2016:
                         chosen_targets = targets
 
                     nest.Disconnect(
-                        pre=nrn['gid'], post=chosen_targets, syn_spec={
+                        pre=[nrn['gid']], post=chosen_targets, syn_spec={
                             'model': 'static_synapse_ex',
                             'pre_synaptic_element': 'Axon_ex',
                             'post_synaptic_element': 'Den_ex',
@@ -788,7 +792,7 @@ class Sinha2016:
                         chosen_targets = targets
 
                     nest.Disconnect(
-                        pre=nrn['gid'], post=chosen_targets, syn_spec={
+                        pre=[nrn['gid']], post=chosen_targets, syn_spec={
                             'model': 'static_synapse',
                             'pre_synaptic_element': 'Axon_in',
                             'post_synaptic_element': 'Den_in',
@@ -817,7 +821,7 @@ class Sinha2016:
                         chosen_sources = sources
 
                     nest.Disconnect(
-                        pre=chosen_sources, post=nrn['gid'], syn_spec={
+                        pre=chosen_sources, post=[nrn['gid']], syn_spec={
                             'model': 'static_synapse_ex',
                             'pre_synaptic_element': 'Axon_ex',
                             'post_synaptic_element': 'Den_ex',
@@ -846,7 +850,7 @@ class Sinha2016:
                         chosen_sources = sources
 
                     nest.Disconnect(
-                        pre=chosen_sources, post=nrn['gid'], syn_spec={
+                        pre=chosen_sources, post=[nrn['gid']], syn_spec={
                             'model': 'static_synapse_in',
                             'pre_synaptic_element': 'Axon_in',
                             'post_synaptic_element': 'Den_in',
@@ -859,6 +863,63 @@ class Sinha2016:
 
     def __create_connections(self, synelms):
         """Create connections from vacant elements."""
+        for nrn in synelms:
+            # excitatory connections - only need to look at Axons, it doesn't
+            # matter which synaptic elements you start with, whichever are less
+            # will act as the limiting factor.
+            if 'Axon_ex' in nrn and nrn['Axon_ex'] > 0.0:
+                targets = []
+                chosen_targets = []
+
+                for atarget in synelms:
+                    if 'Den_ex' in atarget and atarget['Den_ex'] > 0.0:
+                        # add the target multiple times, since it has multiple
+                        # available contact points
+                        targets.extend([atarget['gid']]*int(atarget['Den_ex']))
+
+                if len(targets) > 0:
+                    if len(targets) > int(abs(nrn['Axon_ex'])):
+                        chosen_targets = random.sample(
+                            targets, int(abs(nrn['Axon_ex'])))
+                    else:
+                        chosen_targets = targets
+
+                    nest.Connect([nrn['gid']], chosen_targets,
+                                 conn_spec='all_to_all',
+                                 syn_spec={'model': 'static_synapse_ex',
+                                           'pre_synaptic_element': 'Axon_ex',
+                                           'post_synaptic_element': 'Den_ex'
+                                           })
+                    for cho in chosen_targets:
+                        synelms[cho - 1]['Den_ex'] -= 1
+                    nrn['Axon_ex'] -= len(chosen_targets)
+
+            if 'Axon_in' in nrn and nrn['Axon_in'] > 0.0:
+                targets = []
+                chosen_targets = []
+
+                for atarget in synelms:
+                    if 'Den_in' in atarget and atarget['Den_in'] > 0.0:
+                        # add the target multiple times, since it has multiple
+                        # available contact points
+                        targets.intend([atarget['gid']]*int(atarget['Den_in']))
+
+                if len(targets) > 0:
+                    if len(targets) > int(abs(nrn['Axon_in'])):
+                        chosen_targets = random.sample(
+                            targets, int(abs(nrn['Axon_in'])))
+                    else:
+                        chosen_targets = targets
+
+                    nest.Connect([nrn['gid']], chosen_targets,
+                                 conn_spec='all_to_all',
+                                 syn_spec={'model': 'static_synapse_in',
+                                           'pre_synaptic_element': 'Axon_in',
+                                           'post_synaptic_element': 'Den_in'
+                                           })
+                    for cho in chosen_targets:
+                        synelms[cho - 1]['Den_in'] -= 1
+                    nrn['Axon_in'] -= len(chosen_targets)
 
     def update_connectivity(self):
         """Our implementation of structural plasticity."""
@@ -1368,7 +1429,6 @@ if __name__ == "__main__":
     simulation = Sinha2016()
 
     # Setup network to handle plasticities
-    # nest.EnableStructuralPlasticity() must be called to enable the actual
     # update of the network
     print("SIMULATION STARTED")
     simulation.setup_plasticity(True, True)
