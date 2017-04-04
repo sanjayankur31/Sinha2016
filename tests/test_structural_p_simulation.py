@@ -39,12 +39,14 @@ class TestStructuralPlasticity(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Setup."""
-        cls.stabtime = 20.
+        cls.stabtime = 40.
+        cls.sp_update_interval = 20.
         cls.sim = Sinha2016()
         cls.sim.populations = {'E': 80, 'I': 20, 'P': 8, 'R': 4,
                                'STIM': 10, 'Poisson': 1}
         cls.sim.setup_plasticity(True, True)
         cls.sim.prerun_setup(step=False, stabilisation_time=cls.stabtime,
+                             sp_update_interval=cls.sp_update_interval,
                              recording_interval=10.)
         nest.set_verbosity('M_FATAL')
         cls.prefixes = ['spikes-E', 'spikes-I', 'spikes-pattern',
@@ -96,23 +98,12 @@ class TestStructuralPlasticity(unittest.TestCase):
         self.__class__.sim.store_pattern()
         self.__class__.sim.stabilise()
         self.__class__.sim.deaff_last_pattern()
+        self.__class__.sim.enable_rewiring()
         self.__class__.sim.stabilise()
         self.__class__.sim.recall_last_pattern(10.)
         self.__class__.sim.close_files()
         self.assertEqual(nest.GetKernelStatus()['time'],
                          1000. * (3 * self.__class__.stabtime + 10.))
-
-    def test_03_outputfiles(self):
-        """Test output files."""
-        filelist = os.listdir('.')
-        checklist = []
-        for f in filelist:
-            for entry in self.__class__.prefixes:
-                if re.match(entry, f):
-                    checklist.append(entry)
-                    break
-
-        self.assertEqual(set(checklist), set(self.__class__.prefixes))
 
 if __name__ == '__main__':
     unitttest.main()
