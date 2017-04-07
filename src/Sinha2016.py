@@ -92,12 +92,12 @@ class Sinha2016:
         self.pattern_spike_count_files = []
         self.pattern_count = 0
 
-        self.weightEE = 3.
-        self.weightII = -30.
-        self.weightEI = 3.
+        self.weightEE = 3.0
+        self.weightII = self.weightEE * -10.
+        self.weightEI = self.weightEE
+        self.weightPatternEE = self.weightEE * 5.
         self.weightExtE = 50.
-        self.weightExtI = 50.
-        self.weightPatternEE = 24.
+        self.weightExtI = self.weightExtE
 
         random.seed(42)
 
