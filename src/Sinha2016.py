@@ -676,13 +676,11 @@ class Sinha2016:
     def run_simulation(self, simtime=2000):
         """Run the simulation."""
         if self.step:
-            print("Stepping through the simulation one second at a time")
             sim_steps = numpy.arange(0, simtime)
             for i, step in enumerate(sim_steps):
                 nest.Run(1000)
                 self.__dump_synaptic_weights()
         else:
-            print("Not stepping through it one second at a time")
             nest.Run(simtime*1000)
             self.dump_data()
             current_simtime = (
@@ -929,6 +927,7 @@ class Sinha2016:
         self.__delete_connections(syn_elms)
         syn_elms = self.__get_syn_elms()
         self.__create_connections(syn_elms)
+        nest.Prepare()
 
     def store_pattern(self):
         """ Store a pattern and set up spike detectors."""
@@ -989,6 +988,7 @@ class Sinha2016:
         self.sdB.append(background_spike_detector)
 
         print("Number of patterns stored: {}".format(self.pattern_count))
+        nest.Prepare()
 
     def setup_pattern_for_recall(self, pattern_number):
         """
@@ -1045,6 +1045,7 @@ class Sinha2016:
         nest.Connect(recall_neurons, recall_spike_detector)
         # save the detector
         self.sdR.append(recall_spike_detector)
+        nest.Prepare()
 
     def recall_last_pattern(self, time):
         """
@@ -1071,6 +1072,7 @@ class Sinha2016:
         self.__deaff_pattern(self.pattern_count)
         self.__deaff_bg_E(self.pattern_count)
         self.__deaff_bg_I(self.pattern_count)
+        nest.Prepare()
 
     def deaff_a_pattern(self, pattern_number):
         """Deaff a pattern."""
