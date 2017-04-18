@@ -100,5 +100,18 @@ class TestSynapticPlasticity(unittest.TestCase):
         self.assertEqual(nest.GetKernelStatus()['time'],
                          1000. * (3 * self.__class__.stabtime + 50.))
 
+    def test_03_outputfiles(self):
+        """Test output files."""
+        filelist = os.listdir('.')
+        checklist = []
+        for f in filelist:
+            for entry in self.__class__.prefixes:
+                if re.match(entry, f):
+                    checklist.append(entry)
+                    break
+
+        self.assertEqual(set(checklist), set(self.__class__.prefixes))
+
+
 if __name__ == '__main__':
     unitttest.main()
