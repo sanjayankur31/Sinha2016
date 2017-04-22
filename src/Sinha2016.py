@@ -92,7 +92,7 @@ class Sinha2016:
         self.pattern_spike_count_files = []
         self.pattern_count = 0
 
-        self.wbar = 3.0
+        self.wbar = 1.5
         self.weightEE = self.wbar
         self.weightII = self.wbar * -10.
         self.weightEI = self.wbar
