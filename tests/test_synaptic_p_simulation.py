@@ -91,7 +91,7 @@ class TestSynapticPlasticity(unittest.TestCase):
     def test_02_simrun(self):
         """Test a complete sim run."""
         self.__class__.sim.stabilise()
-        self.__class__.sim.store_pattern()
+        self.__class__.sim.store_pattern(True)
         self.__class__.sim.stabilise()
         self.__class__.sim.deaff_last_pattern()
         self.__class__.sim.stabilise()
