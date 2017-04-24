@@ -93,10 +93,10 @@ class Sinha2016:
         self.pattern_count = 0
 
         self.wbar = 1.5
-        self.weightEE = self.wbar
+        self.weightEE = 0.1
         self.weightII = self.wbar * -10.
         self.weightEI = self.wbar
-        self.weightPatternEE = self.wbar * 5.
+        self.weightPatternEE = self.wbar
         self.weightExtE = 50.
         self.weightExtI = self.weightExtE
 
