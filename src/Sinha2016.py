@@ -1454,6 +1454,7 @@ if __name__ == "__main__":
     for i in range(0, numpats):
         simulation.store_pattern()
     simulation.stabilise()
+    simulation.stabilise()
 
     # Recall last pattern #
     if numpats > 0:
