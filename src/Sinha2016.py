@@ -1445,12 +1445,14 @@ if __name__ == "__main__":
         recording_interval=200.)
 
     # Pattern storage #
-    # store and stabilise patterns
-    for i in range(1, numpats):
-        simulation.store_pattern()
-    # only track the last pattern, otherwise we get too many log files and the
+    # only track the first pattern, otherwise we get too many log files and the
     # postprocessing takes forever
-    simulation.store_pattern(True)
+    if numpats > 0:
+        simulation.store_pattern(True)
+        numpats = numpats - 1
+    # Do not track the others
+    for i in range(0, numpats):
+        simulation.store_pattern()
     simulation.stabilise()
 
     # Recall last pattern #
