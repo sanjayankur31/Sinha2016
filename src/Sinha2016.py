@@ -92,11 +92,11 @@ class Sinha2016:
         self.pattern_spike_count_files = []
         self.pattern_count = 0
 
-        self.wbar = 1.5
-        self.weightEE = 0.1
+        self.wbar = 1.0
+        self.weightEE = self.wbar
         self.weightII = self.wbar * -10.
         self.weightEI = self.wbar
-        self.weightPatternEE = self.wbar
+        self.weightPatternEE = self.wbar * 3.
         self.weightExtE = 50.
         self.weightExtI = self.weightExtE
 
@@ -1430,7 +1430,7 @@ class Sinha2016:
 
 if __name__ == "__main__":
     step = False
-    numpats = 12
+    numpats = 1
     simulation = Sinha2016()
 
     # Setup network to handle plasticities
@@ -1443,6 +1443,7 @@ if __name__ == "__main__":
         stabilisation_time=2000.,
         sp_update_interval=1000.,
         recording_interval=200.)
+    simulation.stabilise()
 
     # Pattern storage #
     # only track the first pattern, otherwise we get too many log files and the
@@ -1453,7 +1454,6 @@ if __name__ == "__main__":
     # Do not track the others
     for i in range(0, numpats):
         simulation.store_pattern()
-    simulation.stabilise()
     simulation.stabilise()
 
     # Recall last pattern #
