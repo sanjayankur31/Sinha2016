@@ -1450,9 +1450,8 @@ if __name__ == "__main__":
     # postprocessing takes forever
     if numpats > 0:
         simulation.store_pattern(True)
-        numpats = numpats - 1
     # Do not track the others
-    for i in range(0, numpats):
+    for i in range(1, numpats):
         simulation.store_pattern()
     simulation.stabilise()
 
