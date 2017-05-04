@@ -29,6 +29,7 @@ import numpy
 import math
 # use random.sample instead of numpy.random - faster
 import random
+from scipy.spatial import cKDTree
 
 
 class Sinha2016:
@@ -66,6 +67,14 @@ class Sinha2016:
 
         self.populations['P'] = self.pattern_percent * self.populations['E']
         self.populations['R'] = self.recall_percent * self.populations['P']
+
+        # location bits
+        self.colsE = 80
+        self.colsI = 40
+        self.neuronal_distE = 150  # micro metres
+        self.neuronal_distI = 300  # micro metres
+        self.location_sd = 15  # micro metres
+        self.location_tree = None
 
         # structural plasticity bits
         # not steps since we're not using it in NEST. This is for our manual
@@ -198,6 +207,29 @@ class Sinha2016:
             self.neuronsE = nest.Create('tif_neuronE', self.populations['E'])
             self.neuronsI = nest.Create('tif_neuronI', self.populations['I'])
 
+        # Generate a grid and construct a cKDTree
+        locations = []
+        for neuron in self.neuronsE:
+            y = random.gauss(
+                int((neuron - self.neuronsE[0])/self.colsE) *
+                self.neuronal_distE, self.location_sd)
+            x = random.gauss(
+                ((neuron - self.neuronsE[0]) % self.colsE) *
+                self.neuronal_distE, self.location_sd)
+            locations.append([x, y])
+        # I neurons have an intiail offset to distribute them evenly between E
+        # neurons
+        for neuron in self.neuronsI:
+            y = self.neuronal_distI/4 + random.gauss(
+                int((neuron - self.neuronsI[0])/self.colsI) *
+                self.neuronal_distI, self.location_sd)
+            x = self.neuronal_distI/4 + random.gauss(
+                ((neuron - self.neuronsI[0]) % self.colsI) *
+                self.neuronal_distI, self.location_sd)
+            locations.append([x, y])
+
+        self.location_tree = cKDTree(locations)
+
         self.poissonExtE = nest.Create('poisson_generator',
                                        self.populations['Poisson'],
                                        params=self.poissonExtDict)
@@ -258,6 +290,7 @@ class Sinha2016:
                                 * sparsity)
         chosen_synapses = []
 
+        # native python random.choices is quicker but isn't in py < 3.6
         chosen_sources = numpy.random.choice(
             sources, size=required_synapses, replace=True)
         chosen_destinations = numpy.random.choice(

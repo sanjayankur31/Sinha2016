@@ -44,6 +44,8 @@ class TestSynapticPlasticity(unittest.TestCase):
         cls.sim = Sinha2016()
         cls.sim.populations = {'E': 80, 'I': 20, 'P': 8, 'R': 4,
                                'STIM': 10, 'Poisson': 1}
+        cls.colsE = 20
+        cls.colsI = 10
         cls.sim.setup_plasticity(False, True)
         cls.sim.prerun_setup(step=False, stabilisation_time=cls.stabtime,
                              sp_update_interval=cls.sp_update_interval,
