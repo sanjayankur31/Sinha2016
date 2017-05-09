@@ -769,8 +769,8 @@ class Sinha2016:
 
         return synaptic_elms
 
-    def __delete_connections(self, synelms):
-        """Delete required connections."""
+    def __delete_random_connections(self, synelms):
+        """Delete connections randomly."""
         # the order in which these are removed should not matter - whether we
         # remove connections using axons first or dendrites first, the end
         # state of the network should be the same.
@@ -893,8 +893,8 @@ class Sinha2016:
                     for s in chosen_sources:
                         synelms[s - 1]['Axon_in'] += 1
 
-    def __create_connections(self, synelms):
-        """Create connections from vacant elements."""
+    def __create_random_connections(self, synelms):
+        """Connect random neurons to create new connections."""
         for nrn in synelms:
             # excitatory connections - only need to look at Axons, it doesn't
             # matter which synaptic elements you start with, whichever are less
@@ -958,9 +958,9 @@ class Sinha2016:
         if not self.rewiring_enabled:
             return
         syn_elms = self.__get_syn_elms()
-        self.__delete_connections(syn_elms)
+        self.__delete_random_connections(syn_elms)
         syn_elms = self.__get_syn_elms()
-        self.__create_connections(syn_elms)
+        self.__create_random_connections(syn_elms)
         nest.Prepare()
 
     def store_pattern(self, track=False):
