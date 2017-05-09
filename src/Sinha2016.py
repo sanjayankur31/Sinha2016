@@ -60,7 +60,7 @@ class Sinha2016:
         # recall percent of pattern
         self.recall_percent = .25
         # deafferentation percent of pattern
-        self.deaff_pattern_percent = .50
+        self.deaff_random_pattern_percent = .50
         # deafferentation percent of background
         self.deaff_bg_percentE = .50
         self.deaff_bg_percentI = .50
@@ -963,8 +963,11 @@ class Sinha2016:
         self.__create_random_connections(syn_elms)
         nest.Prepare()
 
-    def store_pattern(self, track=False):
-        """ Store a pattern and set up spike detectors."""
+    def store_spatial_pattern(self, track=False):
+        """Store a pattern of neurons that are spatially adjacent."""
+
+    def store_random_pattern(self, track=False):
+        """Store a pattern of neurons that are randomly chosen."""
         print("SIMULATION: Storing pattern {}".format(self.pattern_count + 1))
         # Keep track of how many patterns are stored
         self.pattern_count += 1
@@ -1097,32 +1100,32 @@ class Sinha2016:
         self.setup_pattern_for_recall(pattern_number)
         self.run_simulation(time)
 
-    def deaff_last_pattern(self):
+    def deaff_last_random_pattern(self):
         """
-        Deaff last pattern.
+        Deaff last pattern by picking a random set of neurons from it.
 
         An extra helper method, since we'll be doing this most.
         """
         print("SIMULATION: deaffing last pattern ({})".format(
             self.pattern_count))
-        self.__deaff_pattern(self.pattern_count)
-        self.__deaff_bg_E(self.pattern_count)
-        self.__deaff_bg_I(self.pattern_count)
+        self.__deaff_random_pattern(self.pattern_count)
+        self.__deaff_bg_random_E(self.pattern_count)
+        self.__deaff_bg_random_I(self.pattern_count)
         nest.Prepare()
 
-    def deaff_pattern(self, pattern_number):
-        """Deaff a pattern."""
-        self.__deaff_pattern(pattern_number)
-        self.__deaff_bg_E(pattern_number)
-        self.__deaff_bg_I(pattern_number)
+    def deaff_random_pattern(self, pattern_number):
+        """Deaff a pattern by picking a random set of neurons from it."""
+        self.__deaff_random_pattern(pattern_number)
+        self.__deaff_bg_random_E(pattern_number)
+        self.__deaff_bg_random_I(pattern_number)
 
-    def __deaff_pattern(self, pattern_number):
-        """Deaff the pattern neuron set."""
+    def __deaff_random_pattern(self, pattern_number):
+        """Deaff the pattern neuron set by picking a random set of neurons."""
         print("ANKUR>> Deaffing pattern {}".format(pattern_number))
         pattern_neurons = self.patterns[pattern_number - 1]
         deaffed_neurons = random.sample(
             pattern_neurons, int(math.ceil(len(pattern_neurons) *
-                                           self.deaff_pattern_percent)))
+                                           self.deaff_random_pattern_percent)))
         print("ANKUR>> Number of deaff pattern neurons: "
               "{}".format(len(deaffed_neurons)))
         if len(deaffed_neurons) > 0:
@@ -1151,8 +1154,8 @@ class Sinha2016:
                                        set(deaffed_neurons))
             self.__dump_neuron_set(file_name, non_deaffed_neurons)
 
-    def __deaff_bg_E(self, pattern_number):
-        """Deaff background E neurons."""
+    def __deaff_bg_random_E(self, pattern_number):
+        """Deaff background a random selection of E neurons."""
         pattern_neurons = self.patterns[pattern_number - 1]
         bg_neurons = list(set(self.neuronsE) - set(pattern_neurons))
         deaffed_neurons = random.sample(
@@ -1186,8 +1189,8 @@ class Sinha2016:
                                        set(deaffed_neurons))
             self.__dump_neuron_set(file_name, non_deaffed_neurons)
 
-    def __deaff_bg_I(self, pattern_number):
-        """Deaff background I neurons."""
+    def __deaff_bg_random_I(self, pattern_number):
+        """Deaff a random selection of background I neurons."""
         deaffed_neurons = random.sample(
             self.neuronsI, int(math.ceil(len(self.neuronsI) *
                                          self.deaff_bg_percentI)))
@@ -1482,16 +1485,16 @@ if __name__ == "__main__":
     # only track the first pattern, otherwise we get too many log files and the
     # postprocessing takes forever
     if numpats > 0:
-        simulation.store_pattern(True)
+        simulation.store_random_pattern(True)
     # Do not track the others
     for i in range(1, numpats):
-        simulation.store_pattern()
+        simulation.store_random_pattern()
     simulation.stabilise()
 
     # Recall last pattern #
     if numpats > 0:
         # Deaff last pattern #
-        simulation.deaff_pattern(1)
+        simulation.deaff_random_pattern(1)
         # Enable structural plasticity for repair #
         # simulation.enable_rewiring()
         # Stabilise for repair #

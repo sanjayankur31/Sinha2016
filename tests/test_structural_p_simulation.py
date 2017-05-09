@@ -97,9 +97,9 @@ class TestStructuralPlasticity(unittest.TestCase):
     def test_02_simrun(self):
         """Test a complete sim run."""
         self.__class__.sim.stabilise()
-        self.__class__.sim.store_pattern(True)
+        self.__class__.sim.store_random_pattern(True)
         self.__class__.sim.stabilise()
-        self.__class__.sim.deaff_last_pattern()
+        self.__class__.sim.deaff_last_random_pattern()
         self.__class__.sim.enable_rewiring()
         self.__class__.sim.stabilise()
         self.__class__.sim.recall_last_pattern(10.)
