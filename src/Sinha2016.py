@@ -30,6 +30,7 @@ import math
 # use random.sample instead of numpy.random - faster
 import random
 from scipy.spatial import cKDTree
+from mpi4py import MPI
 
 
 class Sinha2016:
@@ -38,6 +39,7 @@ class Sinha2016:
 
     def __init__(self):
         """Initialise variables."""
+        self.comm = MPI.COMM_WORLD
         self.step = False
         # default resolution in nest is 0.1ms. Using the same value
         # http://www.nest-simulator.org/scheduling-and-simulation-flow/
@@ -727,8 +729,15 @@ class Sinha2016:
         """Get synaptic elements all neurons."""
         # Holds the deltas, not the actual numbers
         synaptic_elms = []
-        neurons = nest.GetStatus(self.neuronsE + self.neuronsI,
-                                 ['global_id', 'synaptic_elements'])
+        # must get local neurons, since only local neurons will have global_id
+        # and synaptic_element values in their dicts. The rest are proxies.
+        local_neurons = [stat['global_id'] for stat in
+                         nest.GetStatus(self.neuronsE + self.neuronsI) if
+                         stat['local']]
+
+        lneurons = nest.GetStatus(local_neurons, ['global_id',
+                                                  'synaptic_elements'])
+        neurons = self.comm.allgather(lneurons)
 
         for neuron in neurons:
             gid = neuron[0]
