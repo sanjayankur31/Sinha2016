@@ -969,10 +969,16 @@ class Sinha2016:
         if not self.rewiring_enabled:
             return
         syn_elms = self.__get_syn_elms()
+        with open('synelms-{}.txt'.format(nest.Rank()), 'w') as f:
+            print(syn_elms, file=f)
+
+        return
+    """
         self.__delete_random_connections(syn_elms)
         syn_elms = self.__get_syn_elms()
         self.__create_random_connections(syn_elms)
         nest.Prepare()
+    """
 
     def store_spatial_pattern(self, track=False):
         """Store a pattern of neurons that are spatially adjacent."""
@@ -1490,7 +1496,10 @@ if __name__ == "__main__":
         stabilisation_time=2000.,
         sp_update_interval=1000.,
         recording_interval=200.)
-    simulation.stabilise()
+    simulation.enable_rewiring()
+    simulation.update_connectivity
+
+    """simulation.stabilise()
 
     # Pattern storage #
     # only track the first pattern, otherwise we get too many log files and the
@@ -1517,3 +1526,4 @@ if __name__ == "__main__":
     simulation.close_files()
     nest.Cleanup()
     print("SIMULATION FINISHED SUCCESSFULLY")
+    """
