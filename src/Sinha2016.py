@@ -59,11 +59,13 @@ class Sinha2016:
         self.pattern_percent = .1
         # recall percent of pattern
         self.recall_percent = .25
+
+        # without spatial information
         # deafferentation percent of pattern
         self.deaff_random_pattern_percent = .50
         # deafferentation percent of background
-        self.deaff_bg_percentE = .50
-        self.deaff_bg_percentI = .50
+        self.deaff_bg_random_percentE = .50
+        self.deaff_bg_random_percentI = .50
 
         self.populations['P'] = self.pattern_percent * self.populations['E']
         self.populations['R'] = self.recall_percent * self.populations['P']
@@ -1160,7 +1162,7 @@ class Sinha2016:
         bg_neurons = list(set(self.neuronsE) - set(pattern_neurons))
         deaffed_neurons = random.sample(
             bg_neurons, int(math.ceil(len(bg_neurons) *
-                                      self.deaff_bg_percentE)))
+                                      self.deaff_bg_random_percentE)))
         print("ANKUR>> Number of deaff bg E neurons: "
               "{}".format(len(deaffed_neurons)))
         if len(deaffed_neurons) > 0:
@@ -1193,7 +1195,7 @@ class Sinha2016:
         """Deaff a random selection of background I neurons."""
         deaffed_neurons = random.sample(
             self.neuronsI, int(math.ceil(len(self.neuronsI) *
-                                         self.deaff_bg_percentI)))
+                                         self.deaff_bg_random_percentI)))
 
         print("ANKUR>> Number of deaff bg I neurons: "
               "{}".format(len(deaffed_neurons)))
