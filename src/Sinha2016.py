@@ -1500,19 +1500,19 @@ if __name__ == "__main__":
         recording_interval=200.)
     simulation.stabilise()
 
-    # Pattern storage #
-    # only track the first pattern, otherwise we get too many log files and the
-    # postprocessing takes forever
+    # Pattern related simulation
     if numpats > 0:
+        # store patterns
+        # only track first pattern to limit log files
         simulation.store_random_pattern(True)
-    # Do not track the others
-    for i in range(1, numpats):
-        simulation.store_random_pattern()
-    simulation.stabilise()
+        # Do not track the others
+        for i in range(1, numpats):
+            simulation.store_random_pattern()
 
-    # Recall last pattern #
-    if numpats > 0:
-        # Deaff last pattern #
+        # stabilise network after storing patterns
+        simulation.stabilise()
+
+        # Deaff first pattern (which is also being tracked)
         simulation.deaff_random_pattern(1)
         # Enable structural plasticity for repair #
         simulation.enable_rewiring()
@@ -1520,6 +1520,7 @@ if __name__ == "__main__":
         simulation.stabilise()
         simulation.stabilise()
 
+        # recall stored and tracked pattern
         simulation.recall_pattern(50, 1)
 
     simulation.close_files()
