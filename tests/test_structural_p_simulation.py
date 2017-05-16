@@ -101,6 +101,7 @@ class TestStructuralPlasticity(unittest.TestCase):
         self.__class__.sim.stabilise()
         self.__class__.sim.deaff_last_random_pattern()
         self.__class__.sim.enable_rewiring()
+        self.__class__.sim.update_connectivity()
         self.__class__.sim.stabilise()
         self.__class__.sim.recall_last_pattern(10.)
         self.__class__.sim.close_files()
