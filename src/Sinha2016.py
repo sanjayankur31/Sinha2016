@@ -737,46 +737,48 @@ class Sinha2016:
 
         lneurons = nest.GetStatus(local_neurons, ['global_id',
                                                   'synaptic_elements'])
-        neurons = self.comm.allgather(lneurons)
+        # returns a list of sets - one set from each rank
+        ranksets = self.comm.allgather(lneurons)
 
-        for neuron in neurons:
-            gid = neuron[0]
-            synelms = neuron[1]
+        for rankset in ranksets:
+            for neuron in rankset:
+                gid = neuron[0]
+                synelms = neuron[1]
 
-            if 'Axon_in' in synelms:
-                source_elms_con = synelms['Axon_in']['z_connected']
-                source_elms_total = synelms['Axon_in']['z']
-            elif 'Axon_ex' in synelms:
-                source_elms_con = synelms['Axon_ex']['z_connected']
-                source_elms_total = synelms['Axon_ex']['z']
+                if 'Axon_in' in synelms:
+                    source_elms_con = synelms['Axon_in']['z_connected']
+                    source_elms_total = synelms['Axon_in']['z']
+                elif 'Axon_ex' in synelms:
+                    source_elms_con = synelms['Axon_ex']['z_connected']
+                    source_elms_total = synelms['Axon_ex']['z']
 
-            target_elms_con_ex = synelms['Den_ex']['z_connected']
-            target_elms_con_in = synelms['Den_in']['z_connected']
-            target_elms_total_ex = synelms['Den_ex']['z']
-            target_elms_total_in = synelms['Den_in']['z']
-            delta_z_ax = (math.floor(source_elms_total) -
-                          source_elms_con)
-            delta_z_d_ex = (math.floor(target_elms_total_ex) -
-                            target_elms_con_ex)
-            delta_z_d_in = (math.floor(target_elms_total_in) -
-                            target_elms_con_in)
+                target_elms_con_ex = synelms['Den_ex']['z_connected']
+                target_elms_con_in = synelms['Den_in']['z_connected']
+                target_elms_total_ex = synelms['Den_ex']['z']
+                target_elms_total_in = synelms['Den_in']['z']
+                delta_z_ax = (math.floor(source_elms_total) -
+                              source_elms_con)
+                delta_z_d_ex = (math.floor(target_elms_total_ex) -
+                                target_elms_con_ex)
+                delta_z_d_in = (math.floor(target_elms_total_in) -
+                                target_elms_con_in)
 
-            if 'Axon_in' in synelms:
-                synaptic_elms.append({
-                    'gid': gid,
-                    'Axon_in': (delta_z_ax),
-                    'Den_ex': (delta_z_d_ex),
-                    'Den_in': (delta_z_d_in),
-                }
-                )
-            elif 'Axon_ex' in synelms:
-                synaptic_elms.append({
-                    'gid': gid,
-                    'Axon_ex': (delta_z_ax),
-                    'Den_ex': (delta_z_d_ex),
-                    'Den_in': (delta_z_d_in),
-                }
-                )
+                if 'Axon_in' in synelms:
+                    synaptic_elms.append({
+                        'gid': gid,
+                        'Axon_in': (delta_z_ax),
+                        'Den_ex': (delta_z_d_ex),
+                        'Den_in': (delta_z_d_in),
+                    }
+                    )
+                elif 'Axon_ex' in synelms:
+                    synaptic_elms.append({
+                        'gid': gid,
+                        'Axon_ex': (delta_z_ax),
+                        'Den_ex': (delta_z_d_ex),
+                        'Den_in': (delta_z_d_in),
+                    }
+                    )
 
         return synaptic_elms
 
@@ -1496,10 +1498,7 @@ if __name__ == "__main__":
         stabilisation_time=2000.,
         sp_update_interval=1000.,
         recording_interval=200.)
-    simulation.enable_rewiring()
-    simulation.update_connectivity
-
-    """simulation.stabilise()
+    simulation.stabilise()
 
     # Pattern storage #
     # only track the first pattern, otherwise we get too many log files and the
@@ -1516,8 +1515,8 @@ if __name__ == "__main__":
         # Deaff last pattern #
         simulation.deaff_random_pattern(1)
         # Enable structural plasticity for repair #
-        # simulation.enable_rewiring()
-        # Stabilise for repair #
+        simulation.enable_rewiring()
+        # Stabilise for repair
         simulation.stabilise()
         simulation.stabilise()
 
@@ -1526,4 +1525,3 @@ if __name__ == "__main__":
     simulation.close_files()
     nest.Cleanup()
     print("SIMULATION FINISHED SUCCESSFULLY")
-    """
