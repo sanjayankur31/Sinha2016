@@ -974,13 +974,10 @@ class Sinha2016:
         with open('synelms-{}.txt'.format(nest.Rank()), 'w') as f:
             print(syn_elms, file=f)
 
-        return
-    """
         self.__delete_random_connections(syn_elms)
         syn_elms = self.__get_syn_elms()
         self.__create_random_connections(syn_elms)
         nest.Prepare()
-    """
 
     def store_spatial_pattern(self, track=False):
         """Store a pattern of neurons that are spatially adjacent."""
