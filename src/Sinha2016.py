@@ -728,7 +728,9 @@ class Sinha2016:
     def __get_syn_elms(self):
         """Get synaptic elements all neurons."""
         # Holds the deltas, not the actual numbers
-        synaptic_elms = []
+        # A dictionary - the key is the neuron's gid and the value is another
+        # dictionary that contains the deltas
+        synaptic_elms = {}
         # must get local neurons, since only local neurons will have global_id
         # and synaptic_element values in their dicts. The rest are proxies.
         local_neurons = [stat['global_id'] for stat in
@@ -764,21 +766,19 @@ class Sinha2016:
                                 target_elms_con_in)
 
                 if 'Axon_in' in synelms:
-                    synaptic_elms.append({
-                        'gid': gid,
+                    elms = {
                         'Axon_in': (delta_z_ax),
                         'Den_ex': (delta_z_d_ex),
                         'Den_in': (delta_z_d_in),
                     }
-                    )
+                    synaptic_elms[gid] = elms
                 elif 'Axon_ex' in synelms:
-                    synaptic_elms.append({
-                        'gid': gid,
+                    elms = {
                         'Axon_ex': (delta_z_ax),
                         'Den_ex': (delta_z_d_ex),
                         'Den_in': (delta_z_d_in),
                     }
-                    )
+                    synaptic_elms[gid] = elms
 
         return synaptic_elms
 
@@ -787,10 +787,15 @@ class Sinha2016:
         # the order in which these are removed should not matter - whether we
         # remove connections using axons first or dendrites first, the end
         # state of the network should be the same.
-        for nrn in synelms:
+        # Note that we are modifying a dictionary while iterating over it. This
+        # is OK here since we're not modifying the keys, only the values.
+        # http://stackoverflow.com/a/2315529/375067
+        for nrn in synelms.iteritems():
             # excitatory neurons as sources
-            if 'Axon_ex' in nrn and nrn['Axon_ex'] < 0.0:
-                conns = nest.GetConnections(source=[nrn['gid']],
+            gid = nrn[0]
+            elms = nrn[1]
+            if 'Axon_ex' in elms and elms['Axon_ex'] < 0.0:
+                conns = nest.GetConnections(source=[gid],
                                             synapse_model='static_synapse_ex')
                 targets = []
                 chosen_targets = []
@@ -800,27 +805,27 @@ class Sinha2016:
 
                 if len(targets) > 0:
                     # this is where the selection logic is
-                    if len(targets) > int(abs(nrn['Axon_ex'])):
+                    if len(targets) > int(abs(elms['Axon_ex'])):
                         chosen_targets = random.sample(
-                            targets, int(abs(nrn['Axon_ex'])))
+                            targets, int(abs(elms['Axon_ex'])))
                     else:
                         chosen_targets = targets
 
                     nest.Disconnect(
-                        pre=[nrn['gid']], post=chosen_targets, syn_spec={
+                        pre=[gid], post=chosen_targets, syn_spec={
                             'model': 'static_synapse_ex',
                             'pre_synaptic_element': 'Axon_ex',
                             'post_synaptic_element': 'Den_ex',
                         }, conn_spec={
                             'rule': 'all_to_all'}
                     )
-                    nrn['Axon_ex'] += len(chosen_targets)
+                    elms['Axon_ex'] += len(chosen_targets)
                     for t in chosen_targets:
-                        synelms[t - 1]['Den_ex'] += 1
+                        synelms[s]['Den_ex'] += 1
 
             # inhibitory neurons as sources
-            elif 'Axon_in' in nrn and nrn['Axon_in'] < 0.0:
-                conns = nest.GetConnections(source=[nrn['gid']],
+            elif 'Axon_in' in elms and elms['Axon_in'] < 0.0:
+                conns = nest.GetConnections(source=[gid],
                                             synapse_model='static_synapse_in')
                 targets = []
                 chosen_targets = []
@@ -830,27 +835,27 @@ class Sinha2016:
 
                 if len(targets) > 0:
                     # this is where the selection logic is
-                    if len(targets) > int(abs(nrn['Axon_in'])):
+                    if len(targets) > int(abs(elms['Axon_in'])):
                         chosen_targets = random.sample(
-                            targets, int(abs(nrn['Axon_in'])))
+                            targets, int(abs(elms['Axon_in'])))
                     else:
                         chosen_targets = targets
 
                     nest.Disconnect(
-                        pre=[nrn['gid']], post=chosen_targets, syn_spec={
+                        pre=[gid], post=chosen_targets, syn_spec={
                             'model': 'static_synapse',
                             'pre_synaptic_element': 'Axon_in',
                             'post_synaptic_element': 'Den_in',
                         }, conn_spec={
                             'rule': 'all_to_all'}
                     )
-                    nrn['Axon_in'] += len(chosen_targets)
+                    elms['Axon_in'] += len(chosen_targets)
                     for t in chosen_targets:
-                        synelms[t - 1]['Den_in'] += 1
+                        synelms[s]['Den_in'] += 1
 
             # excitatory dendrites as targets
-            if 'Den_ex' in nrn and nrn['Den_ex'] < 0.0:
-                conns = nest.GetConnections(target=[nrn['gid']],
+            if 'Den_ex' in elms and elms['Den_ex'] < 0.0:
+                conns = nest.GetConnections(target=[gid],
                                             synapse_model='static_synapse_ex')
                 sources = []
                 chosen_sources = []
@@ -859,27 +864,27 @@ class Sinha2016:
                     sources.append(acon[0])
 
                 if len(sources) > 0:
-                    if len(sources) > int(abs(nrn['Den_ex'])):
+                    if len(sources) > int(abs(elms['Den_ex'])):
                         chosen_sources = random.sample(
-                            sources, int(abs(nrn['Den_ex'])))
+                            sources, int(abs(elms['Den_ex'])))
                     else:
                         chosen_sources = sources
 
                     nest.Disconnect(
-                        pre=chosen_sources, post=[nrn['gid']], syn_spec={
+                        pre=chosen_sources, post=[gid], syn_spec={
                             'model': 'static_synapse_ex',
                             'pre_synaptic_element': 'Axon_ex',
                             'post_synaptic_element': 'Den_ex',
                         }, conn_spec={
                             'rule': 'all_to_all'}
                     )
-                    nrn['Den_ex'] += len(chosen_sources)
+                    elms['Den_ex'] += len(chosen_sources)
                     for s in chosen_sources:
-                        synelms[s - 1]['Axon_ex'] += 1
+                        synelms[s]['Axon_ex'] += 1
 
             # inhibitory dendrites as targets
-            if 'Den_in' in nrn and nrn['Den_in'] < 0.0:
-                conns = nest.GetConnections(target=[nrn['gid']],
+            if 'Den_in' in elms and elms['Den_in'] < 0.0:
+                conns = nest.GetConnections(target=[gid],
                                             synapse_model='static_synapse_in')
                 sources = []
                 chosen_sources = []
@@ -888,83 +893,89 @@ class Sinha2016:
                     sources.append(acon[0])
 
                 if len(sources) > 0:
-                    if len(sources) > int(abs(nrn['Den_in'])):
+                    if len(sources) > int(abs(elms['Den_in'])):
                         chosen_sources = random.sample(
-                            sources, int(abs(nrn['Den_in'])))
+                            sources, int(abs(elms['Den_in'])))
                     else:
                         chosen_sources = sources
 
                     nest.Disconnect(
-                        pre=chosen_sources, post=[nrn['gid']], syn_spec={
+                        pre=chosen_sources, post=[gid], syn_spec={
                             'model': 'static_synapse_in',
                             'pre_synaptic_element': 'Axon_in',
                             'post_synaptic_element': 'Den_in',
                         }, conn_spec={
                             'rule': 'all_to_all'}
                     )
-                    nrn['Den_in'] += len(chosen_sources)
+                    elms['Den_in'] += len(chosen_sources)
                     for s in chosen_sources:
-                        synelms[s - 1]['Axon_in'] += 1
+                        synelms[s]['Axon_in'] += 1
 
     def __create_random_connections(self, synelms):
         """Connect random neurons to create new connections."""
-        for nrn in synelms:
+        for nrn in synelms.iteritems():
+            gid = nrn[0]
+            elms = nrn[1]
             # excitatory connections - only need to look at Axons, it doesn't
             # matter which synaptic elements you start with, whichever are less
             # will act as the limiting factor.
-            if 'Axon_ex' in nrn and nrn['Axon_ex'] > 0.0:
+            if 'Axon_ex' in elms and elms['Axon_ex'] > 0.0:
                 targets = []
                 chosen_targets = []
 
-                for atarget in synelms:
-                    if 'Den_ex' in atarget and atarget['Den_ex'] > 0.0:
+                for atarget in synelms.iteritems():
+                    tid = atarget[0]
+                    telms = atarget[1]
+                    if 'Den_ex' in telms and telms['Den_ex'] > 0.0:
                         # add the target multiple times, since it has multiple
                         # available contact points
-                        targets.extend([atarget['gid']]*int(atarget['Den_ex']))
+                        targets.extend([tid]*int(telms['Den_ex']))
 
                 if len(targets) > 0:
-                    if len(targets) > int(abs(nrn['Axon_ex'])):
+                    if len(targets) > int(abs(elms['Axon_ex'])):
                         chosen_targets = random.sample(
-                            targets, int(abs(nrn['Axon_ex'])))
+                            targets, int(abs(elms['Axon_ex'])))
                     else:
                         chosen_targets = targets
 
-                    nest.Connect([nrn['gid']], chosen_targets,
+                    nest.Connect([gid], chosen_targets,
                                  conn_spec='all_to_all',
                                  syn_spec={'model': 'static_synapse_ex',
                                            'pre_synaptic_element': 'Axon_ex',
                                            'post_synaptic_element': 'Den_ex'
                                            })
                     for cho in chosen_targets:
-                        synelms[cho - 1]['Den_ex'] -= 1
-                    nrn['Axon_ex'] -= len(chosen_targets)
+                        synelms[cho]['Den_ex'] -= 1
+                    elms['Axon_ex'] -= len(chosen_targets)
 
-            if 'Axon_in' in nrn and nrn['Axon_in'] > 0.0:
+            if 'Axon_in' in elms and elms['Axon_in'] > 0.0:
                 targets = []
                 chosen_targets = []
 
-                for atarget in synelms:
-                    if 'Den_in' in atarget and atarget['Den_in'] > 0.0:
+                for atarget in synelms.iteritems():
+                    tid = atarget[0]
+                    telms = atarget[1]
+                    if 'Den_in' in telms and telms['Den_in'] > 0.0:
                         # add the target multiple times, since it has multiple
                         # available contact points
-                        targets.intend([atarget['gid']]*int(atarget['Den_in']))
+                        targets.intend([tid]*int(telms['Den_in']))
 
                 if len(targets) > 0:
-                    if len(targets) > int(abs(nrn['Axon_in'])):
+                    if len(targets) > int(abs(elms['Axon_in'])):
                         chosen_targets = random.sample(
-                            targets, int(abs(nrn['Axon_in'])))
+                            targets, int(abs(elms['Axon_in'])))
                     else:
                         chosen_targets = targets
 
-                    nest.Connect([nrn['gid']], chosen_targets,
+                    nest.Connect([gid], chosen_targets,
                                  conn_spec='all_to_all',
                                  syn_spec={'model': 'static_synapse_in',
                                            'pre_synaptic_element': 'Axon_in',
                                            'post_synaptic_element': 'Den_in'
                                            })
                     for cho in chosen_targets:
-                        synelms[cho - 1]['Den_in'] -= 1
-                    nrn['Axon_in'] -= len(chosen_targets)
+                        synelms[cho]['Den_in'] -= 1
+                    elms['Axon_in'] -= len(chosen_targets)
 
     def update_connectivity(self):
         """Our implementation of structural plasticity."""
