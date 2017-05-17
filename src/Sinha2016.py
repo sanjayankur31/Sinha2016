@@ -289,7 +289,6 @@ class Sinha2016:
         going to try to manually find the right number of syapses and connect
         neurons to get a certain sparsity.
         """
-        possible_synapses = []
         required_synapses = int(float(len(sources)) * float(len(destinations))
                                 * sparsity)
         chosen_synapses = []
@@ -821,7 +820,7 @@ class Sinha2016:
                     )
                     elms['Axon_ex'] += len(chosen_targets)
                     for t in chosen_targets:
-                        synelms[s]['Den_ex'] += 1
+                        synelms[t]['Den_ex'] += 1
 
             # inhibitory neurons as sources
             elif 'Axon_in' in elms and elms['Axon_in'] < 0.0:
@@ -851,7 +850,7 @@ class Sinha2016:
                     )
                     elms['Axon_in'] += len(chosen_targets)
                     for t in chosen_targets:
-                        synelms[s]['Den_in'] += 1
+                        synelms[t]['Den_in'] += 1
 
             # excitatory dendrites as targets
             if 'Den_ex' in elms and elms['Den_ex'] < 0.0:
