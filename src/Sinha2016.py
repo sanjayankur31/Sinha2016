@@ -960,7 +960,7 @@ class Sinha2016:
                     if 'Den_in' in telms and telms['Den_in'] > 0.0:
                         # add the target multiple times, since it has multiple
                         # available contact points
-                        targets.intend([tid]*int(telms['Den_in']))
+                        targets.extend([tid]*int(telms['Den_in']))
 
                 if len(targets) > 0:
                     if len(targets) > int(abs(elms['Axon_in'])):
