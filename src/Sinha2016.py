@@ -1051,9 +1051,6 @@ class Sinha2016:
         if not self.rewiring_enabled:
             return
         syn_elms = self.__get_syn_elms()
-        with open('synelms-{}.txt'.format(nest.Rank()), 'w') as f:
-            print(syn_elms, file=f)
-
         self.__delete_random_connections(syn_elms)
         syn_elms = self.__get_syn_elms()
         self.__create_random_connections(syn_elms)
