@@ -950,8 +950,13 @@ class Sinha2016:
                         synelms[cho]['Den_ex'] -= 1
                     elms['Axon_ex'] -= len(chosen_targets)
 
+            # here, you can connect either with E neurons or I neurons but both
+            # will have different synapse types. So, a bit more work required
+            # here than with the Axon_ex which always forms the same type of
+            # synapse
             if 'Axon_in' in elms and elms['Axon_in'] > 0.0:
-                targets = []
+                targetsE = []
+                targetsI = []
                 chosen_targets = []
 
                 for atarget in synelms.iteritems():
@@ -960,23 +965,37 @@ class Sinha2016:
                     if 'Den_in' in telms and telms['Den_in'] > 0.0:
                         # add the target multiple times, since it has multiple
                         # available contact points
-                        targets.extend([tid]*int(telms['Den_in']))
+                        if 'Axon_in' in telms:
+                            targetsE.extend([tid]*int(telms['Den_in']))
+                        else:
+                            targetsI.extend([tid]*int(telms['Den_in']))
 
-                if len(targets) > 0:
-                    if len(targets) > int(abs(elms['Axon_in'])):
+
+                if (len(targetsE) + len(targetsI)) > 0:
+                    if (len(targetsE) + len(targetsI)) > int(abs(elms['Axon_in'])):
                         chosen_targets = random.sample(
-                            targets, int(abs(elms['Axon_in'])))
+                            (targetsE + targetsI), int(abs(elms['Axon_in'])))
                     else:
-                        chosen_targets = targets
+                        chosen_targets = (targetsE + targetsI)
 
-                    nest.Connect([gid], chosen_targets,
-                                 conn_spec='all_to_all',
-                                 syn_spec={'model': 'static_synapse_in',
-                                           'pre_synaptic_element': 'Axon_in',
-                                           'post_synaptic_element': 'Den_in'
-                                           })
-                    for cho in chosen_targets:
-                        synelms[cho]['Den_in'] -= 1
+                    for target in chosen_targets:
+                        if target in targetsE:
+                            nest.Connect([gid], target,
+                                        conn_spec='one_to_one',
+                                        syn_spec={'model': 'vogels_sprekeler_synapse',
+                                                'pre_synaptic_element': 'Axon_in',
+                                                'post_synaptic_element': 'Den_in'
+                                                })
+                            synelms[target]['Den_in'] -= 1
+                        else:
+                            nest.Connect([gid], target,
+                                        conn_spec='one_to_one',
+                                        syn_spec={'model': 'static_synapse_in',
+                                                'pre_synaptic_element': 'Axon_in',
+                                                'post_synaptic_element': 'Den_in'
+                                                })
+                            synelms[target]['Den_in'] -= 1
+
                     elms['Axon_in'] -= len(chosen_targets)
 
     def update_connectivity(self):
