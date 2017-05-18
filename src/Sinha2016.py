@@ -308,7 +308,7 @@ class Sinha2016:
 
         return chosen_synapses
 
-    def __setup_connections(self):
+    def __setup_initial_connection_params(self):
         """Setup connections."""
         # Global sparsity
         self.sparsity = 0.02
@@ -411,7 +411,7 @@ class Sinha2016:
                               'alpha': .12, 'eta': 0.01,
                               'tau': 20.}
 
-    def __setup_initial_connections(self):
+    def __create_initial_connections(self):
         """Initially connect various neuron sets."""
         nest.Connect(self.poissonExtE, self.neuronsE,
                      conn_spec=self.connDictExtE,
@@ -667,7 +667,7 @@ class Sinha2016:
         # Nest stuff
         nest.ResetKernel()
         # http://www.nest-simulator.org/sli/setverbosity/
-        nest.set_verbosity('M_FATAL')
+        nest.set_verbosity('M_INFO')
 
         nest.SetKernelStatus(
             {
@@ -676,15 +676,6 @@ class Sinha2016:
                 'overwrite_files': True
             }
         )
-        self.__setup_neurons()
-        self.__create_neurons()
-        self.__setup_detectors()
-
-        self.__setup_connections()
-        self.__setup_initial_connections()
-
-        self.__setup_files()
-
         # Since I've patched NEST, this doesn't actually update connectivity
         # But, it's required to ensure that synaptic elements are connected
         # correctly when I form or delete new connections
@@ -693,6 +684,16 @@ class Sinha2016:
             'structural_plasticity_update_interval':
             int(self.sp_update_interval),
         })
+
+        self.__setup_neurons()
+        self.__create_neurons()
+        self.__setup_detectors()
+
+        self.__setup_initial_connection_params()
+        self.__create_initial_connections()
+
+        self.__setup_files()
+
         nest.Prepare()
 
         self.dump_data()
@@ -783,6 +784,7 @@ class Sinha2016:
 
     def __delete_random_connections(self, synelms):
         """Delete connections randomly."""
+        print("Deleting RANDOM connections")
         # the order in which these are removed should not matter - whether we
         # remove connections using axons first or dendrites first, the end
         # state of the network should be the same.
@@ -912,6 +914,7 @@ class Sinha2016:
 
     def __create_random_connections(self, synelms):
         """Connect random neurons to create new connections."""
+        print("Creating RANDOM connections")
         for nrn in synelms.iteritems():
             gid = nrn[0]
             elms = nrn[1]
