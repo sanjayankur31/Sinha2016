@@ -667,7 +667,7 @@ class Sinha2016:
         # Nest stuff
         nest.ResetKernel()
         # http://www.nest-simulator.org/sli/setverbosity/
-        nest.set_verbosity('M_INFO')
+        nest.set_verbosity('M_DEBUG')
 
         nest.SetKernelStatus(
             {
@@ -1048,6 +1048,7 @@ class Sinha2016:
 
     def update_connectivity(self):
         """Our implementation of structural plasticity."""
+        print("STRUCTURAL PLASTICITY: Updating connectivity")
         if not self.rewiring_enabled:
             return
         syn_elms = self.__get_syn_elms()
@@ -1055,6 +1056,7 @@ class Sinha2016:
         syn_elms = self.__get_syn_elms()
         self.__create_random_connections(syn_elms)
         nest.Prepare()
+        print("STRUCTURAL PLASTICITY: Connectivity updated")
 
     def store_spatial_pattern(self, track=False):
         """Store a pattern of neurons that are spatially adjacent."""
