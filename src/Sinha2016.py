@@ -853,7 +853,7 @@ class Sinha2016:
                         synelms[target]['Den_in'] += 1
                         if target in targetsE:
                             nest.Disconnect(
-                                pre=[gid], post=target, syn_spec={
+                                pre=[gid], post=[target], syn_spec={
                                     'model': 'vogels_sprekeler_synapse',
                                     'pre_synaptic_element': 'Axon_in',
                                     'post_synaptic_element': 'Den_in',
@@ -862,7 +862,7 @@ class Sinha2016:
                             )
                         else:
                             nest.Disconnect(
-                                pre=[gid], post=target, syn_spec={
+                                pre=[gid], post=[target], syn_spec={
                                     'model': 'static_synapse_in',
                                     'pre_synaptic_element': 'Axon_in',
                                     'post_synaptic_element': 'Den_in',
@@ -1028,7 +1028,7 @@ class Sinha2016:
 
                     for target in chosen_targets:
                         if target in targetsE:
-                            nest.Connect([gid], target,
+                            nest.Connect([gid], [target],
                                         conn_spec='one_to_one',
                                         syn_spec={'model': 'vogels_sprekeler_synapse',
                                                 'pre_synaptic_element': 'Axon_in',
@@ -1036,7 +1036,7 @@ class Sinha2016:
                                                 })
                             synelms[target]['Den_in'] -= 1
                         else:
-                            nest.Connect([gid], target,
+                            nest.Connect([gid], [target],
                                         conn_spec='one_to_one',
                                         syn_spec={'model': 'static_synapse_in',
                                                 'pre_synaptic_element': 'Axon_in',
