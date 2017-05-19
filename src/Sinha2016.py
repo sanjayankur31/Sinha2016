@@ -31,6 +31,7 @@ import math
 import random
 from scipy.spatial import cKDTree
 from mpi4py import MPI
+import logging
 
 
 class Sinha2016:
@@ -332,7 +333,7 @@ class Sinha2016:
 
         # If neither, we've messed up
         if not self.setup_str_p and not self.setup_syn_p:
-            print("Neither plasticity is enabled. Exiting.")
+            logging.critical("Neither plasticity is enabled. Exiting.")
             sys.exit()
 
         # Documentation says things are normalised in the iaf neuron so that
@@ -424,80 +425,80 @@ class Sinha2016:
 
         # only structural plasticity
         if self.setup_str_p and not self.setup_syn_p:
-            print("Only structural plasticity enabled" +
+            logging.info("Only structural plasticity enabled" +
                   "Not setting up any synapses.")
         # only synaptic plasticity
         # setup connections using Nest methods
         elif self.setup_syn_p and not self.setup_str_p:
             conndict = {'rule': 'pairwise_bernoulli',
                         'p': self.sparsity}
-            print("Setting up EE connections.")
+            logging.debug("Setting up EE connections.")
             nest.Connect(self.neuronsE, self.neuronsE,
                          syn_spec=self.synDictEE,
                          conn_spec=conndict)
-            print("EE connections set up.")
+            logging.debug("EE connections set up.")
 
-            print("Setting up EI connections.")
+            logging.debug("Setting up EI connections.")
             nest.Connect(self.neuronsE, self.neuronsI,
                          syn_spec=self.synDictEI,
                          conn_spec=conndict)
-            print("EI connections set up.")
+            logging.debug("EI connections set up.")
 
-            print("Setting up II connections.")
+            logging.debug("Setting up II connections.")
             nest.Connect(self.neuronsI, self.neuronsI,
                          syn_spec=self.synDictII,
                          conn_spec=conndict)
-            print("II connections set up.")
+            logging.debug("II connections set up.")
 
-            print("Setting up IE connections.")
+            logging.debug("Setting up IE connections.")
             nest.Connect(self.neuronsI, self.neuronsE,
                          syn_spec=self.synDictIE,
                          conn_spec=conndict)
-            print("IE connections set up.")
+            logging.debug("IE connections set up.")
         # manually set up initial connections if structural plasticity and
         # synaptic plasticity are both enabled
         # This is because you can only either have all-all or one-one
         # connections when structural plasticity is enabled
         elif self.setup_str_p and self.setup_syn_p:
             conndict = {'rule': 'one_to_one'}
-            print("Setting up EE connections.")
+            logging.debug("Setting up EE connections.")
             synapses_to_create = self.__get_synapses_to_form(
                 self.neuronsE, self.neuronsE, self.sparsity)
             for source, destination in synapses_to_create:
                 nest.Connect([source], [destination],
                              syn_spec=self.synDictEE,
                              conn_spec=conndict)
-            print("{} EE connections set up.".format(
+            logging.debug("{} EE connections set up.".format(
                 len(synapses_to_create)))
 
-            print("Setting up EI connections.")
+            logging.debug("Setting up EI connections.")
             synapses_to_create = self.__get_synapses_to_form(
                 self.neuronsE, self.neuronsI, self.sparsity)
             for source, destination in synapses_to_create:
                 nest.Connect([source], [destination],
                              syn_spec=self.synDictEI,
                              conn_spec=conndict)
-            print("{} EI connections set up.".format(
+            logging.debug("{} EI connections set up.".format(
                 len(synapses_to_create)))
 
-            print("Setting up II connections.")
+            logging.debug("Setting up II connections.")
             synapses_to_create = self.__get_synapses_to_form(
                 self.neuronsI, self.neuronsI, self.sparsity)
             for source, destination in synapses_to_create:
                 nest.Connect([source], [destination],
                              syn_spec=self.synDictII,
                              conn_spec=conndict)
-            print("{} II connections set up.".format(
+            logging.debug("{} II connections set up.".format(
                 len(synapses_to_create)))
 
-            print("Setting up IE connections.")
+            logging.debug("Setting up IE connections.")
             synapses_to_create = self.__get_synapses_to_form(
                 self.neuronsI, self.neuronsE, self.sparsity)
             for source, destination in synapses_to_create:
                 nest.Connect([source], [destination],
                              syn_spec=self.synDictIE,
                              conn_spec=conndict)
-            print("{} IE weights set up.".format(
+            logging.debug("{} IE weights set up.".format(
                 len(synapses_to_create)))
 
     def __setup_detectors(self):
@@ -629,13 +630,13 @@ class Sinha2016:
         self.setup_syn_p = synaptic_p
 
         if self.setup_str_p and self.setup_syn_p:
-            print("NETWORK SETUP TO HANDLE BOTH PLASTICITIES")
+            logging.info("NETWORK SETUP TO HANDLE BOTH PLASTICITIES")
         elif self.setup_str_p and not self.setup_syn_p:
-            print("NETWORK SETUP TO HANDLE ONLY STRUCTURAL PLASTICITY")
+            logging.info("NETWORK SETUP TO HANDLE ONLY STRUCTURAL PLASTICITY")
         elif self.setup_syn_p and not self.setup_str_p:
-            print("NETWORK SETUP TO HANDLE ONLY SYNAPTIC PLASTICITY")
+            logging.info("NETWORK SETUP TO HANDLE ONLY SYNAPTIC PLASTICITY")
         else:
-            print("Both plasticities cannot be disabled. Exiting.")
+            logging.info("Both plasticities cannot be disabled. Exiting.")
             sys.exit()
 
     def prerun_setup(self, step=False,
@@ -700,7 +701,7 @@ class Sinha2016:
 
     def stabilise(self):
         """Stabilise network."""
-        print("SIMULATION: STABILISING for {} seconds".format(
+        logging.info("SIMULATION: STABILISING for {} seconds".format(
             self.stabilisation_time))
         update_steps = numpy.arange(0, self.stabilisation_time,
                                     self.sp_update_interval)
@@ -723,7 +724,7 @@ class Sinha2016:
             self.dump_data()
             current_simtime = (
                 str(nest.GetKernelStatus()['time']) + "msec")
-            print("Simulation time: " "{}".format(current_simtime))
+            logging.info("Simulation time: " "{}".format(current_simtime))
 
     def __get_syn_elms(self):
         """Get synaptic elements all neurons."""
@@ -780,11 +781,12 @@ class Sinha2016:
                     }
                     synaptic_elms[gid] = elms
 
+        logging.debug("Got {} synaptic elements".format(len(synaptic_elms)))
         return synaptic_elms
 
     def __delete_random_connections(self, synelms):
         """Delete connections randomly."""
-        print("Deleting RANDOM connections")
+        logging.debug("Deleting RANDOM connections")
         # the order in which these are removed should not matter - whether we
         # remove connections using axons first or dendrites first, the end
         # state of the network should be the same.
@@ -962,7 +964,7 @@ class Sinha2016:
 
     def __create_random_connections(self, synelms):
         """Connect random neurons to create new connections."""
-        print("Creating RANDOM connections")
+        logging.debug("Creating RANDOM connections")
         for nrn in synelms.iteritems():
             gid = nrn[0]
             elms = nrn[1]
@@ -1048,7 +1050,7 @@ class Sinha2016:
 
     def update_connectivity(self):
         """Our implementation of structural plasticity."""
-        print("STRUCTURAL PLASTICITY: Updating connectivity")
+        logging.info("STRUCTURAL PLASTICITY: Updating connectivity")
         if not self.rewiring_enabled:
             return
         syn_elms = self.__get_syn_elms()
@@ -1056,29 +1058,29 @@ class Sinha2016:
         syn_elms = self.__get_syn_elms()
         self.__create_random_connections(syn_elms)
         nest.Prepare()
-        print("STRUCTURAL PLASTICITY: Connectivity updated")
+        logging.info("STRUCTURAL PLASTICITY: Connectivity updated")
 
     def store_spatial_pattern(self, track=False):
         """Store a pattern of neurons that are spatially adjacent."""
 
     def store_random_pattern(self, track=False):
         """Store a pattern of neurons that are randomly chosen."""
-        print("SIMULATION: Storing pattern {}".format(self.pattern_count + 1))
+        logging.debug("SIMULATION: Storing pattern {}".format(self.pattern_count + 1))
         # Keep track of how many patterns are stored
         self.pattern_count += 1
         pattern_neurons = random.sample(
             self.neuronsE, int(math.ceil(len(self.neuronsE) *
                                          self.pattern_percent)))
-        print("ANKUR>> Number of pattern neurons: "
+        logging.debug("ANKUR>> Number of pattern neurons: "
               "{}".format(len(pattern_neurons)))
 
         # strengthen connections
         connections = nest.GetConnections(source=pattern_neurons,
                                           target=pattern_neurons)
-        print("ANKUR>> Number of connections strengthened: "
+        logging.debug("ANKUR>> Number of connections strengthened: "
               "{}".format(len(connections)))
         nest.SetStatus(connections, {"weight": self.weightPatternEE})
-        print("ANKUR>> New weight: {}nS".format(self.weightPatternEE))
+        logging.debug("ANKUR>> New weight: {}nS".format(self.weightPatternEE))
 
         # store these neurons
         self.patterns.append(pattern_neurons)
@@ -1121,7 +1123,7 @@ class Sinha2016:
             # save the detector
             self.sdB.append(background_spike_detector)
 
-        print("Number of patterns stored: {}".format(self.pattern_count))
+        logging.debug("Number of patterns stored: {}".format(self.pattern_count))
         nest.Prepare()
 
     def setup_pattern_for_recall(self, pattern_number):
@@ -1157,7 +1159,7 @@ class Sinha2016:
         recall_neurons = random.sample(
             pattern_neurons, int(math.ceil(len(pattern_neurons) *
                                            self.recall_percent)))
-        print("ANKUR>> Number of recall neurons: "
+        logging.debug("ANKUR>> Number of recall neurons: "
               "{}".format(len(recall_neurons)))
 
         nest.Connect(stim_neurons, recall_neurons,
@@ -1187,7 +1189,7 @@ class Sinha2016:
 
         An extra helper method, since we'll be doing this most.
         """
-        print("SIMULATION: RECALLING LAST PATTERN")
+        logging.info("SIMULATION: RECALLING LAST PATTERN")
         self.recall_pattern(time, self.pattern_count)
 
     def recall_pattern(self, time, pattern_number):
@@ -1201,7 +1203,7 @@ class Sinha2016:
 
         An extra helper method, since we'll be doing this most.
         """
-        print("SIMULATION: deaffing last pattern ({})".format(
+        logging.info("SIMULATION: deaffing last pattern ({})".format(
             self.pattern_count))
         self.__deaff_random_pattern(self.pattern_count)
         self.__deaff_bg_random_E(self.pattern_count)
@@ -1216,12 +1218,12 @@ class Sinha2016:
 
     def __deaff_random_pattern(self, pattern_number):
         """Deaff the pattern neuron set by picking a random set of neurons."""
-        print("ANKUR>> Deaffing pattern {}".format(pattern_number))
+        logging.info("ANKUR>> Deaffing pattern {}".format(pattern_number))
         pattern_neurons = self.patterns[pattern_number - 1]
         deaffed_neurons = random.sample(
             pattern_neurons, int(math.ceil(len(pattern_neurons) *
                                            self.deaff_random_pattern_percent)))
-        print("ANKUR>> Number of deaff pattern neurons: "
+        logging.info("ANKUR>> Number of deaff pattern neurons: "
               "{}".format(len(deaffed_neurons)))
         if len(deaffed_neurons) > 0:
             conns = nest.GetConnections(source=self.poissonExtE,
@@ -1256,7 +1258,7 @@ class Sinha2016:
         deaffed_neurons = random.sample(
             bg_neurons, int(math.ceil(len(bg_neurons) *
                                       self.deaff_bg_random_percentE)))
-        print("ANKUR>> Number of deaff bg E neurons: "
+        logging.info("ANKUR>> Number of deaff bg E neurons: "
               "{}".format(len(deaffed_neurons)))
         if len(deaffed_neurons) > 0:
             conns = nest.GetConnections(source=self.poissonExtE,
@@ -1290,7 +1292,7 @@ class Sinha2016:
             self.neuronsI, int(math.ceil(len(self.neuronsI) *
                                          self.deaff_bg_random_percentI)))
 
-        print("ANKUR>> Number of deaff bg I neurons: "
+        logging.info("ANKUR>> Number of deaff bg I neurons: "
               "{}".format(len(deaffed_neurons)))
         if len(deaffed_neurons) > 0:
             conns = nest.GetConnections(source=self.poissonExtI,
@@ -1566,7 +1568,7 @@ if __name__ == "__main__":
 
     # Setup network to handle plasticities
     # update of the network
-    print("SIMULATION STARTED")
+    logging.info("SIMULATION STARTED")
     simulation.setup_plasticity(True, True)
 
     # Intial stabilisation #
@@ -1601,4 +1603,4 @@ if __name__ == "__main__":
 
     simulation.close_files()
     nest.Cleanup()
-    print("SIMULATION FINISHED SUCCESSFULLY")
+    logging.info("SIMULATION FINISHED SUCCESSFULLY")
