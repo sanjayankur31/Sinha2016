@@ -737,11 +737,14 @@ class Sinha2016:
         local_neurons = [stat['global_id'] for stat in
                          nest.GetStatus(self.neuronsE + self.neuronsI) if
                          stat['local']]
+        logging.debug("Got {} local neurons on rank {}".format(
+            len(local_neurons), self.rank))
 
         lneurons = nest.GetStatus(local_neurons, ['global_id',
                                                   'synaptic_elements'])
         # returns a list of sets - one set from each rank
         ranksets = self.comm.allgather(lneurons)
+        logging.debug("Got {} ranksets".format(len(ranksets)))
 
         for rankset in ranksets:
             for neuron in rankset:
@@ -823,6 +826,10 @@ class Sinha2016:
                             'rule': 'all_to_all'}
                     )
                     elms['Axon_ex'] += len(chosen_targets)
+                    if elms['Axon_ex'] != 0.0:
+                        logging.critical(
+                            "Rank {}: Axon_ex: logical error - should be zero!".format(
+                                self.rank))
                     for t in chosen_targets:
                         synelms[t]['Den_ex'] += 1
 
@@ -873,6 +880,10 @@ class Sinha2016:
                             )
 
                     elms['Axon_in'] += len(chosen_targets)
+                    if elms['Axon_in'] != 0.0:
+                        logging.critical(
+                            "Rank {}: Axon_in: logical error - should be zero!".format(
+                                self.rank))
 
             # excitatory dendrites as targets
             if 'Den_ex' in elms and elms['Den_ex'] < 0.0:
@@ -900,6 +911,10 @@ class Sinha2016:
                             'rule': 'all_to_all'}
                     )
                     elms['Den_ex'] += len(chosen_sources)
+                    if elms['Den_ex'] != 0.0:
+                        logging.critical(
+                            "Rank {}: Den_ex: logical error - should be zero!".format(
+                                self.rank))
                     for s in chosen_sources:
                         synelms[s]['Axon_ex'] += 1
 
@@ -931,6 +946,10 @@ class Sinha2016:
                                 'rule': 'all_to_all'}
                         )
                         elms['Den_in'] += len(chosen_sources)
+                        if elms['Den_in'] != 0.0:
+                            logging.critical(
+                                "Rank {}: Den_in: logical error - should be zero!".format(
+                                    self.rank))
                         for s in chosen_sources:
                             synelms[s]['Axon_in'] += 1
                 # it's an excitatory neuron
@@ -959,8 +978,13 @@ class Sinha2016:
                                 'rule': 'all_to_all'}
                         )
                         elms['Den_in'] += len(chosen_sources)
+                        if elms['Den_in'] != 0.0:
+                            logging.critical(
+                                "Rank {}: Den_in: logical error - should be zero!".format(
+                                    self.rank))
                         for s in chosen_sources:
                             synelms[s]['Axon_in'] += 1
+        logging.debug("RANDOM connections deleted")
 
     def __create_random_connections(self, synelms):
         """Connect random neurons to create new connections."""
@@ -999,6 +1023,10 @@ class Sinha2016:
                     for cho in chosen_targets:
                         synelms[cho]['Den_ex'] -= 1
                     elms['Axon_ex'] -= len(chosen_targets)
+                    if elms['Axon_ex'] != 0.0:
+                        logging.critical(
+                            "Rank {}: Axon_ex: logical error - should be zero!".format(
+                                self.rank))
 
             # here, you can connect either with E neurons or I neurons but both
             # will have different synapse types. So, a bit more work required
@@ -1047,6 +1075,11 @@ class Sinha2016:
                             synelms[target]['Den_in'] -= 1
 
                     elms['Axon_in'] -= len(chosen_targets)
+                    if elms['Axon_in'] != 0.0:
+                        logging.critical(
+                            "Rank {}: Axon_in: logical error - should be zero!".format(
+                                self.rank))
+        logging.debug("RANDOM connections created")
 
     def update_connectivity(self):
         """Our implementation of structural plasticity."""
@@ -1563,6 +1596,11 @@ class Sinha2016:
         self.rewiring_enabled = False
 
 if __name__ == "__main__":
+    # Set up logging configuration
+    logging.basicConfig(
+        format='%(funcName)s: %(lineno)d: %(levelname)s: %(message)s',
+        level=logging.DEBUG)
+
     step = False
     numpats = 1
     simulation = Sinha2016()
