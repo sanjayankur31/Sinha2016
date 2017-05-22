@@ -1619,12 +1619,10 @@ if __name__ == "__main__":
 
     # Intial stabilisation #
     simulation.prerun_setup(
-        stabilisation_time=2000.,
-        sp_update_interval=1000.,
-        recording_interval=200.)
+        stabilisation_time=1000.,
+        sp_update_interval=500.,
+        recording_interval=100.)
     simulation.enable_rewiring()
-    simulation.stabilise()
-    simulation.stabilise()
     simulation.stabilise()
 
     # Pattern related simulation
