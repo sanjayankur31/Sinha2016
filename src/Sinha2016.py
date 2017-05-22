@@ -668,7 +668,7 @@ class Sinha2016:
         # Nest stuff
         nest.ResetKernel()
         # http://www.nest-simulator.org/sli/setverbosity/
-        nest.set_verbosity('M_DEBUG')
+        nest.set_verbosity('M_INFO')
 
         nest.SetKernelStatus(
             {
@@ -798,6 +798,9 @@ class Sinha2016:
         # http://stackoverflow.com/a/2315529/375067
         for nrn in synelms.iteritems():
             # excitatory neurons as sources
+            # here, I'm not using the synapse dicts because I don't need to
+            # specify the weight of the connection too. Whatever the weight is,
+            # we want to break the synapse.
             gid = nrn[0]
             elms = nrn[1]
             if 'Axon_ex' in elms and elms['Axon_ex'] < 0.0:
@@ -817,21 +820,22 @@ class Sinha2016:
                     else:
                         chosen_targets = targets
 
-                    nest.Disconnect(
-                        pre=[gid], post=chosen_targets, syn_spec={
-                            'model': 'static_synapse_ex',
-                            'pre_synaptic_element': 'Axon_ex',
-                            'post_synaptic_element': 'Den_ex',
-                        }, conn_spec={
-                            'rule': 'all_to_all'}
-                    )
+                    for t in chosen_targets:
+                        nest.Disconnect(
+                            pre=[gid], post=[t], syn_spec={
+                                'model': 'static_synapse_ex',
+                                'pre_synaptic_element': 'Axon_ex',
+                                'post_synaptic_element': 'Den_ex',
+                            }, conn_spec={
+                                'rule': 'one_to_one'}
+                        )
+                        synelms[t]['Den_ex'] += 1
+
                     elms['Axon_ex'] += len(chosen_targets)
                     if elms['Axon_ex'] != 0.0:
                         logging.critical(
                             "Rank {}: Axon_ex: logical error - should be zero!".format(
                                 self.rank))
-                    for t in chosen_targets:
-                        synelms[t]['Den_ex'] += 1
 
             # inhibitory neurons as sources
             # here, there can be two types of targets, E neurons or I neurons,
@@ -902,21 +906,22 @@ class Sinha2016:
                     else:
                         chosen_sources = sources
 
-                    nest.Disconnect(
-                        pre=chosen_sources, post=[gid], syn_spec={
-                            'model': 'static_synapse_ex',
-                            'pre_synaptic_element': 'Axon_ex',
-                            'post_synaptic_element': 'Den_ex',
-                        }, conn_spec={
-                            'rule': 'all_to_all'}
-                    )
+                    for s in chosen_sources:
+                        nest.Disconnect(
+                            pre=[s], post=[gid], syn_spec={
+                                'model': 'static_synapse_ex',
+                                'pre_synaptic_element': 'Axon_ex',
+                                'post_synaptic_element': 'Den_ex',
+                            }, conn_spec={
+                                'rule': 'one_to_one'}
+                        )
+                        synelms[s]['Axon_ex'] += 1
+
                     elms['Den_ex'] += len(chosen_sources)
                     if elms['Den_ex'] != 0.0:
                         logging.critical(
                             "Rank {}: Den_ex: logical error - should be zero!".format(
                                 self.rank))
-                    for s in chosen_sources:
-                        synelms[s]['Axon_ex'] += 1
 
             # inhibitory dendrites as targets
             if 'Den_in' in elms and elms['Den_in'] < 0.0:
@@ -937,21 +942,22 @@ class Sinha2016:
                         else:
                             chosen_sources = sources
 
-                        nest.Disconnect(
-                            pre=chosen_sources, post=[gid], syn_spec={
-                                'model': 'static_synapse_in',
-                                'pre_synaptic_element': 'Axon_in',
-                                'post_synaptic_element': 'Den_in',
-                            }, conn_spec={
-                                'rule': 'all_to_all'}
-                        )
+                        for s in chosen_sources:
+                            nest.Disconnect(
+                                pre=[s], post=[gid], syn_spec={
+                                    'model': 'static_synapse_in',
+                                    'pre_synaptic_element': 'Axon_in',
+                                    'post_synaptic_element': 'Den_in',
+                                }, conn_spec={
+                                    'rule': 'one_to_one'}
+                            )
+                            synelms[s]['Axon_in'] += 1
+
                         elms['Den_in'] += len(chosen_sources)
                         if elms['Den_in'] != 0.0:
                             logging.critical(
                                 "Rank {}: Den_in: logical error - should be zero!".format(
                                     self.rank))
-                        for s in chosen_sources:
-                            synelms[s]['Axon_in'] += 1
                 # it's an excitatory neuron
                 else:
                     conns = nest.GetConnections(target=[gid],
@@ -969,21 +975,22 @@ class Sinha2016:
                         else:
                             chosen_sources = sources
 
-                        nest.Disconnect(
-                            pre=chosen_sources, post=[gid], syn_spec={
-                                'model': 'vogels_sprekeler_synapse',
-                                'pre_synaptic_element': 'Axon_in',
-                                'post_synaptic_element': 'Den_in',
-                            }, conn_spec={
-                                'rule': 'all_to_all'}
-                        )
+                        for s in chosen_sources:
+                            nest.Disconnect(
+                                pre=[s], post=[gid], syn_spec={
+                                    'model': 'vogels_sprekeler_synapse',
+                                    'pre_synaptic_element': 'Axon_in',
+                                    'post_synaptic_element': 'Den_in',
+                                }, conn_spec={
+                                    'rule': 'one_to_one'}
+                            )
+                            synelms[s]['Axon_in'] += 1
+
                         elms['Den_in'] += len(chosen_sources)
                         if elms['Den_in'] != 0.0:
                             logging.critical(
                                 "Rank {}: Den_in: logical error - should be zero!".format(
                                     self.rank))
-                        for s in chosen_sources:
-                            synelms[s]['Axon_in'] += 1
         logging.debug("RANDOM connections deleted")
 
     def __create_random_connections(self, synelms):
@@ -996,7 +1003,8 @@ class Sinha2016:
             # matter which synaptic elements you start with, whichever are less
             # will act as the limiting factor.
             if 'Axon_ex' in elms and elms['Axon_ex'] > 0.0:
-                targets = []
+                targetsE = []
+                targetsI = []
                 chosen_targets = []
 
                 for atarget in synelms.iteritems():
@@ -1005,23 +1013,29 @@ class Sinha2016:
                     if 'Den_ex' in telms and telms['Den_ex'] > 0.0:
                         # add the target multiple times, since it has multiple
                         # available contact points
-                        targets.extend([tid]*int(telms['Den_ex']))
+                        if 'Axon_ex' in telms:
+                            targetsE.extend([tid]*int(telms['Den_ex']))
+                        else:
+                            targetsI.extend([tid]*int(telms['Den_ex']))
 
-                if len(targets) > 0:
-                    if len(targets) > int(abs(elms['Axon_ex'])):
+                if (len(targetsE) + len(targetsI)) > 0:
+                    if (len(targetsE) + len(targetsI)) > int(abs(elms['Axon_ex'])):
                         chosen_targets = random.sample(
-                            targets, int(abs(elms['Axon_ex'])))
+                            (targetsE + targetsI), int(abs(elms['Axon_ex'])))
                     else:
-                        chosen_targets = targets
+                        chosen_targets = (targetsE + targetsI)
 
-                    nest.Connect([gid], chosen_targets,
-                                 conn_spec='all_to_all',
-                                 syn_spec={'model': 'static_synapse_ex',
-                                           'pre_synaptic_element': 'Axon_ex',
-                                           'post_synaptic_element': 'Den_ex'
-                                           })
                     for cho in chosen_targets:
                         synelms[cho]['Den_ex'] -= 1
+                        if cho in targetsE:
+                            nest.Connect([gid], [cho],
+                                        conn_spec='one_to_one',
+                                        syn_spec=self.synDictEE)
+                        else:
+                            nest.Connect([gid], [cho],
+                                        conn_spec='one_to_one',
+                                        syn_spec=self.synDictEI)
+
                     elms['Axon_ex'] -= len(chosen_targets)
                     if elms['Axon_ex'] != 0.0:
                         logging.critical(
@@ -1043,7 +1057,7 @@ class Sinha2016:
                     if 'Den_in' in telms and telms['Den_in'] > 0.0:
                         # add the target multiple times, since it has multiple
                         # available contact points
-                        if 'Axon_in' in telms:
+                        if 'Axon_ex' in telms:
                             targetsE.extend([tid]*int(telms['Den_in']))
                         else:
                             targetsI.extend([tid]*int(telms['Den_in']))
@@ -1057,22 +1071,15 @@ class Sinha2016:
                         chosen_targets = (targetsE + targetsI)
 
                     for target in chosen_targets:
+                        synelms[target]['Den_in'] -= 1
                         if target in targetsE:
                             nest.Connect([gid], [target],
                                         conn_spec='one_to_one',
-                                        syn_spec={'model': 'vogels_sprekeler_synapse',
-                                                'pre_synaptic_element': 'Axon_in',
-                                                'post_synaptic_element': 'Den_in'
-                                                })
-                            synelms[target]['Den_in'] -= 1
+                                        syn_spec=self.synDictIE)
                         else:
                             nest.Connect([gid], [target],
                                         conn_spec='one_to_one',
-                                        syn_spec={'model': 'static_synapse_in',
-                                                'pre_synaptic_element': 'Axon_in',
-                                                'post_synaptic_element': 'Den_in'
-                                                })
-                            synelms[target]['Den_in'] -= 1
+                                        syn_spec=self.synDictII)
 
                     elms['Axon_in'] -= len(chosen_targets)
                     if elms['Axon_in'] != 0.0:
