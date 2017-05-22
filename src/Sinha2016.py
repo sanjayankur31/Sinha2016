@@ -1055,6 +1055,7 @@ class Sinha2016:
             return
         syn_elms = self.__get_syn_elms()
         self.__delete_random_connections(syn_elms)
+        nest.Prepare()
         syn_elms = self.__get_syn_elms()
         self.__create_random_connections(syn_elms)
         nest.Prepare()
