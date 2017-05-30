@@ -695,7 +695,6 @@ class Sinha2016:
 
         self.__setup_files()
 
-        nest.Prepare()
 
         self.dump_data()
 
@@ -717,10 +716,10 @@ class Sinha2016:
         if self.step:
             sim_steps = numpy.arange(0, simtime)
             for i, step in enumerate(sim_steps):
-                nest.Run(1000)
+                nest.Simulate(1000)
                 self.__dump_synaptic_weights()
         else:
-            nest.Run(simtime*1000)
+            nest.Simulate(simtime*1000)
             self.dump_data()
             current_simtime = (
                 str(nest.GetKernelStatus()['time']) + "msec")
@@ -1165,7 +1164,6 @@ class Sinha2016:
             self.sdB.append(background_spike_detector)
 
         logging.debug("Number of patterns stored: {}".format(self.pattern_count))
-        nest.Prepare()
 
     def setup_pattern_for_recall(self, pattern_number):
         """
@@ -1222,7 +1220,6 @@ class Sinha2016:
         nest.Connect(recall_neurons, recall_spike_detector)
         # save the detector
         self.sdR.append(recall_spike_detector)
-        nest.Prepare()
 
     def recall_last_pattern(self, time):
         """
@@ -1249,7 +1246,6 @@ class Sinha2016:
         self.__deaff_random_pattern(self.pattern_count)
         self.__deaff_bg_random_E(self.pattern_count)
         self.__deaff_bg_random_I(self.pattern_count)
-        nest.Prepare()
 
     def deaff_random_pattern(self, pattern_number):
         """Deaff a pattern by picking a random set of neurons from it."""
