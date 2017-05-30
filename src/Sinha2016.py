@@ -784,11 +784,15 @@ class Sinha2016:
                     synaptic_elms[gid] = elms
 
         logging.debug("Got {} synaptic elements".format(len(synaptic_elms)))
+        with open("syn-elms-rank-{}.txt".format(nest.Rank()), 'w') as f:
+            print(synaptic_elms, file=f)
         return synaptic_elms
 
     def __delete_random_connections(self, synelms):
         """Delete connections randomly."""
         logging.debug("Deleting RANDOM connections")
+        total_synapses = 0
+        synapses_deleted = 0
         # the order in which these are removed should not matter - whether we
         # remove connections using axons first or dendrites first, the end
         # state of the network should be the same.
@@ -803,13 +807,21 @@ class Sinha2016:
             gid = nrn[0]
             elms = nrn[1]
             if 'Axon_ex' in elms and elms['Axon_ex'] < 0.0:
+                # GetConnections only returns connections who have targets on
+                # this particular rank. So I need to allgather to collect all
+                # targets.
                 conns = nest.GetConnections(source=[gid],
                                             synapse_model='static_synapse_ex')
                 targets = []
                 chosen_targets = []
 
-                for acon in conns:
-                    targets.append(acon[1])
+                ranksets = self.comm.allgather(conns)
+
+                for rankset in ranksets:
+                    for acon in rankset:
+                        targets.append(acon[1])
+
+                total_synapses += len(targets)
 
                 if len(targets) > 0:
                     # this is where the selection logic is
@@ -820,6 +832,7 @@ class Sinha2016:
                         chosen_targets = targets
 
                     for t in chosen_targets:
+                        synapses_deleted += 1
                         nest.Disconnect(
                             pre=[gid], post=[t], syn_spec={
                                 'model': 'static_synapse_ex',
@@ -840,18 +853,28 @@ class Sinha2016:
             # here, there can be two types of targets, E neurons or I neurons,
             # and they must each be treated separately
             elif 'Axon_in' in elms and elms['Axon_in'] < 0.0:
-                connsI = nest.GetConnections(source=[gid],
+                connsToI = nest.GetConnections(source=[gid],
                                             synapse_model='static_synapse_in')
-                connsE = nest.GetConnections(source=[gid],
+                ranksetsI = self.comm.allgather(connsToI)
+
+                connsToE = nest.GetConnections(source=[gid],
                                             synapse_model='vogels_sprekeler_synapse')
+                ranksetsE = self.comm.allgather(connsToE)
+
                 targetsI = []
                 targetsE = []
+
+
                 chosen_targets = []
 
-                for acon in connsI:
-                    targetsI.append(acon[1])
-                for acon in connsE:
-                    targetsE.append(acon[1])
+                for rankset in ranksetsE:
+                    for acon in rankset:
+                        targetsI.append(acon[1])
+                for rankset in ranksetsI:
+                    for acon in rankset:
+                        targetsE.append(acon[1])
+
+                total_synapses += (len(targetsE) + len(targetsI))
 
                 if (len(targetsE) + len(targetsI)) > 0:
                     # this is where the selection logic is
@@ -863,6 +886,7 @@ class Sinha2016:
 
                     for target in chosen_targets:
                         synelms[target]['Den_in'] += 1
+                        synapses_deleted += 1
                         if target in targetsE:
                             nest.Disconnect(
                                 pre=[gid], post=[target], syn_spec={
@@ -892,11 +916,15 @@ class Sinha2016:
             if 'Den_ex' in elms and elms['Den_ex'] < 0.0:
                 conns = nest.GetConnections(target=[gid],
                                             synapse_model='static_synapse_ex')
+                ranksets = self.comm.allgather(conns)
+
                 sources = []
                 chosen_sources = []
 
-                for acon in conns:
-                    sources.append(acon[0])
+                for rankset in ranksets:
+                    for acon in rankset:
+                        sources.append(acon[0])
+                total_synapses += len(sources)
 
                 if len(sources) > 0:
                     if len(sources) > int(abs(elms['Den_ex'])):
@@ -906,6 +934,7 @@ class Sinha2016:
                         chosen_sources = sources
 
                     for s in chosen_sources:
+                        synapses_deleted += 1
                         nest.Disconnect(
                             pre=[s], post=[gid], syn_spec={
                                 'model': 'static_synapse_ex',
@@ -928,11 +957,15 @@ class Sinha2016:
                 if 'Axon_in' in elms:
                     conns = nest.GetConnections(target=[gid],
                                                 synapse_model='static_synapse_in')
+                    ranksets = self.comm.allgather(conns)
+
                     sources = []
                     chosen_sources = []
 
-                    for acon in conns:
-                        sources.append(acon[0])
+                    for rankset in ranksets:
+                        for acon in rankset:
+                            sources.append(acon[0])
+                    total_synapses += len(sources)
 
                     if len(sources) > 0:
                         if len(sources) > int(abs(elms['Den_in'])):
@@ -942,6 +975,7 @@ class Sinha2016:
                             chosen_sources = sources
 
                         for s in chosen_sources:
+                            synapses_deleted += 1
                             nest.Disconnect(
                                 pre=[s], post=[gid], syn_spec={
                                     'model': 'static_synapse_in',
@@ -961,11 +995,15 @@ class Sinha2016:
                 else:
                     conns = nest.GetConnections(target=[gid],
                                                 synapse_model='vogels_sprekeler_synapse')
+                    ranksets = self.comm.allgather(conns)
+
                     sources = []
                     chosen_sources = []
 
-                    for acon in conns:
-                        sources.append(acon[0])
+                    for rankset in ranksets:
+                        for acon in conns:
+                            sources.append(acon[0])
+                    total_synapses += len(sources)
 
                     if len(sources) > 0:
                         if len(sources) > int(abs(elms['Den_in'])):
@@ -975,6 +1013,7 @@ class Sinha2016:
                             chosen_sources = sources
 
                         for s in chosen_sources:
+                            synapses_deleted += 1
                             nest.Disconnect(
                                 pre=[s], post=[gid], syn_spec={
                                     'model': 'vogels_sprekeler_synapse',
@@ -990,11 +1029,12 @@ class Sinha2016:
                             logging.critical(
                                 "Rank {}: Den_in: logical error - should be zero!".format(
                                     self.rank))
-        logging.debug("RANDOM connections deleted")
+        logging.debug("{} of {} RANDOM connections deleted".format(synapses_deleted, total_synapses))
 
     def __create_random_connections(self, synelms):
         """Connect random neurons to create new connections."""
         logging.debug("Creating RANDOM connections")
+        synapses_formed = 0
         for nrn in synelms.iteritems():
             gid = nrn[0]
             elms = nrn[1]
@@ -1026,6 +1066,7 @@ class Sinha2016:
 
                     for cho in chosen_targets:
                         synelms[cho]['Den_ex'] -= 1
+                        synapses_formed += 1
                         if cho in targetsE:
                             nest.Connect([gid], [cho],
                                         conn_spec='one_to_one',
@@ -1070,6 +1111,7 @@ class Sinha2016:
                         chosen_targets = (targetsE + targetsI)
 
                     for target in chosen_targets:
+                        synapses_formed += 1
                         synelms[target]['Den_in'] -= 1
                         if target in targetsE:
                             nest.Connect([gid], [target],
@@ -1085,7 +1127,7 @@ class Sinha2016:
                         logging.critical(
                             "Rank {}: Axon_in: logical error - should be zero!".format(
                                 self.rank))
-        logging.debug("RANDOM connections created")
+        logging.debug("{} new RANDOM connections created".format(synapses_formed))
 
     def update_connectivity(self):
         """Our implementation of structural plasticity."""
@@ -1095,9 +1137,12 @@ class Sinha2016:
         syn_elms = self.__get_syn_elms()
         self.__delete_random_connections(syn_elms)
         nest.Prepare()
+        self.comm.Barrier()
+
         syn_elms = self.__get_syn_elms()
         self.__create_random_connections(syn_elms)
         nest.Prepare()
+        self.comm.Barrier()
         logging.info("STRUCTURAL PLASTICITY: Connectivity updated")
 
     def store_spatial_pattern(self, track=False):
