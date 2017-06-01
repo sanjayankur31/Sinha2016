@@ -1675,7 +1675,7 @@ if __name__ == "__main__":
         level=logging.DEBUG)
 
     step = False
-    numpats = 0
+    numpats = 1
     simulation = Sinha2016()
 
     # Setup network to handle plasticities
@@ -1685,10 +1685,9 @@ if __name__ == "__main__":
 
     # Intial stabilisation #
     simulation.prerun_setup(
-        stabilisation_time=1000.,
-        sp_update_interval=200.,
-        recording_interval=100.)
-    simulation.enable_rewiring()
+        stabilisation_time=2000.,
+        sp_update_interval=1000.,
+        recording_interval=200.)
     simulation.stabilise()
 
     # Pattern related simulation
