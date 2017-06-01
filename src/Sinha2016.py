@@ -630,12 +630,14 @@ class Sinha2016:
             self.synapses_deleted_filename = ("04-synapses-deleted-" + str(self.rank) + ".txt")
             self.synapses_deleted_handle = open( self.synapses_deleted_filename, 'w')
             print("{}\t{}\t{}\t{}\t{}".format(
-                "time(ms)", "gid", "total conns", "conns deleted"))
+                "time(ms)", "gid", "total conns", "conns deleted"),
+                file=self.synapses_deleted_handle)
 
             self.synapses_formed_filename = ("04-synapses-formed-" + str(self.rank) + ".txt")
             self.synapses_formed_handle = open( self.synapses_formed_filename, 'w')
             print("{}\t{}\t{}\t{}".format(
-                "time(ms)", "gid", "available conns", "conns gained"))
+                "time(ms)", "gid", "available conns", "conns gained"),
+                file=self.synapses_formed_handle)
 
     def setup_plasticity(self, structural_p=True, synaptic_p=True):
         """Control plasticities."""
@@ -803,7 +805,8 @@ class Sinha2016:
         """Delete connections randomly."""
         logging.debug("Deleting RANDOM connections")
         total_synapses = 0
-        synapses_deleted = 0
+        deleted_synapses = 0
+        current_simtime = (str(nest.GetKernelStatus()['time']))
         # the order in which these are removed should not matter - whether we
         # remove connections using axons first or dendrites first, the end
         # state of the network should be the same.
@@ -818,6 +821,8 @@ class Sinha2016:
             gid = nrn[0]
             elms = nrn[1]
             partner = 0  # for exception
+            total_synapses_this_gid = 0
+            deleted_synapses_this_gid = 0
             try:
                 if 'Axon_ex' in elms and elms['Axon_ex'] < 0.0:
                     # GetConnections only returns connections who have targets on
@@ -833,7 +838,7 @@ class Sinha2016:
 
                     alltargets = self.comm.allgather(localtargets)
                     targets = [t for sublist in alltargets for t in sublist]
-                    total_synapses += len(targets)
+                    total_synapses_this_gid = len(targets)
                     logging.debug("Total targets for neuron {} is {}".format(gid, len(targets)))
 
                     if len(targets) > 0:
@@ -845,7 +850,7 @@ class Sinha2016:
                             chosen_targets = targets
 
                         for t in chosen_targets:
-                            synapses_deleted += 1
+                            deleted_synapses_this_gid += 1
                             partner = t
                             nest.Disconnect(
                                 pre=[gid], post=[t], syn_spec={
@@ -886,8 +891,7 @@ class Sinha2016:
                     targetsI = [t for sublist in alltargetsI for t in sublist]
                     targetsE = [t for sublist in alltargetsE for t in sublist]
 
-                    total_synapses += (len(targetsE) + len(targetsI))
-                    logging.debug("Total targets for neuron {} is {}".format(gid, len(targetsE) + len(targetsI)))
+                    total_synapses_this_gid = (len(targetsE) + len(targetsI))
 
                     if (len(targetsE) + len(targetsI)) > 0:
                         # this is where the selection logic is
@@ -899,7 +903,7 @@ class Sinha2016:
 
                         for t in chosen_targets:
                             synelms[t]['Den_in'] += 1
-                            synapses_deleted += 1
+                            deleted_synapses_this_gid += 1
                             partner = t
                             if t in targetsE:
                                 nest.Disconnect(
@@ -937,7 +941,7 @@ class Sinha2016:
 
                     allsources = self.comm.allgather(localsources)
                     sources = [s for sublist in allsources for s in sublist]
-                    total_synapses += len(sources)
+                    total_synapses_this_gid = len(sources)
                     logging.debug("Total sources for neuron {} is {}".format(gid, len(sources)))
 
                     if len(sources) > 0:
@@ -948,7 +952,7 @@ class Sinha2016:
                             chosen_sources = sources
 
                         for s in chosen_sources:
-                            synapses_deleted += 1
+                            deleted_synapses_this_gid += 1
                             partner = s
                             nest.Disconnect(
                                 pre=[s], post=[gid], syn_spec={
@@ -978,7 +982,7 @@ class Sinha2016:
                             localsources.append(acon[0])
                         allsources = self.comm.allgather(localsources)
                         sources = [s for sublist in allsources for s in sublist]
-                        total_synapses += len(sources)
+                        total_synapses_this_gid = len(sources)
                         logging.debug("Total sources for neuron {} is {}".format(gid, len(sources)))
 
                         if len(sources) > 0:
@@ -989,7 +993,7 @@ class Sinha2016:
                                 chosen_sources = sources
 
                             for s in chosen_sources:
-                                synapses_deleted += 1
+                                deleted_synapses_this_gid += 1
                                 partner = s
                                 nest.Disconnect(
                                     pre=[s], post=[gid], syn_spec={
@@ -1016,7 +1020,7 @@ class Sinha2016:
                             localsources.append(acon[0])
                         allsources = self.comm.allgather(localsources)
                         sources = [s for sublist in allsources for s in sublist]
-                        total_synapses += len(sources)
+                        total_synapses_this_gid = len(sources)
                         logging.debug("Total sources for neuron {} is {}".format(gid, len(sources)))
 
                         if len(sources) > 0:
@@ -1027,7 +1031,7 @@ class Sinha2016:
                                 chosen_sources = sources
 
                             for s in chosen_sources:
-                                synapses_deleted += 1
+                                deleted_synapses_this_gid += 1
                                 partner = s
                                 nest.Disconnect(
                                     pre=[s], post=[gid], syn_spec={
@@ -1044,6 +1048,13 @@ class Sinha2016:
                                 logging.critical(
                                     "Rank {}: Den_in: logical error - should be zero!".format(
                                         self.rank))
+
+                print("{}\t{}\t{}\t{}\t{}".format(
+                    current_simtime, gid, total_synapses_this_gid,
+                    deleted_synapses_this_gid),
+                    file=self.synapses_deleted_handle)
+                total_synapses += total_synapses_this_gid
+                deleted_synapses += deleted_synapses_this_gid
             except KeyError, e:
                 logging.critical("KeyError exception while disconnecting!")
                 logging.critical("GID: {} : {}".format(gid, synelms[gid]))
@@ -1054,7 +1065,7 @@ class Sinha2016:
                 logging.critical("Some other exception")
                 raise
 
-        logging.debug("{} of {} RANDOM connections deleted".format(synapses_deleted, total_synapses))
+        logging.debug("{} of {} RANDOM connections deleted".format(deleted_synapses, total_synapses))
 
     def __create_random_connections(self, synelms):
         """Connect random neurons to create new connections."""
