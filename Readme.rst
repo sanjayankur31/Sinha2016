@@ -139,3 +139,40 @@ Used to generate:
 
 - Plots showing a snapshot of the network
 - Will also come in handy later when we want to look at synaptic elements of particular neurons and particular regions
+
+
+Per neuron synapse loss files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: text
+
+    time(ms) gid total_conns conns_deleted
+
+- Name format: :code:`04-synapses-deleted-{rank}.txt`
+- Collected after synapses are deleted per structural plasticity update
+- One file per MPI rank, although all files should be identical
+
+Used to generate:
+
+- Plots showing synapse loss for individual neurons
+- Plots showing mean synapse loss for network
+
+Per neuron synapse gain files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: text
+
+    time(ms) gid conns_gained
+
+- Name format: :code:`04-synapses-formed-{rank}.txt`
+- Collected after new synapses are formed per structural plasticity update
+- One file per MPI rank, although all files should be identical
+
+Used to generate:
+
+- Plots showing synapse gain for individual neurons
+- Plots showing mean synapse gain for network
+
+The data from the two together will give:
+
+- Plots showing synaptic turnover as the network evolves
