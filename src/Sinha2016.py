@@ -625,6 +625,16 @@ class Sinha2016:
                 ),
                 file=self.syn_elms_file_handle_I)
 
+            self.synapses_deleted_filename = ("04-synapses-deleted-" + str(self.rank) + ".txt")
+            self.synapses_deleted_handle = open( self.synapses_deleted_filename, 'w')
+            print("{}\t{}\t{}\t{}\t{}".format(
+                "time(ms)", "gid", "total conns", "conns deleted"))
+
+            self.synapses_formed_filename = ("04-synapses-formed-" + str(self.rank) + ".txt")
+            self.synapses_formed_handle = open( self.synapses_formed_filename, 'w')
+            print("{}\t{}\t{}\t{}".format(
+                "time(ms)", "gid", "available conns", "conns gained"))
+
     def setup_plasticity(self, structural_p=True, synaptic_p=True):
         """Control plasticities."""
         self.setup_str_p = structural_p
@@ -785,8 +795,6 @@ class Sinha2016:
                     synaptic_elms[gid] = elms
 
         logging.debug("Got synaptic elements for {} neurons.".format(len(synaptic_elms)))
-        with open("syn-elms-rank-{}.txt".format(nest.Rank()), 'w') as f:
-            print(synaptic_elms, file=f)
         return synaptic_elms
 
     def __delete_random_connections(self, synelms):
@@ -1649,6 +1657,8 @@ class Sinha2016:
         if self.setup_str_p:
             self.syn_elms_file_handle_E.close()
             self.syn_elms_file_handle_I.close()
+            self.synapses_formed_handle.close()
+            self.synapses_deleted_handle.close()
 
     def enable_rewiring(self):
         """Enable the rewiring."""
