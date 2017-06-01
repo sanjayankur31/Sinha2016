@@ -55,6 +55,8 @@ class Sinha2016:
         self.setup_str_p = True
         self.setup_syn_p = True
         self.rewiring_enabled = False
+        self.synapse_deletion_strategy = "random"  # or "distance" or "weight"
+        self.synapse_formation_strategy = "random"  # or "distance"
 
         # populations
         self.populations = {'E': 8000, 'I': 2000, 'STIM': 1000, 'Poisson': 1}
@@ -1154,16 +1156,34 @@ class Sinha2016:
 
     def update_connectivity(self):
         """Our implementation of structural plasticity."""
-        logging.info("STRUCTURAL PLASTICITY: Updating connectivity")
         if not self.rewiring_enabled:
             return
+        logging.info("STRUCTURAL PLASTICITY: Updating connectivity")
         syn_elms = self.__get_syn_elms()
-        self.__delete_random_connections(syn_elms)
+        if self.synapse_deletion_strategy ==  "random":
+            self.__delete_random_connections(syn_elms)
+        elif self.synapse_deletion_strategy == "distance":
+            # TODO - to be implemented
+            logging.critcal("DISTANCE dependent deletion has not been implemented yet!")
+        elif self.synapse_deletion_strategy == "weight":
+            # TODO - to be implemented
+            logging.critcal("WEIGHT dependent deletion has not been implemented yet!")
+        else:
+            logging.critical("INVALIID DELETION STRATEGY!")
+            exit(-1)
         nest.Prepare()
         self.comm.Barrier()
 
         syn_elms = self.__get_syn_elms()
-        self.__create_random_connections(syn_elms)
+        if self.synapse_formation_strategy == "random":
+            self.__create_random_connections(syn_elms)
+        elif self.synapse_formation_strategy == "distance":
+            # TODO - to be implemented
+            logging.critcal("DISTANCE dependent formation has not been implemented yet!")
+        else:
+            logging.critical("INVALIID FORMATION STRATEGY!")
+            exit(-1)
+
         nest.Prepare()
         self.comm.Barrier()
         logging.info("STRUCTURAL PLASTICITY: Connectivity updated")
