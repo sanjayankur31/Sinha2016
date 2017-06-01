@@ -629,7 +629,7 @@ class Sinha2016:
 
             self.synapses_deleted_filename = ("04-synapses-deleted-" + str(self.rank) + ".txt")
             self.synapses_deleted_handle = open( self.synapses_deleted_filename, 'w')
-            print("{}\t{}\t{}\t{}\t{}".format(
+            print("{}\t{}\t{}\t{}".format(
                 "time(ms)", "gid", "total conns", "conns deleted"),
                 file=self.synapses_deleted_handle)
 
