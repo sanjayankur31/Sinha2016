@@ -635,8 +635,8 @@ class Sinha2016:
 
             self.synapses_formed_filename = ("04-synapses-formed-" + str(self.rank) + ".txt")
             self.synapses_formed_handle = open( self.synapses_formed_filename, 'w')
-            print("{}\t{}\t{}\t{}".format(
-                "time(ms)", "gid", "available conns", "conns gained"),
+            print("{}\t{}\t{}".format(
+                "time(ms)", "gid", "conns gained"),
                 file=self.synapses_formed_handle)
 
     def setup_plasticity(self, structural_p=True, synaptic_p=True):
@@ -1071,7 +1071,9 @@ class Sinha2016:
         """Connect random neurons to create new connections."""
         logging.debug("Creating RANDOM connections")
         synapses_formed = 0
+        current_simtime = (str(nest.GetKernelStatus()['time']))
         for nrn in synelms.iteritems():
+            synapses_formed_this_gid = 0
             gid = nrn[0]
             elms = nrn[1]
             # excitatory connections - only need to look at Axons, it doesn't
@@ -1102,7 +1104,7 @@ class Sinha2016:
 
                     for cho in chosen_targets:
                         synelms[cho]['Den_ex'] -= 1
-                        synapses_formed += 1
+                        synapses_formed_this_gid += 1
                         if cho in targetsE:
                             nest.Connect([gid], [cho],
                                         conn_spec='one_to_one',
@@ -1147,7 +1149,7 @@ class Sinha2016:
                         chosen_targets = (targetsE + targetsI)
 
                     for target in chosen_targets:
-                        synapses_formed += 1
+                        synapses_formed_this_gid += 1
                         synelms[target]['Den_in'] -= 1
                         if target in targetsE:
                             nest.Connect([gid], [target],
@@ -1163,6 +1165,10 @@ class Sinha2016:
                         logging.critical(
                             "Rank {}: Axon_in: logical error - should be zero!".format(
                                 self.rank))
+            synapses_formed += synapses_formed_this_gid
+            print("{}\t{}\t{}".format(
+                current_simtime, gid, synapses_formed_this_gid),
+                file=self.synapses_formed_handle)
         logging.debug("{} new RANDOM connections created".format(synapses_formed))
 
     def update_connectivity(self):
