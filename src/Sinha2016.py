@@ -1189,6 +1189,7 @@ class Sinha2016:
             logging.critical("INVALIID DELETION STRATEGY!")
             exit(-1)
         nest.Prepare()
+        # Must wait for all ranks to finish before proceeding
         self.comm.Barrier()
 
         syn_elms = self.__get_syn_elms()
@@ -1202,6 +1203,7 @@ class Sinha2016:
             exit(-1)
 
         nest.Prepare()
+        # Must wait for all ranks to finish before proceeding
         self.comm.Barrier()
         logging.info("STRUCTURAL PLASTICITY: Connectivity updated")
 
