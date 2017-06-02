@@ -800,12 +800,12 @@ class Sinha2016:
         logging.debug("Got synaptic elements for {} neurons.".format(len(synaptic_elms)))
         return synaptic_elms
 
-    def __chose_deletion_partners_weight(anchor, options, num_required):
+    def __choose_deletion_partners_weight(anchor, options, num_required):
         """Choose partners to delete based on weight of connections."""
         logging.critical("UNIMPLEMENTED. EXITING!")
         sys.exit(-1)
 
-    def __chose_deletion_partners_distance(anchor, options, num_required):
+    def __choose_deletion_partners_distance(anchor, options, num_required):
         """Choose partners to delete based on distance between source and options."""
         logging.critical("UNIMPLEMENTED. EXITING!")
         sys.exit(-1)
@@ -858,10 +858,10 @@ class Sinha2016:
                                 chosen_targets = random.sample(
                                     targets, int(abs(elms['Axon_ex'])))
                             elif self.synapse_deletion_strategy == "distance":
-                                chosen_targets = self.__chose_deletion_partners_distance(
+                                chosen_targets = self.__choose_deletion_partners_distance(
                                     gid, targets, int(abs(elms['Axon_ex'])))
                             elif self.synapse_deletion_strategy == "weight":
-                                chosen_targets = self.__chose_deletion_partners_weight(
+                                chosen_targets = self.__choose_deletion_partners_weight(
                                     gid, targets, int(abs(elms['Axon_ex'])))
                         else:
                             chosen_targets = targets
@@ -918,10 +918,10 @@ class Sinha2016:
                                 chosen_targets = random.sample(
                                     (targetsE + targetsI), int(abs(elms['Axon_in'])))
                             elif self.synapse_deletion_strategy == "distance":
-                                chosen_targets = self.__chose_deletion_partners_distance(
+                                chosen_targets = self.__choose_deletion_partners_distance(
                                     gid, (targetsE + targetsI), int(abs(elms['Axon_in'])))
                             elif self.synapse_deletion_strategy == "weight":
-                                chosen_targets = self.__chose_deletion_partners_weight(
+                                chosen_targets = self.__choose_deletion_partners_weight(
                                     gid, (targetsE + targetsI), int(abs(elms['Axon_in'])))
                         else:
                             chosen_targets = (targetsE + targetsI)
@@ -975,10 +975,10 @@ class Sinha2016:
                                 chosen_sources = random.sample(
                                     sources, int(abs(elms['Den_ex'])))
                             elif self.synapse_deletion_strategy == "distance":
-                                chosen_sources = self.__chose_deletion_partners_distance(
+                                chosen_sources = self.__choose_deletion_partners_distance(
                                     gid, sources, int(abs(elms['Den_ex'])))
                             elif self.synapse_deletion_strategy == "weight":
-                                chosen_sources = self.__chose_deletion_partners_weight(
+                                chosen_sources = self.__choose_deletion_partners_weight(
                                     gid, sources, int(abs(elms['Den_ex'])))
                         else:
                             chosen_sources = sources
@@ -1023,10 +1023,10 @@ class Sinha2016:
                                     chosen_sources = random.sample(
                                         sources, int(abs(elms['Den_in'])))
                                 elif self.synapse_deletion_strategy == "distance":
-                                    chosen_sources = self.__chose_deletion_partners_distance(
+                                    chosen_sources = self.__choose_deletion_partners_distance(
                                         gid, sources, int(abs(elms['Den_in'])))
                                 elif self.synapse_deletion_strategy == "weight":
-                                    chosen_sources = self.__chose_deletion_partners_weight(
+                                    chosen_sources = self.__choose_deletion_partners_weight(
                                         gid, sources, int(abs(elms['Den_in'])))
                             else:
                                 chosen_sources = sources
@@ -1068,10 +1068,10 @@ class Sinha2016:
                                     chosen_sources = random.sample(
                                         sources, int(abs(elms['Den_in'])))
                                 elif self.synapse_deletion_strategy == "distance":
-                                    chosen_sources = self.__chose_deletion_partners_distance(
+                                    chosen_sources = self.__choose_deletion_partners_distance(
                                         gid, sources, int(abs(elms['Den_in'])))
                                 elif self.synapse_deletion_strategy == "weight":
-                                    chosen_sources = self.__chose_deletion_partners_weight(
+                                    chosen_sources = self.__choose_deletion_partners_weight(
                                         gid, sources, int(abs(elms['Den_in'])))
                             else:
                                 chosen_sources = sources
