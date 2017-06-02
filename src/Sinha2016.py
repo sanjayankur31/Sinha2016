@@ -1702,6 +1702,14 @@ class Sinha2016:
     def enable_rewiring(self):
         """Enable the rewiring."""
         self.rewiring_enabled = True
+        if self.synapse_deletion_strategy not in ["random", "distance", "weight"]:
+            logging.critical("INVALID SYNAPSE DELETION STRATEGY: {}".format(self.synapse_deletion_strategy))
+            logging.critical("EXITING SIMULATION.")
+            sys.exit(-1)
+        if self.synapse_formation_strategy not in ["random", "distance"]:
+            logging.critical("INVALID SYNAPSE FORMATION STRATEGY: {}".format(self.synapse_formation_strategy))
+            logging.critical("EXITING SIMULATION.")
+            sys.exit(-1)
 
     def disable_rewiring(self):
         """Disable the rewiring."""
