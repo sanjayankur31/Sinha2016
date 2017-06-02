@@ -4,7 +4,7 @@ NEST simulation code for my PhD research.
 
 File: Sinha2016.py
 
-Copyright 2015 Ankur Sinha
+Copyright 2017 Ankur Sinha
 Author: Ankur Sinha <sanjay DOT ankur AT gmail DOT com>
 
 This program is free software: you can redistribute it and/or modify
