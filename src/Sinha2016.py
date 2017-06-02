@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 NEST simulation code for my PhD research.
 
@@ -21,7 +21,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from __future__ import print_function
 import sys
 sys.argv.append('--quiet')
 import nest
@@ -1055,7 +1054,7 @@ class Sinha2016:
                     file=self.synapses_deleted_handle)
                 total_synapses += total_synapses_this_gid
                 deleted_synapses += deleted_synapses_this_gid
-            except KeyError, e:
+            except KeyError as e:
                 logging.critical("KeyError exception while disconnecting!")
                 logging.critical("GID: {} : {}".format(gid, synelms[gid]))
                 logging.critical("Partner id: {} : {}".format(partner, synelms[partner]))
