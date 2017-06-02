@@ -913,8 +913,16 @@ class Sinha2016:
                     if (len(targetsE) + len(targetsI)) > 0:
                         # this is where the selection logic is
                         if (len(targetsE) + len(targetsI)) > int(abs(elms['Axon_in'])):
-                            chosen_targets = random.sample(
-                                (targetsE + targetsI), int(abs(elms['Axon_in'])))
+                            if self.synapse_deletion_strategy == "random":
+                                # Doesn't merit a new method
+                                chosen_targets = random.sample(
+                                    (targetsE + targetsI), int(abs(elms['Axon_in'])))
+                            elif self.synapse_deletion_strategy == "distance":
+                                chosen_targets = self.__chose_deletion_partners_distance(
+                                    gid, (targetsE + targetsI), int(abs(elms['Axon_in'])))
+                            elif self.synapse_deletion_strategy == "weight":
+                                chosen_targets = self.__chose_deletion_partners_weight(
+                                    gid, (targetsE + targetsI), int(abs(elms['Axon_in'])))
                         else:
                             chosen_targets = (targetsE + targetsI)
 
