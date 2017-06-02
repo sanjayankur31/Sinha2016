@@ -800,9 +800,19 @@ class Sinha2016:
         logging.debug("Got synaptic elements for {} neurons.".format(len(synaptic_elms)))
         return synaptic_elms
 
-    def __delete_random_connections(self, synelms):
+    def __chose_deletion_partners_weight(anchor, options, num_required):
+        """Choose partners to delete based on weight of connections."""
+        logging.critical("UNIMPLEMENTED. EXITING!")
+        sys.exit(-1)
+
+    def __chose_deletion_partners_distance(anchor, options, num_required):
+        """Choose partners to delete based on distance between source and options."""
+        logging.critical("UNIMPLEMENTED. EXITING!")
+        sys.exit(-1)
+
+    def __delete_connections(self, synelms):
         """Delete connections randomly."""
-        logging.debug("Deleting RANDOM connections")
+        logging.debug("Deleting connections using the '{}' deletion strategy".format(self.synapse_deletion_strategy))
         total_synapses = 0
         deleted_synapses = 0
         current_simtime = (str(nest.GetKernelStatus()['time']))
@@ -843,8 +853,16 @@ class Sinha2016:
                     if len(targets) > 0:
                         # this is where the selection logic is
                         if len(targets) > int(abs(elms['Axon_ex'])):
-                            chosen_targets = random.sample(
-                                targets, int(abs(elms['Axon_ex'])))
+                            if self.synapse_deletion_strategy == "random":
+                                # Doesn't merit a new method
+                                chosen_targets = random.sample(
+                                    targets, int(abs(elms['Axon_ex'])))
+                            elif self.synapse_deletion_strategy == "distance":
+                                chosen_targets = self.__chose_deletion_partners_distance(
+                                    gid, targets, int(abs(elms['Axon_ex'])))
+                            elif self.synapse_deletion_strategy == "weight":
+                                chosen_targets = self.__chose_deletion_partners_weight(
+                                    gid, targets, int(abs(elms['Axon_ex'])))
                         else:
                             chosen_targets = targets
 
@@ -945,8 +963,15 @@ class Sinha2016:
 
                     if len(sources) > 0:
                         if len(sources) > int(abs(elms['Den_ex'])):
-                            chosen_sources = random.sample(
-                                sources, int(abs(elms['Den_ex'])))
+                            if self.synapse_deletion_strategy == "random":
+                                chosen_sources = random.sample(
+                                    sources, int(abs(elms['Den_ex'])))
+                            elif self.synapse_deletion_strategy == "distance":
+                                chosen_sources = self.__chose_deletion_partners_distance(
+                                    gid, sources, int(abs(elms['Den_ex'])))
+                            elif self.synapse_deletion_strategy == "weight":
+                                chosen_sources = self.__chose_deletion_partners_weight(
+                                    gid, sources, int(abs(elms['Den_ex'])))
                         else:
                             chosen_sources = sources
 
@@ -986,8 +1011,15 @@ class Sinha2016:
 
                         if len(sources) > 0:
                             if len(sources) > int(abs(elms['Den_in'])):
-                                chosen_sources = random.sample(
-                                    sources, int(abs(elms['Den_in'])))
+                                if self.synapse_deletion_strategy == "random":
+                                    chosen_sources = random.sample(
+                                        sources, int(abs(elms['Den_in'])))
+                                elif self.synapse_deletion_strategy == "distance":
+                                    chosen_sources = self.__chose_deletion_partners_distance(
+                                        gid, sources, int(abs(elms['Den_in'])))
+                                elif self.synapse_deletion_strategy == "weight":
+                                    chosen_sources = self.__chose_deletion_partners_weight(
+                                        gid, sources, int(abs(elms['Den_in'])))
                             else:
                                 chosen_sources = sources
 
@@ -1024,8 +1056,15 @@ class Sinha2016:
 
                         if len(sources) > 0:
                             if len(sources) > int(abs(elms['Den_in'])):
-                                chosen_sources = random.sample(
-                                    sources, int(abs(elms['Den_in'])))
+                                if self.synapse_deletion_strategy == "random":
+                                    chosen_sources = random.sample(
+                                        sources, int(abs(elms['Den_in'])))
+                                elif self.synapse_deletion_strategy == "distance":
+                                    chosen_sources = self.__chose_deletion_partners_distance(
+                                        gid, sources, int(abs(elms['Den_in'])))
+                                elif self.synapse_deletion_strategy == "weight":
+                                    chosen_sources = self.__chose_deletion_partners_weight(
+                                        gid, sources, int(abs(elms['Den_in'])))
                             else:
                                 chosen_sources = sources
 
@@ -1064,9 +1103,10 @@ class Sinha2016:
                 logging.critical("Some other exception")
                 raise
 
-        logging.debug("{} of {} RANDOM connections deleted".format(deleted_synapses, total_synapses))
 
-    def __create_random_connections(self, synelms):
+        logging.debug("{} of {} connections deleted".format(deleted_synapses, total_synapses))
+
+    def __create_connections(self, synelms):
         """Connect random neurons to create new connections."""
         logging.debug("Creating RANDOM connections")
         synapses_formed = 0
@@ -1176,31 +1216,13 @@ class Sinha2016:
             return
         logging.info("STRUCTURAL PLASTICITY: Updating connectivity")
         syn_elms = self.__get_syn_elms()
-        if self.synapse_deletion_strategy ==  "random":
-            self.__delete_random_connections(syn_elms)
-        elif self.synapse_deletion_strategy == "distance":
-            # TODO - to be implemented
-            logging.critcal("DISTANCE dependent deletion has not been implemented yet!")
-        elif self.synapse_deletion_strategy == "weight":
-            # TODO - to be implemented
-            logging.critcal("WEIGHT dependent deletion has not been implemented yet!")
-        else:
-            logging.critical("INVALIID DELETION STRATEGY!")
-            exit(-1)
+        self.__delete_connections(syn_elms)
         nest.Prepare()
         # Must wait for all ranks to finish before proceeding
         self.comm.Barrier()
 
         syn_elms = self.__get_syn_elms()
-        if self.synapse_formation_strategy == "random":
-            self.__create_random_connections(syn_elms)
-        elif self.synapse_formation_strategy == "distance":
-            # TODO - to be implemented
-            logging.critcal("DISTANCE dependent formation has not been implemented yet!")
-        else:
-            logging.critical("INVALIID FORMATION STRATEGY!")
-            exit(-1)
-
+        self.__create_connections(syn_elms)
         nest.Prepare()
         # Must wait for all ranks to finish before proceeding
         self.comm.Barrier()
