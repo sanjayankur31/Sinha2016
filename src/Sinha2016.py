@@ -1114,6 +1114,11 @@ class Sinha2016:
 
         logging.debug("{} of {} connections deleted".format(deleted_synapses, total_synapses))
 
+
+    def __choose_formation_partners_distance(self, source, options, num_required):
+        """Choose partners based on distance."""
+        logging.critical("UNIMPLEMENTED. EXITING!")
+
     def __create_connections(self, synelms):
         """Connect random neurons to create new connections."""
         logging.debug("Creating RANDOM connections")
@@ -1144,8 +1149,12 @@ class Sinha2016:
 
                 if (len(targetsE) + len(targetsI)) > 0:
                     if (len(targetsE) + len(targetsI)) > int(abs(elms['Axon_ex'])):
-                        chosen_targets = random.sample(
-                            (targetsE + targetsI), int(abs(elms['Axon_ex'])))
+                        if self.synapse_formation_strategy ==  "random":
+                            chosen_targets = random.sample(
+                                (targetsE + targetsI), int(abs(elms['Axon_ex'])))
+                        elif self.synapse_formation_strategy == "distance":
+                            chosen_targets = self.__choose_formation_partners_distance(
+                                gid, (targetsE + targetsI), int(abs(elms['Axon_ex'])))
                     else:
                         chosen_targets = (targetsE + targetsI)
 
@@ -1190,8 +1199,12 @@ class Sinha2016:
 
                 if (len(targetsE) + len(targetsI)) > 0:
                     if (len(targetsE) + len(targetsI)) > int(abs(elms['Axon_in'])):
-                        chosen_targets = random.sample(
-                            (targetsE + targetsI), int(abs(elms['Axon_in'])))
+                        if self.synapse_formation_strategy ==  "random":
+                            chosen_targets = random.sample(
+                                (targetsE + targetsI), int(abs(elms['Axon_in'])))
+                        elif self.synapse_formation_strategy == "distance":
+                            chosen_targets = self.__choose_formation_partners_distance(
+                                gid, (targetsE + targetsI), int(abs(elms['Axon_in'])))
                     else:
                         chosen_targets = (targetsE + targetsI)
 
