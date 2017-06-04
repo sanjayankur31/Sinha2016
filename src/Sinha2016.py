@@ -1074,12 +1074,8 @@ class Sinha2016:
                                 synelms[s]['Axon_in'] += 1
 
                             elms['Den_in'] += len(chosen_sources)
-                            if elms['Den_in'] != 0.0:
-                                logging.critical(
-                                    "Rank {}: Den_in: logical error - should be zero!".format(
-                                        self.rank))
 
-                print("{}\t{}\t{}\t{}\t{}".format(
+                print("{}\t{}\t{}\t{}".format(
                     current_simtime, gid, total_synapses_this_gid,
                     deleted_synapses_this_gid),
                     file=self.synapses_deleted_handle)
