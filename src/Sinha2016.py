@@ -822,7 +822,7 @@ class Sinha2016:
         # Note that we are modifying a dictionary while iterating over it. This
         # is OK here since we're not modifying the keys, only the values.
         # http://stackoverflow.com/a/2315529/375067
-        for nrn in synelms.iteritems():
+        for nrn in synelms.items():
             # excitatory neurons as sources
             # here, I'm not using the synapse dicts because I don't need to
             # specify the weight of the connection too. Whatever the weight is,
@@ -1104,7 +1104,7 @@ class Sinha2016:
         logging.debug("Creating RANDOM connections")
         synapses_formed = 0
         current_simtime = (str(nest.GetKernelStatus()['time']))
-        for nrn in synelms.iteritems():
+        for nrn in synelms.items():
             synapses_formed_this_gid = 0
             gid = nrn[0]
             elms = nrn[1]
@@ -1116,7 +1116,7 @@ class Sinha2016:
                 targetsI = []
                 chosen_targets = []
 
-                for atarget in synelms.iteritems():
+                for atarget in synelms.items():
                     tid = atarget[0]
                     telms = atarget[1]
                     if 'Den_ex' in telms and telms['Den_ex'] > 0.0:
@@ -1165,7 +1165,7 @@ class Sinha2016:
                 targetsI = []
                 chosen_targets = []
 
-                for atarget in synelms.iteritems():
+                for atarget in synelms.items():
                     tid = atarget[0]
                     telms = atarget[1]
                     if 'Den_in' in telms and telms['Den_in'] > 0.0:
