@@ -880,10 +880,6 @@ class Sinha2016:
                             synelms[t]['Den_ex'] += 1
 
                         elms['Axon_ex'] += len(chosen_targets)
-                        if elms['Axon_ex'] != 0.0:
-                            logging.critical(
-                                "Rank {}: Axon_ex: logical error - should be zero!".format(
-                                    self.rank))
 
                 # inhibitory neurons as sources
                 # here, there can be two types of targets, E neurons or I neurons,
@@ -950,10 +946,6 @@ class Sinha2016:
                                 )
 
                         elms['Axon_in'] += len(chosen_targets)
-                        if elms['Axon_in'] != 0.0:
-                            logging.critical(
-                                "Rank {}: Axon_in: logical error - should be zero!".format(
-                                    self.rank))
 
                 # excitatory dendrites as targets
                 if 'Den_ex' in elms and elms['Den_ex'] < 0.0:
@@ -997,10 +989,6 @@ class Sinha2016:
                             synelms[s]['Axon_ex'] += 1
 
                         elms['Den_ex'] += len(chosen_sources)
-                        if elms['Den_ex'] != 0.0:
-                            logging.critical(
-                                "Rank {}: Den_ex: logical error - should be zero!".format(
-                                    self.rank))
 
                 # inhibitory dendrites as targets
                 if 'Den_in' in elms and elms['Den_in'] < 0.0:
@@ -1045,10 +1033,6 @@ class Sinha2016:
                                 synelms[s]['Axon_in'] += 1
 
                             elms['Den_in'] += len(chosen_sources)
-                            if elms['Den_in'] != 0.0:
-                                logging.critical(
-                                    "Rank {}: Den_in: logical error - should be zero!".format(
-                                        self.rank))
                     # it's an excitatory neuron
                     else:
                         conns = nest.GetConnections(target=[gid],
