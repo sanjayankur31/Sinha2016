@@ -53,7 +53,7 @@ class Sinha2016:
         self.setup_str_p = True
         self.setup_syn_p = True
         self.rewiring_enabled = False
-        self.synapse_deletion_strategy = "random"  # or "distance" or "weight"
+        self.synapse_deletion_strategy = "random"  # "random" or "distance" or "weight"
         self.synapse_formation_strategy = "random"  # or "distance"
 
         # populations
