@@ -22,7 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import sys
-sys.argv.append('--quiet')
 import nest
 import numpy
 import math
@@ -291,8 +290,7 @@ class Sinha2016:
         going to try to manually find the right number of syapses and connect
         neurons to get a certain sparsity.
         """
-        required_synapses = int(float(len(sources)) * float(len(destinations))
-                                * sparsity)
+        required_synapses = int(float(len(sources)) * float(len(destinations)) * sparsity)
         chosen_synapses = []
 
         # native python random.choices is quicker but isn't in py < 3.6
@@ -318,8 +316,8 @@ class Sinha2016:
 
         # Other connection numbers
         self.connectionNumberStim = int((self.populations['STIM'] *
-                                         self.populations['R'])
-                                        * self.sparsityStim)
+                                         self.populations['R']) *
+                                        self.sparsityStim)
         # From the butz paper
         self.connectionNumberExtE = 1
         self.connectionNumberExtI = 1
@@ -428,7 +426,7 @@ class Sinha2016:
         # only structural plasticity
         if self.setup_str_p and not self.setup_syn_p:
             logging.info("Only structural plasticity enabled" +
-                  "Not setting up any synapses.")
+                         "Not setting up any synapses.")
         # only synaptic plasticity
         # setup connections using Nest methods
         elif self.setup_syn_p and not self.setup_str_p:
@@ -626,14 +624,18 @@ class Sinha2016:
                 ),
                 file=self.syn_elms_file_handle_I)
 
-            self.synapses_deleted_filename = ("04-synapses-deleted-" + str(self.rank) + ".txt")
-            self.synapses_deleted_handle = open( self.synapses_deleted_filename, 'w')
+            self.synapses_deleted_filename = (
+                "04-synapses-deleted-" + str(self.rank) + ".txt")
+            self.synapses_deleted_handle = open(
+                self.synapses_deleted_filename, 'w')
             print("{}\t{}\t{}\t{}".format(
                 "time(ms)", "gid", "total conns", "conns deleted"),
                 file=self.synapses_deleted_handle)
 
-            self.synapses_formed_filename = ("04-synapses-formed-" + str(self.rank) + ".txt")
-            self.synapses_formed_handle = open( self.synapses_formed_filename, 'w')
+            self.synapses_formed_filename = (
+                "04-synapses-formed-" + str(self.rank) + ".txt")
+            self.synapses_formed_handle = open(
+                self.synapses_formed_filename, 'w')
             print("{}\t{}\t{}".format(
                 "time(ms)", "gid", "conns gained"),
                 file=self.synapses_formed_handle)
@@ -708,7 +710,6 @@ class Sinha2016:
         self.__create_initial_connections()
 
         self.__setup_files()
-
 
         self.dump_data()
 
@@ -797,7 +798,9 @@ class Sinha2016:
                     }
                     synaptic_elms[gid] = elms
 
-        logging.debug("Got synaptic elements for {} neurons.".format(len(synaptic_elms)))
+        logging.debug(
+            "Got synaptic elements for {} neurons.".format(
+                len(synaptic_elms)))
         return synaptic_elms
 
     def __choose_deletion_partners_weight(anchor, options, num_required):
@@ -806,13 +809,15 @@ class Sinha2016:
         sys.exit(-1)
 
     def __choose_deletion_partners_distance(anchor, options, num_required):
-        """Choose partners to delete based on distance between source and options."""
+        """Choose partners to delete based on distance."""
         logging.critical("UNIMPLEMENTED. EXITING!")
         sys.exit(-1)
 
     def __delete_connections(self, synelms):
         """Delete connections randomly."""
-        logging.debug("Deleting connections using the '{}' deletion strategy".format(self.synapse_deletion_strategy))
+        logging.debug(
+            "Deleting connections using the '{}' deletion strategy".format(
+                self.synapse_deletion_strategy))
         total_synapses = 0
         deleted_synapses = 0
         current_simtime = (str(nest.GetKernelStatus()['time']))
@@ -834,9 +839,9 @@ class Sinha2016:
             deleted_synapses_this_gid = 0
             try:
                 if 'Axon_ex' in elms and elms['Axon_ex'] < 0.0:
-                    # GetConnections only returns connections who have targets on
-                    # this particular rank. So I need to allgather to collect all
-                    # targets.
+                    # GetConnections only returns connections who have targets
+                    # on this particular rank. So I need to allgather to
+                    # collect all targets.
                     chosen_targets = []
                     conns = []
                     conns = nest.GetConnections(
@@ -860,7 +865,9 @@ class Sinha2016:
                     alltargets = self.comm.allgather(localtargets)
                     targets = [t for sublist in alltargets for t in sublist]
                     total_synapses_this_gid = len(targets)
-                    logging.debug("Total targets for neuron {} is {}".format(gid, len(targets)))
+                    logging.debug(
+                        "Total targets for neuron {} is {}".format(
+                            gid, len(targets)))
 
                     if len(targets) > 0:
                         # this is where the selection logic is
@@ -894,8 +901,8 @@ class Sinha2016:
                         elms['Axon_ex'] += len(chosen_targets)
 
                 # inhibitory neurons as sources
-                # here, there can be two types of targets, E neurons or I neurons,
-                # and they must each be treated separately
+                # here, there can be two types of targets, E neurons or
+                # I neurons, and they must each be treated separately
                 elif 'Axon_in' in elms and elms['Axon_in'] < 0.0:
                     connsToI = nest.GetConnections(
                         source=[gid], synapse_model='static_synapse_in')
@@ -938,7 +945,8 @@ class Sinha2016:
                             if self.synapse_deletion_strategy == "random":
                                 # Doesn't merit a new method
                                 chosen_targets = random.sample(
-                                    (targetsE + targetsI), int(abs(elms['Axon_in'])))
+                                    (targetsE + targetsI),
+                                    int(abs(elms['Axon_in'])))
                             elif self.synapse_deletion_strategy == "distance":
                                 chosen_targets = self.__choose_deletion_partners_distance(
                                     gid, (targetsE + targetsI), int(abs(elms['Axon_in'])))
@@ -993,7 +1001,9 @@ class Sinha2016:
                     allsources = self.comm.allgather(localsources)
                     sources = [s for sublist in allsources for s in sublist]
                     total_synapses_this_gid = len(sources)
-                    logging.debug("Total sources for neuron {} is {}".format(gid, len(sources)))
+                    logging.debug(
+                        "Total sources for neuron {} is {}".format(
+                            gid, len(sources)))
 
                     if len(sources) > 0:
                         if len(sources) > int(abs(elms['Den_ex'])):
@@ -1047,7 +1057,9 @@ class Sinha2016:
                         allsources = self.comm.allgather(localsources)
                         sources = [s for sublist in allsources for s in sublist]
                         total_synapses_this_gid = len(sources)
-                        logging.debug("Total sources for neuron {} is {}".format(gid, len(sources)))
+                        logging.debug(
+                            "Total sources for neuron {} is {}".format(
+                                gid, len(sources)))
 
                         if len(sources) > 0:
                             if len(sources) > int(abs(elms['Den_in'])):
@@ -1097,7 +1109,9 @@ class Sinha2016:
                         allsources = self.comm.allgather(localsources)
                         sources = [s for sublist in allsources for s in sublist]
                         total_synapses_this_gid = len(sources)
-                        logging.debug("Total sources for neuron {} is {}".format(gid, len(sources)))
+                        logging.debug(
+                            "Total sources for neuron {} is {}".format(
+                                gid, len(sources)))
 
                         if len(sources) > 0:
                             if len(sources) > int(abs(elms['Den_in'])):
@@ -1137,18 +1151,22 @@ class Sinha2016:
             except KeyError as e:
                 logging.critical("KeyError exception while disconnecting!")
                 logging.critical("GID: {} : {}".format(gid, synelms[gid]))
-                logging.critical("Partner id: {} : {}".format(partner, synelms[partner]))
+                logging.critical(
+                    "Partner id: {} : {}".format(
+                        partner, synelms[partner]))
                 logging.critical("Exception: {}".format(str(e)))
                 raise
             except:
                 logging.critical("Some other exception")
                 raise
 
+        logging.debug(
+            "{} of {} connections deleted".format(
+                deleted_synapses,
+                total_synapses))
 
-        logging.debug("{} of {} connections deleted".format(deleted_synapses, total_synapses))
-
-
-    def __choose_formation_partners_distance(self, source, options, num_required):
+    def __choose_formation_partners_distance(
+            self, source, options, num_required):
         """Choose partners based on distance."""
         logging.critical("UNIMPLEMENTED. EXITING!")
 
@@ -1182,9 +1200,10 @@ class Sinha2016:
 
                 if (len(targetsE) + len(targetsI)) > 0:
                     if (len(targetsE) + len(targetsI)) > int(abs(elms['Axon_ex'])):
-                        if self.synapse_formation_strategy ==  "random":
+                        if self.synapse_formation_strategy == "random":
                             chosen_targets = random.sample(
-                                (targetsE + targetsI), int(abs(elms['Axon_ex'])))
+                                (targetsE + targetsI),
+                                int(abs(elms['Axon_ex'])))
                         elif self.synapse_formation_strategy == "distance":
                             chosen_targets = self.__choose_formation_partners_distance(
                                 gid, (targetsE + targetsI), int(abs(elms['Axon_ex'])))
@@ -1196,18 +1215,14 @@ class Sinha2016:
                         synapses_formed_this_gid += 1
                         if cho in targetsE:
                             nest.Connect([gid], [cho],
-                                        conn_spec='one_to_one',
-                                        syn_spec=self.synDictEE)
+                                         conn_spec='one_to_one',
+                                         syn_spec=self.synDictEE)
                         else:
                             nest.Connect([gid], [cho],
-                                        conn_spec='one_to_one',
-                                        syn_spec=self.synDictEI)
+                                         conn_spec='one_to_one',
+                                         syn_spec=self.synDictEI)
 
                     elms['Axon_ex'] -= len(chosen_targets)
-                    if elms['Axon_ex'] != 0.0:
-                        logging.critical(
-                            "Rank {}: Axon_ex: logical error - should be zero!".format(
-                                self.rank))
 
             # here, you can connect either with E neurons or I neurons but both
             # will have different synapse types. So, a bit more work required
@@ -1229,12 +1244,12 @@ class Sinha2016:
                         else:
                             targetsI.extend([tid]*int(telms['Den_in']))
 
-
                 if (len(targetsE) + len(targetsI)) > 0:
                     if (len(targetsE) + len(targetsI)) > int(abs(elms['Axon_in'])):
-                        if self.synapse_formation_strategy ==  "random":
+                        if self.synapse_formation_strategy == "random":
                             chosen_targets = random.sample(
-                                (targetsE + targetsI), int(abs(elms['Axon_in'])))
+                                (targetsE + targetsI),
+                                int(abs(elms['Axon_in'])))
                         elif self.synapse_formation_strategy == "distance":
                             chosen_targets = self.__choose_formation_partners_distance(
                                 gid, (targetsE + targetsI), int(abs(elms['Axon_in'])))
@@ -1246,23 +1261,21 @@ class Sinha2016:
                         synelms[target]['Den_in'] -= 1
                         if target in targetsE:
                             nest.Connect([gid], [target],
-                                        conn_spec='one_to_one',
-                                        syn_spec=self.synDictIE)
+                                         conn_spec='one_to_one',
+                                         syn_spec=self.synDictIE)
                         else:
                             nest.Connect([gid], [target],
-                                        conn_spec='one_to_one',
-                                        syn_spec=self.synDictII)
+                                         conn_spec='one_to_one',
+                                         syn_spec=self.synDictII)
 
                     elms['Axon_in'] -= len(chosen_targets)
-                    if elms['Axon_in'] != 0.0:
-                        logging.critical(
-                            "Rank {}: Axon_in: logical error - should be zero!".format(
-                                self.rank))
+
             synapses_formed += synapses_formed_this_gid
             print("{}\t{}\t{}".format(
                 current_simtime, gid, synapses_formed_this_gid),
                 file=self.synapses_formed_handle)
-        logging.debug("{} new RANDOM connections created".format(synapses_formed))
+        logging.debug(
+            "{} new RANDOM connections created".format(synapses_formed))
 
     def update_connectivity(self):
         """Our implementation of structural plasticity."""
@@ -1287,20 +1300,22 @@ class Sinha2016:
 
     def store_random_pattern(self, track=False):
         """Store a pattern of neurons that are randomly chosen."""
-        logging.debug("SIMULATION: Storing pattern {}".format(self.pattern_count + 1))
+        logging.debug(
+            "SIMULATION: Storing pattern {}".format(
+                self.pattern_count + 1))
         # Keep track of how many patterns are stored
         self.pattern_count += 1
         pattern_neurons = random.sample(
             self.neuronsE, int(math.ceil(len(self.neuronsE) *
                                          self.pattern_percent)))
         logging.debug("ANKUR>> Number of pattern neurons: "
-              "{}".format(len(pattern_neurons)))
+                      "{}".format(len(pattern_neurons)))
 
         # strengthen connections
         connections = nest.GetConnections(source=pattern_neurons,
                                           target=pattern_neurons)
         logging.debug("ANKUR>> Number of connections strengthened: "
-              "{}".format(len(connections)))
+                      "{}".format(len(connections)))
         nest.SetStatus(connections, {"weight": self.weightPatternEE})
         logging.debug("ANKUR>> New weight: {}nS".format(self.weightPatternEE))
 
@@ -1345,7 +1360,9 @@ class Sinha2016:
             # save the detector
             self.sdB.append(background_spike_detector)
 
-        logging.debug("Number of patterns stored: {}".format(self.pattern_count))
+        logging.debug(
+            "Number of patterns stored: {}".format(
+                self.pattern_count))
 
     def setup_pattern_for_recall(self, pattern_number):
         """
@@ -1381,7 +1398,7 @@ class Sinha2016:
             pattern_neurons, int(math.ceil(len(pattern_neurons) *
                                            self.recall_percent)))
         logging.debug("ANKUR>> Number of recall neurons: "
-              "{}".format(len(recall_neurons)))
+                      "{}".format(len(recall_neurons)))
 
         nest.Connect(stim_neurons, recall_neurons,
                      conn_spec=self.connDictStim)
@@ -1443,7 +1460,7 @@ class Sinha2016:
             pattern_neurons, int(math.ceil(len(pattern_neurons) *
                                            self.deaff_random_pattern_percent)))
         logging.info("ANKUR>> Number of deaff pattern neurons: "
-              "{}".format(len(deaffed_neurons)))
+                     "{}".format(len(deaffed_neurons)))
         if len(deaffed_neurons) > 0:
             conns = nest.GetConnections(source=self.poissonExtE,
                                         target=deaffed_neurons)
@@ -1478,7 +1495,7 @@ class Sinha2016:
             bg_neurons, int(math.ceil(len(bg_neurons) *
                                       self.deaff_bg_random_percentE)))
         logging.info("ANKUR>> Number of deaff bg E neurons: "
-              "{}".format(len(deaffed_neurons)))
+                     "{}".format(len(deaffed_neurons)))
         if len(deaffed_neurons) > 0:
             conns = nest.GetConnections(source=self.poissonExtE,
                                         target=deaffed_neurons)
@@ -1512,7 +1529,7 @@ class Sinha2016:
                                          self.deaff_bg_random_percentI)))
 
         logging.info("ANKUR>> Number of deaff bg I neurons: "
-              "{}".format(len(deaffed_neurons)))
+                     "{}".format(len(deaffed_neurons)))
         if len(deaffed_neurons) > 0:
             conns = nest.GetConnections(source=self.poissonExtI,
                                         target=deaffed_neurons)
@@ -1777,12 +1794,17 @@ class Sinha2016:
     def enable_rewiring(self):
         """Enable the rewiring."""
         self.rewiring_enabled = True
-        if self.synapse_deletion_strategy not in ["random", "distance", "weight"]:
-            logging.critical("INVALID SYNAPSE DELETION STRATEGY: {}".format(self.synapse_deletion_strategy))
+        if self.synapse_deletion_strategy not in [
+                "random", "distance", "weight"]:
+            logging.critical(
+                "INVALID SYNAPSE DELETION STRATEGY: {}".format(
+                    self.synapse_deletion_strategy))
             logging.critical("EXITING SIMULATION.")
             sys.exit(-1)
         if self.synapse_formation_strategy not in ["random", "distance"]:
-            logging.critical("INVALID SYNAPSE FORMATION STRATEGY: {}".format(self.synapse_formation_strategy))
+            logging.critical(
+                "INVALID SYNAPSE FORMATION STRATEGY: {}".format(
+                    self.synapse_formation_strategy))
             logging.critical("EXITING SIMULATION.")
             sys.exit(-1)
 
