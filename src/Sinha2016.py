@@ -839,12 +839,24 @@ class Sinha2016:
                     # targets.
                     chosen_targets = []
                     conns = []
-                    conns = nest.GetConnections(source=[gid],
-                                                synapse_model='static_synapse_ex')
+                    conns = nest.GetConnections(
+                        source=[gid], synapse_model='static_synapse_ex')
+                    weights = nest.GetStatus(conns, "weight")
                     localtargets = []
-                    for acon in conns:
-                        localtargets.append(acon[1])
+                    if self.synapse_deletion_strategy == "weight":
+                        # also need to store weight
+                        # list of lists: [[target, weight], [target, weight]..]
+                        for i in range(0, len(conns)):
+                            localtargets.append([conns[i][1], weights[i]])
+                    else:
+                        # otherwise only tids
+                        for acon in conns:
+                            localtargets.append(acon[1])
 
+                    # I could've passed weights and gids separately, but I'm
+                    # unsure if they would correspond after the communication.
+                    # So, to be sure, I send them together in case weights are
+                    # also required
                     alltargets = self.comm.allgather(localtargets)
                     targets = [t for sublist in alltargets for t in sublist]
                     total_synapses_this_gid = len(targets)
@@ -885,18 +897,32 @@ class Sinha2016:
                 # here, there can be two types of targets, E neurons or I neurons,
                 # and they must each be treated separately
                 elif 'Axon_in' in elms and elms['Axon_in'] < 0.0:
-                    connsToI = nest.GetConnections(source=[gid],
-                                                synapse_model='static_synapse_in')
-                    connsToE = nest.GetConnections(source=[gid],
-                                                synapse_model='stdp_synapse_in')
+                    connsToI = nest.GetConnections(
+                        source=[gid], synapse_model='static_synapse_in')
+                    weightsToI = nest.GetStatus(connsToI, "weight")
+
+                    connsToE = nest.GetConnections(
+                        source=[gid], synapse_model='stdp_synapse_in')
+                    weightsToE = nest.GetStatus(connsToE, "weight")
+
                     localtargetsI = []
                     localtargetsE = []
                     chosen_targets = []
 
-                    for acon in connsToI:
-                        localtargetsI.append(acon[1])
-                    for acon in connsToE:
-                        localtargetsE.append(acon[1])
+                    if self.synapse_deletion_strategy == "weight":
+                        # also need to store weight
+                        # list of lists: [[target, weight], [target, weight]..]
+                        for i in range(0, len(connsToI)):
+                            localtargetsI.append(
+                                [connsToI[i][1], weightsToI[i]])
+                        for i in range(0, len(connsToE)):
+                            localtargetsE.append(
+                                [connsToE[i][1], weightsToE[i]])
+                    else:
+                        for acon in connsToI:
+                            localtargetsI.append(acon[1])
+                        for acon in connsToE:
+                            localtargetsE.append(acon[1])
 
                     alltargetsI = self.comm.allgather(localtargetsI)
                     alltargetsE = self.comm.allgather(localtargetsE)
@@ -949,12 +975,20 @@ class Sinha2016:
 
                 # excitatory dendrites as targets
                 if 'Den_ex' in elms and elms['Den_ex'] < 0.0:
-                    conns = nest.GetConnections(target=[gid],
-                                                synapse_model='static_synapse_ex')
+                    conns = nest.GetConnections(
+                        target=[gid], synapse_model='static_synapse_ex')
+                    weights = nest.GetStatus(conns, "weight")
                     localsources = []
                     chosen_sources = []
-                    for acon in conns:
-                        localsources.append(acon[0])
+                    if self.synapse_deletion_strategy == "weight":
+                        # also need to store weight
+                        # list of lists: [[source, weight], [source, weight]..]
+                        for i in range(0, len(conns)):
+                            localsources.append([conns[i][0], weights[i]])
+                    else:
+                        # otherwise only sids
+                        for acon in conns:
+                            localsources.append(acon[0])
 
                     allsources = self.comm.allgather(localsources)
                     sources = [s for sublist in allsources for s in sublist]
@@ -994,12 +1028,22 @@ class Sinha2016:
                 if 'Den_in' in elms and elms['Den_in'] < 0.0:
                     # is it an inhibitory neuron?
                     if 'Axon_in' in elms:
-                        conns = nest.GetConnections(target=[gid],
-                                                    synapse_model='static_synapse_in')
+                        conns = nest.GetConnections(
+                            target=[gid], synapse_model='static_synapse_in')
+                        weights = nest.GetStatus(conns, "weight")
                         localsources = []
                         chosen_sources = []
-                        for acon in conns:
-                            localsources.append(acon[0])
+                        if self.synapse_deletion_strategy == "weight":
+                            # also need to store weight
+                            # list of lists: [[source, weight], [source,
+                            # weight]..]
+                            for i in range(0, len(conns)):
+                                localsources.append([conns[i][0], weights[i]])
+                        else:
+                            # otherwise only sids
+                            for acon in conns:
+                                localsources.append(acon[0])
+
                         allsources = self.comm.allgather(localsources)
                         sources = [s for sublist in allsources for s in sublist]
                         total_synapses_this_gid = len(sources)
@@ -1035,12 +1079,21 @@ class Sinha2016:
                             elms['Den_in'] += len(chosen_sources)
                     # it's an excitatory neuron
                     else:
-                        conns = nest.GetConnections(target=[gid],
-                                                    synapse_model='stdp_synapse_in')
+                        conns = nest.GetConnections(
+                            target=[gid], synapse_model='stdp_synapse_in')
+                        weights = nest.GetStatus(conns, "weight")
                         localsources = []
                         chosen_sources = []
-                        for acon in conns:
-                            localsources.append(acon[0])
+                        if self.synapse_deletion_strategy == "weight":
+                            # also need to store weight
+                            # list of lists: [[source, weight], [source,
+                            # weight]..]
+                            for i in range(0, len(conns)):
+                                localsources.append([conns[i][0], weights[i]])
+                        else:
+                            # otherwise only sids
+                            for acon in conns:
+                                localsources.append(acon[0])
                         allsources = self.comm.allgather(localsources)
                         sources = [s for sublist in allsources for s in sublist]
                         total_synapses_this_gid = len(sources)
