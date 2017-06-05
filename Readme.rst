@@ -11,7 +11,6 @@ Requirements
   The NEST development team intends to remove structural plasticity from NEST core in the future. The plan is to develop a standalone structural plasticity manager that will interface with different simulators.
 
 - you can use `my scripts <https://github.com/sanjayankur31/Sinha2016-scripts>`__ to post-process the data
-- :code:`python-nose` for a few simple tests
 
 Outputs from the simulation
 ============================
