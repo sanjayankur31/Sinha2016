@@ -814,7 +814,7 @@ class Sinha2016:
         sys.exit(-1)
 
     def __delete_connections(self, synelms):
-        """Delete connections randomly."""
+        """Delete connections."""
         logging.debug(
             "Deleting connections using the '{}' deletion strategy".format(
                 self.synapse_deletion_strategy))
@@ -846,17 +846,11 @@ class Sinha2016:
                     conns = []
                     conns = nest.GetConnections(
                         source=[gid], synapse_model='static_synapse_ex')
-                    weights = nest.GetStatus(conns, "weight")
                     localtargets = []
-                    if self.synapse_deletion_strategy == "weight":
-                        # also need to store weight
-                        # list of lists: [[target, weight], [target, weight]..]
-                        for i in range(0, len(conns)):
-                            localtargets.append([conns[i][1], weights[i]])
-                    else:
-                        # otherwise only tids
-                        for acon in conns:
-                            localtargets.append(acon[1])
+                    # For this connection, all synapses have same weight, so
+                    # the "weight" strategy doesn't apply
+                    for acon in conns:
+                        localtargets.append(acon[1])
 
                     # I could've passed weights and gids separately, but I'm
                     # unsure if they would correspond after the communication.
@@ -872,15 +866,12 @@ class Sinha2016:
                     if len(targets) > 0:
                         # this is where the selection logic is
                         if len(targets) > int(abs(elms['Axon_ex'])):
-                            if self.synapse_deletion_strategy == "random":
+                            if self.synapse_deletion_strategy == "random" or self.synapse_deletion_strategy == "weight":
                                 # Doesn't merit a new method
                                 chosen_targets = random.sample(
                                     targets, int(abs(elms['Axon_ex'])))
                             elif self.synapse_deletion_strategy == "distance":
                                 chosen_targets = self.__choose_deletion_partners_distance(
-                                    gid, targets, int(abs(elms['Axon_ex'])))
-                            elif self.synapse_deletion_strategy == "weight":
-                                chosen_targets = self.__choose_deletion_partners_weight(
                                     gid, targets, int(abs(elms['Axon_ex'])))
                         else:
                             chosen_targets = targets
@@ -906,11 +897,8 @@ class Sinha2016:
                 elif 'Axon_in' in elms and elms['Axon_in'] < 0.0:
                     connsToI = nest.GetConnections(
                         source=[gid], synapse_model='static_synapse_in')
-                    weightsToI = nest.GetStatus(connsToI, "weight")
-
                     connsToE = nest.GetConnections(
                         source=[gid], synapse_model='stdp_synapse_in')
-                    weightsToE = nest.GetStatus(connsToE, "weight")
 
                     localtargetsI = []
                     localtargetsE = []
@@ -919,6 +907,10 @@ class Sinha2016:
                     if self.synapse_deletion_strategy == "weight":
                         # also need to store weight
                         # list of lists: [[target, weight], [target, weight]..]
+                        # Could optimise this too, ideally only weights to I
+                        # can be of different values
+                        weightsToI = nest.GetStatus(connsToI, "weight")
+                        weightsToE = nest.GetStatus(connsToE, "weight")
                         for i in range(0, len(connsToI)):
                             localtargetsI.append(
                                 [connsToI[i][1], weightsToI[i]])
@@ -982,21 +974,15 @@ class Sinha2016:
                         elms['Axon_in'] += len(chosen_targets)
 
                 # excitatory dendrites as targets
+                # weight dependent deletion doesn't apply - all synapses have
+                # same weight
                 if 'Den_ex' in elms and elms['Den_ex'] < 0.0:
                     conns = nest.GetConnections(
                         target=[gid], synapse_model='static_synapse_ex')
-                    weights = nest.GetStatus(conns, "weight")
                     localsources = []
                     chosen_sources = []
-                    if self.synapse_deletion_strategy == "weight":
-                        # also need to store weight
-                        # list of lists: [[source, weight], [source, weight]..]
-                        for i in range(0, len(conns)):
-                            localsources.append([conns[i][0], weights[i]])
-                    else:
-                        # otherwise only sids
-                        for acon in conns:
-                            localsources.append(acon[0])
+                    for acon in conns:
+                        localsources.append(acon[0])
 
                     allsources = self.comm.allgather(localsources)
                     sources = [s for sublist in allsources for s in sublist]
@@ -1007,14 +993,11 @@ class Sinha2016:
 
                     if len(sources) > 0:
                         if len(sources) > int(abs(elms['Den_ex'])):
-                            if self.synapse_deletion_strategy == "random":
+                            if self.synapse_deletion_strategy == "random" or self.synapse_deletion_strategy == "weight":
                                 chosen_sources = random.sample(
                                     sources, int(abs(elms['Den_ex'])))
                             elif self.synapse_deletion_strategy == "distance":
                                 chosen_sources = self.__choose_deletion_partners_distance(
-                                    gid, sources, int(abs(elms['Den_ex'])))
-                            elif self.synapse_deletion_strategy == "weight":
-                                chosen_sources = self.__choose_deletion_partners_weight(
                                     gid, sources, int(abs(elms['Den_ex'])))
                         else:
                             chosen_sources = sources
@@ -1038,21 +1021,14 @@ class Sinha2016:
                 if 'Den_in' in elms and elms['Den_in'] < 0.0:
                     # is it an inhibitory neuron?
                     if 'Axon_in' in elms:
+                        # all synapses are of same weight, so weight dependent
+                        # not required
                         conns = nest.GetConnections(
                             target=[gid], synapse_model='static_synapse_in')
-                        weights = nest.GetStatus(conns, "weight")
                         localsources = []
                         chosen_sources = []
-                        if self.synapse_deletion_strategy == "weight":
-                            # also need to store weight
-                            # list of lists: [[source, weight], [source,
-                            # weight]..]
-                            for i in range(0, len(conns)):
-                                localsources.append([conns[i][0], weights[i]])
-                        else:
-                            # otherwise only sids
-                            for acon in conns:
-                                localsources.append(acon[0])
+                        for acon in conns:
+                            localsources.append(acon[0])
 
                         allsources = self.comm.allgather(localsources)
                         sources = [s for sublist in allsources for s in sublist]
@@ -1063,14 +1039,11 @@ class Sinha2016:
 
                         if len(sources) > 0:
                             if len(sources) > int(abs(elms['Den_in'])):
-                                if self.synapse_deletion_strategy == "random":
+                                if self.synapse_deletion_strategy == "random" or self.synapse_deletion_strategy == "weight":
                                     chosen_sources = random.sample(
                                         sources, int(abs(elms['Den_in'])))
                                 elif self.synapse_deletion_strategy == "distance":
                                     chosen_sources = self.__choose_deletion_partners_distance(
-                                        gid, sources, int(abs(elms['Den_in'])))
-                                elif self.synapse_deletion_strategy == "weight":
-                                    chosen_sources = self.__choose_deletion_partners_weight(
                                         gid, sources, int(abs(elms['Den_in'])))
                             else:
                                 chosen_sources = sources
@@ -1093,13 +1066,13 @@ class Sinha2016:
                     else:
                         conns = nest.GetConnections(
                             target=[gid], synapse_model='stdp_synapse_in')
-                        weights = nest.GetStatus(conns, "weight")
                         localsources = []
                         chosen_sources = []
                         if self.synapse_deletion_strategy == "weight":
                             # also need to store weight
                             # list of lists: [[source, weight], [source,
                             # weight]..]
+                            weights = nest.GetStatus(conns, "weight")
                             for i in range(0, len(conns)):
                                 localsources.append([conns[i][0], weights[i]])
                         else:
