@@ -860,8 +860,8 @@ class Sinha2016:
                     targets = [t for sublist in alltargets for t in sublist]
                     total_synapses_this_gid = len(targets)
                     logging.debug(
-                        "Total targets for neuron {} is {}".format(
-                            gid, len(targets)))
+                        "Rank {}: Total targets for neuron {} is {}".format(
+                            self.rank, gid, total_synapses_this_gid))
 
                     if len(targets) > 0:
                         # this is where the selection logic is
@@ -930,6 +930,9 @@ class Sinha2016:
                     targetsE = [t for sublist in alltargetsE for t in sublist]
 
                     total_synapses_this_gid = (len(targetsE) + len(targetsI))
+                    logging.debug(
+                        "Rank {}: Total targets for neuron {} is {}".format(
+                            self.rank, gid, total_synapses_this_gid))
 
                     if (len(targetsE) + len(targetsI)) > 0:
                         # this is where the selection logic is
@@ -988,8 +991,8 @@ class Sinha2016:
                     sources = [s for sublist in allsources for s in sublist]
                     total_synapses_this_gid = len(sources)
                     logging.debug(
-                        "Total sources for neuron {} is {}".format(
-                            gid, len(sources)))
+                        "Rank {}: Total sources for neuron {} is {}".format(
+                            self.rank, gid, total_synapses_this_gid))
 
                     if len(sources) > 0:
                         if len(sources) > int(abs(elms['Den_ex'])):
@@ -1034,8 +1037,8 @@ class Sinha2016:
                         sources = [s for sublist in allsources for s in sublist]
                         total_synapses_this_gid = len(sources)
                         logging.debug(
-                            "Total sources for neuron {} is {}".format(
-                                gid, len(sources)))
+                            "Rank {}: Total sources for neuron {} is {}".format(
+                                self.rank, gid, total_synapses_this_gid))
 
                         if len(sources) > 0:
                             if len(sources) > int(abs(elms['Den_in'])):
@@ -1083,8 +1086,8 @@ class Sinha2016:
                         sources = [s for sublist in allsources for s in sublist]
                         total_synapses_this_gid = len(sources)
                         logging.debug(
-                            "Total sources for neuron {} is {}".format(
-                                gid, len(sources)))
+                            "Rank {}: Total sources for neuron {} is {}".format(
+                                self.rank, gid, total_synapses_this_gid))
 
                         if len(sources) > 0:
                             if len(sources) > int(abs(elms['Den_in'])):
