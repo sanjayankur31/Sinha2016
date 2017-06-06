@@ -666,6 +666,7 @@ class Sinha2016:
         self.update_windows(stabilisation_time, sp_update_interval,
                             recording_interval)
         self.__setup_simulation()
+        self.comm.Barrier()
 
     def update_windows(self,
                        stabilisation_time=None,
@@ -827,13 +828,13 @@ class Sinha2016:
         # Note that we are modifying a dictionary while iterating over it. This
         # is OK here since we're not modifying the keys, only the values.
         # http://stackoverflow.com/a/2315529/375067
-        for nrn in synelms.items():
+        for nrn in (self.neuronsE + self.neuronsI):
             # excitatory neurons as sources
             # here, I'm not using the synapse dicts because I don't need to
             # specify the weight of the connection too. Whatever the weight is,
             # we want to break the synapse.
-            gid = nrn[0]
-            elms = nrn[1]
+            gid = nrn
+            elms = synelms[nrn]
             partner = 0  # for exception
             total_synapses_this_gid = 0
             deleted_synapses_this_gid = 0
@@ -1151,10 +1152,10 @@ class Sinha2016:
         logging.debug("Creating RANDOM connections")
         synapses_formed = 0
         current_simtime = (str(nest.GetKernelStatus()['time']))
-        for nrn in synelms.items():
+        for nrn in (self.neuronsE + self.neuronsI):
             synapses_formed_this_gid = 0
-            gid = nrn[0]
-            elms = nrn[1]
+            gid = nrn
+            elms = synelms[nrn]
             # excitatory connections - only need to look at Axons, it doesn't
             # matter which synaptic elements you start with, whichever are less
             # will act as the limiting factor.
@@ -1163,9 +1164,11 @@ class Sinha2016:
                 targetsI = []
                 chosen_targets = []
 
-                for atarget in synelms.items():
-                    tid = atarget[0]
-                    telms = atarget[1]
+                for atarget in (self.neuronsE + self.neuronsI):
+                    if atarget == gid:
+                        continue
+                    tid = atarget
+                    telms = synelms[atarget]
                     if 'Den_ex' in telms and telms['Den_ex'] > 0.0:
                         # add the target multiple times, since it has multiple
                         # available contact points
@@ -1209,9 +1212,11 @@ class Sinha2016:
                 targetsI = []
                 chosen_targets = []
 
-                for atarget in synelms.items():
-                    tid = atarget[0]
-                    telms = atarget[1]
+                for atarget in (self.neuronsE + self.neuronsI):
+                    if atarget == gid:
+                        continue
+                    tid = atarget
+                    telms = synelms[atarget]
                     if 'Den_in' in telms and telms['Den_in'] > 0.0:
                         # add the target multiple times, since it has multiple
                         # available contact points
@@ -1260,15 +1265,15 @@ class Sinha2016:
         logging.info("STRUCTURAL PLASTICITY: Updating connectivity")
         syn_elms = self.__get_syn_elms()
         self.__delete_connections(syn_elms)
-        nest.Prepare()
         # Must wait for all ranks to finish before proceeding
         self.comm.Barrier()
+        nest.Prepare()
 
         syn_elms = self.__get_syn_elms()
         self.__create_connections(syn_elms)
-        nest.Prepare()
         # Must wait for all ranks to finish before proceeding
         self.comm.Barrier()
+        nest.Prepare()
         logging.info("STRUCTURAL PLASTICITY: Connectivity updated")
 
     def store_spatial_pattern(self, track=False):
@@ -1800,7 +1805,7 @@ if __name__ == "__main__":
 
     # Setup network to handle plasticities
     # update of the network
-    logging.info("SIMULATION STARTED")
+    logging.info("Rank {}: SIMULATION STARTED".format(simulation.rank))
     simulation.setup_plasticity(True, True)
 
     # Intial stabilisation #
@@ -1835,4 +1840,4 @@ if __name__ == "__main__":
 
     simulation.close_files()
     nest.Cleanup()
-    logging.info("SIMULATION FINISHED SUCCESSFULLY")
+    logging.info("Rank {}: SIMULATION FINISHED SUCCESSFULLY".format(simulation.rank))
