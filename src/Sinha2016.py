@@ -779,12 +779,10 @@ class Sinha2016:
                 target_elms_total_in = synelms['Den_in']['z']
                 # total elms cannot be less than 0
                 # connected elms cannot be less than 0
-                delta_z_ax = math.trunc((source_elms_total) -
-                                        source_elms_con)
-                delta_z_d_ex = math.trunc((target_elms_total_ex) -
-                                          target_elms_con_ex)
-                delta_z_d_in = math.trunc((target_elms_total_in) -
-                                          target_elms_con_in)
+                # continuous = False, so all values are already ints here
+                delta_z_ax = int(source_elms_total - source_elms_con)
+                delta_z_d_ex = int(target_elms_total_ex - target_elms_con_ex)
+                delta_z_d_in = int(target_elms_total_in - target_elms_con_in)
 
                 if 'Axon_in' in synelms:
                     elms = {
@@ -838,7 +836,7 @@ class Sinha2016:
             deleted_synapses_this_gid = 0
             try:
                 # excitatory neurons as sources
-                if 'Axon_ex' in elms and elms['Axon_ex'] < 0.0:
+                if 'Axon_ex' in elms and elms['Axon_ex'] < 0:
                     # GetConnections only returns connections who have targets
                     # on this particular rank. So I need to allgather to
                     # collect all targets.
@@ -896,7 +894,7 @@ class Sinha2016:
                 # inhibitory neurons as sources
                 # here, there can be two types of targets, E neurons or
                 # I neurons, and they must each be treated separately
-                elif 'Axon_in' in elms and elms['Axon_in'] < 0.0:
+                elif 'Axon_in' in elms and elms['Axon_in'] < 0:
                     connsToI = nest.GetConnections(
                         source=[gid], synapse_model='static_synapse_in')
                     connsToE = nest.GetConnections(
@@ -1024,7 +1022,7 @@ class Sinha2016:
             total_synapses_this_gid = 0
             deleted_synapses_this_gid = 0
             try:
-                if 'Den_ex' in elms and elms['Den_ex'] < 0.0:
+                if 'Den_ex' in elms and elms['Den_ex'] < 0:
                     conns = nest.GetConnections(
                         target=[gid], synapse_model='static_synapse_ex')
                     localsources = []
@@ -1064,7 +1062,7 @@ class Sinha2016:
                             synelms[s]['Axon_ex'] += 1
 
                 # inhibitory dendrites as targets
-                if 'Den_in' in elms and elms['Den_in'] < 0.0:
+                if 'Den_in' in elms and elms['Den_in'] < 0:
                     # is it an inhibitory neuron?
                     if 'Axon_in' in elms:
                         # all synapses are of same weight, so weight dependent
@@ -1202,14 +1200,14 @@ class Sinha2016:
             # excitatory connections - only need to look at Axons, it doesn't
             # matter which synaptic elements you start with, whichever are less
             # will act as the limiting factor.
-            if 'Axon_ex' in elms and elms['Axon_ex'] > 0.0:
+            if 'Axon_ex' in elms and elms['Axon_ex'] > 0:
                 targetsE = []
                 targetsI = []
 
                 for atarget in (self.neuronsE + self.neuronsI):
                     tid = atarget
                     telms = synelms[atarget]
-                    if 'Den_ex' in telms and telms['Den_ex'] > 0.0:
+                    if 'Den_ex' in telms and telms['Den_ex'] > 0:
                         # add the target multiple times, since it has multiple
                         # available contact points
                         if 'Axon_ex' in telms:
@@ -1250,14 +1248,14 @@ class Sinha2016:
             # will have different synapse types. So, a bit more work required
             # here than with the Axon_ex which always forms the same type of
             # synapse
-            elif 'Axon_in' in elms and elms['Axon_in'] > 0.0:
+            elif 'Axon_in' in elms and elms['Axon_in'] > 0:
                 targetsE = []
                 targetsI = []
 
                 for atarget in (self.neuronsE + self.neuronsI):
                     tid = atarget
                     telms = synelms[atarget]
-                    if 'Den_in' in telms and telms['Den_in'] > 0.0:
+                    if 'Den_in' in telms and telms['Den_in'] > 0:
                         # add the target multiple times, since it has multiple
                         # available contact points
                         if 'Axon_ex' in telms:
@@ -1292,7 +1290,6 @@ class Sinha2016:
                             nest.Connect([gid], [target],
                                          conn_spec='one_to_one',
                                          syn_spec=self.synDictII)
-
 
             if synapses_formed_this_gid > 0:
                 print("{}\t{}\t{}".format(
@@ -1870,8 +1867,8 @@ if __name__ == "__main__":
 
     # Intial stabilisation #
     simulation.prerun_setup(
-        stabilisation_time=500.,
-        sp_update_interval=100.,
+        stabilisation_time=1000.,
+        sp_update_interval=200.,
         recording_interval=50.)
     simulation.enable_rewiring()
     simulation.stabilise()
