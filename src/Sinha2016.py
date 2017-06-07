@@ -847,6 +847,7 @@ class Sinha2016:
                     localtargets = []
                     # For this connection, all synapses have same weight, so
                     # the "weight" strategy doesn't apply
+                    # TODO: Implement - it'll apply to our pattern!
                     for acon in conns:
                         localtargets.append(acon[1])
 
@@ -907,8 +908,6 @@ class Sinha2016:
                     if self.synapse_deletion_strategy == "weight":
                         # also need to store weight
                         # list of lists: [[target, weight], [target, weight]..]
-                        # Could optimise this too, ideally only weights to I
-                        # can be of different values
                         weightsToI = nest.GetStatus(connsToI, "weight")
                         weightsToE = nest.GetStatus(connsToE, "weight")
                         for i in range(0, len(connsToI)):
@@ -1787,10 +1786,10 @@ class Sinha2016:
     def dump_data(self):
         """Master datadump function."""
         logging.info("Rank {}: Printing data to files".format(self.rank))
-        # self.__dump_synaptic_weights()
-        # self.__dump_ca_concentration()
-        # self.__dump_synaptic_elements_per_neurons()
-        # self.__dump_total_synaptic_elements()
+        self.__dump_synaptic_weights()
+        self.__dump_ca_concentration()
+        self.__dump_synaptic_elements_per_neurons()
+        self.__dump_total_synaptic_elements()
 
     def close_files(self):
         """Close all files when the simulation is finished."""
@@ -1867,9 +1866,9 @@ if __name__ == "__main__":
 
     # Intial stabilisation #
     simulation.prerun_setup(
-        stabilisation_time=1000.,
-        sp_update_interval=200.,
-        recording_interval=50.)
+        stabilisation_time=3000.,
+        sp_update_interval=500.,
+        recording_interval=100.)
     simulation.enable_rewiring()
     simulation.stabilise()
 
@@ -1890,7 +1889,6 @@ if __name__ == "__main__":
         # Enable structural plasticity for repair #
         simulation.enable_rewiring()
         # Stabilise for repair
-        simulation.stabilise()
         simulation.stabilise()
 
         # recall stored and tracked pattern
