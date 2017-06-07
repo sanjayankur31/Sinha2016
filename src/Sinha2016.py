@@ -777,12 +777,14 @@ class Sinha2016:
                 target_elms_con_in = synelms['Den_in']['z_connected']
                 target_elms_total_ex = synelms['Den_ex']['z']
                 target_elms_total_in = synelms['Den_in']['z']
-                delta_z_ax = (math.floor(source_elms_total) -
-                              source_elms_con)
-                delta_z_d_ex = (math.floor(target_elms_total_ex) -
-                                target_elms_con_ex)
-                delta_z_d_in = (math.floor(target_elms_total_in) -
-                                target_elms_con_in)
+                # total elms cannot be less than 0
+                # connected elms cannot be less than 0
+                delta_z_ax = math.trunc((source_elms_total) -
+                                        source_elms_con)
+                delta_z_d_ex = math.trunc((target_elms_total_ex) -
+                                          target_elms_con_ex)
+                delta_z_d_in = math.trunc((target_elms_total_in) -
+                                          target_elms_con_in)
 
                 if 'Axon_in' in synelms:
                     elms = {
@@ -814,10 +816,10 @@ class Sinha2016:
         logging.critical("UNIMPLEMENTED. EXITING!")
         sys.exit(-1)
 
-    def __delete_connections(self, synelms):
-        """Delete connections."""
+    def __delete_connections_from_pre(self, synelms):
+        """Delete connections when the neuron is a source."""
         logging.debug(
-            "Deleting connections using the '{}' deletion strategy".format(
+            "Deleting connections from pre using the '{}' deletion strategy".format(
                 self.synapse_deletion_strategy))
         total_synapses = 0
         deleted_synapses = 0
@@ -860,10 +862,6 @@ class Sinha2016:
                     alltargets = self.comm.allgather(localtargets)
                     targets = [t for sublist in alltargets for t in sublist]
                     total_synapses_this_gid = len(targets)
-                    logging.debug(
-                        "Rank {}: Total targets for neuron {} is {}".format(
-                            self.rank, gid, total_synapses_this_gid))
-
                     if len(targets) > 0:
                         # this is where the selection logic is
                         if len(targets) > int(abs(elms['Axon_ex'])):
@@ -876,8 +874,16 @@ class Sinha2016:
                                     gid, targets, int(abs(elms['Axon_ex'])))
                         else:
                             chosen_targets = targets
+                        logging.debug(
+                            "Rank {}: {}/{} targets chosen for neuron {}".format(
+                                self.rank, len(chosen_targets), total_synapses_this_gid, gid))
 
-                        for t in chosen_targets:
+                        # only deal with targets that are local to this rank -
+                        # cannot delete targets that are not local
+                        # local_chosen_targets = [x for x in chosen_targets if x in local_neurons]
+                        local_chosen_targets = chosen_targets
+
+                        for t in local_chosen_targets:
                             deleted_synapses_this_gid += 1
                             partner = t
                             nest.Disconnect(
@@ -889,8 +895,6 @@ class Sinha2016:
                                     'rule': 'one_to_one'}
                             )
                             synelms[t]['Den_ex'] += 1
-
-                        elms['Axon_ex'] += len(chosen_targets)
 
                 # inhibitory neurons as sources
                 # here, there can be two types of targets, E neurons or
@@ -931,9 +935,6 @@ class Sinha2016:
                     targetsE = [t for sublist in alltargetsE for t in sublist]
 
                     total_synapses_this_gid = (len(targetsE) + len(targetsI))
-                    logging.debug(
-                        "Rank {}: Total targets for neuron {} is {}".format(
-                            self.rank, gid, total_synapses_this_gid))
 
                     if (len(targetsE) + len(targetsI)) > 0:
                         # this is where the selection logic is
@@ -951,8 +952,16 @@ class Sinha2016:
                                     gid, (targetsE + targetsI), int(abs(elms['Axon_in'])))
                         else:
                             chosen_targets = (targetsE + targetsI)
+                        logging.debug(
+                            "Rank {}: {}/{} targets chosen for neuron {}".format(
+                                self.rank, len(chosen_targets), total_synapses_this_gid, gid))
 
-                        for t in chosen_targets:
+                        # only deal with targets that are local to this rank -
+                        # cannot delete targets that are not local
+                        # local_chosen_targets = [x for x in chosen_targets if x in local_neurons]
+                        local_chosen_targets = chosen_targets
+
+                        for t in local_chosen_targets:
                             synelms[t]['Den_in'] += 1
                             deleted_synapses_this_gid += 1
                             partner = t
@@ -975,11 +984,49 @@ class Sinha2016:
                                         'rule': 'one_to_one'}
                                 )
 
-                        elms['Axon_in'] += len(chosen_targets)
+                if deleted_synapses_this_gid > 0:
+                    print("{}\t{}\t{}\t{}".format(
+                        current_simtime, gid, total_synapses_this_gid,
+                        deleted_synapses_this_gid),
+                        file=self.synapses_deleted_handle)
+                    total_synapses += total_synapses_this_gid
+                    deleted_synapses += deleted_synapses_this_gid
 
-                # excitatory dendrites as targets
-                # weight dependent deletion doesn't apply - all synapses have
-                # same weight
+            except KeyError as e:
+                logging.critical("KeyError exception while disconnecting!")
+                logging.critical("GID: {} : {}".format(gid, synelms[gid]))
+                logging.critical(
+                    "Partner id: {} : {}".format(
+                        partner, synelms[partner]))
+                logging.critical("Exception: {}".format(str(e)))
+                raise
+            except:
+                logging.critical("Some other exception")
+                raise
+
+        logging.debug(
+            "{} of {} connections deleted from pre".format(
+                deleted_synapses,
+                total_synapses))
+
+    def __delete_connections_from_post(self, synelms):
+        """Delete connections when neuron is target."""
+        logging.debug(
+            "Deleting connections from post using the '{}' deletion strategy".format(
+                self.synapse_deletion_strategy))
+        total_synapses = 0
+        deleted_synapses = 0
+        current_simtime = (str(nest.GetKernelStatus()['time']))
+        # excitatory dendrites as targets
+        # weight dependent deletion doesn't apply - all synapses have
+        # same weight
+        for nrn in (self.neuronsE + self.neuronsI):
+            gid = nrn
+            elms = synelms[nrn]
+            partner = 0  # for exception
+            total_synapses_this_gid = 0
+            deleted_synapses_this_gid = 0
+            try:
                 if 'Den_ex' in elms and elms['Den_ex'] < 0.0:
                     conns = nest.GetConnections(
                         target=[gid], synapse_model='static_synapse_ex')
@@ -991,9 +1038,6 @@ class Sinha2016:
                     allsources = self.comm.allgather(localsources)
                     sources = [s for sublist in allsources for s in sublist]
                     total_synapses_this_gid = len(sources)
-                    logging.debug(
-                        "Rank {}: Total sources for neuron {} is {}".format(
-                            self.rank, gid, total_synapses_this_gid))
 
                     if len(sources) > 0:
                         if len(sources) > int(abs(elms['Den_ex'])):
@@ -1005,6 +1049,9 @@ class Sinha2016:
                                     gid, sources, int(abs(elms['Den_ex'])))
                         else:
                             chosen_sources = sources
+                        logging.debug(
+                            "Rank {}: {}/{} sources chosen for neuron {}".format(
+                                self.rank, len(chosen_sources), total_synapses_this_gid, gid))
 
                         for s in chosen_sources:
                             deleted_synapses_this_gid += 1
@@ -1018,8 +1065,6 @@ class Sinha2016:
                                     'rule': 'one_to_one'}
                             )
                             synelms[s]['Axon_ex'] += 1
-
-                        elms['Den_ex'] += len(chosen_sources)
 
                 # inhibitory dendrites as targets
                 if 'Den_in' in elms and elms['Den_in'] < 0.0:
@@ -1037,9 +1082,6 @@ class Sinha2016:
                         allsources = self.comm.allgather(localsources)
                         sources = [s for sublist in allsources for s in sublist]
                         total_synapses_this_gid = len(sources)
-                        logging.debug(
-                            "Rank {}: Total sources for neuron {} is {}".format(
-                                self.rank, gid, total_synapses_this_gid))
 
                         if len(sources) > 0:
                             if len(sources) > int(abs(elms['Den_in'])):
@@ -1051,6 +1093,9 @@ class Sinha2016:
                                         gid, sources, int(abs(elms['Den_in'])))
                             else:
                                 chosen_sources = sources
+                            logging.debug(
+                                "Rank {}: {}/{} sources chosen for neuron {}".format(
+                                    self.rank, len(chosen_sources), total_synapses_this_gid, gid))
 
                             for s in chosen_sources:
                                 deleted_synapses_this_gid += 1
@@ -1065,7 +1110,6 @@ class Sinha2016:
                                 )
                                 synelms[s]['Axon_in'] += 1
 
-                            elms['Den_in'] += len(chosen_sources)
                     # it's an excitatory neuron
                     else:
                         conns = nest.GetConnections(
@@ -1086,9 +1130,6 @@ class Sinha2016:
                         allsources = self.comm.allgather(localsources)
                         sources = [s for sublist in allsources for s in sublist]
                         total_synapses_this_gid = len(sources)
-                        logging.debug(
-                            "Rank {}: Total sources for neuron {} is {}".format(
-                                self.rank, gid, total_synapses_this_gid))
 
                         if len(sources) > 0:
                             if len(sources) > int(abs(elms['Den_in'])):
@@ -1103,6 +1144,9 @@ class Sinha2016:
                                         gid, sources, int(abs(elms['Den_in'])))
                             else:
                                 chosen_sources = sources
+                            logging.debug(
+                                "Rank {}: {}/{} sources chosen for neuron {}".format(
+                                    self.rank, len(chosen_sources), total_synapses_this_gid, gid))
 
                             for s in chosen_sources:
                                 deleted_synapses_this_gid += 1
@@ -1117,14 +1161,14 @@ class Sinha2016:
                                 )
                                 synelms[s]['Axon_in'] += 1
 
-                            elms['Den_in'] += len(chosen_sources)
+                if deleted_synapses_this_gid > 0:
+                    print("{}\t{}\t{}\t{}".format(
+                        current_simtime, gid, total_synapses_this_gid,
+                        deleted_synapses_this_gid),
+                        file=self.synapses_deleted_handle)
+                    total_synapses += total_synapses_this_gid
+                    deleted_synapses += deleted_synapses_this_gid
 
-                print("{}\t{}\t{}\t{}".format(
-                    current_simtime, gid, total_synapses_this_gid,
-                    deleted_synapses_this_gid),
-                    file=self.synapses_deleted_handle)
-                total_synapses += total_synapses_this_gid
-                deleted_synapses += deleted_synapses_this_gid
             except KeyError as e:
                 logging.critical("KeyError exception while disconnecting!")
                 logging.critical("GID: {} : {}".format(gid, synelms[gid]))
@@ -1138,7 +1182,7 @@ class Sinha2016:
                 raise
 
         logging.debug(
-            "{} of {} connections deleted".format(
+            "{} of {} connections deleted from post".format(
                 deleted_synapses,
                 total_synapses))
 
@@ -1154,19 +1198,18 @@ class Sinha2016:
         current_simtime = (str(nest.GetKernelStatus()['time']))
         for nrn in (self.neuronsE + self.neuronsI):
             synapses_formed_this_gid = 0
+            total_options_this_gid = 0
             gid = nrn
             elms = synelms[nrn]
+            chosen_targets = []
             # excitatory connections - only need to look at Axons, it doesn't
             # matter which synaptic elements you start with, whichever are less
             # will act as the limiting factor.
             if 'Axon_ex' in elms and elms['Axon_ex'] > 0.0:
                 targetsE = []
                 targetsI = []
-                chosen_targets = []
 
                 for atarget in (self.neuronsE + self.neuronsI):
-                    if atarget == gid:
-                        continue
                     tid = atarget
                     telms = synelms[atarget]
                     if 'Den_ex' in telms and telms['Den_ex'] > 0.0:
@@ -1177,6 +1220,7 @@ class Sinha2016:
                         else:
                             targetsI.extend([tid]*int(telms['Den_ex']))
 
+                total_options_this_gid = len(targetsE) + len(targetsI)
                 if (len(targetsE) + len(targetsI)) > 0:
                     if (len(targetsE) + len(targetsI)) > int(abs(elms['Axon_ex'])):
                         if self.synapse_formation_strategy == "random":
@@ -1188,6 +1232,9 @@ class Sinha2016:
                                 gid, (targetsE + targetsI), int(abs(elms['Axon_ex'])))
                     else:
                         chosen_targets = (targetsE + targetsI)
+                    logging.debug(
+                        "Rank {}: {}/{} options chosen for neuron {}".format(
+                            self.rank, len(chosen_targets), total_options_this_gid, gid))
 
                     for cho in chosen_targets:
                         synelms[cho]['Den_ex'] -= 1
@@ -1201,20 +1248,16 @@ class Sinha2016:
                                          conn_spec='one_to_one',
                                          syn_spec=self.synDictEI)
 
-                    elms['Axon_ex'] -= len(chosen_targets)
 
             # here, you can connect either with E neurons or I neurons but both
             # will have different synapse types. So, a bit more work required
             # here than with the Axon_ex which always forms the same type of
             # synapse
-            if 'Axon_in' in elms and elms['Axon_in'] > 0.0:
+            elif 'Axon_in' in elms and elms['Axon_in'] > 0.0:
                 targetsE = []
                 targetsI = []
-                chosen_targets = []
 
                 for atarget in (self.neuronsE + self.neuronsI):
-                    if atarget == gid:
-                        continue
                     tid = atarget
                     telms = synelms[atarget]
                     if 'Den_in' in telms and telms['Den_in'] > 0.0:
@@ -1225,6 +1268,7 @@ class Sinha2016:
                         else:
                             targetsI.extend([tid]*int(telms['Den_in']))
 
+                total_options_this_gid = len(targetsE) + len(targetsI)
                 if (len(targetsE) + len(targetsI)) > 0:
                     if (len(targetsE) + len(targetsI)) > int(abs(elms['Axon_in'])):
                         if self.synapse_formation_strategy == "random":
@@ -1236,6 +1280,9 @@ class Sinha2016:
                                 gid, (targetsE + targetsI), int(abs(elms['Axon_in'])))
                     else:
                         chosen_targets = (targetsE + targetsI)
+                    logging.debug(
+                        "Rank {}: {}/{} options chosen for neuron {}".format(
+                            self.rank, len(chosen_targets), total_options_this_gid, gid))
 
                     for target in chosen_targets:
                         synapses_formed_this_gid += 1
@@ -1249,14 +1296,16 @@ class Sinha2016:
                                          conn_spec='one_to_one',
                                          syn_spec=self.synDictII)
 
-                    elms['Axon_in'] -= len(chosen_targets)
 
-            synapses_formed += synapses_formed_this_gid
-            print("{}\t{}\t{}".format(
-                current_simtime, gid, synapses_formed_this_gid),
-                file=self.synapses_formed_handle)
+            if synapses_formed_this_gid > 0:
+                print("{}\t{}\t{}".format(
+                    current_simtime, gid, synapses_formed_this_gid),
+                    file=self.synapses_formed_handle)
+                synapses_formed += synapses_formed_this_gid
+
         logging.debug(
-            "{} new RANDOM connections created".format(synapses_formed))
+            "Rank {}: {} new connections created".format(
+                self.rank, synapses_formed))
 
     def update_connectivity(self):
         """Our implementation of structural plasticity."""
@@ -1264,16 +1313,23 @@ class Sinha2016:
             return
         logging.info("STRUCTURAL PLASTICITY: Updating connectivity")
         syn_elms = self.__get_syn_elms()
-        self.__delete_connections(syn_elms)
+        self.__delete_connections_from_pre(syn_elms)
+        nest.Cleanup()
+        nest.Prepare()
+
+        # syn_elms = self.__get_syn_elms()
+        # self.__delete_connections_from_post(syn_elms)
+        # nest.Cleanup()
+        # nest.Prepare()
         # Must wait for all ranks to finish before proceeding
         self.comm.Barrier()
-        nest.Prepare()
 
         syn_elms = self.__get_syn_elms()
         self.__create_connections(syn_elms)
+        nest.Cleanup()
+        nest.Prepare()
         # Must wait for all ranks to finish before proceeding
         self.comm.Barrier()
-        nest.Prepare()
         logging.info("STRUCTURAL PLASTICITY: Connectivity updated")
 
     def store_spatial_pattern(self, track=False):
@@ -1734,13 +1790,15 @@ class Sinha2016:
 
     def dump_data(self):
         """Master datadump function."""
-        self.__dump_synaptic_weights()
-        self.__dump_ca_concentration()
-        self.__dump_synaptic_elements_per_neurons()
-        self.__dump_total_synaptic_elements()
+        logging.info("Rank {}: Printing data to files".format(self.rank))
+        # self.__dump_synaptic_weights()
+        # self.__dump_ca_concentration()
+        # self.__dump_synaptic_elements_per_neurons()
+        # self.__dump_total_synaptic_elements()
 
     def close_files(self):
         """Close all files when the simulation is finished."""
+        logging.info("Rank {}: Closing open files".format(self.rank))
         # Comma printed so that pandas can read it as a dataframe point
         print("{},".format(self.num_synapses_EE),
               file=self.weights_file_handle_EE)
@@ -1789,9 +1847,12 @@ class Sinha2016:
             logging.critical("EXITING SIMULATION.")
             sys.exit(-1)
 
+        logging.info("Rank {}: REWIRING ENABLED".format(self.rank))
+
     def disable_rewiring(self):
         """Disable the rewiring."""
         self.rewiring_enabled = False
+        logging.info("Rank {}: REWIRING DISABLED".format(self.rank))
 
 if __name__ == "__main__":
     # Set up logging configuration
@@ -1800,7 +1861,7 @@ if __name__ == "__main__":
         level=logging.DEBUG)
 
     step = False
-    numpats = 1
+    numpats = 0
     simulation = Sinha2016()
 
     # Setup network to handle plasticities
@@ -1810,9 +1871,10 @@ if __name__ == "__main__":
 
     # Intial stabilisation #
     simulation.prerun_setup(
-        stabilisation_time=2000.,
-        sp_update_interval=1000.,
-        recording_interval=200.)
+        stabilisation_time=1000.,
+        sp_update_interval=100.,
+        recording_interval=50.)
+    simulation.enable_rewiring()
     simulation.stabilise()
 
     # Pattern related simulation
