@@ -979,12 +979,12 @@ class Sinha2016:
                                         'rule': 'one_to_one'}
                                 )
 
+                total_synapses += total_synapses_this_gid
                 if deleted_synapses_this_gid > 0:
                     print("{}\t{}\t{}\t{}".format(
                         current_simtime, gid, total_synapses_this_gid,
                         deleted_synapses_this_gid),
                         file=self.synapses_deleted_handle)
-                    total_synapses += total_synapses_this_gid
                     deleted_synapses += deleted_synapses_this_gid
 
             except KeyError as e:
@@ -1156,12 +1156,12 @@ class Sinha2016:
                                 )
                                 synelms[s]['Axon_in'] += 1
 
+                total_synapses += total_synapses_this_gid
                 if deleted_synapses_this_gid > 0:
                     print("{}\t{}\t{}\t{}".format(
                         current_simtime, gid, total_synapses_this_gid,
                         deleted_synapses_this_gid),
                         file=self.synapses_deleted_handle)
-                    total_synapses += total_synapses_this_gid
                     deleted_synapses += deleted_synapses_this_gid
 
             except KeyError as e:
