@@ -831,16 +831,13 @@ class Sinha2016:
         # is OK here since we're not modifying the keys, only the values.
         # http://stackoverflow.com/a/2315529/375067
         for nrn in (self.neuronsE + self.neuronsI):
-            # excitatory neurons as sources
-            # here, I'm not using the synapse dicts because I don't need to
-            # specify the weight of the connection too. Whatever the weight is,
-            # we want to break the synapse.
             gid = nrn
             elms = synelms[nrn]
             partner = 0  # for exception
             total_synapses_this_gid = 0
             deleted_synapses_this_gid = 0
             try:
+                # excitatory neurons as sources
                 if 'Axon_ex' in elms and elms['Axon_ex'] < 0.0:
                     # GetConnections only returns connections who have targets
                     # on this particular rank. So I need to allgather to
@@ -1316,11 +1313,13 @@ class Sinha2016:
         self.__delete_connections_from_pre(syn_elms)
         nest.Cleanup()
         nest.Prepare()
+        # Must wait for all ranks to finish before proceeding
+        self.comm.Barrier()
 
-        # syn_elms = self.__get_syn_elms()
-        # self.__delete_connections_from_post(syn_elms)
-        # nest.Cleanup()
-        # nest.Prepare()
+        syn_elms = self.__get_syn_elms()
+        self.__delete_connections_from_post(syn_elms)
+        nest.Cleanup()
+        nest.Prepare()
         # Must wait for all ranks to finish before proceeding
         self.comm.Barrier()
 
@@ -1871,7 +1870,7 @@ if __name__ == "__main__":
 
     # Intial stabilisation #
     simulation.prerun_setup(
-        stabilisation_time=1000.,
+        stabilisation_time=500.,
         sp_update_interval=100.,
         recording_interval=50.)
     simulation.enable_rewiring()
