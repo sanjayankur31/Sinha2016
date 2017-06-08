@@ -1312,15 +1312,15 @@ class Sinha2016:
         # Must wait for all ranks to finish before proceeding
         self.comm.Barrier()
 
-        syn_elms = self.__get_syn_elms()
-        self.__delete_connections_from_post(syn_elms)
+        syn_elms_1 = self.__get_syn_elms()
+        self.__delete_connections_from_post(syn_elms_1)
         nest.Cleanup()
         nest.Prepare()
         # Must wait for all ranks to finish before proceeding
         self.comm.Barrier()
 
-        syn_elms = self.__get_syn_elms()
-        self.__create_connections(syn_elms)
+        syn_elms_2 = self.__get_syn_elms()
+        self.__create_connections(syn_elms_2)
         nest.Cleanup()
         nest.Prepare()
         # Must wait for all ranks to finish before proceeding
@@ -1856,7 +1856,7 @@ if __name__ == "__main__":
         level=logging.DEBUG)
 
     step = False
-    numpats = 0
+    numpats = 1
     simulation = Sinha2016()
 
     # Setup network to handle plasticities
@@ -1866,10 +1866,9 @@ if __name__ == "__main__":
 
     # Intial stabilisation #
     simulation.prerun_setup(
-        stabilisation_time=3000.,
+        stabilisation_time=2000.,
         sp_update_interval=500.,
         recording_interval=100.)
-    simulation.enable_rewiring()
     simulation.stabilise()
 
     # Pattern related simulation
@@ -1889,6 +1888,7 @@ if __name__ == "__main__":
         # Enable structural plasticity for repair #
         simulation.enable_rewiring()
         # Stabilise for repair
+        simulation.stabilise()
         simulation.stabilise()
 
         # recall stored and tracked pattern
