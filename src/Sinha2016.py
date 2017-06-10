@@ -65,7 +65,7 @@ class Sinha2016:
 
         # without spatial information
         # deafferentation percent of pattern
-        self.deaff_random_pattern_percent = .50
+        self.deaff_pattern_percent = .50
         # deafferentation percent of background
         self.deaff_bg_random_percentE = .50
         self.deaff_bg_random_percentI = .50
@@ -1514,7 +1514,7 @@ class Sinha2016:
         pattern_neurons = self.patterns[pattern_number - 1]
         deaffed_neurons = random.sample(
             pattern_neurons, int(math.ceil(len(pattern_neurons) *
-                                           self.deaff_random_pattern_percent)))
+                                           self.deaff_pattern_percent)))
         logging.info("ANKUR>> Number of deaff pattern neurons: "
                      "{}".format(len(deaffed_neurons)))
         if len(deaffed_neurons) > 0:
