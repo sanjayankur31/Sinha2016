@@ -114,8 +114,6 @@ class Sinha2016:
         self.weightExtE = 50.
         self.weightExtI = self.weightExtE
 
-        random.seed(42)
-
         # used to track how many comma separated values each line will have
         # when I store synaptic conductances.
         # Required in post processing, so that I know what the size of my
@@ -125,6 +123,7 @@ class Sinha2016:
         self.num_synapses_EI = 0
         self.num_synapses_II = 0
         self.num_synapses_IE = 0
+        random.seed(42)
 
     def __setup_neurons(self):
         """Setup properties of neurons."""
@@ -232,7 +231,6 @@ class Sinha2016:
                 ((neuron - self.neuronsI[0]) % self.colsI) *
                 self.neuronal_distI, self.location_sd)
             locations.append([x, y])
-
         self.location_tree = cKDTree(locations)
 
         self.poissonExtE = nest.Create('poisson_generator',
@@ -279,7 +277,6 @@ class Sinha2016:
             )
             random.shuffle(arow)
             weights.append(arow)
-
         return weights
 
     def __get_synapses_to_form(self, sources, destinations, sparsity):
@@ -305,7 +302,6 @@ class Sinha2016:
         # average, which is OK.
         for i in range(0, required_synapses):
             chosen_synapses.append([chosen_sources[i], chosen_destinations[i]])
-
         return chosen_synapses
 
     def __setup_initial_connection_params(self):
@@ -313,7 +309,6 @@ class Sinha2016:
         # Global sparsity
         self.sparsity = 0.02
         self.sparsityStim = 0.05
-
         # Other connection numbers
         self.connectionNumberStim = int((self.populations['STIM'] *
                                          self.populations['R']) *
@@ -321,7 +316,6 @@ class Sinha2016:
         # From the butz paper
         self.connectionNumberExtE = 1
         self.connectionNumberExtI = 1
-
         # connection dictionaries
         self.connDictExtE = {'rule': 'fixed_indegree',
                              'indegree': self.connectionNumberExtE}
@@ -348,17 +342,14 @@ class Sinha2016:
                                   'weight': 1.,
                                   'pre_synaptic_element': 'Axon_ex',
                                   'post_synaptic_element': 'Den_ex'}
-
                 self.synDictEI = {'model': 'static_synapse_ex',
                                   'weight': 1.,
                                   'pre_synaptic_element': 'Axon_ex',
                                   'post_synaptic_element': 'Den_ex'}
-
                 self.synDictII = {'model': 'static_synapse_in',
                                   'weight': 1.,
                                   'pre_synaptic_element': 'Axon_in',
                                   'post_synaptic_element': 'Den_in'}
-
                 self.synDictIE = {'model': 'static_synapse_in',
                                   'weight': -1.,
                                   'pre_synaptic_element': 'Axon_in',
@@ -370,24 +361,20 @@ class Sinha2016:
                                   'weight': self.weightEE,
                                   'pre_synaptic_element': 'Axon_ex',
                                   'post_synaptic_element': 'Den_ex'}
-
                 self.synDictEI = {'model': 'static_synapse_ex',
                                   'weight': self.weightEI,
                                   'pre_synaptic_element': 'Axon_ex',
                                   'post_synaptic_element': 'Den_ex'}
-
                 self.synDictII = {'model': 'static_synapse_in',
                                   'weight': self.weightII,
                                   'pre_synaptic_element': 'Axon_in',
                                   'post_synaptic_element': 'Den_in'}
-
                 self.synDictIE = {'model': 'stdp_synapse_in',
                                   'weight': -0.0000001, 'Wmax': -30000.,
                                   'alpha': .12, 'eta': 0.01,
                                   'tau': 20.,
                                   'pre_synaptic_element': 'Axon_in',
                                   'post_synaptic_element': 'Den_in'}
-
             nest.SetStructuralPlasticityStatus({
                 'structural_plasticity_synapses': {
                     'static_synapse_ex': self.synDictEE,
@@ -396,17 +383,14 @@ class Sinha2016:
                     'stdp_synapse_in': self.synDictIE,
                 }
             })
-
         # Only synaptic plasticity - do not define synaptic elements
         else:
             self.synDictEE = {'model': 'static_synapse_ex',
                               'weight': self.weightEE}
             self.synDictEI = {'model': 'static_synapse_ex',
                               'weight': self.weightEI}
-
             self.synDictII = {'model': 'static_synapse_in',
                               'weight': self.weightII}
-
             self.synDictIE = {'model': 'stdp_synapse_in',
                               'weight': -0.0000001, 'Wmax': -30000.,
                               'alpha': .12, 'eta': 0.01,
@@ -686,7 +670,6 @@ class Sinha2016:
         nest.ResetKernel()
         # http://www.nest-simulator.org/sli/setverbosity/
         nest.set_verbosity('M_INFO')
-
         nest.SetKernelStatus(
             {
                 'resolution': self.dt,
@@ -706,10 +689,8 @@ class Sinha2016:
         self.__setup_neurons()
         self.__create_neurons()
         self.__setup_detectors()
-
         self.__setup_initial_connection_params()
         self.__create_initial_connections()
-
         self.__setup_files()
 
         self.dump_data()
@@ -1848,6 +1829,7 @@ class Sinha2016:
         """Disable the rewiring."""
         self.rewiring_enabled = False
         logging.info("Rank {}: REWIRING DISABLED".format(self.rank))
+
 
 if __name__ == "__main__":
     # Set up logging configuration
