@@ -1351,8 +1351,89 @@ class Sinha2016:
         self.comm.Barrier()
         logging.info("STRUCTURAL PLASTICITY: Connectivity updated")
 
-    def store_spatial_pattern(self, track=False):
-        """Store a pattern of neurons that are spatially adjacent."""
+    def __store_lpz_pattern_neurons(self, num_neurons):
+        """Get neurons in the centre of the grid."""
+        first_point = self.location_tree.data[0]
+        last_point = self.location_tree.data[-1]
+        mid_point = [(x - y)/2 for x, y in zip(last_point, first_point)]
+        pattern_neurons = self.location_tree.query(
+            mid_point, k=num_neurons)[1]
+        logging.debug("ANKUR>> Number of pattern neurons: "
+                      "{}".format(len(pattern_neurons)))
+        return pattern_neurons
+
+    def __get_random_pattern_neurons(self, num_neurons):
+        """Get neurons randomly."""
+        pattern_neurons = random.sample(self.neuronsE, num_neurons)
+        logging.debug("ANKUR>> Number of pattern neurons: "
+                      "{}".format(len(pattern_neurons)))
+        return pattern_neurons
+
+    def __strengthen_pattern_connections(self, pattern_neurons):
+        """Strengthen connections that make up the pattern."""
+        connections = nest.GetConnections(source=pattern_neurons,
+                                          target=pattern_neurons)
+        logging.debug("ANKUR>> Number of connections strengthened: "
+                      "{}".format(len(connections)))
+        nest.SetStatus(connections, {"weight": self.weightPatternEE})
+        logging.debug("ANKUR>> New weight: {}nS".format(self.weightPatternEE))
+
+    def __track_pattern(self, pattern_neurons):
+        """Track the pattern."""
+        logging.debug("Tracking this pattern")
+        self.patterns.append(pattern_neurons)
+        # print to file
+        file_name = "patternneurons-{}-rank-{}.txt".format(
+            self.pattern_count, self.rank)
+        with open(file_name, 'w') as file_handle:
+            for neuron in pattern_neurons:
+                print(neuron, file=file_handle)
+
+        # background neurons
+        background_neurons = list(
+            set(self.neuronsE) - set(pattern_neurons))
+        file_name = "backgroundneurons-{}-rank-{}.txt".format(
+            self.pattern_count, self.rank)
+
+        with open(file_name, 'w') as file_handle:
+            for neuron in background_neurons:
+                print(neuron, file=file_handle)
+
+        # set up spike detectors
+        sd_params = self.spike_detector_paramsP.copy()
+        sd_params['label'] = (sd_params['label'] + "-{}".format(
+            self.pattern_count))
+        # pattern
+        pattern_spike_detector = nest.Create(
+            'spike_detector', params=sd_params)
+        nest.Connect(pattern_neurons, pattern_spike_detector)
+        # save the detector
+        self.sdP.append(pattern_spike_detector)
+
+        # background
+        sd_params = self.spike_detector_paramsB.copy()
+        sd_params['label'] = (sd_params['label'] + "-{}".format(
+            self.pattern_count))
+        background_spike_detector = nest.Create(
+            'spike_detector', params=sd_params)
+        nest.Connect(background_neurons, background_spike_detector)
+        # save the detector
+        self.sdB.append(background_spike_detector)
+
+    def store_lpz_spatial_pattern(self, track=False):
+        """Store a pattern in the centre of neuronal grid."""
+        logging.debug(
+            "SIMULATION: Storing pattern {}".format(
+                self.pattern_count + 1))
+        self.pattern_count += 1
+        pattern_neurons = self.__store_lpz_pattern_neurons(
+            len(self.neuronsE) * self.pattern_percent)
+        self.__strengthen_pattern_connections(pattern_neurons)
+        if track:
+            self.__track_pattern(pattern_neurons)
+        logging.debug(
+            "Number of patterns stored: {}".format(
+                self.pattern_count))
 
     def store_random_pattern(self, track=False):
         """Store a pattern of neurons that are randomly chosen."""
@@ -1361,61 +1442,11 @@ class Sinha2016:
                 self.pattern_count + 1))
         # Keep track of how many patterns are stored
         self.pattern_count += 1
-        pattern_neurons = random.sample(
-            self.neuronsE, int(math.ceil(len(self.neuronsE) *
-                                         self.pattern_percent)))
-        logging.debug("ANKUR>> Number of pattern neurons: "
-                      "{}".format(len(pattern_neurons)))
-
-        # strengthen connections
-        connections = nest.GetConnections(source=pattern_neurons,
-                                          target=pattern_neurons)
-        logging.debug("ANKUR>> Number of connections strengthened: "
-                      "{}".format(len(connections)))
-        nest.SetStatus(connections, {"weight": self.weightPatternEE})
-        logging.debug("ANKUR>> New weight: {}nS".format(self.weightPatternEE))
-
-        # store these neurons
-        self.patterns.append(pattern_neurons)
+        pattern_neurons = self.__get_random_pattern_neurons(
+            len(self.neuronsE) * self.pattern_percent)
+        self.__strengthen_pattern_connections(pattern_neurons)
         if track:
-            # print to file
-            file_name = "patternneurons-{}-rank-{}.txt".format(
-                self.pattern_count, self.rank)
-            with open(file_name, 'w') as file_handle:
-                for neuron in pattern_neurons:
-                    print(neuron, file=file_handle)
-
-            # background neurons
-            background_neurons = list(
-                set(self.neuronsE) - set(pattern_neurons))
-            file_name = "backgroundneurons-{}-rank-{}.txt".format(
-                self.pattern_count, self.rank)
-
-            with open(file_name, 'w') as file_handle:
-                for neuron in background_neurons:
-                    print(neuron, file=file_handle)
-
-            # set up spike detectors
-            sd_params = self.spike_detector_paramsP.copy()
-            sd_params['label'] = (sd_params['label'] + "-{}".format(
-                self.pattern_count))
-            # pattern
-            pattern_spike_detector = nest.Create(
-                'spike_detector', params=sd_params)
-            nest.Connect(pattern_neurons, pattern_spike_detector)
-            # save the detector
-            self.sdP.append(pattern_spike_detector)
-
-            # background
-            sd_params = self.spike_detector_paramsB.copy()
-            sd_params['label'] = (sd_params['label'] + "-{}".format(
-                self.pattern_count))
-            background_spike_detector = nest.Create(
-                'spike_detector', params=sd_params)
-            nest.Connect(background_neurons, background_spike_detector)
-            # save the detector
-            self.sdB.append(background_spike_detector)
-
+            self.__track_pattern(pattern_neurons)
         logging.debug(
             "Number of patterns stored: {}".format(
                 self.pattern_count))
@@ -1490,20 +1521,9 @@ class Sinha2016:
         self.setup_pattern_for_recall(pattern_number)
         self.run_simulation(time)
 
-    def deaff_last_random_pattern(self):
-        """
-        Deaff last pattern by picking a random set of neurons from it.
-
-        An extra helper method, since we'll be doing this most.
-        """
-        logging.info("SIMULATION: deaffing last pattern ({})".format(
-            self.pattern_count))
-        self.__deaff_random_pattern(self.pattern_count)
-        self.__deaff_bg_random_E(self.pattern_count)
-        self.__deaff_bg_random_I(self.pattern_count)
-
-    def deaff_random_pattern(self, pattern_number):
-        """Deaff a pattern by picking a random set of neurons from it."""
+    def deaff_non_spatial_network(self, pattern_number):
+        """Deaff non spatial network."""
+        logging.info("SIMULATION: deaffing non spatial network")
         self.__deaff_random_pattern(pattern_number)
         self.__deaff_bg_random_E(pattern_number)
         self.__deaff_bg_random_I(pattern_number)
@@ -1542,6 +1562,10 @@ class Sinha2016:
             non_deaffed_neurons = list(set(pattern_neurons) -
                                        set(deaffed_neurons))
             self.__dump_neuron_set(file_name, non_deaffed_neurons)
+
+    def deaff_spatial_network(self, pattern_number):
+        """Deaff a the network."""
+        logging.info("SIMULATION: deaffing spatial network")
 
     def __deaff_bg_random_E(self, pattern_number):
         """Deaff background a random selection of E neurons."""
@@ -1881,6 +1905,7 @@ if __name__ == "__main__":
         level=logging.DEBUG)
 
     step = False
+    spatial = True
     numpats = 1
     simulation = Sinha2016()
 
@@ -1901,16 +1926,23 @@ if __name__ == "__main__":
     if numpats > 0:
         # store patterns
         # only track first pattern to limit log files
-        simulation.store_random_pattern(True)
-        # Do not track the others
-        for i in range(1, numpats):
-            simulation.store_random_pattern()
+        if spatial:
+            simulation.store_lpz_spatial_pattern(True)
+            for i in range(1, numpats):
+                simulation.store_lpz_spatial_pattern(True)
+        else:
+            simulation.store_random_pattern(False)
+            for i in range(1, numpats):
+                simulation.store_lpz_spatial_pattern(False)
 
         # stabilise network after storing patterns
         simulation.stabilise()
 
         # Deaff first pattern (which is also being tracked)
-        simulation.deaff_random_pattern(1)
+        if spatial:
+            simulation.deaff_spatial_network(1)
+        else:
+            simulation.deaff_non_spatial_network(1)
         # Enable structural plasticity for repair #
         simulation.enable_rewiring()
         # Stabilise for repair
