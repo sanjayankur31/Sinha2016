@@ -211,6 +211,8 @@ class Sinha2016:
 
         # Generate a grid and construct a cKDTree
         locations = []
+        if self.rank == 0:
+            loc_file = open("00-neuron-locations-E.txt", 'w')
         for neuron in self.neuronsE:
             y = random.gauss(
                 int((neuron - self.neuronsE[0])/self.colsE) *
@@ -219,8 +221,15 @@ class Sinha2016:
                 ((neuron - self.neuronsE[0]) % self.colsE) *
                 self.neuronal_distE, self.location_sd)
             locations.append([x, y])
+            if self.rank == 0:
+                print("{}\t{}\t{}".format(neuron, x, y), file=loc_file)
+        if self.rank == 0:
+            loc_file.close()
+
         # I neurons have an intiail offset to distribute them evenly between E
         # neurons
+        if self.rank == 0:
+            loc_file = open("00-neuron-locations-I.txt", 'w')
         for neuron in self.neuronsI:
             y = self.neuronal_distI/4 + random.gauss(
                 int((neuron - self.neuronsI[0])/self.colsI) *
@@ -229,6 +238,10 @@ class Sinha2016:
                 ((neuron - self.neuronsI[0]) % self.colsI) *
                 self.neuronal_distI, self.location_sd)
             locations.append([x, y])
+            if self.rank == 0:
+                print("{}\t{}\t{}".format(neuron, x, y), file=loc_file)
+        if self.rank == 0:
+            loc_file.close()
         self.location_tree = cKDTree(locations)
 
         self.poissonExtE = nest.Create('poisson_generator',
