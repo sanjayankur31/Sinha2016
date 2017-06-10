@@ -1351,7 +1351,7 @@ class Sinha2016:
         self.comm.Barrier()
         logging.info("STRUCTURAL PLASTICITY: Connectivity updated")
 
-    def __store_lpz_pattern_neurons(self, num_neurons):
+    def __get_lpz_pattern_neurons(self, num_neurons):
         """Get neurons in the centre of the grid."""
         first_point = self.location_tree.data[0]
         last_point = self.location_tree.data[-1]
@@ -1426,7 +1426,7 @@ class Sinha2016:
             "SIMULATION: Storing pattern {}".format(
                 self.pattern_count + 1))
         self.pattern_count += 1
-        pattern_neurons = self.__store_lpz_pattern_neurons(
+        pattern_neurons = self.__get_lpz_pattern_neurons(
             len(self.neuronsE) * self.pattern_percent)
         self.__strengthen_pattern_connections(pattern_neurons)
         if track:
@@ -1933,7 +1933,7 @@ if __name__ == "__main__":
         else:
             simulation.store_random_pattern(False)
             for i in range(1, numpats):
-                simulation.store_lpz_spatial_pattern(False)
+                simulation.store_random_pattern(False)
 
         # stabilise network after storing patterns
         simulation.stabilise()
