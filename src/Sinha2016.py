@@ -636,7 +636,7 @@ class Sinha2016:
         elif self.setup_syn_p and not self.setup_str_p:
             logging.info("NETWORK SETUP TO HANDLE ONLY SYNAPTIC PLASTICITY")
         else:
-            logging.info("Both plasticities cannot be disabled. Exiting.")
+            logging.critical("Both plasticities cannot be disabled. Exiting.")
             sys.exit()
 
     def prerun_setup(self, step=False,
@@ -647,12 +647,12 @@ class Sinha2016:
         # Cannot be changed mid simulation
         if step:
             self.step = step
-        self.update_windows(stabilisation_time, sp_update_interval,
+        self.update_time_windows(stabilisation_time, sp_update_interval,
                             recording_interval)
         self.__setup_simulation()
         self.comm.Barrier()
 
-    def update_windows(self,
+    def update_time_windows(self,
                        stabilisation_time=None,
                        sp_update_interval=None,
                        recording_interval=None):
