@@ -88,8 +88,6 @@ class Sinha2016:
         # time recall stimulus is enabled for
         self.recall_time = 1000.  # ms
 
-        self.recall_ext_i = 3000.
-
         self.rank = nest.Rank()
 
         self.patterns = []
@@ -1255,7 +1253,6 @@ class Sinha2016:
                             nest.Connect([gid], [cho],
                                          conn_spec='one_to_one',
                                          syn_spec=self.synDictEI)
-
 
             # here, you can connect either with E neurons or I neurons but both
             # will have different synapse types. So, a bit more work required
