@@ -659,7 +659,7 @@ class Sinha2016:
         if step:
             self.step = step
         self.update_time_windows(stabilisation_time, sp_update_interval,
-                            recording_interval)
+                                 recording_interval)
         self.__setup_simulation()
         self.comm.Barrier()
 
@@ -697,9 +697,9 @@ class Sinha2016:
                 print("{}: {}".format("sparsity", self.sparsity), file=pfile)
 
     def update_time_windows(self,
-                       stabilisation_time=None,
-                       sp_update_interval=None,
-                       recording_interval=None):
+                            stabilisation_time=None,
+                            sp_update_interval=None,
+                            recording_interval=None):
         """Set up stabilisation time."""
         if stabilisation_time:
             self.stabilisation_time = stabilisation_time
