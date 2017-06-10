@@ -652,6 +652,39 @@ class Sinha2016:
         self.__setup_simulation()
         self.comm.Barrier()
 
+    def print_simulation_parameters(self):
+        """Print the parameters of the simulation to a file."""
+        if self.rank == 0:
+            with open("00-simulation_params.txt", 'w') as pfile:
+                print("{}: {}".format("dt", self.dt), file=pfile)
+                print("{}: {}".format("stabilisation_time", self.dt), file=pfile)
+                print("{}: {}".format("recording_interval", self.recording_interval), file=pfile)
+                print("{}: {}".format("str_p_enabled", self.setup_str_p), file=pfile)
+                print("{}: {}".format("syn_p_enabled", self.setup_syn_p), file=pfile)
+                print("{}: {}".format("rewiring_enabled", self.rewiring_enabled), file=pfile)
+                print("{}: {}".format("synapse_deletion_strategy", self.synapse_deletion_strategy), file=pfile)
+                print("{}: {}".format("synapse_formation_strategy", self.synapse_formation_strategy), file=pfile)
+                print("{}: {}".format("num_E", self.populations['E']), file=pfile)
+                print("{}: {}".format("num_I", self.populations['I']), file=pfile)
+                print("{}: {}".format("num_P", self.populations['P']), file=pfile)
+                print("{}: {}".format("num_R", self.populations['R']), file=pfile)
+                print("{}: {}".format("pattern_percent", self.pattern_percent), file=pfile)
+                print("{}: {}".format("recall_percent", self.recall_percent), file=pfile)
+                print("{}: {}".format("num_colsE", self.colsE), file=pfile)
+                print("{}: {}".format("num_colsI", self.colsI), file=pfile)
+                print("{}: {}".format("dist_neuronsE", self.neuronal_distE), file=pfile)
+                print("{}: {}".format("dist_neuronsI", self.neuronal_distI), file=pfile)
+                print("{}: {}".format("sd_dist", self.location_sd), file=pfile)
+                print("{}: {}".format("sp_update_interval", self.sp_update_interval), file=pfile)
+                print("{}: {}".format("recording_interval", self.recording_interval), file=pfile)
+                print("{}: {}".format("wbar", self.wbar), file=pfile)
+                print("{}: {}".format("weightEE", self.weightEE), file=pfile)
+                print("{}: {}".format("weightEI", self.weightEI), file=pfile)
+                print("{}: {}".format("weightII", self.weightII), file=pfile)
+                print("{}: {}".format("weightExtI", self.weightExtI), file=pfile)
+                print("{}: {}".format("weightExtE", self.weightExtE), file=pfile)
+                print("{}: {}".format("sparsity", self.sparsity), file=pfile)
+
     def update_time_windows(self,
                        stabilisation_time=None,
                        sp_update_interval=None,
@@ -1851,6 +1884,7 @@ if __name__ == "__main__":
         stabilisation_time=2000.,
         sp_update_interval=500.,
         recording_interval=100.)
+    simulation.print_simulation_parameters()
     simulation.stabilise()
 
     # Pattern related simulation
