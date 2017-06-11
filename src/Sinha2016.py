@@ -1900,8 +1900,7 @@ if __name__ == "__main__":
         level=logging.DEBUG)
 
     step = False
-    spatial = True
-    store_patterns = 1
+    store_patterns = True
     simulation = Sinha2016()
 
     # simulation setup
@@ -1924,7 +1923,7 @@ if __name__ == "__main__":
     simulation.stabilise()
 
     # Pattern related simulation
-    if store_patterns > 0:
+    if store_patterns:
         # store patterns
         # only track first pattern to limit log files
         simulation.store_lpz_central_pattern(True)
