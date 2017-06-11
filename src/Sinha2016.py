@@ -245,8 +245,11 @@ class Sinha2016:
 
     def __get_deaffed_neurons(self):
         """Divide neurons into LPZ and the rest."""
-        deaffed_neurons = self.__get_neurons_from_grid_centre(
-            (len(self.neuronsE) + len(self.neuronsI)) * self.deaff_percent)
+        first_point = self.location_tree.data[0]
+        last_point = self.location_tree.data[len(self.neuronsE) - 1]
+        deaffed_neurons = self.__get_neurons_from_region(
+            (len(self.neuronsE) + len(self.neuronsI)) * self.deaff_percent,
+            first_point, last_point)
         self.deaffed_neurons_E = list(set(deaffed_neurons).intersection(
             set(self.neuronsE)))
         self.deaffed_neurons_I = list(set(deaffed_neurons).intersection(
@@ -1413,24 +1416,16 @@ class Sinha2016:
         self.comm.Barrier()
         logging.info("STRUCTURAL PLASTICITY: Connectivity updated")
 
-    def __get_neurons_from_grid_centre(self, num_neurons):
+    def __get_neurons_from_region(self, num_neurons, first_point, last_point):
         """Get neurons in the centre of the grid.
 
         This will be used to get neurons for deaff, and also to get neurons for
         the centred pattern.
         """
-        # first E neuron
-        first_point = self.location_tree.data[0]
-        # last E neuron
-        # I neurons are spread among the E neurons and therefore do not make it
-        # to the extremeties
-        last_point = self.location_tree.data[len(self.neuronsE) - 1]
         mid_point = [(x - y)/2 for x, y in zip(last_point, first_point)]
-        pattern_neurons = self.location_tree.query(
+        neurons = self.location_tree.query(
             mid_point, k=num_neurons)[1]
-        logging.debug("ANKUR>> Number of pattern neurons: "
-                      "{}".format(len(pattern_neurons)))
-        return pattern_neurons
+        return neurons
 
     def __strengthen_pattern_connections(self, pattern_neurons):
         """Strengthen connections that make up the pattern."""
@@ -1483,16 +1478,22 @@ class Sinha2016:
         # save the detector
         self.sdB.append(background_spike_detector)
 
-    def store_lpz_spatial_pattern(self, track=False):
+    def store_lpz_central_pattern(self, track=False):
         """Store a pattern in the centre of neuronal grid."""
         logging.debug(
             "SIMULATION: Storing pattern {}".format(
                 self.pattern_count + 1))
         self.pattern_count += 1
+        # first E neuron
+        first_point = self.location_tree.data[0]
+        # last E neuron
+        # I neurons are spread among the E neurons and therefore do not make it
+        # to the extremeties
+        last_point = self.location_tree.data[len(self.neuronsE) - 1]
         # get 1000 neurons - 800 will be E and 200 will be I
         # we only need the 800 I neurons
-        all_neurons = self.__get_neurons_from_grid_centre(
-            (1.25 * self.populations['P']))
+        all_neurons = self.__get_neurons_from_region(
+            (1.25 * self.populations['P']), first_point, last_point)
         pattern_neurons = list(set(all_neurons).intersection(
             set(self.neuronsE)))
         self.__strengthen_pattern_connections(pattern_neurons)
