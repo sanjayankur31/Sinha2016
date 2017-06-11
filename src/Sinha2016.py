@@ -1431,10 +1431,9 @@ class Sinha2016:
         """Strengthen connections that make up the pattern."""
         connections = nest.GetConnections(source=pattern_neurons,
                                           target=pattern_neurons)
+        nest.SetStatus(connections, {"weight": self.weightPatternEE})
         logging.debug("ANKUR>> Number of connections strengthened: "
                       "{}".format(len(connections)))
-        nest.SetStatus(connections, {"weight": self.weightPatternEE})
-        logging.debug("ANKUR>> New weight: {}nS".format(self.weightPatternEE))
 
     def __track_pattern(self, pattern_neurons):
         """Track the pattern."""
