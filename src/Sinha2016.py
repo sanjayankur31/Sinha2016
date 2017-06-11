@@ -1608,7 +1608,7 @@ class Sinha2016:
         self.setup_pattern_for_recall(pattern_number)
         self.run_simulation(time)
 
-    def deaff_network(self, pattern_number):
+    def deaff_network(self):
         """Deaff a the network."""
         logging.info("SIMULATION: deaffing spatial network")
         for nrn in self.deaffed_neurons_E:
@@ -1933,7 +1933,7 @@ if __name__ == "__main__":
         simulation.stabilise()
 
         # Deaff first pattern (which is also being tracked)
-        simulation.deaff_network(1)
+        simulation.deaff_network()
         # Enable structural plasticity for repair #
         simulation.enable_rewiring()
         # Stabilise for repair
