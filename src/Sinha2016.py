@@ -770,6 +770,7 @@ class Sinha2016:
 
         self.__setup_neurons()
         self.__create_neurons()
+        self.__divide_neurons()
         self.__setup_detectors()
         self.__setup_initial_connection_params()
         self.__create_initial_connections()
