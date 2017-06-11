@@ -62,3 +62,5 @@ target/
 *.pyc
 *.swo
 *.swp
+
+__Scratch__
