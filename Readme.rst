@@ -34,7 +34,7 @@ For the following neuron sets:
 - Pattern/signal neurons
 - Background/noise neurons
 - Recall neurons
-- Deafferentiated neurons
+- Deafferentated neurons
 - Stim neurons
 
 Used to generate:
