@@ -105,8 +105,7 @@ class Sinha2016:
         self.weightII = self.wbar * -10.
         self.weightEI = self.wbar
         self.weightPatternEE = self.wbar * 5.
-        self.weightExtE = 50.
-        self.weightExtI = self.weightExtE
+        self.weightExt = 50.
 
         # used to track how many comma separated values each line will have
         # when I store synaptic conductances.
@@ -240,12 +239,18 @@ class Sinha2016:
             loc_file.close()
         self.location_tree = cKDTree(locations)
 
-        self.poissonExtE = nest.Create('poisson_generator',
-                                       self.populations['Poisson'],
-                                       params=self.poissonExtDict)
-        self.poissonExtI = nest.Create('poisson_generator',
-                                       self.populations['Poisson'],
-                                       params=self.poissonExtDict)
+        self.poissonExt = nest.Create('poisson_generator',
+                                      self.populations['Poisson'],
+                                      params=self.poissonExtDict)
+
+    def __divide_neurons(self):
+        """Divide neurons into LPZ and the rest."""
+        deaffed_neurons = self.__get_neurons_from_grid_centre(
+            (len(self.neuronsE) + len(self.neuronsI)) * self.deaff_percent)
+        self.deaffed_neurons_E = list(set(deaffed_neurons).intersection(
+            set(self.neuronsE)))
+        self.deaffed_neurons_I = list(set(deaffed_neurons).intersection(
+            set(self.neuronsI)))
 
     def __create_sparse_list(self, length, static_w, sparsity):
         """Create one list to use with SetStatus."""
@@ -321,14 +326,10 @@ class Sinha2016:
         self.connectionNumberStim = int((self.populations['STIM'] *
                                          self.populations['R']) *
                                         self.sparsityStim)
-        # From the butz paper
-        self.connectionNumberExtE = 1
-        self.connectionNumberExtI = 1
-        # connection dictionaries
-        self.connDictExtE = {'rule': 'fixed_indegree',
-                             'indegree': self.connectionNumberExtE}
-        self.connDictExtI = {'rule': 'fixed_indegree',
-                             'indegree': self.connectionNumberExtI}
+        # each neuron gets a single input
+        self.connDictExt = {'rule': 'fixed_indegree',
+                            'indegree': 1}
+        # recall stimulus
         self.connDictStim = {'rule': 'fixed_total_number',
                              'N': self.connectionNumberStim}
 
@@ -406,14 +407,14 @@ class Sinha2016:
 
     def __create_initial_connections(self):
         """Initially connect various neuron sets."""
-        nest.Connect(self.poissonExtE, self.neuronsE,
-                     conn_spec=self.connDictExtE,
+        nest.Connect(self.poissonExt, self.neuronsE,
+                     conn_spec=self.connDictExt,
                      syn_spec={'model': 'static_synapse',
-                               'weight': self.weightExtE})
-        nest.Connect(self.poissonExtI, self.neuronsI,
-                     conn_spec=self.connDictExtI,
+                               'weight': self.weightExt})
+        nest.Connect(self.poissonExt, self.neuronsI,
+                     conn_spec=self.connDictExt,
                      syn_spec={'model': 'static_synapse',
-                               'weight': self.weightExtI})
+                               'weight': self.weightExt})
 
         # only structural plasticity
         if self.setup_str_p and not self.setup_syn_p:
