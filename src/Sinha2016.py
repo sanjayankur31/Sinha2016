@@ -867,12 +867,12 @@ class Sinha2016:
                 len(synaptic_elms)))
         return synaptic_elms
 
-    def __choose_deletion_partners_weight(anchor, options, num_required):
+    def __get_del_ps_w(anchor, options, num_required):
         """Choose partners to delete based on weight of connections."""
         logging.critical("UNIMPLEMENTED. EXITING!")
         sys.exit(-1)
 
-    def __choose_deletion_partners_distance(anchor, options, num_required):
+    def __get_del_ps_d(anchor, options, num_required):
         """Choose partners to delete based on distance."""
         logging.critical("UNIMPLEMENTED. EXITING!")
         sys.exit(-1)
@@ -880,8 +880,8 @@ class Sinha2016:
     def __delete_connections_from_pre(self, synelms):
         """Delete connections when the neuron is a source."""
         logging.debug(
-            "Deleting connections from pre using the '{}' deletion strategy".format(
-                self.synapse_deletion_strategy))
+            "Deleting connections from pre using '{}' deletion strategy".format(
+                self.syn_del_strategy))
         total_synapses = 0
         deleted_synapses = 0
         current_simtime = (str(nest.GetKernelStatus()['time']))
@@ -965,7 +965,7 @@ class Sinha2016:
                     localtargetsE = []
                     chosen_targets = []
 
-                    if self.synapse_deletion_strategy == "weight":
+                    if self.syn_del_strategy == "weight":
                         # also need to store weight
                         # list of lists: [[target, weight], [target, weight]..]
                         weightsToI = nest.GetStatus(connsToI, "weight")
