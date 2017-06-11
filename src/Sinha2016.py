@@ -73,7 +73,7 @@ class Sinha2016:
         self.neuronal_distI = 300  # micro metres
         self.location_sd = 15  # micro metres
         self.location_tree = None
-        self.deaff_size = []  # x-width, y-width
+        self.deaff_percent = []
 
         # structural plasticity bits
         # not steps since we're not using it in NEST. This is for our manual
