@@ -1477,6 +1477,33 @@ class Sinha2016:
         # save the detector
         self.sdB.append(background_spike_detector)
 
+    def store_lpz_border_pattern(self, track=False):
+        """Store a pattern on the border of the LPZ."""
+        logging.debug(
+            "SIMULATION: Storing pattern {} on left border of LPZ".format(
+                self.pattern_count + 1))
+        self.pattern_count += 1
+        # left most, top most
+        first_point = self.location_tree.data[0]
+        # right most, bottom most
+        last_point = self.location_tree.data[len(self.neuronsE) - 1]
+        # mid point of grid
+        mid_point = [(x + y)/2 for x, y in zip(last_point, first_point)]
+        # left most, mid y
+        first_point[1] = mid_point[1]
+        # get 1000 neurons - 800 will be E and 200 will be I
+        # we only need the 800 I neurons
+        all_neurons = self.__get_neurons_from_region(
+            (1.25 * self.populations['P']), first_point, mid_point)
+        pattern_neurons = list(set(all_neurons).intersection(
+            set(self.neuronsE)))
+        self.__strengthen_pattern_connections(pattern_neurons)
+        if track:
+            self.__track_pattern(pattern_neurons)
+        logging.debug(
+            "Number of patterns stored: {}".format(
+                self.pattern_count))
+
     def store_lpz_central_pattern(self, track=False):
         """Store a pattern in the centre of neuronal grid."""
         logging.debug(
