@@ -63,12 +63,6 @@ class Sinha2016:
         # recall percent of pattern
         self.recall_percent = .25
 
-        # deafferentation percent of pattern
-        self.deaff_pattern_percent = .50
-        # deafferentation percent of background
-        self.deaff_bg_random_percentE = .50
-        self.deaff_bg_random_percentI = .50
-
         self.populations['P'] = self.pattern_percent * self.populations['E']
         self.populations['R'] = self.recall_percent * self.populations['P']
 
@@ -1518,120 +1512,9 @@ class Sinha2016:
         self.setup_pattern_for_recall(pattern_number)
         self.run_simulation(time)
 
-    def deaff_non_spatial_network(self, pattern_number):
-        """Deaff non spatial network."""
-        logging.info("SIMULATION: deaffing non spatial network")
-        self.__deaff_random_pattern(pattern_number)
-        self.__deaff_bg_random_E(pattern_number)
-        self.__deaff_bg_random_I(pattern_number)
-
-    def __deaff_random_pattern(self, pattern_number):
-        """Deaff the pattern neuron set by picking a random set of neurons."""
-        logging.info("ANKUR>> Deaffing pattern {}".format(pattern_number))
-        pattern_neurons = self.patterns[pattern_number - 1]
-        deaffed_neurons = random.sample(
-            pattern_neurons, int(math.ceil(len(pattern_neurons) *
-                                           self.deaff_pattern_percent)))
-        logging.info("ANKUR>> Number of deaff pattern neurons: "
-                     "{}".format(len(deaffed_neurons)))
-        if len(deaffed_neurons) > 0:
-            conns = nest.GetConnections(source=self.poissonExtE,
-                                        target=deaffed_neurons)
-            for conn in conns:
-                nest.DisconnectOneToOne(conn[0], conn[1],
-                                        syn_spec={'model': 'static_synapse'})
-
-            sd_params = self.spike_detector_paramsDP.copy()
-            sd_params['label'] = sd_params['label'] + "-{}".format(
-                pattern_number)
-            deaff_spike_detector = nest.Create(
-                'spike_detector', params=sd_params)
-            nest.Connect(deaffed_neurons, deaff_spike_detector)
-            # save the detector
-            self.sdDP.append(deaff_spike_detector)
-
-            file_name = "deaffed-patternneurons-{}-rank-{}.txt".format(
-                pattern_number, self.rank)
-            self.__dump_neuron_set(file_name, deaffed_neurons)
-
-            file_name = "non-deaffed-patternneurons-{}-rank-{}.txt".format(
-                pattern_number, self.rank)
-            non_deaffed_neurons = list(set(pattern_neurons) -
-                                       set(deaffed_neurons))
-            self.__dump_neuron_set(file_name, non_deaffed_neurons)
-
-    def deaff_spatial_network(self, pattern_number):
+    def deaff_network(self, pattern_number):
         """Deaff a the network."""
         logging.info("SIMULATION: deaffing spatial network")
-
-    def __deaff_bg_random_E(self, pattern_number):
-        """Deaff background a random selection of E neurons."""
-        pattern_neurons = self.patterns[pattern_number - 1]
-        bg_neurons = list(set(self.neuronsE) - set(pattern_neurons))
-        deaffed_neurons = random.sample(
-            bg_neurons, int(math.ceil(len(bg_neurons) *
-                                      self.deaff_bg_random_percentE)))
-        logging.info("ANKUR>> Number of deaff bg E neurons: "
-                     "{}".format(len(deaffed_neurons)))
-        if len(deaffed_neurons) > 0:
-            conns = nest.GetConnections(source=self.poissonExtE,
-                                        target=deaffed_neurons)
-            for conn in conns:
-                nest.DisconnectOneToOne(conn[0], conn[1],
-                                        syn_spec={'model': 'static_synapse'})
-
-            sd_params = self.spike_detector_paramsDBG_E.copy()
-            sd_params['label'] = sd_params['label'] + "-{}".format(
-                pattern_number)
-            deaff_spike_detector = nest.Create(
-                'spike_detector', params=sd_params)
-            nest.Connect(deaffed_neurons, deaff_spike_detector)
-            # save the detector
-            self.sdDBG_E.append(deaff_spike_detector)
-
-            file_name = "deaffed-backgroundneurons-{}-rank-{}.txt".format(
-                pattern_number, self.rank)
-            self.__dump_neuron_set(file_name, deaffed_neurons)
-
-            file_name = "non-deaffed-backgroundneurons-{}-rank-{}.txt".format(
-                pattern_number, self.rank)
-            non_deaffed_neurons = list(set(bg_neurons) -
-                                       set(deaffed_neurons))
-            self.__dump_neuron_set(file_name, non_deaffed_neurons)
-
-    def __deaff_bg_random_I(self, pattern_number):
-        """Deaff a random selection of background I neurons."""
-        deaffed_neurons = random.sample(
-            self.neuronsI, int(math.ceil(len(self.neuronsI) *
-                                         self.deaff_bg_random_percentI)))
-
-        logging.info("ANKUR>> Number of deaff bg I neurons: "
-                     "{}".format(len(deaffed_neurons)))
-        if len(deaffed_neurons) > 0:
-            conns = nest.GetConnections(source=self.poissonExtI,
-                                        target=deaffed_neurons)
-            for conn in conns:
-                nest.DisconnectOneToOne(conn[0], conn[1],
-                                        syn_spec={'model': 'static_synapse'})
-
-            sd_params = self.spike_detector_paramsDBG_I.copy()
-            sd_params['label'] = sd_params['label'] + "-{}".format(
-                pattern_number)
-            deaff_spike_detector = nest.Create(
-                'spike_detector', params=sd_params)
-            nest.Connect(deaffed_neurons, deaff_spike_detector)
-            # save the detector
-            self.sdDBG_I.append(deaff_spike_detector)
-
-            file_name = "deaffed-Ineurons-{}-rank-{}.txt".format(
-                pattern_number, self.rank)
-            self.__dump_neuron_set(file_name, deaffed_neurons)
-
-            file_name = "non-deaffed-Ineurons-{}-rank-{}.txt".format(
-                pattern_number, self.rank)
-            non_deaffed_neurons = list(set(self.neuronsI) -
-                                       set(deaffed_neurons))
-            self.__dump_neuron_set(file_name, non_deaffed_neurons)
 
     def __dump_neuron_set(self, file_name, neurons):
         """Dump a set of neuronIDs to a text file."""
@@ -1925,21 +1808,12 @@ if __name__ == "__main__":
         # only track first pattern to limit log files
         if spatial:
             simulation.store_lpz_spatial_pattern(True)
-            for i in range(1, numpats):
-                simulation.store_lpz_spatial_pattern(True)
-        else:
-            simulation.store_random_pattern(False)
-            for i in range(1, numpats):
-                simulation.store_random_pattern(False)
 
         # stabilise network after storing patterns
         simulation.stabilise()
 
         # Deaff first pattern (which is also being tracked)
-        if spatial:
-            simulation.deaff_spatial_network(1)
-        else:
-            simulation.deaff_non_spatial_network(1)
+        simulation.deaff_network(1)
         # Enable structural plasticity for repair #
         simulation.enable_rewiring()
         # Stabilise for repair
