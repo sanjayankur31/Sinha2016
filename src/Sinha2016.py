@@ -1505,9 +1505,9 @@ class Sinha2016:
                 self.pattern_count))
 
     def store_lpz_central_pattern(self, track=False):
-        """Store a pattern in the centre of neuronal grid."""
+        """Store a pattern in the centre of LPZ."""
         logging.debug(
-            "SIMULATION: Storing pattern {}".format(
+            "SIMULATION: Storing pattern {} in the centre of LPZ".format(
                 self.pattern_count + 1))
         self.pattern_count += 1
         # first E neuron
