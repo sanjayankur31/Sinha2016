@@ -75,7 +75,7 @@ class Sinha2016:
         self.neuronal_distI = 300  # micro metres
         self.location_sd = 15  # micro metres
         self.location_tree = None
-        self.deaff_percent = []
+        self.lpz_percent = 0.5
 
         # structural plasticity bits
         # not steps since we're not using it in NEST. This is for our manual
@@ -248,7 +248,7 @@ class Sinha2016:
         first_point = self.location_tree.data[0]
         last_point = self.location_tree.data[len(self.neuronsE) - 1]
         deaffed_neurons = self.__get_neurons_from_region(
-            (len(self.neuronsE) + len(self.neuronsI)) * self.deaff_percent,
+            (len(self.neuronsE) + len(self.neuronsI)) * self.lpz_percent,
             first_point, last_point)
         self.deaffed_neurons_E = list(set(deaffed_neurons).intersection(
             set(self.neuronsE)))
@@ -729,7 +729,7 @@ class Sinha2016:
                       file=pfile)
                 print("{}: {}".format("dist_neuronsI", self.neuronal_distI),
                       file=pfile)
-                print("{}: {}".format("deaff_percent", self.deaff_percent),
+                print("{}: {}".format("lpz_percent", self.lpz_percent),
                       file=pfile)
                 print("{}: {}".format(
                     "grid_size_E",
@@ -1888,9 +1888,9 @@ class Sinha2016:
         self.rewiring_enabled = False
         logging.info("Rank {}: REWIRING DISABLED".format(self.rank))
 
-    def set_deaff_percent(self, deaff_percent):
+    def set_lpz_percent(self, lpz_percent):
         """Set up the network for deaff."""
-        self.deaff_percent = deaff_percent
+        self.lpz_percent = lpz_percent
 
 
 if __name__ == "__main__":
@@ -1908,7 +1908,7 @@ if __name__ == "__main__":
     # update of the network
     simulation.setup_plasticity(True, True)
     # set up deaff extent, and neuron sets
-    simulation.set_deaff_percent(0.75)
+    simulation.set_lpz_percent(0.75)
     # set up neurons, connections, spike detectors, files
     simulation.prerun_setup(
         stabilisation_time=2000.,
