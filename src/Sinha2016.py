@@ -1866,7 +1866,7 @@ if __name__ == "__main__":
 
     step = False
     spatial = True
-    numpats = 1
+    store_patterns = 1
     simulation = Sinha2016()
 
     # simulation setup
@@ -1889,12 +1889,10 @@ if __name__ == "__main__":
     simulation.stabilise()
 
     # Pattern related simulation
-    if numpats > 0:
+    if store_patterns > 0:
         # store patterns
         # only track first pattern to limit log files
-        simulation.store_lpz_spatial_pattern(True)
-        for i in range(1, numpats):
-            simulation.store_lpz_spatial_pattern(True)
+        simulation.store_lpz_central_pattern(True)
 
         # stabilise network after storing patterns
         simulation.stabilise()
