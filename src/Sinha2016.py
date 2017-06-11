@@ -243,7 +243,7 @@ class Sinha2016:
                                       self.populations['Poisson'],
                                       params=self.poissonExtDict)
 
-    def __get_deaffed_neurons(self):
+    def __get_lpz_neurons(self):
         """Divide neurons into LPZ and the rest."""
         first_point = self.location_tree.data[0]
         last_point = self.location_tree.data[len(self.neuronsE) - 1]
@@ -792,7 +792,7 @@ class Sinha2016:
 
         self.__setup_neurons()
         self.__create_neurons()
-        self.__get_deaffed_neurons()
+        self.__get_lpz_neurons()
         self.__setup_detectors()
         self.__setup_initial_connection_params()
         self.__create_initial_connections()
