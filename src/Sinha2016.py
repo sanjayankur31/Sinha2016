@@ -496,38 +496,47 @@ class Sinha2016:
 
     def __setup_detectors(self):
         """Setup spike detectors."""
+        # E neurons
         self.sd_paramsE = {
             'to_file': True,
             'label': 'spikes-E'
         }
+        # I neurons
         self.sd_paramsI = {
             'to_file': True,
             'label': 'spikes-I'
         }
+        # pattern neurons
         self.sd_paramsP = {
             'to_file': True,
             'label': 'spikes-pattern'
         }
+        # background neurons
         self.sd_paramsB = {
             'to_file': True,
             'label': 'spikes-background'
         }
+        # recall neurons
         self.sd_paramsR = {
             'to_file': True,
             'label': 'spikes-recall'
         }
+        # deafferentated pattern neurons
         self.sd_paramsDP = {
             'to_file': True,
             'label': 'spikes-deaffed-pattern'
         }
+        # deafferentated non pattern E neurons
         self.sd_paramsDBG_E = {
             'to_file': True,
             'label': 'spikes-deaffed-bg-E'
         }
+        # deafferentated non pattern I neurons
         self.sd_paramsDBG_I = {
             'to_file': True,
             'label': 'spikes-deaffed-bg-I'
         }
+        # recall stimulus neurons
         self.sd_paramsStim = {
             'to_file': True,
             'label': 'spikes-stim'
@@ -1400,8 +1409,12 @@ class Sinha2016:
         This will be used to get neurons for deaff, and also to get neurons for
         the centred pattern.
         """
+        # first E neuron
         first_point = self.location_tree.data[0]
-        last_point = self.location_tree.data[-1]
+        # last E neuron
+        # I neurons are spread among the E neurons and therefore do not make it
+        # to the extremeties
+        last_point = self.location_tree.data[len(self.neuronsE) - 1]
         mid_point = [(x - y)/2 for x, y in zip(last_point, first_point)]
         pattern_neurons = self.location_tree.query(
             mid_point, k=num_neurons)[1]
@@ -1813,6 +1826,7 @@ class Sinha2016:
     def set_deaff_percent(self, deaff_percent):
         """Set up the network for deaff."""
         self.deaff_percent = deaff_percent
+
 
 if __name__ == "__main__":
     # Set up logging configuration
