@@ -1561,6 +1561,13 @@ class Sinha2016:
     def deaff_network(self, pattern_number):
         """Deaff a the network."""
         logging.info("SIMULATION: deaffing spatial network")
+        for nrn in self.deaffed_neurons_E:
+            nest.DisconnectOneToOne(self.poissonExt, nrn,
+                                    syn_spec={'model': 'static_synapse'})
+        for nrn in self.deaffed_neurons_I:
+            nest.DisconnectOneToOne(self.poissonExt, nrn,
+                                    syn_spec={'model': 'static_synapse'})
+        logging.info("SIMULATION: Network deafferentated")
 
     def __dump_neuron_set(self, file_name, neurons):
         """Dump a set of neuronIDs to a text file."""
