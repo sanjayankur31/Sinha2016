@@ -243,7 +243,7 @@ class Sinha2016:
                                       self.populations['Poisson'],
                                       params=self.poissonExtDict)
 
-    def __divide_neurons(self):
+    def __get_deaffed_neurons(self):
         """Divide neurons into LPZ and the rest."""
         deaffed_neurons = self.__get_neurons_from_grid_centre(
             (len(self.neuronsE) + len(self.neuronsI)) * self.deaff_percent)
@@ -496,47 +496,47 @@ class Sinha2016:
 
     def __setup_detectors(self):
         """Setup spike detectors."""
-        self.spike_detector_paramsE = {
+        self.sd_paramsE = {
             'to_file': True,
             'label': 'spikes-E'
         }
-        self.spike_detector_paramsI = {
+        self.sd_paramsI = {
             'to_file': True,
             'label': 'spikes-I'
         }
-        self.spike_detector_paramsP = {
+        self.sd_paramsP = {
             'to_file': True,
             'label': 'spikes-pattern'
         }
-        self.spike_detector_paramsB = {
+        self.sd_paramsB = {
             'to_file': True,
             'label': 'spikes-background'
         }
-        self.spike_detector_paramsR = {
+        self.sd_paramsR = {
             'to_file': True,
             'label': 'spikes-recall'
         }
-        self.spike_detector_paramsDP = {
+        self.sd_paramsDP = {
             'to_file': True,
             'label': 'spikes-deaffed-pattern'
         }
-        self.spike_detector_paramsDBG_E = {
+        self.sd_paramsDBG_E = {
             'to_file': True,
             'label': 'spikes-deaffed-bg-E'
         }
-        self.spike_detector_paramsDBG_I = {
+        self.sd_paramsDBG_I = {
             'to_file': True,
             'label': 'spikes-deaffed-bg-I'
         }
-        self.spike_detector_paramsStim = {
+        self.sd_paramsStim = {
             'to_file': True,
             'label': 'spikes-stim'
         }
 
         self.sdE = nest.Create('spike_detector',
-                               params=self.spike_detector_paramsE)
+                               params=self.sd_paramsE)
         self.sdI = nest.Create('spike_detector',
-                               params=self.spike_detector_paramsI)
+                               params=self.sd_paramsI)
 
         nest.Connect(self.neuronsE, self.sdE)
         nest.Connect(self.neuronsI, self.sdI)
@@ -770,7 +770,7 @@ class Sinha2016:
 
         self.__setup_neurons()
         self.__create_neurons()
-        self.__divide_neurons()
+        self.__get_deaffed_neurons()
         self.__setup_detectors()
         self.__setup_initial_connection_params()
         self.__create_initial_connections()
@@ -1440,7 +1440,7 @@ class Sinha2016:
                 print(neuron, file=file_handle)
 
         # set up spike detectors
-        sd_params = self.spike_detector_paramsP.copy()
+        sd_params = self.sd_paramsP.copy()
         sd_params['label'] = (sd_params['label'] + "-{}".format(
             self.pattern_count))
         # pattern
@@ -1451,7 +1451,7 @@ class Sinha2016:
         self.sdP.append(pattern_spike_detector)
 
         # background
-        sd_params = self.spike_detector_paramsB.copy()
+        sd_params = self.sd_paramsB.copy()
         sd_params['label'] = (sd_params['label'] + "-{}".format(
             self.pattern_count))
         background_spike_detector = nest.Create(
@@ -1489,7 +1489,7 @@ class Sinha2016:
                           'origin': stim_time,
                           'start': 0., 'stop': self.recall_time}
 
-        sd_params = self.spike_detector_paramsStim.copy()
+        sd_params = self.sd_paramsStim.copy()
         sd_params['label'] = sd_params['label'] + "-{}".format(pattern_number)
 
         stim = nest.Create('poisson_generator', 1,
@@ -1523,7 +1523,7 @@ class Sinha2016:
             for neuron in recall_neurons:
                 print(neuron, file=file_handle)
 
-        sd_params = self.spike_detector_paramsR.copy()
+        sd_params = self.sd_paramsR.copy()
         sd_params['label'] = sd_params['label'] + "-{}".format(pattern_number)
         recall_spike_detector = nest.Create(
             'spike_detector', params=sd_params)
