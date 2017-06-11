@@ -1928,19 +1928,20 @@ if __name__ == "__main__":
         # only track first pattern to limit log files
         simulation.store_lpz_central_pattern(True)
         simulation.store_lpz_border_pattern(True)
-
         # stabilise network after storing patterns
         simulation.stabilise()
 
-        # Deaff first pattern (which is also being tracked)
-        simulation.deaff_network()
-        # Enable structural plasticity for repair #
-        simulation.enable_rewiring()
-        # Stabilise for repair
-        simulation.stabilise()
-        simulation.stabilise()
+    # Deaff network
+    simulation.deaff_network()
+    # Enable structural plasticity for repair #
+    simulation.enable_rewiring()
+    # Stabilise for repair
+    simulation.stabilise()
+    simulation.stabilise()
 
+    if store_patterns:
         # recall stored and tracked pattern
+        # TODO: REDO recall
         simulation.recall_pattern(50, 1)
 
     simulation.close_files()
