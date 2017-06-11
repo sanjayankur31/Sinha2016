@@ -1442,9 +1442,15 @@ class Sinha2016:
         # print to file
         file_name = "patternneurons-{}-rank-{}.txt".format(
             self.pattern_count, self.rank)
+        # NOTE: since these are E neurons, the indices match in the location
+        # tree. No need to subtract self.neuronsE[0] to get the right indices at
+        # the moment. But keep in mind in case something changes in the future.
         with open(file_name, 'w') as file_handle:
             for neuron in pattern_neurons:
-                print(neuron, file=file_handle)
+                print("{}\t{}\t{}".format(neuron,
+                                          self.location_tree.data[neuron][0],
+                                          self.location_tree.data[neuron][1]),
+                      file=file_handle)
 
         # background neurons
         background_neurons = list(
@@ -1454,7 +1460,10 @@ class Sinha2016:
 
         with open(file_name, 'w') as file_handle:
             for neuron in background_neurons:
-                print(neuron, file=file_handle)
+                print("{}\t{}\t{}".format(neuron,
+                                          self.location_tree.data[neuron][0],
+                                          self.location_tree.data[neuron][1]),
+                      file=file_handle)
 
         # set up spike detectors
         sd_params = self.sd_paramsP.copy()
