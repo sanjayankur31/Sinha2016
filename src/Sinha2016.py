@@ -1422,7 +1422,7 @@ class Sinha2016:
         This will be used to get neurons for deaff, and also to get neurons for
         the centred pattern.
         """
-        mid_point = [(x - y)/2 for x, y in zip(last_point, first_point)]
+        mid_point = [(x + y)/2 for x, y in zip(last_point, first_point)]
         neurons = self.location_tree.query(
             mid_point, k=num_neurons)[1]
         return neurons
