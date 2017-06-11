@@ -501,10 +501,20 @@ class Sinha2016:
             'to_file': True,
             'label': 'spikes-E'
         }
+        # deaffed E neurons
+        self.sd_paramsDE = {
+            'to_file': True,
+            'label': 'spikes-deaffed-E'
+        }
         # I neurons
         self.sd_paramsI = {
             'to_file': True,
             'label': 'spikes-I'
+        }
+        # deaffed I neurons
+        self.sd_paramsDI = {
+            'to_file': True,
+            'label': 'spikes-deaffed-I'
         }
         # pattern neurons
         self.sd_paramsP = {
@@ -1567,6 +1577,14 @@ class Sinha2016:
         for nrn in self.deaffed_neurons_I:
             nest.DisconnectOneToOne(self.poissonExt, nrn,
                                     syn_spec={'model': 'static_synapse'})
+
+        self.sdDE = nest.Create('spike_detector',
+                                params=self.sd_paramsDE)
+        self.sdDI = nest.Create('spike_detector',
+                                params=self.sd_paramsDI)
+
+        nest.Connect(self.deaffed_neurons_E, self.sdDE)
+        nest.Connect(self.deaffed_neurons_I, self.sdDI)
         logging.info("SIMULATION: Network deafferentated")
 
     def __dump_neuron_set(self, file_name, neurons):
