@@ -1489,8 +1489,12 @@ class Sinha2016:
             "SIMULATION: Storing pattern {}".format(
                 self.pattern_count + 1))
         self.pattern_count += 1
-        pattern_neurons = self.__get_neurons_from_grid_centre(
-            self.populations['P'])
+        # get 1000 neurons - 800 will be E and 200 will be I
+        # we only need the 800 I neurons
+        all_neurons = self.__get_neurons_from_grid_centre(
+            (1.25 * self.populations['P']))
+        pattern_neurons = list(set(all_neurons).intersection(
+            set(self.neuronsE)))
         self.__strengthen_pattern_connections(pattern_neurons)
         if track:
             self.__track_pattern(pattern_neurons)
