@@ -73,6 +73,7 @@ class Sinha2016:
         self.neuronal_distI = 300  # micro metres
         self.location_sd = 15  # micro metres
         self.location_tree = None
+        self.deaff_size = []  # x-width, y-width
 
         # structural plasticity bits
         # not steps since we're not using it in NEST. This is for our manual
@@ -678,6 +679,8 @@ class Sinha2016:
                 print("{}: {}".format("num_colsI", self.colsI), file=pfile)
                 print("{}: {}".format("dist_neuronsE", self.neuronal_distE), file=pfile)
                 print("{}: {}".format("dist_neuronsI", self.neuronal_distI), file=pfile)
+                print("{}: {}".format("deaff_size", self.deaff_size), file=pfile)
+                print("{}: {}".format("grid_size_E", self.location_tree.data[len(self.neuronsE) -1]), file=pfile)
                 print("{}: {}".format("sd_dist", self.location_sd), file=pfile)
                 print("{}: {}".format("sp_update_interval", self.sp_update_interval), file=pfile)
                 print("{}: {}".format("recording_interval", self.recording_interval), file=pfile)
@@ -1777,6 +1780,9 @@ class Sinha2016:
         self.rewiring_enabled = False
         logging.info("Rank {}: REWIRING DISABLED".format(self.rank))
 
+    def set_deaff_size(self, x_width, y_width):
+        """Set up the network for deaff."""
+        self.deaff_size = [x_width, y_width]
 
 if __name__ == "__main__":
     # Set up logging configuration
@@ -1789,24 +1795,31 @@ if __name__ == "__main__":
     numpats = 1
     simulation = Sinha2016()
 
+    # simulation setup
     # Setup network to handle plasticities
     # update of the network
-    logging.info("Rank {}: SIMULATION STARTED".format(simulation.rank))
     simulation.setup_plasticity(True, True)
-
-    # Intial stabilisation #
+    # set up deaff extent, and neuron sets
+    simulation.set_deaff_size(1200, 1200)
+    # set up neurons, connections, spike detectors, files
     simulation.prerun_setup(
         stabilisation_time=2000.,
         sp_update_interval=500.,
         recording_interval=100.)
+    # print em up
     simulation.print_simulation_parameters()
+    logging.info("Rank {}: SIMULATION SETUP".format(simulation.rank))
+
+    # initial setup
+    logging.info("Rank {}: SIMULATION STARTED".format(simulation.rank))
     simulation.stabilise()
 
     # Pattern related simulation
     if numpats > 0:
         # store patterns
         # only track first pattern to limit log files
-        if spatial:
+        simulation.store_lpz_spatial_pattern(True)
+        for i in range(1, numpats):
             simulation.store_lpz_spatial_pattern(True)
 
         # stabilise network after storing patterns
