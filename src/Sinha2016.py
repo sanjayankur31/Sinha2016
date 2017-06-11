@@ -1810,9 +1810,9 @@ class Sinha2016:
         self.rewiring_enabled = False
         logging.info("Rank {}: REWIRING DISABLED".format(self.rank))
 
-    def set_deaff_size(self, x_width, y_width):
+    def set_deaff_percent(self, deaff_percent):
         """Set up the network for deaff."""
-        self.deaff_size = [x_width, y_width]
+        self.deaff_percent = deaff_percent
 
 if __name__ == "__main__":
     # Set up logging configuration
@@ -1830,7 +1830,7 @@ if __name__ == "__main__":
     # update of the network
     simulation.setup_plasticity(True, True)
     # set up deaff extent, and neuron sets
-    simulation.set_deaff_size(1200, 1200)
+    simulation.set_deaff_percent(0.75)
     # set up neurons, connections, spike detectors, files
     simulation.prerun_setup(
         stabilisation_time=2000.,
