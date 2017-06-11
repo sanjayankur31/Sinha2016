@@ -63,7 +63,6 @@ class Sinha2016:
         # recall percent of pattern
         self.recall_percent = .25
 
-        # without spatial information
         # deafferentation percent of pattern
         self.deaff_pattern_percent = .50
         # deafferentation percent of background
@@ -1426,8 +1425,7 @@ class Sinha2016:
             "SIMULATION: Storing pattern {}".format(
                 self.pattern_count + 1))
         self.pattern_count += 1
-        pattern_neurons = self.__get_lpz_pattern_neurons(
-            len(self.neuronsE) * self.pattern_percent)
+        pattern_neurons = self.__get_lpz_pattern_neurons(self.populations['P'])
         self.__strengthen_pattern_connections(pattern_neurons)
         if track:
             self.__track_pattern(pattern_neurons)
@@ -1442,8 +1440,7 @@ class Sinha2016:
                 self.pattern_count + 1))
         # Keep track of how many patterns are stored
         self.pattern_count += 1
-        pattern_neurons = self.__get_random_pattern_neurons(
-            len(self.neuronsE) * self.pattern_percent)
+        pattern_neurons = self.__get_random_pattern_neurons(self.populations['P'])
         self.__strengthen_pattern_connections(pattern_neurons)
         if track:
             self.__track_pattern(pattern_neurons)
