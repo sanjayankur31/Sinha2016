@@ -1409,13 +1409,6 @@ class Sinha2016:
                       "{}".format(len(pattern_neurons)))
         return pattern_neurons
 
-    def __get_random_pattern_neurons(self, num_neurons):
-        """Get neurons randomly."""
-        pattern_neurons = random.sample(self.neuronsE, num_neurons)
-        logging.debug("ANKUR>> Number of pattern neurons: "
-                      "{}".format(len(pattern_neurons)))
-        return pattern_neurons
-
     def __strengthen_pattern_connections(self, pattern_neurons):
         """Strengthen connections that make up the pattern."""
         connections = nest.GetConnections(source=pattern_neurons,
@@ -1473,22 +1466,8 @@ class Sinha2016:
             "SIMULATION: Storing pattern {}".format(
                 self.pattern_count + 1))
         self.pattern_count += 1
-        pattern_neurons = self.__get_lpz_pattern_neurons(self.populations['P'])
-        self.__strengthen_pattern_connections(pattern_neurons)
-        if track:
-            self.__track_pattern(pattern_neurons)
-        logging.debug(
-            "Number of patterns stored: {}".format(
-                self.pattern_count))
-
-    def store_random_pattern(self, track=False):
-        """Store a pattern of neurons that are randomly chosen."""
-        logging.debug(
-            "SIMULATION: Storing pattern {}".format(
-                self.pattern_count + 1))
-        # Keep track of how many patterns are stored
-        self.pattern_count += 1
-        pattern_neurons = self.__get_random_pattern_neurons(self.populations['P'])
+        pattern_neurons = self.__get_neurons_from_grid_centre(
+            self.populations['P'])
         self.__strengthen_pattern_connections(pattern_neurons)
         if track:
             self.__track_pattern(pattern_neurons)
