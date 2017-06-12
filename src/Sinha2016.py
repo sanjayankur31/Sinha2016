@@ -247,12 +247,12 @@ class Sinha2016:
         """Divide neurons into LPZ and the rest."""
         first_point = self.location_tree.data[0]
         last_point = self.location_tree.data[len(self.neuronsE) - 1]
-        deaffed_neurons = self.__get_neurons_from_region(
+        lpz_neurons = self.__get_neurons_from_region(
             (len(self.neuronsE) + len(self.neuronsI)) * self.lpz_percent,
             first_point, last_point)
-        self.deaffed_neurons_E = list(set(deaffed_neurons).intersection(
+        self.lpz_neurons_E = list(set(lpz_neurons).intersection(
             set(self.neuronsE)))
-        self.deaffed_neurons_I = list(set(deaffed_neurons).intersection(
+        self.lpz_neurons_I = list(set(lpz_neurons).intersection(
             set(self.neuronsI)))
 
     def __create_sparse_list(self, length, static_w, sparsity):
@@ -1611,10 +1611,10 @@ class Sinha2016:
     def deaff_network(self):
         """Deaff a the network."""
         logging.info("SIMULATION: deaffing spatial network")
-        for nrn in self.deaffed_neurons_E:
+        for nrn in self.lpz_neurons_E:
             nest.DisconnectOneToOne(self.poissonExt, nrn,
                                     syn_spec={'model': 'static_synapse'})
-        for nrn in self.deaffed_neurons_I:
+        for nrn in self.lpz_neurons_I:
             nest.DisconnectOneToOne([self.poissonExt], [nrn],
                                     syn_spec={'model': 'static_synapse'})
 
@@ -1623,8 +1623,8 @@ class Sinha2016:
         self.sdDI = nest.Create('spike_detector',
                                 params=self.sd_paramsDI)
 
-        nest.Connect(self.deaffed_neurons_E, self.sdDE)
-        nest.Connect(self.deaffed_neurons_I, self.sdDI)
+        nest.Connect(self.lpz_neurons_E, self.sdDE)
+        nest.Connect(self.lpz_neurons_I, self.sdDI)
         logging.info("SIMULATION: Network deafferentated")
 
     def __dump_neuron_set(self, file_name, neurons):
@@ -1692,7 +1692,7 @@ class Sinha2016:
                     ), file=filehandle_E)
 
             loc_lpz_neurons_E = list(set(loc_e).intersection(
-                set(self.deaffed_neurons_E)))
+                set(self.lpz_neurons_E)))
             synaptic_element_file_lpz_E = (
                 "03-synaptic-elements-lpz-E-" + str(self.rank) + "-" +
                 current_simtime + ".txt")
@@ -1742,7 +1742,7 @@ class Sinha2016:
                     ), file=filehandle_I)
 
             loc_lpz_neurons_I = list(set(loc_i).intersection(
-                set(self.deaffed_neurons_I)))
+                set(self.lpz_neurons_I)))
             synaptic_element_file_lpz_I = (
                 "03-synaptic-elements-lpz-I-" + str(self.rank) + "-" +
                 current_simtime + ".txt")
