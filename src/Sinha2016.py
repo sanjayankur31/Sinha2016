@@ -505,9 +505,9 @@ class Sinha2016:
             'label': 'spikes-E'
         }
         # deaffed E neurons
-        self.sd_paramsDE = {
+        self.sd_params_LPZ_E = {
             'to_file': True,
-            'label': 'spikes-deaffed-E'
+            'label': 'spikes-lpz-E'
         }
         # I neurons
         self.sd_paramsI = {
@@ -515,9 +515,9 @@ class Sinha2016:
             'label': 'spikes-I'
         }
         # deaffed I neurons
-        self.sd_paramsDI = {
+        self.sd_params_LPZ_I = {
             'to_file': True,
-            'label': 'spikes-deaffed-I'
+            'label': 'spikes-lpz-I'
         }
         # pattern neurons
         self.sd_paramsP = {
@@ -535,19 +535,19 @@ class Sinha2016:
             'label': 'spikes-recall'
         }
         # deafferentated pattern neurons
-        self.sd_paramsDP = {
+        self.sd_params_LPZ_P = {
             'to_file': True,
-            'label': 'spikes-deaffed-pattern'
+            'label': 'spikes-lpz-pattern'
         }
         # deafferentated non pattern E neurons
-        self.sd_paramsDBG_E = {
+        self.sd_params_LPZ_BG_E = {
             'to_file': True,
-            'label': 'spikes-deaffed-bg-E'
+            'label': 'spikes-lpz-bg-E'
         }
         # deafferentated non pattern I neurons
-        self.sd_paramsDBG_I = {
+        self.sd_params_LPZ_BG_I = {
             'to_file': True,
-            'label': 'spikes-deaffed-bg-I'
+            'label': 'spikes-lpz-bg-I'
         }
         # recall stimulus neurons
         self.sd_paramsStim = {
@@ -1620,9 +1620,9 @@ class Sinha2016:
                                     syn_spec={'model': 'static_synapse'})
 
         self.sdDE = nest.Create('spike_detector',
-                                params=self.sd_paramsDE)
+                                params=self.sd_params_LPZ_E)
         self.sdDI = nest.Create('spike_detector',
-                                params=self.sd_paramsDI)
+                                params=self.sd_params_LPZ_I)
 
         nest.Connect(self.lpz_neurons_E, self.sdDE)
         nest.Connect(self.lpz_neurons_I, self.sdDI)
