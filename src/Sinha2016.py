@@ -689,7 +689,8 @@ class Sinha2016:
             with open("00-simulation_params.txt", 'w') as pfile:
                 print("{}: {}".format("dt", self.dt),
                       file=pfile)
-                print("{}: {}".format("stabilisation_time", self.dt),
+                print("{}: {}".format("stabilisation_time",
+                                      self.stabilisation_time),
                       file=pfile)
                 print("{}: {}".format("recording_interval",
                                       self.recording_interval),
