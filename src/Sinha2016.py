@@ -1691,6 +1691,32 @@ class Sinha2016:
                         dendrites_in, dendrites_in_conn
                     ), file=filehandle_E)
 
+            loc_lpz_neurons_E = list(set(loc_e).intersection(
+                set(self.deaffed_neurons_E)))
+            synaptic_element_file_lpz_E = (
+                "03-synaptic-elements-lpz-E-" + str(self.rank) + "-" +
+                current_simtime + ".txt")
+            with open(synaptic_element_file_lpz_E, 'w') as filehandle_lpz_E:
+                print("neuronID\tAxon_ex\tAxon_ex_connected" +
+                      "\tDend_ex\tDend_ex_con\t" +
+                      "Dend_in\tDend_in_con", file=filehandle_lpz_E)
+
+                for neuron in loc_lpz_neurons_E:
+                    syn_elms = nest.GetStatus([neuron], 'synaptic_elements')[0]
+                    axons = syn_elms['Axon_ex']['z']
+                    axons_conn = syn_elms['Axon_ex']['z_connected']
+                    dendrites_ex = syn_elms['Den_ex']['z']
+                    dendrites_ex_conn = syn_elms['Den_ex']['z_connected']
+                    dendrites_in = syn_elms['Den_in']['z']
+                    dendrites_in_conn = syn_elms['Den_in']['z_connected']
+
+                    print("{}\t{}\t{}\t{}\t{}\t{}\t{}".format(
+                        neuron,
+                        axons, axons_conn,
+                        dendrites_ex, dendrites_ex_conn,
+                        dendrites_in, dendrites_in_conn
+                    ), file=filehandle_lpz_E)
+
             synaptic_element_file_I = (
                 "03-synaptic-elements-I-" + str(self.rank) + "-" +
                 current_simtime + ".txt")
@@ -1714,6 +1740,32 @@ class Sinha2016:
                         dendrites_ex, dendrites_ex_conn,
                         dendrites_in, dendrites_in_conn
                     ), file=filehandle_I)
+
+            loc_lpz_neurons_I = list(set(loc_i).intersection(
+                set(self.deaffed_neurons_I)))
+            synaptic_element_file_lpz_I = (
+                "03-synaptic-elements-lpz-I-" + str(self.rank) + "-" +
+                current_simtime + ".txt")
+            with open(synaptic_element_file_lpz_I, 'w') as filehandle_lpz_I:
+                print("neuronID\tAxon_in\tAxon_in_connected" +
+                      "\tDend_ex\tDend_ex_con\t" +
+                      "Dend_in\tDend_in_con", file=filehandle_lpz_I)
+
+                for neuron in loc_lpz_neurons_I:
+                    syn_elms = nest.GetStatus([neuron], 'synaptic_elements')[0]
+                    axons = syn_elms['Axon_in']['z']
+                    axons_conn = syn_elms['Axon_in']['z_connected']
+                    dendrites_ex = syn_elms['Den_ex']['z']
+                    dendrites_ex_conn = syn_elms['Den_ex']['z_connected']
+                    dendrites_in = syn_elms['Den_in']['z']
+                    dendrites_in_conn = syn_elms['Den_in']['z_connected']
+
+                    print("{}\t{}\t{}\t{}\t{}\t{}\t{}".format(
+                        neuron,
+                        axons, axons_conn,
+                        dendrites_ex, dendrites_ex_conn,
+                        dendrites_in, dendrites_in_conn
+                    ), file=filehandle_lpz_I)
 
     def __dump_total_synaptic_elements(self):
         """Dump total number of synaptic elements."""
