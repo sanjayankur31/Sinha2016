@@ -91,9 +91,9 @@ class Sinha2016:
         self.recalls = []
         self.sdP = []
         self.sdR = []
-        self.sdDP = []
-        self.sdDBG_E = []
-        self.sdDBG_I = []
+        self.sd_LPZ_P = []
+        self.sd_LPZ_BG_E = []
+        self.sd_LPZ_BG_I = []
         self.sdB = []
         self.sdStim = []
         self.pattern_spike_count_file_names = []
@@ -1619,13 +1619,13 @@ class Sinha2016:
             nest.DisconnectOneToOne(self.poissonExt[0], nrn,
                                     syn_spec={'model': 'static_synapse'})
 
-        self.sdDE = nest.Create('spike_detector',
+        self.sd_LPZ_E = nest.Create('spike_detector',
                                 params=self.sd_params_LPZ_E)
-        self.sdDI = nest.Create('spike_detector',
+        self.sd_LPZ_I = nest.Create('spike_detector',
                                 params=self.sd_params_LPZ_I)
 
-        nest.Connect(self.lpz_neurons_E, self.sdDE)
-        nest.Connect(self.lpz_neurons_I, self.sdDI)
+        nest.Connect(self.lpz_neurons_E, self.sd_LPZ_E)
+        nest.Connect(self.lpz_neurons_I, self.sd_LPZ_I)
         logging.info("SIMULATION: Network deafferentated")
 
     def __dump_neuron_set(self, file_name, neurons):
