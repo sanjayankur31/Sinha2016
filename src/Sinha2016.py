@@ -1612,7 +1612,7 @@ class Sinha2016:
         """Deaff a the network."""
         logging.info("SIMULATION: deaffing spatial network")
         for nrn in self.lpz_neurons_E:
-            nest.DisconnectOneToOne(self.poissonExt, nrn,
+            nest.DisconnectOneToOne([self.poissonExt], [nrn],
                                     syn_spec={'model': 'static_synapse'})
         for nrn in self.lpz_neurons_I:
             nest.DisconnectOneToOne([self.poissonExt], [nrn],
