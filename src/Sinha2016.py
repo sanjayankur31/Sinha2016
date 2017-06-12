@@ -1620,9 +1620,9 @@ class Sinha2016:
                                     syn_spec={'model': 'static_synapse'})
 
         self.sd_LPZ_E = nest.Create('spike_detector',
-                                params=self.sd_params_LPZ_E)
+                                    params=self.sd_params_LPZ_E)
         self.sd_LPZ_I = nest.Create('spike_detector',
-                                params=self.sd_params_LPZ_I)
+                                    params=self.sd_params_LPZ_I)
 
         nest.Connect(self.lpz_neurons_E, self.sd_LPZ_E)
         nest.Connect(self.lpz_neurons_I, self.sd_LPZ_I)
