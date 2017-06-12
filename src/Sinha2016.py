@@ -1615,7 +1615,7 @@ class Sinha2016:
             nest.DisconnectOneToOne(self.poissonExt, nrn,
                                     syn_spec={'model': 'static_synapse'})
         for nrn in self.deaffed_neurons_I:
-            nest.DisconnectOneToOne(self.poissonExt, nrn,
+            nest.DisconnectOneToOne([self.poissonExt], [nrn],
                                     syn_spec={'model': 'static_synapse'})
 
         self.sdDE = nest.Create('spike_detector',
