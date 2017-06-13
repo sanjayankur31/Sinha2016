@@ -82,20 +82,18 @@ class Sinha2016:
         # updates
         self.sp_update_interval = 1000.  # seconds
         # time recall stimulus is enabled for
-        self.recall_time = 1000.  # ms
+        self.recall_duration = 1000.  # ms
 
         self.rank = nest.Rank()
 
         self.patterns = []
-        self.neuronsStim = []
-        self.recalls = []
+        self.recall_neurons = []
         self.sdP = []
         self.sdR = []
         self.sd_LPZ_P = []
         self.sd_LPZ_BG_E = []
         self.sd_LPZ_BG_I = []
         self.sdB = []
-        self.sdStim = []
         self.pattern_spike_count_file_names = []
         self.pattern_spike_count_files = []
         self.pattern_count = 0
@@ -566,11 +564,6 @@ class Sinha2016:
         self.sd_params_LPZ_BG_I = {
             'to_file': True,
             'label': 'spikes-lpz-bg-I'
-        }
-        # recall stimulus neurons
-        self.sd_paramsStim = {
-            'to_file': True,
-            'label': 'spikes-stim'
         }
 
         self.sdE = nest.Create('spike_detector',
