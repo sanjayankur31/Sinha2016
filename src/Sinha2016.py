@@ -1518,8 +1518,9 @@ class Sinha2016:
         first_point[1] = mid_point[1]
         # get 1000 neurons - 800 will be E and 200 will be I
         # we only need the 800 I neurons
-        self.store_pattern(first_point, last_point,
-                           (1.25 * self.populations['P']), track=True)
+        self.store_pattern_by_extent(first_point, last_point,
+                                     (1.25 * self.populations['P']),
+                                     track=True)
 
     def store_lpz_central_pattern(self, track=False):
         """Store a pattern in the centre of LPZ."""
@@ -1532,8 +1533,9 @@ class Sinha2016:
         # I neurons are spread among the E neurons and therefore do not make it
         # to the extremeties
         last_point = self.location_tree.data[len(self.neuronsE) - 1]
-        self.store_pattern(first_point, last_point,
-                           (1.25 * self.populations['P']),  track=True)
+        self.store_pattern_by_extent(first_point, last_point,
+                                     (1.25 * self.populations['P']),
+                                     track=True)
 
     def store_pattern_by_extent(self, first_point,
                                 last_point, num_neurons, track=False):
