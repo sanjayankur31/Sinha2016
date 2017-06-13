@@ -50,8 +50,8 @@ class Sinha2016:
         self.recording_interval = 500.  # seconds
 
         # what plasticity should the network be setup to handle
-        self.setup_str_p = True
-        self.setup_syn_p = True
+        self.is_str_p_enabled = True
+        self.is_syn_p_enabled = True
         self.rewiring_enabled = False
         # "random" or "distance" or "weight"
         self.syn_del_strategy = "random"
@@ -122,7 +122,7 @@ class Sinha2016:
         # Growth curves
         # eta is the minimum calcium concentration
         # epsilon is the target mean calcium concentration
-        if self.setup_str_p:
+        if self.is_str_p_enabled:
             self.growth_curve_axonal_E = {
                 'growth_curve': "gaussian",
                 'growth_rate': 0.0001,  # Beta (elements/ms)
@@ -184,7 +184,7 @@ class Sinha2016:
         # external stimulus
         # if synaptic plasticity is enabled, we have an initial set of
         # connections, so we don't need so many connections
-        if self.setup_syn_p:
+        if self.is_syn_p_enabled:
             self.poissonExtDict = {'rate': 10., 'origin': 0., 'start': 0.}
         # else, if no synaptic plasticity, only structural, so we need more
         # input stimulus to get the connections to form
@@ -193,7 +193,7 @@ class Sinha2016:
 
     def __create_neurons(self):
         """Create our neurons."""
-        if self.setup_str_p:
+        if self.is_str_p_enabled:
             self.neuronsE = nest.Create('tif_neuronE', self.populations['E'], {
                 'synaptic_elements': self.structural_p_elements_E})
             self.neuronsI = nest.Create('tif_neuronI', self.populations['I'], {
@@ -353,7 +353,7 @@ class Sinha2016:
                              'N': self.connectionNumberStim}
 
         # If neither, we've messed up
-        if not self.setup_str_p and not self.setup_syn_p:
+        if not self.is_str_p_enabled and not self.is_syn_p_enabled:
             logging.critical("Neither plasticity is enabled. Exiting.")
             sys.exit()
 
@@ -364,8 +364,8 @@ class Sinha2016:
         nest.CopyModel('static_synapse', 'static_synapse_ex')
         nest.CopyModel('static_synapse', 'static_synapse_in')
         nest.CopyModel('vogels_sprekeler_synapse', 'stdp_synapse_in')
-        if self.setup_str_p:
-            if not self.setup_syn_p:
+        if self.is_str_p_enabled:
+            if not self.is_syn_p_enabled:
                 self.synDictEE = {'model': 'static_synapse_ex',
                                   'weight': 1.,
                                   'pre_synaptic_element': 'Axon_ex',
@@ -436,12 +436,12 @@ class Sinha2016:
                                'weight': self.weightExt})
 
         # only structural plasticity
-        if self.setup_str_p and not self.setup_syn_p:
+        if self.is_str_p_enabled and not self.is_syn_p_enabled:
             logging.info("Only structural plasticity enabled" +
                          "Not setting up any synapses.")
         # only synaptic plasticity
         # setup connections using Nest methods
-        elif self.setup_syn_p and not self.setup_str_p:
+        elif self.is_syn_p_enabled and not self.is_str_p_enabled:
             conndict = {'rule': 'pairwise_bernoulli',
                         'p': self.sparsity}
             logging.debug("Setting up EE connections.")
@@ -471,7 +471,7 @@ class Sinha2016:
         # synaptic plasticity are both enabled
         # This is because you can only either have all-all or one-one
         # connections when structural plasticity is enabled
-        elif self.setup_str_p and self.setup_syn_p:
+        elif self.is_str_p_enabled and self.is_syn_p_enabled:
             conndict = {'rule': 'one_to_one'}
             logging.debug("Setting up EE connections.")
             synapses_to_create = self.__get_synapses_to_form(
@@ -623,7 +623,7 @@ class Sinha2016:
         print("{}, {}".format(
             "time(ms)", "cal_I values"), file=self.ca_file_handle_I)
 
-        if self.setup_str_p:
+        if self.is_str_p_enabled:
             self.syn_elms_filename_E = ("02-synaptic-elements-totals-E-" +
                                         str(self.rank) + ".txt")
             self.syn_elms_file_handle_E = open(self.syn_elms_filename_E, 'w')
@@ -668,14 +668,14 @@ class Sinha2016:
 
     def setup_plasticity(self, structural_p=True, synaptic_p=True):
         """Control plasticities."""
-        self.setup_str_p = structural_p
-        self.setup_syn_p = synaptic_p
+        self.is_str_p_enabled = structural_p
+        self.is_syn_p_enabled = synaptic_p
 
-        if self.setup_str_p and self.setup_syn_p:
+        if self.is_str_p_enabled and self.is_syn_p_enabled:
             logging.info("NETWORK SETUP TO HANDLE BOTH PLASTICITIES")
-        elif self.setup_str_p and not self.setup_syn_p:
+        elif self.is_str_p_enabled and not self.is_syn_p_enabled:
             logging.info("NETWORK SETUP TO HANDLE ONLY STRUCTURAL PLASTICITY")
-        elif self.setup_syn_p and not self.setup_str_p:
+        elif self.is_syn_p_enabled and not self.is_str_p_enabled:
             logging.info("NETWORK SETUP TO HANDLE ONLY SYNAPTIC PLASTICITY")
         else:
             logging.critical("Both plasticities cannot be disabled. Exiting.")
@@ -707,10 +707,10 @@ class Sinha2016:
                                       self.recording_interval),
                       file=pfile)
                 print("{}: {}".format("str_p_enabled",
-                                      self.setup_str_p),
+                                      self.is_str_p_enabled),
                       file=pfile)
                 print("{}: {}".format("syn_p_enabled",
-                                      self.setup_syn_p),
+                                      self.is_syn_p_enabled),
                       file=pfile)
                 print("{}: {}".format("rewiring_enabled",
                                       self.rewiring_enabled),
@@ -1689,7 +1689,7 @@ class Sinha2016:
 
         neuronid    ax_total    ax_connected    den_ex_total ...
         """
-        if self.setup_str_p:
+        if self.is_str_p_enabled:
             loc_e = [stat['global_id'] for stat
                      in nest.GetStatus(self.neuronsE)
                      if stat['local']]
@@ -1801,7 +1801,7 @@ class Sinha2016:
 
     def __dump_total_synaptic_elements(self):
         """Dump total number of synaptic elements."""
-        if self.setup_str_p:
+        if self.is_str_p_enabled:
             loc_e = [stat['global_id'] for stat
                      in nest.GetStatus(self.neuronsE)
                      if stat['local']]
@@ -1942,7 +1942,7 @@ class Sinha2016:
         print("{},".format(len(local_neurons)), file=self.ca_file_handle_I)
         self.ca_file_handle_I.close()
 
-        if self.setup_str_p:
+        if self.is_str_p_enabled:
             self.syn_elms_file_handle_E.close()
             self.syn_elms_file_handle_I.close()
             self.synapses_formed_handle.close()
