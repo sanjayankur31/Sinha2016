@@ -1566,48 +1566,42 @@ class Sinha2016:
         Set up a pattern for recall.
 
         Creates a new poisson generator and connects it to a recall subset of
-        this pattern - the poisson stimulus will run for the set recall_time
+        this pattern - the poisson stimulus will run for the set recall_duration
         from the invocation of this method.
         """
         # set up external stimulus
         stim_time = nest.GetKernelStatus()['time']
         neuronDictStim = {'rate': 200.,
                           'origin': stim_time,
-                          'start': 0., 'stop': self.recall_time}
-
-        sd_params = self.sd_paramsStim.copy()
-        sd_params['label'] = sd_params['label'] + "-{}".format(pattern_number)
-
+                          'start': 0., 'stop': self.recall_duration}
         stim = nest.Create('poisson_generator', 1,
                            neuronDictStim)
-        # TODO: Do I need a parrot neuron?
-        stim_neurons = nest.Create('parrot_neuron',
-                                   self.populations['STIM'])
-        nest.Connect(stim, stim_neurons)
-        sd = nest.Create('spike_detector',
-                         params=sd_params)
-        nest.Connect(stim_neurons, sd)
-        self.sdStim.append(sd)
-        self.neuronsStim.append(stim_neurons)
 
         pattern_neurons = self.patterns[pattern_number - 1]
+        # Only neurons that have are not in the LPZ will be given stimulus
+        pattern_neurons = list(set(pattern_neurons) - set(self.lpz_neurons_E))
+        # Pick percent of neurons that are not in the LPZ
         recall_neurons = random.sample(
             pattern_neurons, int(math.ceil(len(pattern_neurons) *
                                            self.recall_percent)))
-        logging.debug("ANKUR>> Number of recall neurons: "
-                      "{}".format(len(recall_neurons)))
 
-        nest.Connect(stim_neurons, recall_neurons,
+        logging.debug("ANKUR>> Number of recall neurons for pattern"
+                      "{}: {}".format(pattern_number, len(recall_neurons)))
+        nest.Connect(stim, recall_neurons,
                      conn_spec=self.connDictStim)
-
-        self.recalls.append(recall_neurons)
+        self.recall_neurons.append(recall_neurons)
 
         # print to file
-        file_name = "recallneurons-{}-rank-{}.txt".format(pattern_number,
-                                                          self.rank)
-        with open(file_name, 'w') as file_handle:
-            for neuron in recall_neurons:
-                print(neuron, file=file_handle)
+        if self.rank == 0:
+            file_name = "00-recall-neurons-{}-rank.txt".format(pattern_number)
+            with open(file_name, 'w') as file_handle:
+                for neuron in recall_neurons:
+                    print("{}\t{}\t{}".format(
+                        neuron,
+                        self.location_tree.data[neuron - 1][0],
+                        self.location_tree.data[neuron - 1][1]),
+                        file=file_handle)
+                    print(neuron, file=file_handle)
 
         sd_params = self.sd_paramsR.copy()
         sd_params['label'] = sd_params['label'] + "-{}".format(pattern_number)
