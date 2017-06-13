@@ -52,7 +52,7 @@ class Sinha2016:
         # what plasticity should the network be setup to handle
         self.is_str_p_enabled = True
         self.is_syn_p_enabled = True
-        self.rewiring_enabled = False
+        self.is_rewiring_enabled = False
         # "random" or "distance" or "weight"
         self.syn_del_strategy = "random"
         # "random" or "distance"
@@ -712,8 +712,8 @@ class Sinha2016:
                 print("{}: {}".format("syn_p_enabled",
                                       self.is_syn_p_enabled),
                       file=pfile)
-                print("{}: {}".format("rewiring_enabled",
-                                      self.rewiring_enabled),
+                print("{}: {}".format("is_rewiring_enabled",
+                                      self.is_rewiring_enabled),
                       file=pfile)
                 print("{}: {}".format("syn_del_strategy",
                                       self.syn_del_strategy),
@@ -1404,7 +1404,7 @@ class Sinha2016:
 
     def update_connectivity(self):
         """Our implementation of structural plasticity."""
-        if not self.rewiring_enabled:
+        if not self.is_rewiring_enabled:
             return
         logging.info("STRUCTURAL PLASTICITY: Updating connectivity")
         syn_elms = self.__get_syn_elms()
@@ -1955,7 +1955,7 @@ class Sinha2016:
             logging.critical("Doing nothing")
             return 0
 
-        self.rewiring_enabled = True
+        self.is_rewiring_enabled = True
         if self.syn_del_strategy not in [
                 "random", "distance", "weight"]:
             logging.critical(
@@ -1979,7 +1979,7 @@ class Sinha2016:
             logging.critical("Doing nothing")
             return 0
 
-        self.rewiring_enabled = False
+        self.is_rewiring_enabled = False
         logging.info("Rank {}: REWIRING DISABLED".format(self.rank))
 
     def set_lpz_percent(self, lpz_percent):
