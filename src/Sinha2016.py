@@ -89,10 +89,6 @@ class Sinha2016:
         self.patterns = []
         self.recall_neurons = []
         self.sdP = []
-        self.sdR = []
-        self.sd_LPZ_P = []
-        self.sd_LPZ_BG_E = []
-        self.sd_LPZ_BG_I = []
         self.sdB = []
         self.pattern_spike_count_file_names = []
         self.pattern_spike_count_files = []
@@ -544,26 +540,6 @@ class Sinha2016:
         self.sd_paramsB = {
             'to_file': True,
             'label': 'spikes-background'
-        }
-        # recall neurons
-        self.sd_paramsR = {
-            'to_file': True,
-            'label': 'spikes-recall'
-        }
-        # deafferentated pattern neurons
-        self.sd_params_LPZ_P = {
-            'to_file': True,
-            'label': 'spikes-lpz-pattern'
-        }
-        # deafferentated non pattern E neurons
-        self.sd_params_LPZ_BG_E = {
-            'to_file': True,
-            'label': 'spikes-lpz-bg-E'
-        }
-        # deafferentated non pattern I neurons
-        self.sd_params_LPZ_BG_I = {
-            'to_file': True,
-            'label': 'spikes-lpz-bg-I'
         }
 
         self.sdE = nest.Create('spike_detector',
@@ -1606,25 +1582,6 @@ class Sinha2016:
                      conn_spec=self.connDictStim)
         self.recall_neurons.append(recall_neurons)
 
-        # print to file
-        if self.rank == 0:
-            file_name = "00-recall-neurons-{}-rank.txt".format(pattern_number)
-            with open(file_name, 'w') as file_handle:
-                for neuron in recall_neurons:
-                    print("{}\t{}\t{}".format(
-                        neuron,
-                        self.location_tree.data[neuron - 1][0],
-                        self.location_tree.data[neuron - 1][1]),
-                        file=file_handle)
-                    print(neuron, file=file_handle)
-
-        sd_params = self.sd_paramsR.copy()
-        sd_params['label'] = sd_params['label'] + "-{}".format(pattern_number)
-        recall_spike_detector = nest.Create(
-            'spike_detector', params=sd_params)
-        nest.Connect(recall_neurons, recall_spike_detector)
-        # save the detector
-        self.sdR.append(recall_spike_detector)
 
     def recall_last_pattern(self, time):
         """
