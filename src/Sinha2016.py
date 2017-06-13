@@ -592,12 +592,22 @@ class Sinha2016:
         self.ca_file_handle_E = open(self.ca_filename_E, 'w')
         print("{}, {}".format(
             "time(ms)", "cal_E values"), file=self.ca_file_handle_E)
+        self.ca_filename_LPZ_E = ("01-calcium-lpz-E-" +
+                                  str(self.rank) + ".txt")
+        self.ca_file_handle_LPZ_E = open(self.ca_filename_LPZ_E, 'w')
+        print("{}, {}".format(
+            "time(ms)", "cal_E values"), file=self.ca_file_handle_LPZ_E)
 
         self.ca_filename_I = ("01-calcium-I-" +
                               str(self.rank) + ".txt")
         self.ca_file_handle_I = open(self.ca_filename_I, 'w')
         print("{}, {}".format(
             "time(ms)", "cal_I values"), file=self.ca_file_handle_I)
+        self.ca_filename_LPZ_I = ("01-calcium-lpz-I-" +
+                                  str(self.rank) + ".txt")
+        self.ca_file_handle_LPZ_I = open(self.ca_filename_LPZ_I, 'w')
+        print("{}, {}".format(
+            "time(ms)", "cal_I values"), file=self.ca_file_handle_LPZ_I)
 
         if self.is_str_p_enabled:
             self.syn_elms_filename_E = ("02-synaptic-elements-totals-E-" +
@@ -1582,7 +1592,6 @@ class Sinha2016:
                      conn_spec=self.connDictStim)
         self.recall_neurons.append(recall_neurons)
 
-
     def recall_last_pattern(self, time):
         """
         Only setup the last pattern.
@@ -1628,17 +1637,28 @@ class Sinha2016:
                  if stat['local']]
         loc_i = [stat['global_id'] for stat in nest.GetStatus(self.neuronsI)
                  if stat['local']]
+        lpz_e = list(set(loc_e).intersection(set(self.lpz_neurons_E)))
+        lpz_i = list(set(loc_i).intersection(set(self.lpz_neurons_I)))
+
         ca_e = nest.GetStatus(loc_e, 'Ca')
         ca_i = nest.GetStatus(loc_i, 'Ca')
+        ca_lpz_e = nest.GetStatus(lpz_e, 'Ca')
+        ca_lpz_i = nest.GetStatus(lpz_i, 'Ca')
 
         current_simtime = (str(nest.GetKernelStatus()['time']))
         print("{}, {}".format(current_simtime,
                               str(ca_e).strip('[]').strip('()')),
               file=self.ca_file_handle_E)
+        print("{}, {}".format(current_simtime,
+                              str(ca_lpz_e).strip('[]').strip('()')),
+              file=self.ca_file_handle_LPZ_E)
 
         print("{}, {}".format(current_simtime,
                               str(ca_i).strip('[]').strip('()')),
               file=self.ca_file_handle_I)
+        print("{}, {}".format(current_simtime,
+                              str(ca_lpz_i).strip('[]').strip('()')),
+              file=self.ca_file_handle_LPZ_I)
 
     def __dump_synaptic_elements_per_neurons(self):
         """
