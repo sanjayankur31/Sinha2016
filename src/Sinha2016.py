@@ -1027,7 +1027,8 @@ class Sinha2016:
 
                     if (total_synapses_this_gid) > 0:
                         # this is where the selection logic is
-                        if (total_synapses_this_gid) > int(abs(elms['Axon_in'])):
+                        if (total_synapses_this_gid) > \
+                                int(abs(elms['Axon_in'])):
                             if self.syn_del_strategy == "random":
                                 # Doesn't merit a new method
                                 chosen_targets = random.sample(
