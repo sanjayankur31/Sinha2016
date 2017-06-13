@@ -1460,30 +1460,33 @@ class Sinha2016:
         logging.debug("Tracking this pattern")
         self.patterns.append(pattern_neurons)
         # print to file
-        file_name = "patternneurons-{}-rank-{}.txt".format(
-            self.pattern_count, self.rank)
         # NOTE: since these are E neurons, the indices match in the location
         # tree. No need to subtract self.neuronsE[0] to get the right indices at
         # the moment. But keep in mind in case something changes in the future.
-        with open(file_name, 'w') as file_handle:
-            for neuron in pattern_neurons:
-                print("{}\t{}\t{}".format(neuron,
-                                          self.location_tree.data[neuron][0],
-                                          self.location_tree.data[neuron][1]),
-                      file=file_handle)
+        if self.rank == 0:
+            file_name = "00-pattern-neurons-{}.txt".format(
+                self.pattern_count)
+            with open(file_name, 'w') as file_handle:
+                for neuron in pattern_neurons:
+                    print("{}\t{}\t{}".format(
+                        neuron,
+                        self.location_tree.data[neuron][0],
+                        self.location_tree.data[neuron][1]),
+                        file=file_handle)
 
-        # background neurons
-        background_neurons = list(
-            set(self.neuronsE) - set(pattern_neurons))
-        file_name = "backgroundneurons-{}-rank-{}.txt".format(
-            self.pattern_count, self.rank)
+            # background neurons
+            background_neurons = list(
+                set(self.neuronsE) - set(pattern_neurons))
+            file_name = "00-background-neurons-{}.txt".format(
+                self.pattern_count)
 
-        with open(file_name, 'w') as file_handle:
-            for neuron in background_neurons:
-                print("{}\t{}\t{}".format(neuron,
-                                          self.location_tree.data[neuron][0],
-                                          self.location_tree.data[neuron][1]),
-                      file=file_handle)
+            with open(file_name, 'w') as file_handle:
+                for neuron in background_neurons:
+                    print("{}\t{}\t{}".format(
+                        neuron,
+                        self.location_tree.data[neuron][0],
+                        self.location_tree.data[neuron][1]),
+                        file=file_handle)
 
         # set up spike detectors
         sd_params = self.sd_paramsP.copy()
