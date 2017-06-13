@@ -1950,6 +1950,11 @@ class Sinha2016:
 
     def enable_rewiring(self):
         """Enable the rewiring."""
+        if not self.is_str_p_enabled:
+            logging.critical("Structural plasticity isnt enabled!")
+            logging.critical("Doing nothing")
+            return 0
+
         self.rewiring_enabled = True
         if self.syn_del_strategy not in [
                 "random", "distance", "weight"]:
@@ -1969,6 +1974,11 @@ class Sinha2016:
 
     def disable_rewiring(self):
         """Disable the rewiring."""
+        if not self.is_str_p_enabled:
+            logging.critical("Structural plasticity isnt enabled!")
+            logging.critical("Doing nothing")
+            return 0
+
         self.rewiring_enabled = False
         logging.info("Rank {}: REWIRING DISABLED".format(self.rank))
 
