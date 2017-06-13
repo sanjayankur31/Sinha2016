@@ -1444,6 +1444,7 @@ class Sinha2016:
         mid_point = [(x + y)/2 for x, y in zip(last_point, first_point)]
         neurons = self.location_tree.query(
             mid_point, k=num_neurons)[1]
+        logging.info("Got {}/{} neurons".format(len(neurons), num_neurons))
         return neurons
 
     def __strengthen_pattern_connections(self, pattern_neurons):
@@ -1962,6 +1963,7 @@ class Sinha2016:
     def set_lpz_percent(self, lpz_percent):
         """Set up the network for deaff."""
         self.lpz_percent = lpz_percent
+        logging.info("LPZ percent set to {}".format(self.lpz_percent))
 
 
 if __name__ == "__main__":
