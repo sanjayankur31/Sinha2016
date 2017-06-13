@@ -1459,6 +1459,8 @@ class Sinha2016:
         """Track the pattern."""
         logging.debug("Tracking this pattern")
         self.patterns.append(pattern_neurons)
+        background_neurons = list(
+            set(self.neuronsE) - set(pattern_neurons))
         # print to file
         # NOTE: since these are E neurons, the indices match in the location
         # tree. No need to subtract self.neuronsE[0] to get the right indices at
@@ -1475,8 +1477,6 @@ class Sinha2016:
                         file=file_handle)
 
             # background neurons
-            background_neurons = list(
-                set(self.neuronsE) - set(pattern_neurons))
             file_name = "00-background-neurons-{}.txt".format(
                 self.pattern_count)
 
