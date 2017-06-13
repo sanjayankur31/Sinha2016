@@ -1981,7 +1981,7 @@ if __name__ == "__main__":
     # update of the network
     simulation.setup_plasticity(True, True)
     # set up deaff extent, and neuron sets
-    simulation.set_lpz_percent(0.75)
+    simulation.set_lpz_percent(0.3)
     # set up neurons, connections, spike detectors, files
     simulation.prerun_setup(
         stabilisation_time=2000.,
