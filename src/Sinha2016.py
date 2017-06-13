@@ -2013,7 +2013,7 @@ if __name__ == "__main__":
         # only track first pattern to limit log files
         simulation.store_lpz_central_pattern(True)
         simulation.store_lpz_border_pattern(True)
-        simulation.store_pattern_by_centre([10000, 1000], 800)
+        simulation.store_pattern_by_centre([10000, 1000], 800, True)
         # stabilise network after storing patterns
         simulation.stabilise()
 
