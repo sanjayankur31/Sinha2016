@@ -1507,7 +1507,6 @@ class Sinha2016:
         logging.debug(
             "SIMULATION: Storing pattern {} on left border of LPZ".format(
                 self.pattern_count + 1))
-        self.pattern_count += 1
         # left most, top most
         first_point = self.location_tree.data[0]
         # right most, bottom most
@@ -1518,8 +1517,34 @@ class Sinha2016:
         first_point[1] = mid_point[1]
         # get 1000 neurons - 800 will be E and 200 will be I
         # we only need the 800 I neurons
+        self.store_pattern(first_point, last_point,
+                           (1.25 * self.populations['P']), track=True)
+
+    def store_lpz_central_pattern(self, track=False):
+        """Store a pattern in the centre of LPZ."""
+        logging.debug(
+            "SIMULATION: Storing pattern {} in centre of LPZ".format(
+                self.pattern_count + 1))
+        # first E neuron
+        first_point = self.location_tree.data[0]
+        # last E neuron
+        # I neurons are spread among the E neurons and therefore do not make it
+        # to the extremeties
+        last_point = self.location_tree.data[len(self.neuronsE) - 1]
+        self.store_pattern(first_point, last_point,
+                           (1.25 * self.populations['P']),  track=True)
+
+    def store_pattern_by_extent(self, first_point,
+                                last_point, num_neurons, track=False):
+        """Store a pattern by specifying area extent."""
+        logging.debug(
+            "SIMULATION: Storing pattern {} in extent:".format(
+                self.pattern_count + 1, first_point, last_point))
+        self.pattern_count += 1
+        # get 1000 neurons - 800 will be E and 200 will be I
+        # we only need the 800 I neurons
         all_neurons = self.__get_neurons_from_region(
-            (1.25 * self.populations['P']), first_point, mid_point)
+            num_neurons, first_point, last_point)
         pattern_neurons = list(set(all_neurons).intersection(
             set(self.neuronsE)))
         self.__strengthen_pattern_connections(pattern_neurons)
@@ -1529,22 +1554,16 @@ class Sinha2016:
             "Number of patterns stored: {}".format(
                 self.pattern_count))
 
-    def store_lpz_central_pattern(self, track=False):
-        """Store a pattern in the centre of LPZ."""
+    def store_pattern_by_centre(self, centre_point, num_neurons, track=False):
+        """Store a pattern by specifying area extent."""
         logging.debug(
-            "SIMULATION: Storing pattern {} in the centre of LPZ".format(
-                self.pattern_count + 1))
+            "SIMULATION: Storing pattern {} centred at:".format(
+                self.pattern_count + 1, centre_point))
         self.pattern_count += 1
-        # first E neuron
-        first_point = self.location_tree.data[0]
-        # last E neuron
-        # I neurons are spread among the E neurons and therefore do not make it
-        # to the extremeties
-        last_point = self.location_tree.data[len(self.neuronsE) - 1]
         # get 1000 neurons - 800 will be E and 200 will be I
         # we only need the 800 I neurons
-        all_neurons = self.__get_neurons_from_region(
-            (1.25 * self.populations['P']), first_point, last_point)
+        all_neurons = self.location_tree.query(
+            centre_point, k=num_neurons)[1]
         pattern_neurons = list(set(all_neurons).intersection(
             set(self.neuronsE)))
         self.__strengthen_pattern_connections(pattern_neurons)
@@ -1991,6 +2010,7 @@ if __name__ == "__main__":
         # only track first pattern to limit log files
         simulation.store_lpz_central_pattern(True)
         simulation.store_lpz_border_pattern(True)
+        simulation.store_pattern_by_centre([10000, 1000], 800)
         # stabilise network after storing patterns
         simulation.stabilise()
 
