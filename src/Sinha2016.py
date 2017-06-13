@@ -1472,8 +1472,8 @@ class Sinha2016:
                 for neuron in pattern_neurons:
                     print("{}\t{}\t{}".format(
                         neuron,
-                        self.location_tree.data[neuron][0],
-                        self.location_tree.data[neuron][1]),
+                        self.location_tree.data[neuron - 1][0],
+                        self.location_tree.data[neuron - 1][1]),
                         file=file_handle)
 
             # background neurons
@@ -1484,8 +1484,8 @@ class Sinha2016:
                 for neuron in background_neurons:
                     print("{}\t{}\t{}".format(
                         neuron,
-                        self.location_tree.data[neuron][0],
-                        self.location_tree.data[neuron][1]),
+                        self.location_tree.data[neuron - 1][0],
+                        self.location_tree.data[neuron - 1][1]),
                         file=file_handle)
 
         # set up spike detectors
