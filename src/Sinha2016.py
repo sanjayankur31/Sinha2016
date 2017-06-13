@@ -255,6 +255,22 @@ class Sinha2016:
         self.lpz_neurons_I = list(set(lpz_neurons).intersection(
             set(self.neuronsI)))
 
+        if self.rank == 0:
+            with open("00-lpz-neuron-locations-E.txt", 'w') as f1:
+                for neuron in self.lpz_neurons_E:
+                    nrnid = neuron - self.neuronsE[0]
+                    print("{}\t{}\t{}".format(neuron,
+                                              self.location_tree.data[nrnid][0],
+                                              self.location_tree[nrnid][1]),
+                          file=f1)
+            with open("00-lpz-neuron-locations-I.txt", 'w') as f1:
+                for neuron in self.lpz_neurons_I:
+                    nrnid = neuron + self.neuronsE[-1] - self.neuronsI[0]
+                    print("{}\t{}\t{}".format(neuron,
+                                              self.location_tree.data[nrnid][0],
+                                              self.location_tree[nrnid][1]),
+                          file=f1)
+
     def __create_sparse_list(self, length, static_w, sparsity):
         """Create one list to use with SetStatus."""
         weights = []
