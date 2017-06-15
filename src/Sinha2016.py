@@ -712,10 +712,10 @@ class Sinha2016:
                 print("{}: {} milli seconds".format("dt", self.dt),
                       file=pfile)
                 print("{}: {} seconds".format("stabilisation_time",
-                                      self.stabilisation_time),
+                                              self.stabilisation_time),
                       file=pfile)
                 print("{}: {} seconds".format("recording_interval",
-                                      self.recording_interval),
+                                              self.recording_interval),
                       file=pfile)
                 print("{}: {}".format("str_p_enabled",
                                       self.is_str_p_enabled),
@@ -761,10 +761,10 @@ class Sinha2016:
                 print("{}: {} micro metres".format("sd_dist", self.location_sd),
                       file=pfile)
                 print("{}: {} seconds".format("sp_update_interval",
-                                      self.sp_update_interval),
+                                              self.sp_update_interval),
                       file=pfile)
                 print("{}: {} seconds".format("recording_interval",
-                                      self.recording_interval),
+                                              self.recording_interval),
                       file=pfile)
                 print("{}: {} nS".format("wbar", self.wbar),
                       file=pfile)
