@@ -709,12 +709,12 @@ class Sinha2016:
         """Print the parameters of the simulation to a file."""
         if self.rank == 0:
             with open("00-simulation_params.txt", 'w') as pfile:
-                print("{}: {}".format("dt", self.dt),
+                print("{}: {} milli seconds".format("dt", self.dt),
                       file=pfile)
-                print("{}: {}".format("stabilisation_time",
+                print("{}: {} seconds".format("stabilisation_time",
                                       self.stabilisation_time),
                       file=pfile)
-                print("{}: {}".format("recording_interval",
+                print("{}: {} seconds".format("recording_interval",
                                       self.recording_interval),
                       file=pfile)
                 print("{}: {}".format("str_p_enabled",
@@ -754,27 +754,27 @@ class Sinha2016:
                       file=pfile)
                 print("{}: {}".format("lpz_percent", self.lpz_percent),
                       file=pfile)
-                print("{}: {}".format(
+                print("{}: {} micro metres".format(
                     "grid_size_E",
                     self.location_tree.data[len(self.neuronsE) - 1]),
                     file=pfile)
-                print("{}: {}".format("sd_dist", self.location_sd),
+                print("{}: {} micro metres".format("sd_dist", self.location_sd),
                       file=pfile)
-                print("{}: {}".format("sp_update_interval",
+                print("{}: {} seconds".format("sp_update_interval",
                                       self.sp_update_interval),
                       file=pfile)
-                print("{}: {}".format("recording_interval",
+                print("{}: {} seconds".format("recording_interval",
                                       self.recording_interval),
                       file=pfile)
-                print("{}: {}".format("wbar", self.wbar),
+                print("{}: {} nS".format("wbar", self.wbar),
                       file=pfile)
-                print("{}: {}".format("weightEE", self.weightEE),
+                print("{}: {} nS".format("weightEE", self.weightEE),
                       file=pfile)
-                print("{}: {}".format("weightEI", self.weightEI),
+                print("{}: {} nS".format("weightEI", self.weightEI),
                       file=pfile)
-                print("{}: {}".format("weightII", self.weightII),
+                print("{}: {} nS".format("weightII", self.weightII),
                       file=pfile)
-                print("{}: {}".format("weightExt", self.weightExt),
+                print("{}: {} nS".format("weightExt", self.weightExt),
                       file=pfile)
                 print("{}: {}".format("sparsity", self.sparsity),
                       file=pfile)
