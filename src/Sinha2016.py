@@ -770,6 +770,9 @@ class Sinha2016:
                       file=pfile)
                 print("{}: {} nS".format("weightEE", self.weightEE),
                       file=pfile)
+                print("{}: {} ns".format("weightPatternEE",
+                                         self.weightPatternEE),
+                      file=pfile)
                 print("{}: {} nS".format("weightEI", self.weightEI),
                       file=pfile)
                 print("{}: {} nS".format("weightII", self.weightII),
