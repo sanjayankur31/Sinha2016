@@ -203,15 +203,14 @@ class Sinha2016:
         if self.rank == 0:
             loc_file = open("00-neuron-locations-E.txt", 'w')
         for neuron in self.neuronsE:
-            y = random.gauss(
-                int((neuron - self.neuronsE[0])/self.colsE) *
-                self.neuronal_distE, self.location_sd)
-            x = random.gauss(
-                ((neuron - self.neuronsE[0]) % self.colsE) *
-                self.neuronal_distE, self.location_sd)
+            row = int((neuron - self.neuronsE[0])/self.colsE)
+            y = random.gauss(row * self.neuronal_distE, self.location_sd)
+            col = ((neuron - self.neuronsE[0]) % self.colsE)
+            x = random.gauss(col * self.neuronal_distE, self.location_sd)
             locations.append([x, y])
             if self.rank == 0:
-                print("{}\t{}\t{}".format(neuron, x, y), file=loc_file)
+                print("{}\t{}\t{}\t{}\t{}".format(neuron, col, row, x, y),
+                      file=loc_file)
         if self.rank == 0:
             loc_file.close()
 
