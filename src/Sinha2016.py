@@ -1599,25 +1599,38 @@ class Sinha2016:
         from the invocation of this method.
         """
         # set up external stimulus
-        stim_time = nest.GetKernelStatus()['time']
-        neuronDictStim = {'rate': 200.,
-                          'origin': stim_time,
-                          'start': 0., 'stop': self.recall_duration}
-        stim = nest.Create('poisson_generator', 1,
-                           neuronDictStim)
-
         pattern_neurons = self.patterns[pattern_number - 1]
         # Only neurons that have are not in the LPZ will be given stimulus
-        pattern_neurons = list(set(pattern_neurons) - set(self.lpz_neurons_E))
+        active_pattern_neurons = list(set(pattern_neurons) -
+                                      set(self.lpz_neurons_E))
         # Pick percent of neurons that are not in the LPZ
-        recall_neurons = random.sample(
-            pattern_neurons, int(math.ceil(len(pattern_neurons) *
-                                           self.recall_percent)))
+        recall_neurons = []
+        if len(active_pattern_neurons) > 0:
+            num_recall_neurons = int(math.ceil(len(active_pattern_neurons) *
+                                               self.recall_pattern))
+            # if the number of active pattern neurons is too small, use the
+            # whole lot
+            if num_recall_neurons > 0:
+                recall_neurons = random.sample(active_pattern_neurons,
+                                               num_recall_neurons)
+            else:
+                recall_neurons = active_pattern_neurons
 
-        logging.debug("ANKUR>> Number of recall neurons for pattern"
-                      "{}: {}".format(pattern_number, len(recall_neurons)))
-        nest.Connect(stim, recall_neurons,
-                     conn_spec=self.connDictStim)
+            stim_time = nest.GetKernelStatus()['time']
+            neuronDictStim = {'rate': 200.,
+                              'origin': stim_time,
+                              'start': 0., 'stop': self.recall_duration}
+            stim = nest.Create('poisson_generator', 1,
+                               neuronDictStim)
+
+            nest.Connect(stim, recall_neurons,
+                         conn_spec=self.connDictStim)
+
+            logging.debug("ANKUR>> Number of recall neurons for pattern"
+                          "{}: {}".format(pattern_number, len(recall_neurons)))
+        else:
+            logging.debug("ANKUR>> Pattern {} appears to be completely "
+                          "deafferentated - not setting up a recall stimulus")
         self.recall_neurons.append(recall_neurons)
 
     def recall_last_pattern(self, time):
@@ -2043,8 +2056,9 @@ if __name__ == "__main__":
 
     if store_patterns:
         # recall stored and tracked pattern
-        # TODO: REDO recall
         simulation.recall_pattern(50, 1)
+        simulation.recall_pattern(50, 2)
+        simulation.recall_pattern(50, 3)
 
     simulation.close_files()
     nest.Cleanup()
