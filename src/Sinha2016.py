@@ -219,15 +219,16 @@ class Sinha2016:
         if self.rank == 0:
             loc_file = open("00-neuron-locations-I.txt", 'w')
         for neuron in self.neuronsI:
+            row = int((neuron - self.neuronsI[0])/self.colsI)
             y = self.neuronal_distI/4 + random.gauss(
-                int((neuron - self.neuronsI[0])/self.colsI) *
-                self.neuronal_distI, self.location_sd)
+                row * self.neuronal_distI, self.location_sd)
+            col = ((neuron - self.neuronsI[0]) % self.colsI)
             x = self.neuronal_distI/4 + random.gauss(
-                ((neuron - self.neuronsI[0]) % self.colsI) *
-                self.neuronal_distI, self.location_sd)
+                col * self.neuronal_distI, self.location_sd)
             locations.append([x, y])
             if self.rank == 0:
-                print("{}\t{}\t{}".format(neuron, x, y), file=loc_file)
+                print("{}\t{}\t{}\t{}\t{}".format(neuron, col, row, x, y),
+                      file=loc_file)
         if self.rank == 0:
             loc_file.close()
         self.location_tree = cKDTree(locations)
