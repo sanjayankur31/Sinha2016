@@ -1984,7 +1984,7 @@ if __name__ == "__main__":
     # simulation setup
     # Setup network to handle plasticities
     # update of the network
-    simulation.setup_plasticity(True, True)
+    simulation.setup_plasticity(False, True)
     # set up deaff extent, and neuron sets
     simulation.set_lpz_percent(0.3)
     # set up neurons, connections, spike detectors, files
