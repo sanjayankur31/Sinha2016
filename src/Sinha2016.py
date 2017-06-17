@@ -1571,7 +1571,7 @@ class Sinha2016:
             "Number of patterns stored: {}".format(
                 self.pattern_count))
 
-    def store_pattern_by_centre(self, centre_point, num_neurons, track=False):
+    def store_pattern_at_centre(self, centre_point, num_neurons, track=False):
         """Store a pattern by specifying area extent."""
         logging.debug(
             "SIMULATION: Storing pattern {} centred at:".format(
@@ -2042,7 +2042,7 @@ if __name__ == "__main__":
         # only track first pattern to limit log files
         simulation.store_lpz_central_pattern(True)
         simulation.store_lpz_border_pattern(True)
-        simulation.store_pattern_by_centre([10000, 2000], 600, True)
+        simulation.store_pattern_at_centre([10000, 2000], 600, True)
         # stabilise network after storing patterns
         simulation.stabilise()
 
