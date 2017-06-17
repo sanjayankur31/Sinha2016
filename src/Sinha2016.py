@@ -2008,7 +2008,7 @@ if __name__ == "__main__":
         # outside the LPZ
         simulation.store_pattern_with_centre([10000, 2000], 600, True)
         # store other pattern
-        simulation.store_pattern_off_centre([0., 2000.0], True)
+        simulation.store_pattern_off_centre([0., 2500.0], True)
 
         # stabilise network after storing patterns
         simulation.stabilise()
