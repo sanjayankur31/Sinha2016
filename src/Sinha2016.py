@@ -1607,7 +1607,7 @@ class Sinha2016:
         recall_neurons = []
         if len(active_pattern_neurons) > 0:
             num_recall_neurons = int(math.ceil(len(active_pattern_neurons) *
-                                               self.recall_pattern))
+                                               self.recall_percent))
             # if the number of active pattern neurons is too small, use the
             # whole lot
             if num_recall_neurons > 0:
