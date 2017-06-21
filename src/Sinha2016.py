@@ -1920,10 +1920,19 @@ class Sinha2016:
                          nest.GetStatus(self.neuronsE) if stat['local']]
         print("{},".format(len(local_neurons)), file=self.ca_file_handle_E)
         self.ca_file_handle_E.close()
+
+        lpz_e = list(set(local_neurons).intersection(set(self.lpz_neurons_E)))
+        print("{},".format(len(lpz_e)), file=self.ca_file_handle_LPZ_E)
+        self.ca_file_handle_LPZ_E.close()
+
         local_neurons = [stat['global_id'] for stat in
                          nest.GetStatus(self.neuronsI) if stat['local']]
         print("{},".format(len(local_neurons)), file=self.ca_file_handle_I)
         self.ca_file_handle_I.close()
+
+        lpz_i = list(set(local_neurons).intersection(set(self.lpz_neurons_I)))
+        print("{},".format(len(lpz_i)), file=self.ca_file_handle_LPZ_I)
+        self.ca_file_handle_LPZ_I.close()
 
         if self.is_str_p_enabled:
             self.syn_elms_file_handle_E.close()
