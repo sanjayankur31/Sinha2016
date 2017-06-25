@@ -1575,8 +1575,7 @@ class Sinha2016:
             # if the number of active pattern neurons is too small, use the
             # whole lot
             if num_recall_neurons > 0:
-                recall_neurons = random.sample(active_pattern_neurons,
-                                               num_recall_neurons)
+                recall_neurons = active_pattern_neurons[-num_recall_neurons:]
             else:
                 recall_neurons = active_pattern_neurons
 
