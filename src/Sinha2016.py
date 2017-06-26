@@ -98,7 +98,7 @@ class Sinha2016:
         self.weightEE = self.wbar
         self.weightII = self.wbar * -10.
         self.weightEI = self.wbar
-        self.weightPatternEE = self.wbar * 5.
+        self.weightPatternEE = self.wbar * 10.
         self.weightExt = 50.
 
         # used to track how many comma separated values each line will have
@@ -1992,7 +1992,7 @@ if __name__ == "__main__":
     # simulation setup
     # Setup network to handle plasticities
     # update of the network
-    simulation.setup_plasticity(True, True)
+    simulation.setup_plasticity(False, True)
     # set up deaff extent, and neuron sets
     simulation.set_lpz_percent(0.3)
     # set up neurons, connections, spike detectors, files
