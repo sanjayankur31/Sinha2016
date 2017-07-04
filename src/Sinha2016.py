@@ -2011,7 +2011,7 @@ if __name__ == "__main__":
     # Pattern related simulation
     if store_patterns:
         # store other pattern
-        simulation.store_pattern_off_centre([0., 3500.0], True)
+        simulation.store_pattern_off_centre([0., 4000.0], True)
 
         # stabilise network after storing patterns
         simulation.stabilise()
