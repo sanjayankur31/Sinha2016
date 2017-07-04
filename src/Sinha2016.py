@@ -98,7 +98,7 @@ class Sinha2016:
         self.weightEE = self.wbar
         self.weightII = self.wbar * -10.
         self.weightEI = self.wbar
-        self.weightPatternEE = self.wbar * 5.
+        self.weightPatternEE = self.wbar * 10.
         self.weightExt = 50.
 
         # used to track how many comma separated values each line will have
@@ -2010,12 +2010,6 @@ if __name__ == "__main__":
 
     # Pattern related simulation
     if store_patterns:
-        # control LPZs
-        # pattern at centre of LPZ
-        simulation.store_pattern_off_centre([0., 0.], True)
-        # outside the LPZ
-        simulation.store_pattern_with_centre([10000, 2000], 600, True)
-        # store other pattern
         simulation.store_pattern_off_centre([0., 2000.0], True)
 
         # stabilise network after storing patterns
@@ -2032,8 +2026,6 @@ if __name__ == "__main__":
     if store_patterns:
         # recall stored and tracked pattern
         simulation.recall_pattern(50, 1)
-        simulation.recall_pattern(50, 2)
-        simulation.recall_pattern(50, 3)
 
     simulation.close_files()
     nest.Cleanup()
