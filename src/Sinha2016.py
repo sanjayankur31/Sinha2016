@@ -252,19 +252,19 @@ class Sinha2016:
         if self.rank == 0:
             with open("00-lpz-neuron-locations-E.txt", 'w') as f1:
                 for neuron in self.lpz_neurons_E:
-                    nrnid = neuron - self.neuronsE[0]
+                    nrnindex = neuron - self.neuronsE[0]
                     print("{}\t{}\t{}".format(
                         neuron,
-                        self.location_tree.data[nrnid][0],
-                        self.location_tree.data[nrnid][1]),
+                        self.location_tree.data[nrnindex][0],
+                        self.location_tree.data[nrnindex][1]),
                         file=f1)
             with open("00-lpz-neuron-locations-I.txt", 'w') as f1:
                 for neuron in self.lpz_neurons_I:
-                    nrnid = neuron + self.neuronsE[-1] - self.neuronsI[0]
+                    nrnindex = neuron + self.neuronsE[-1] - self.neuronsI[0]
                     print("{}\t{}\t{}".format(
                         neuron,
-                        self.location_tree.data[nrnid][0],
-                        self.location_tree.data[nrnid][1]),
+                        self.location_tree.data[nrnindex][0],
+                        self.location_tree.data[nrnindex][1]),
                         file=f1)
 
     def __create_sparse_list(self, length, static_w, sparsity):
