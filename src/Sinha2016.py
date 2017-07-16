@@ -97,7 +97,7 @@ class Sinha2016:
         self.wbar = 0.5
         self.weightEE = self.wbar
         self.weightII = self.wbar * -10.
-        self.weightEI = self.wbar
+        self.weightEI = self.wbar  # is the same as EE, specified for clarity
         self.weightPatternEE = self.wbar * 5.
         self.weightExt = 50.
 
@@ -366,10 +366,7 @@ class Sinha2016:
                                   'weight': 1.,
                                   'pre_synaptic_element': 'Axon_ex',
                                   'post_synaptic_element': 'Den_ex'}
-                self.synDictEI = {'model': 'static_synapse_ex',
-                                  'weight': 1.,
-                                  'pre_synaptic_element': 'Axon_ex',
-                                  'post_synaptic_element': 'Den_ex'}
+                self.synDictEI = self.synDictEE
                 self.synDictII = {'model': 'static_synapse_in',
                                   'weight': 1.,
                                   'pre_synaptic_element': 'Axon_in',
@@ -385,10 +382,7 @@ class Sinha2016:
                                   'weight': self.weightEE,
                                   'pre_synaptic_element': 'Axon_ex',
                                   'post_synaptic_element': 'Den_ex'}
-                self.synDictEI = {'model': 'static_synapse_ex',
-                                  'weight': self.weightEI,
-                                  'pre_synaptic_element': 'Axon_ex',
-                                  'post_synaptic_element': 'Den_ex'}
+                self.synDictEI = self.synDictEE
                 self.synDictII = {'model': 'static_synapse_in',
                                   'weight': self.weightII,
                                   'pre_synaptic_element': 'Axon_in',
@@ -402,7 +396,6 @@ class Sinha2016:
             nest.SetStructuralPlasticityStatus({
                 'structural_plasticity_synapses': {
                     'static_synapse_ex': self.synDictEE,
-                    'static_synapse_ex': self.synDictEI,
                     'static_synapse_in': self.synDictII,
                     'stdp_synapse_in': self.synDictIE,
                 }
