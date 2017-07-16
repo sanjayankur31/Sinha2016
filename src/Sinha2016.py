@@ -30,6 +30,7 @@ import random
 from scipy.spatial import cKDTree
 from mpi4py import MPI
 import logging
+import operator
 
 
 class Sinha2016:
@@ -1287,10 +1288,23 @@ class Sinha2016:
                 deleted_synapses,
                 total_synapses))
 
-    def __get_form_part_d(
-            self, source, options, num_required):
+    def __get_form_part_d(self, source, options, num_required):
         """Choose partners based on distance."""
-        logging.critical("UNIMPLEMENTED. EXITING!")
+        # in efficient, but works.
+        distances = {}
+        sourceloc = numpy.array(self.location_tree.data[source -
+                                                        self.neuronsE[0]])
+        for opt in options:
+            location = numpy.array(self.location_tree.data[opt -
+                                                           self.neuronsE[0]])
+            distance = numpy.linalg.norm(location - sourceloc)
+            distances[opt] = distance
+
+        sorted_distances = sorted(distances.items(), key=operator.itemgetter(1))
+        nearest_opts = sorted_distances.keys()[0:num_required]
+        logging.debug("Returning closest partners")
+
+        return nearest_opts
 
     def __create_connections(self, synelms):
         """Connect random neurons to create new connections."""
