@@ -911,10 +911,16 @@ class Sinha2016:
                 len(synaptic_elms)))
         return synaptic_elms
 
-    def __get_del_ps_w(anchor, options, num_required):
+    def __get_del_ps_w(self, anchor, options, num_required):
         """Choose partners to delete based on weight of connections."""
-        logging.critical("UNIMPLEMENTED. EXITING!")
-        sys.exit(-1)
+        optdict = {}
+        for opt in options:
+            optdict[opt[0]] = opt[1]
+
+        sortedoptions = sorted(optdict.items(), key=operator.itemgetter(1))
+        weakestoptions = sortedoptions.keys()[0:num_required:]
+        logging.debug("Returning weakest links")
+        return weakestoptions
 
     def __get_del_ps_d(self, anchor, options, num_required):
         """Choose partners to delete based on distance."""
