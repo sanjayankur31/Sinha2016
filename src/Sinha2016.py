@@ -916,10 +916,22 @@ class Sinha2016:
         logging.critical("UNIMPLEMENTED. EXITING!")
         sys.exit(-1)
 
-    def __get_del_ps_d(anchor, options, num_required):
+    def __get_del_ps_d(self, anchor, options, num_required):
         """Choose partners to delete based on distance."""
-        logging.critical("UNIMPLEMENTED. EXITING!")
-        sys.exit(-1)
+        distances = {}
+        anchorloc = numpy.array(
+            self.location_tree.data[anchor - self.neuronsE[0]])
+        for opt in options:
+            location = numpy.array(
+                self.location_tree.data[opt - self.neuronsE[0]])
+            distance = numpy.linalg.norm(location - anchorloc)
+            distances[opt] = distance
+
+        sorted_distances = sorted(distances.items(), key=operator.itemgetter(1))
+        farthest_opts = sorted_distances.keys()[-num_required:]
+        logging.debug("Returning closest partners")
+
+        return farthest_opts
 
     def __delete_connections_from_pre(self, synelms):
         """Delete connections when the neuron is a source."""
