@@ -970,29 +970,32 @@ class Sinha2016:
                     conns = nest.GetConnections(
                         source=[gid], synapse_model='static_synapse_ex')
                     localtargets = []
-                    # For this connection, all synapses have same weight, so
-                    # the "weight" strategy doesn't apply
-                    # TODO: Implement - it'll apply to our pattern!
-                    for acon in conns:
-                        localtargets.append(acon[1])
+                    if self.syn_del_strategy == "weight":
+                        # also need to store weight
+                        # list of lists: [[target, weight], [target, weight]..]
+                        weights = nest.GetStatus(conns, "weight")
+                        for i in range(0, len(conns)):
+                            localtargets.append(
+                                [conns[i][1], weights[i]])
+                    else:
+                        for acon in conns:
+                            localtargets.append(acon[1])
 
-                    # I could've passed weights and gids separately, but I'm
-                    # unsure if they would correspond after the communication.
-                    # So, to be sure, I send them together in case weights are
-                    # also required
                     alltargets = self.comm.allgather(localtargets)
                     targets = [t for sublist in alltargets for t in sublist]
                     total_synapses_this_gid = len(targets)
                     if len(targets) > 0:
                         # this is where the selection logic is
                         if len(targets) > int(abs(elms['Axon_ex'])):
-                            if self.syn_del_strategy == "random" or \
-                                    self.syn_del_strategy == "weight":
+                            if self.syn_del_strategy == "random":
                                 # Doesn't merit a new method
                                 chosen_targets = random.sample(
                                     targets, int(abs(elms['Axon_ex'])))
                             elif self.syn_del_strategy == "distance":
                                 chosen_targets = self.__get_del_ps_d(
+                                    gid, targets, int(abs(elms['Axon_ex'])))
+                            elif self.syn_del_strategy == "weight":
+                                chosen_targets = self.__get_del_ps_w(
                                     gid, targets, int(abs(elms['Axon_ex'])))
                         else:
                             chosen_targets = targets
@@ -1147,8 +1150,16 @@ class Sinha2016:
                         target=[gid], synapse_model='static_synapse_ex')
                     localsources = []
                     chosen_sources = []
-                    for acon in conns:
-                        localsources.append(acon[0])
+                    if self.syn_del_strategy == "weight":
+                        # also need to store weight
+                        # list of lists: [[target, weight], [target, weight]..]
+                        weights = nest.GetStatus(conns, "weight")
+                        for i in range(0, len(conns)):
+                            localsources.append(
+                                [conns[i][0], weights[i]])
+                    else:
+                        for acon in conns:
+                            localsources.append(acon[0])
 
                     allsources = self.comm.allgather(localsources)
                     sources = [s for sublist in allsources for s in sublist]
@@ -1156,12 +1167,14 @@ class Sinha2016:
 
                     if len(sources) > 0:
                         if len(sources) > int(abs(elms['Den_ex'])):
-                            if self.syn_del_strategy == "random" \
-                                    or self.syn_del_strategy == "weight":
+                            if self.syn_del_strategy == "random":
                                 chosen_sources = random.sample(
                                     sources, int(abs(elms['Den_ex'])))
                             elif self.syn_del_strategy == "distance":
                                 chosen_sources = self.__get_del_ps_d(
+                                    gid, sources, int(abs(elms['Den_ex'])))
+                            elif self.syn_del_strategy == "weight":
+                                chosen_sources = self.__get_del_ps_w(
                                     gid, sources, int(abs(elms['Den_ex'])))
                         else:
                             chosen_sources = sources
