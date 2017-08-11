@@ -2106,7 +2106,7 @@ if __name__ == "__main__":
         level=logging.DEBUG)
 
     step = False
-    store_patterns = True
+    store_patterns = False
     simulation = Sinha2016()
 
     # simulation setup
@@ -2118,7 +2118,7 @@ if __name__ == "__main__":
     # set up neurons, connections, spike detectors, files
     simulation.prerun_setup(
         stabilisation_time=2000.,
-        sp_update_interval=500.,
+        sp_update_interval=200.,
         recording_interval=100.)
     # print em up
     simulation.print_simulation_parameters()
