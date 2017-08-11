@@ -54,6 +54,7 @@ class Sinha2016:
         self.is_str_p_enabled = True
         self.is_syn_p_enabled = True
         self.is_rewiring_enabled = False
+        self.is_metaplasticity_enabled = True
         # "random" or "distance" or "weight"
         self.syn_del_strategy = "random"
         # "random" or "distance"
@@ -84,6 +85,15 @@ class Sinha2016:
         self.sp_update_interval = 1000.  # seconds
         # time recall stimulus is enabled for
         self.recall_duration = 1000.  # ms
+        # homoeostatic stable points for E and I neurons
+        # eps is for a neuron - same for axonal and dendritic elements
+        # but eta is different for axonal and dendritic elements
+        self.eps_e = 0.7
+        self.eps_i = 0.7
+        self.eta_ax_e = 0.4
+        self.eta_ax_i = 0.4
+        self.eta_den_e = 0.1
+        self.eta_den_i = 0.1
 
         self.rank = nest.Rank()
 
@@ -124,29 +134,29 @@ class Sinha2016:
                 'growth_curve': "gaussian",
                 'growth_rate': 0.0001,  # Beta (elements/ms)
                 'continuous': False,
-                'eta': 0.4,
-                'eps': 0.7,
+                'eta': self.eta_ax_e,
+                'eps': self.eps_e
             }
             self.growth_curve_axonal_I = {
                 'growth_curve': "gaussian",
                 'growth_rate': 0.0001,  # Beta (elements/ms)
                 'continuous': False,
-                'eta': 0.4,
-                'eps': 0.7,
+                'eta': self.eta_ax_i,
+                'eps': self.eps_i
             }
             self.growth_curve_dendritic_E = {
                 'growth_curve': "gaussian",
                 'growth_rate': 0.0001,  # Beta (elements/ms)
                 'continuous': False,
-                'eta': 0.1,
-                'eps': 0.7,
+                'eta': self.eta_den_e,
+                'eps': self.eps_e
             }
             self.growth_curve_dendritic_I = {
                 'growth_curve': "gaussian",
                 'growth_rate': 0.0001,  # Beta (elements/ms)
                 'continuous': False,
-                'eta': 0.1,
-                'eps': 0.7,
+                'eta': self.eta_den_i,
+                'eps': self.eps_i
             }
 
             self.structural_p_elements_E = {
@@ -833,6 +843,8 @@ class Sinha2016:
             for j, k in enumerate(sim_steps):
                 self.run_simulation(self.recording_interval)
             self.update_connectivity()
+            # NOTE - can change the timescale of this too, should we?
+            self.update_metaplasticity()
 
     def run_simulation(self, simtime=2000):
         """Run the simulation."""
@@ -1482,6 +1494,13 @@ class Sinha2016:
         self.comm.Barrier()
         logging.info("STRUCTURAL PLASTICITY: Connectivity updated")
 
+    def update_metaplasticity(self):
+        """Update growth curve parameters."""
+        if self.is_metaplasticity_enabled:
+            [ca_e, ca_i, ca_lpz_e, ca_lpz_i] = self.__get_ca_concentration()
+            self.__set_str_p_hom_point(ca_e, ca_i)
+        logging.info("META PLASTICITY: Growth curves updated")
+
     def __get_neurons_from_region(self, num_neurons, first_point, last_point):
         """Get neurons in the centre of the grid.
 
@@ -1673,8 +1692,8 @@ class Sinha2016:
             for neuron in neurons:
                 print(neuron, file=file_handle)
 
-    def __dump_ca_concentration(self):
-        """Dump calcium concentration."""
+    def __get_ca_concentration(self):
+        """Get calcium concentrations from all neurons."""
         loc_e = [stat['global_id'] for stat in nest.GetStatus(self.neuronsE)
                  if stat['local']]
         loc_i = [stat['global_id'] for stat in nest.GetStatus(self.neuronsI)
@@ -1687,6 +1706,11 @@ class Sinha2016:
         ca_lpz_e = nest.GetStatus(lpz_e, 'Ca')
         ca_lpz_i = nest.GetStatus(lpz_i, 'Ca')
 
+        return [ca_e, ca_i, ca_lpz_e, ca_lpz_i]
+
+    def __dump_ca_concentration(self):
+        """Dump calcium concentration."""
+        [ca_e, ca_i, ca_lpz_e, ca_lpz_i] = self.__get_ca_concentration()
         current_simtime = (str(nest.GetKernelStatus()['time']))
         print("{}, {}".format(current_simtime,
                               str(ca_e).strip('[]').strip('()')),
@@ -2016,6 +2040,64 @@ class Sinha2016:
         self.lpz_percent = lpz_percent
         logging.info("LPZ percent set to {}".format(self.lpz_percent))
 
+    def __set_str_p_hom_point(self, ca_e, ca_i):
+        """Set the new gaussian parameters for MSP."""
+        self.eps_e = numpy.mean(ca_e)
+        self.eps_i = numpy.mean(ca_i)
+        self.eta_ax_e = self.eps_e * 0.50
+        self.eta_ax_i = self.eps_i * 0.50
+        self.eta_den_e = self.eps_e * 0.1
+        self.eta_den_i = self.eps_i * 0.1
+
+        new_growth_curve_axonal_E = {
+            'growth_curve': "gaussian",
+            'growth_rate': 0.0001,  # Beta (elements/ms)
+            'continuous': False,
+            'eta': self.eta_ax_e,
+            'eps': self.eps_e
+        }
+        new_growth_curve_axonal_I = {
+            'growth_curve': "gaussian",
+            'growth_rate': 0.0001,  # Beta (elements/ms)
+            'continuous': False,
+            'eta': self.eta_ax_i,
+            'eps': self.eps_i
+        }
+        new_growth_curve_dendritic_E = {
+            'growth_curve': "gaussian",
+            'growth_rate': 0.0001,  # Beta (elements/ms)
+            'continuous': False,
+            'eta': self.eta_den_e,
+            'eps': self.eps_e
+        }
+        new_growth_curve_dendritic_I = {
+            'growth_curve': "gaussian",
+            'growth_rate': 0.0001,  # Beta (elements/ms)
+            'continuous': False,
+            'eta': self.eta_den_i,
+            'eps': self.eps_i
+        }
+
+        new_structural_p_elements_E = {
+            'Den_ex': new_growth_curve_dendritic_E,
+            'Den_in': new_growth_curve_dendritic_I,
+            'Axon_ex': new_growth_curve_axonal_E
+        }
+
+        new_structural_p_elements_I = {
+            'Den_ex': new_growth_curve_dendritic_I,
+            'Den_in': new_growth_curve_dendritic_I,
+            'Axon_in': new_growth_curve_axonal_I
+        }
+
+        loc_e = [stat['global_id'] for stat in nest.GetStatus(self.neuronsE)
+                 if stat['local']]
+        loc_i = [stat['global_id'] for stat in nest.GetStatus(self.neuronsI)
+                 if stat['local']]
+        nest.SetStatus(loc_e, 'synaptic_elements_param',
+                       new_structural_p_elements_E)
+        nest.SetStatus(loc_i, 'synaptic_elements_param',
+                       new_structural_p_elements_I)
 
 if __name__ == "__main__":
     # Set up logging configuration
