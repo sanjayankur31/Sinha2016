@@ -843,8 +843,6 @@ class Sinha2016:
             for j, k in enumerate(sim_steps):
                 self.run_simulation(self.recording_interval)
             self.update_connectivity()
-            # NOTE - can change the timescale of this too, should we?
-            self.update_metaplasticity()
 
     def run_simulation(self, simtime=2000):
         """Run the simulation."""
@@ -2099,6 +2097,7 @@ class Sinha2016:
         nest.SetStatus(loc_i, 'synaptic_elements_param',
                        new_structural_p_elements_I)
 
+
 if __name__ == "__main__":
     # Set up logging configuration
     logging.basicConfig(
@@ -2140,6 +2139,9 @@ if __name__ == "__main__":
 
         # stabilise network after storing patterns
         simulation.stabilise()
+    # Set homoeostatic structural plasticity parameters to whatever the network
+    # has achieved now
+    simulation.update_metaplasticity()
 
     # Deaff network
     simulation.deaff_network()
