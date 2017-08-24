@@ -45,7 +45,7 @@ class Sinha2016:
         # http://www.nest-simulator.org/scheduling-and-simulation-flow/
         self.dt = 0.1
         # time to stabilise network after pattern storage etc.
-        self.stabilisation_time = 12000.  # seconds
+        self.default_stabilisation_time = 12000.  # seconds
         # keep this a divisor of the structural plasticity update interval, and
         # the stabilisation time for simplicity
         self.recording_interval = 500.  # seconds
@@ -717,7 +717,7 @@ class Sinha2016:
                 print("{}: {} milli seconds".format("dt", self.dt),
                       file=pfile)
                 print("{}: {} seconds".format("stabilisation_time",
-                                              self.stabilisation_time),
+                                              self.default_stabilisation_time),
                       file=pfile)
                 print("{}: {} seconds".format("recording_interval",
                                               self.recording_interval),
@@ -793,7 +793,7 @@ class Sinha2016:
                             recording_interval=None):
         """Set up stabilisation time."""
         if stabilisation_time:
-            self.stabilisation_time = stabilisation_time
+            self.default_stabilisation_time = stabilisation_time
         if sp_update_interval:
             self.sp_update_interval = sp_update_interval
         if recording_interval:
@@ -831,17 +831,19 @@ class Sinha2016:
 
         self.dump_data()
 
-    def stabilise(self):
+    def stabilise(self, stab_time=0.):
         """Stabilise network."""
+        if stab_time:
+            stabilisation_time = stab_time
+        else:
+            stabilisation_time = self.default_stabilisation_time
+
         logging.info("SIMULATION: STABILISING for {} seconds".format(
-            self.stabilisation_time))
-        update_steps = numpy.arange(0, self.stabilisation_time,
+            stabilisation_time))
+        update_steps = numpy.arange(0, stabilisation_time,
                                     self.sp_update_interval)
         for i, j in enumerate(update_steps):
-            sim_steps = numpy.arange(0, self.sp_update_interval,
-                                     self.recording_interval)
-            for j, k in enumerate(sim_steps):
-                self.run_simulation(self.recording_interval)
+            self.run_simulation(self.sp_update_interval)
             self.update_connectivity()
 
     def run_simulation(self, simtime=2000):
@@ -853,10 +855,10 @@ class Sinha2016:
                 self.__dump_synaptic_weights()
         else:
             nest.Simulate(simtime*1000)
-            self.dump_data()
-            current_simtime = (
-                str(nest.GetKernelStatus()['time']) + "msec")
-            logging.info("Simulation time: " "{}".format(current_simtime))
+            current_simtime = nest.GetKernelStatus()['time']/1000.
+            if current_simtime % self.recording_interval == 0:
+                self.dump_data()
+            logging.info("Simulation time: {} seconds".format(current_simtime))
 
     def __get_syn_elms(self):
         """Get synaptic elements all neurons."""
@@ -2040,6 +2042,7 @@ class Sinha2016:
 
     def __set_str_p_hom_point(self, ca_e, ca_i):
         """Set the new gaussian parameters for MSP."""
+        logging.info("Calcium concentration means are [ca_e, ca_i]:  [{}, {}]".format(ca_e, ca_i))
         self.eps_e = numpy.mean(ca_e)
         self.eps_i = numpy.mean(ca_i)
         self.eta_ax_e = self.eps_e * 0.50
@@ -2117,7 +2120,7 @@ if __name__ == "__main__":
     # set up neurons, connections, spike detectors, files
     simulation.prerun_setup(
         stabilisation_time=2000.,
-        sp_update_interval=200.,
+        sp_update_interval=1000.,
         recording_interval=100.)
     # print em up
     simulation.print_simulation_parameters()
@@ -2147,8 +2150,13 @@ if __name__ == "__main__":
     simulation.deaff_network()
     # Enable structural plasticity for repair #
     simulation.enable_rewiring()
+    # update time windows
+    # we update connectivity every 2 seconds, and dump data every 50 seconds
+    # in the paper, they updated connectivity every 100ms
+    simulation.update_time_windows(stabilisation_time=5000.,
+                                   sp_update_interval=2.,
+                                   recording_interval=50.)
     # Stabilise for repair
-    simulation.stabilise()
     simulation.stabilise()
 
     if store_patterns:
