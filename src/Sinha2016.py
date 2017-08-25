@@ -840,11 +840,17 @@ class Sinha2016:
 
         logging.info("SIMULATION: STABILISING for {} seconds".format(
             stabilisation_time))
+
+        # take the smaller of the two intervals
+        run_duration = self.recording_interval
+        if self.is_rewiring_enabled:
+            if self.sp_update_interval < run_duration:
+                run_duration = self.sp_update_interval
+
         update_steps = numpy.arange(0, stabilisation_time,
-                                    self.sp_update_interval)
+                                    run_duration)
         for i, j in enumerate(update_steps):
-            self.run_simulation(self.sp_update_interval)
-            self.update_connectivity()
+            self.run_simulation(run_duration)
 
     def run_simulation(self, simtime=2000):
         """Run the simulation."""
@@ -855,10 +861,14 @@ class Sinha2016:
                 self.__dump_synaptic_weights()
         else:
             nest.Simulate(simtime*1000)
-            current_simtime = nest.GetKernelStatus()['time']/1000.
-            if current_simtime % self.recording_interval == 0:
-                self.dump_data()
-            logging.info("Simulation time: {} seconds".format(current_simtime))
+
+        current_simtime = nest.GetKernelStatus()['time']/1000.
+        if current_simtime % self.recording_interval == 0:
+            self.dump_data()
+        if current_simtime % self.sp_update_interval == 0:
+            self.update_connectivity()
+
+        logging.info("Simulation time: {} seconds".format(current_simtime))
 
     def __get_syn_elms(self):
         """Get synaptic elements all neurons."""
@@ -2153,7 +2163,7 @@ if __name__ == "__main__":
     # update time windows
     # we update connectivity every 2 seconds, and dump data every 50 seconds
     # in the paper, they updated connectivity every 100ms
-    simulation.update_time_windows(stabilisation_time=5000.,
+    simulation.update_time_windows(stabilisation_time=10000.,
                                    sp_update_interval=2.,
                                    recording_interval=50.)
     # Stabilise for repair
