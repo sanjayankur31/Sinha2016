@@ -2121,7 +2121,7 @@ if __name__ == "__main__":
     simulation.prerun_setup(
         stabilisation_time=2000.,
         sp_update_interval=1000.,
-        recording_interval=100.)
+        recording_interval=50.)
     # print em up
     simulation.print_simulation_parameters()
     logging.info("Rank {}: SIMULATION SETUP".format(simulation.rank))
