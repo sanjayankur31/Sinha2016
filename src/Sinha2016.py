@@ -58,7 +58,7 @@ class Sinha2016:
         # "random" or "distance" or "weight"
         self.syn_del_strategy = "random"
         # "random" or "distance"
-        self.syn_form_strategy = "random"
+        self.syn_form_strategy = "distance"
 
         # populations
         self.populations = {'E': 8000, 'I': 2000, 'STIM': 1000, 'Poisson': 1}
