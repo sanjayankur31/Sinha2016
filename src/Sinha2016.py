@@ -1353,7 +1353,8 @@ class Sinha2016:
             distance = numpy.linalg.norm(location - sourceloc)
             distances[opt] = distance
 
-        sorted_distances = sorted(distances.items(), key=operator.itemgetter(1))
+        sorted_distances = dict(sorted(distances.items(),
+                                       key=operator.itemgetter(1)))
         nearest_opts = sorted_distances.keys()[0:num_required]
         logging.debug("Returning closest partners")
 
