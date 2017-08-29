@@ -939,8 +939,9 @@ class Sinha2016:
         for opt in options:
             optdict[opt[0]] = opt[1]
 
-        sortedoptions = sorted(optdict.items(), key=operator.itemgetter(1))
-        weakestoptions = sortedoptions.keys()[0:num_required:]
+        sortedoptions = dict(sorted(optdict.items(),
+                                    key=operator.itemgetter(1)))
+        weakestoptions = list(sortedoptions.keys())[0:num_required:]
         logging.debug("Returning weakest links")
         return weakestoptions
 
@@ -955,8 +956,9 @@ class Sinha2016:
             distance = numpy.linalg.norm(location - anchorloc)
             distances[opt] = distance
 
-        sorted_distances = sorted(distances.items(), key=operator.itemgetter(1))
-        farthest_opts = sorted_distances.keys()[-num_required:]
+        sorted_distances = dict(sorted(distances.items(),
+                                       key=operator.itemgetter(1)))
+        farthest_opts = list(sorted_distances.keys())[-num_required:]
         logging.debug("Returning closest partners")
 
         return farthest_opts
@@ -1355,7 +1357,7 @@ class Sinha2016:
 
         sorted_distances = dict(sorted(distances.items(),
                                        key=operator.itemgetter(1)))
-        nearest_opts = sorted_distances.keys()[0:num_required]
+        nearest_opts = list(sorted_distances.keys())[0:num_required]
         logging.debug("Returning closest partners")
 
         return nearest_opts
