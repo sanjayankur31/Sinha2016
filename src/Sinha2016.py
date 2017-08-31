@@ -560,7 +560,7 @@ class Sinha2016:
         # get the firing rate and so on
 
         self.synaptic_p_weights_file_name_EE = (
-            "00-synaptic-weights-EE-" + str(self.rank) + ".txt")
+            "01-synaptic-weights-EE-" + str(self.rank) + ".txt")
         self.weights_file_handle_EE = open(
             self.synaptic_p_weights_file_name_EE, 'w')
         print("{},{}".format(
@@ -568,7 +568,7 @@ class Sinha2016:
             file=self.weights_file_handle_EE)
 
         self.synaptic_p_weights_file_name_EI = (
-            "00-synaptic-weights-EI-" + str(self.rank) + ".txt")
+            "01-synaptic-weights-EI-" + str(self.rank) + ".txt")
         self.weights_file_handle_EI = open(
             self.synaptic_p_weights_file_name_EI, 'w')
         print("{},{}".format(
@@ -576,7 +576,7 @@ class Sinha2016:
             file=self.weights_file_handle_EI)
 
         self.synaptic_p_weights_file_name_II = (
-            "00-synaptic-weights-II-" + str(self.rank) + ".txt")
+            "01-synaptic-weights-II-" + str(self.rank) + ".txt")
         self.weights_file_handle_II = open(
             self.synaptic_p_weights_file_name_II, 'w')
         print("{},{}".format(
@@ -584,37 +584,37 @@ class Sinha2016:
             file=self.weights_file_handle_II)
 
         self.synaptic_p_weights_file_name_IE = (
-            "00-synaptic-weights-IE-" + str(self.rank) + ".txt")
+            "01-synaptic-weights-IE-" + str(self.rank) + ".txt")
         self.weights_file_handle_IE = open(
             self.synaptic_p_weights_file_name_IE, 'w')
         print("{},{}".format(
             "time(ms)", "IE(nS)"),
             file=self.weights_file_handle_IE)
 
-        self.ca_filename_E = ("01-calcium-E-" +
+        self.ca_filename_E = ("02-calcium-E-" +
                               str(self.rank) + ".txt")
         self.ca_file_handle_E = open(self.ca_filename_E, 'w')
         print("{}, {}".format(
             "time(ms)", "cal_E values"), file=self.ca_file_handle_E)
-        self.ca_filename_LPZ_E = ("01-calcium-lpz-E-" +
+        self.ca_filename_LPZ_E = ("02-calcium-lpz-E-" +
                                   str(self.rank) + ".txt")
         self.ca_file_handle_LPZ_E = open(self.ca_filename_LPZ_E, 'w')
         print("{}, {}".format(
             "time(ms)", "cal_E values"), file=self.ca_file_handle_LPZ_E)
 
-        self.ca_filename_I = ("01-calcium-I-" +
+        self.ca_filename_I = ("02-calcium-I-" +
                               str(self.rank) + ".txt")
         self.ca_file_handle_I = open(self.ca_filename_I, 'w')
         print("{}, {}".format(
             "time(ms)", "cal_I values"), file=self.ca_file_handle_I)
-        self.ca_filename_LPZ_I = ("01-calcium-lpz-I-" +
+        self.ca_filename_LPZ_I = ("02-calcium-lpz-I-" +
                                   str(self.rank) + ".txt")
         self.ca_file_handle_LPZ_I = open(self.ca_filename_LPZ_I, 'w')
         print("{}, {}".format(
             "time(ms)", "cal_I values"), file=self.ca_file_handle_LPZ_I)
 
         if self.is_str_p_enabled:
-            self.syn_elms_filename_E = ("02-synaptic-elements-totals-E-" +
+            self.syn_elms_filename_E = ("03-synaptic-elements-totals-E-" +
                                         str(self.rank) + ".txt")
             self.syn_elms_file_handle_E = open(self.syn_elms_filename_E, 'w')
             print(
@@ -627,7 +627,7 @@ class Sinha2016:
                 ),
                 file=self.syn_elms_file_handle_E)
             self.syn_elms_filename_lpz_E = (
-                "02-synaptic-elements-totals-lpz-E-" + str(self.rank) + ".txt")
+                "03-synaptic-elements-totals-lpz-E-" + str(self.rank) + ".txt")
             self.syn_elms_file_handle_lpz_E = open(
                 self.syn_elms_filename_lpz_E, 'w')
             print(
@@ -640,7 +640,7 @@ class Sinha2016:
                 ),
                 file=self.syn_elms_file_handle_lpz_E)
 
-            self.syn_elms_filename_I = ("02-synaptic-elements-totals-I-" +
+            self.syn_elms_filename_I = ("03-synaptic-elements-totals-I-" +
                                         str(self.rank) + ".txt")
             self.syn_elms_file_handle_I = open(self.syn_elms_filename_I, 'w')
             print(
@@ -653,7 +653,7 @@ class Sinha2016:
                 ),
                 file=self.syn_elms_file_handle_I)
             self.syn_elms_filename_lpz_I = (
-                "02-synaptic-elements-totals-lpz-I-" + str(self.rank) + ".txt")
+                "03-synaptic-elements-totals-lpz-I-" + str(self.rank) + ".txt")
             self.syn_elms_file_handle_lpz_I = open(
                 self.syn_elms_filename_lpz_I, 'w')
             print(
@@ -713,7 +713,7 @@ class Sinha2016:
     def print_simulation_parameters(self):
         """Print the parameters of the simulation to a file."""
         if self.rank == 0:
-            with open("00-simulation_params.txt", 'w') as pfile:
+            with open("99-simulation_params.txt", 'w') as pfile:
                 print("{}: {} milli seconds".format("dt", self.dt),
                       file=pfile)
                 print("{}: {} seconds".format("stabilisation_time",
@@ -1756,7 +1756,7 @@ class Sinha2016:
             current_simtime = (str(nest.GetKernelStatus()['time']))
 
             synaptic_element_file_E = (
-                "03-synaptic-elements-E-" + str(self.rank) + "-" +
+                "04-synaptic-elements-E-" + str(self.rank) + "-" +
                 current_simtime + ".txt")
             with open(synaptic_element_file_E, 'w') as filehandle_E:
                 print("neuronID\tAxon_ex\tAxon_ex_connected" +
@@ -1780,7 +1780,7 @@ class Sinha2016:
                     ), file=filehandle_E)
 
             synaptic_element_file_I = (
-                "03-synaptic-elements-I-" + str(self.rank) + "-" +
+                "04-synaptic-elements-I-" + str(self.rank) + "-" +
                 current_simtime + ".txt")
             with open(synaptic_element_file_I, 'w') as filehandle_I:
                 print("neuronID\tAxon_in\tAxon_in_connected" +
