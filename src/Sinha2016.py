@@ -2055,13 +2055,25 @@ class Sinha2016:
 
     def __set_str_p_hom_point(self, ca_e, ca_i):
         """Set the new gaussian parameters for MSP."""
-        logging.info("Calcium concentration means are [ca_e, ca_i]:  [{}, {}]".format(ca_e, ca_i))
+        homeostatic_params_filenameE = ("21-gaussian-params-E-" + str(self.rank)
+                                        + ".txt")
+        homeostatic_params_filenameI = ("21-gaussian-params-I-" + str(self.rank)
+                                        + ".txt")
         self.eps_e = numpy.mean(ca_e)
         self.eps_i = numpy.mean(ca_i)
-        self.eta_ax_e = self.eps_e * 0.50
-        self.eta_ax_i = self.eps_i * 0.50
-        self.eta_den_e = self.eps_e * 0.1
-        self.eta_den_i = self.eps_i * 0.1
+        # 0.4/0.7
+        self.eta_ax_e = self.eps_e * 0.56
+        self.eta_ax_i = self.eps_i * 0.56
+        # 0.1/0.7
+        self.eta_den_e = self.eps_e * 0.14
+        self.eta_den_i = self.eps_i * 0.14
+
+        with open(homeostatic_params_filenameE, 'w') as f:
+            print("{}\t{}\t{}".format(self.eps_e, self.eta_ax_e,
+                                      self.eta_den_e), file=f)
+        with open(homeostatic_params_filenameI, 'w') as f:
+            print("{}\t{}\t{}".format(self.eps_i, self.eta_ax_i,
+                                      self.eta_den_i), file=f)
 
         new_growth_curve_axonal_E = {
             'growth_curve': "gaussian",
