@@ -1968,7 +1968,7 @@ class Sinha2016:
         logging.info("Rank {}: Printing data to files".format(self.rank))
         self.__dump_synaptic_weights()
         self.__dump_ca_concentration()
-        self.__dump_synaptic_elements_per_neurons()
+        # self.__dump_synaptic_elements_per_neurons()
         self.__dump_total_synaptic_elements()
 
     def close_files(self):
