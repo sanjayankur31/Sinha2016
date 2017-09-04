@@ -1813,7 +1813,7 @@ class Sinha2016:
                      in nest.GetStatus(self.neuronsI)
                      if stat['local']]
             loc_lpz_e = list(set(loc_e).intersection(set(self.lpz_neurons_E)))
-            loc_lpz_i = list(set(loc_e).intersection(set(self.lpz_neurons_I)))
+            loc_lpz_i = list(set(loc_i).intersection(set(self.lpz_neurons_I)))
 
             syn_elms_e = nest.GetStatus(loc_e, 'synaptic_elements')
             syn_elms_i = nest.GetStatus(loc_i, 'synaptic_elements')
