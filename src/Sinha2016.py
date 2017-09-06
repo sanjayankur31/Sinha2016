@@ -2128,7 +2128,7 @@ if __name__ == "__main__":
 
     step = False
     store_patterns = False
-    deafferentate_network = False
+    deafferentate_network = True
     simulation = Sinha2016()
 
     # simulation setup
