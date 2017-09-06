@@ -1512,7 +1512,7 @@ class Sinha2016:
         self.comm.Barrier()
         logging.info("STRUCTURAL PLASTICITY: Connectivity updated")
 
-    def update_metaplasticity(self):
+    def invoke_metaplasticity(self):
         """Update growth curve parameters."""
         if self.is_metaplasticity_enabled:
             [ca_e, ca_i, ca_lpz_e, ca_lpz_i] = self.__get_ca_concentration()
@@ -2163,10 +2163,7 @@ if __name__ == "__main__":
         simulation.stabilise()
     # Set homoeostatic structural plasticity parameters to whatever the network
     # has achieved now
-    simulation.update_metaplasticity()
-
-    # Deaff network
-    simulation.deaff_network()
+    simulation.invoke_metaplasticity()
     # Enable structural plasticity for repair #
     simulation.enable_rewiring()
     # update time windows
