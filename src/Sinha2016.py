@@ -2128,6 +2128,7 @@ if __name__ == "__main__":
 
     step = False
     store_patterns = False
+    deafferentate_network = False
     simulation = Sinha2016()
 
     # simulation setup
@@ -2169,11 +2170,17 @@ if __name__ == "__main__":
     # update time windows
     # we update connectivity every 2 seconds, and dump data every 50 seconds
     # in the paper, they updated connectivity every 100ms
-    simulation.update_time_windows(stabilisation_time=5000.,
-                                   sp_update_interval=1.,
+    simulation.update_time_windows(stabilisation_time=2000.,
+                                   sp_update_interval=2.,
                                    recording_interval=50.)
-    # Stabilise for repair
+    # Stabilise with both plasticities active
     simulation.stabilise()
+
+    if deafferentate_network:
+        # Deaff network
+        simulation.deaff_network()
+        # Stabilise for repair
+        simulation.stabilise()
 
     if store_patterns:
         # recall stored and tracked pattern
