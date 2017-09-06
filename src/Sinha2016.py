@@ -2167,7 +2167,7 @@ if __name__ == "__main__":
     # update time windows
     # we update connectivity every 2 seconds, and dump data every 50 seconds
     # in the paper, they updated connectivity every 100ms
-    simulation.update_time_windows(stabilisation_time=15000.,
+    simulation.update_time_windows(stabilisation_time=5000.,
                                    sp_update_interval=1.,
                                    recording_interval=50.)
     # Stabilise for repair
