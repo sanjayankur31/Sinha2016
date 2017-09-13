@@ -2171,7 +2171,7 @@ if __name__ == "__main__":
     # we update connectivity every 2 seconds, and dump data every 50 seconds
     # in the paper, they updated connectivity every 100ms
     simulation.update_time_windows(stabilisation_time=2000.,
-                                   sp_update_interval=2.,
+                                   sp_update_interval=0.1,
                                    recording_interval=50.)
     # Stabilise with both plasticities active
     simulation.stabilise()
