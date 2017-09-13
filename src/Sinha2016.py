@@ -2124,7 +2124,7 @@ if __name__ == "__main__":
     # Set up logging configuration
     logging.basicConfig(
         format='%(funcName)s: %(lineno)d: %(levelname)s: %(message)s',
-        level=logging.ERROR)
+        level=logging.CRITICAL)
 
     step = False
     store_patterns = False
@@ -2170,12 +2170,15 @@ if __name__ == "__main__":
     # update time windows
     # we update connectivity every 2 seconds, and dump data every 50 seconds
     # in the paper, they updated connectivity every 100ms
-    simulation.update_time_windows(stabilisation_time=2000.,
+    simulation.update_time_windows(stabilisation_time=1000.,
                                    sp_update_interval=0.1,
                                    recording_interval=50.)
     # Stabilise with both plasticities active
     simulation.stabilise()
 
+    simulation.update_time_windows(stabilisation_time=5000.,
+                                   sp_update_interval=0.1,
+                                   recording_interval=50.)
     if deafferentate_network:
         # Deaff network
         simulation.deaff_network()
