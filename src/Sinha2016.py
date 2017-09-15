@@ -94,6 +94,7 @@ class Sinha2016:
         self.eta_ax_i = 0.4
         self.eta_den_e = 0.1
         self.eta_den_i = 0.1
+        self.nu = 0.0001  # maximum value of dz/dt
 
         self.rank = nest.Rank()
 
@@ -2071,28 +2072,28 @@ class Sinha2016:
 
         new_growth_curve_axonal_E = {
             'growth_curve': "gaussian",
-            'growth_rate': 0.0001,  # max dz/dt (elements/ms)
+            'growth_rate': self.nu,  # max dz/dt (elements/ms)
             'continuous': False,
             'eta': self.eta_ax_e,
             'eps': self.eps_e
         }
         new_growth_curve_axonal_I = {
             'growth_curve': "gaussian",
-            'growth_rate': 0.0001,  # max dz/dt (elements/ms)
+            'growth_rate': self.nu,  # max dz/dt (elements/ms)
             'continuous': False,
             'eta': self.eta_ax_i,
             'eps': self.eps_i
         }
         new_growth_curve_dendritic_E = {
             'growth_curve': "gaussian",
-            'growth_rate': 0.0001,  # max dz/dt (elements/ms)
+            'growth_rate': self.nu,  # max dz/dt (elements/ms)
             'continuous': False,
             'eta': self.eta_den_e,
             'eps': self.eps_e
         }
         new_growth_curve_dendritic_I = {
             'growth_curve': "gaussian",
-            'growth_rate': 0.0001,  # max dz/dt (elements/ms)
+            'growth_rate': self.nu,  # max dz/dt (elements/ms)
             'continuous': False,
             'eta': self.eta_den_i,
             'eps': self.eps_i
