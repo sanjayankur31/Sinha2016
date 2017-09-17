@@ -873,6 +873,7 @@ class Sinha2016:
             self.dump_data()
         if current_simtime % self.sp_update_interval == 0:
             self.update_connectivity()
+            self.comm.Barrier()
 
         logging.info("Simulation time: {} seconds".format(current_simtime))
 
@@ -1493,22 +1494,14 @@ class Sinha2016:
         logging.info("STRUCTURAL PLASTICITY: Updating connectivity")
         syn_elms = self.__get_syn_elms()
         self.__delete_connections_from_pre(syn_elms)
-        nest.Cleanup()
-        nest.Prepare()
         # Must wait for all ranks to finish before proceeding
-        self.comm.Barrier()
 
         syn_elms_1 = self.__get_syn_elms()
         self.__delete_connections_from_post(syn_elms_1)
-        nest.Cleanup()
-        nest.Prepare()
         # Must wait for all ranks to finish before proceeding
-        self.comm.Barrier()
 
         syn_elms_2 = self.__get_syn_elms()
         self.__create_connections(syn_elms_2)
-        nest.Cleanup()
-        nest.Prepare()
         # Must wait for all ranks to finish before proceeding
         self.comm.Barrier()
         logging.info("STRUCTURAL PLASTICITY: Connectivity updated")
