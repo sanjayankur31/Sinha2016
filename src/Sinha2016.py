@@ -443,7 +443,7 @@ class Sinha2016:
 
         # only structural plasticity
         if self.is_str_p_enabled and not self.is_syn_p_enabled:
-            logging.info("Only structural plasticity enabled" +
+            logging.debug("Only structural plasticity enabled" +
                          "Not setting up any synapses.")
         # only synaptic plasticity
         # setup connections using Nest methods
@@ -844,7 +844,7 @@ class Sinha2016:
         else:
             stabilisation_time = self.default_stabilisation_time
 
-        logging.info("SIMULATION: STABILISING for {} seconds".format(
+        logging.debug("SIMULATION: STABILISING for {} seconds".format(
             stabilisation_time))
 
         # take the smaller of the two intervals
@@ -1491,7 +1491,7 @@ class Sinha2016:
         """Our implementation of structural plasticity."""
         if not self.is_rewiring_enabled:
             return
-        logging.info("STRUCTURAL PLASTICITY: Updating connectivity")
+        logging.debug("STRUCTURAL PLASTICITY: Updating connectivity")
         syn_elms = self.__get_syn_elms()
         self.__delete_connections_from_pre(syn_elms)
         # Must wait for all ranks to finish before proceeding
@@ -1503,15 +1503,14 @@ class Sinha2016:
         syn_elms_2 = self.__get_syn_elms()
         self.__create_connections(syn_elms_2)
         # Must wait for all ranks to finish before proceeding
-        self.comm.Barrier()
-        logging.info("STRUCTURAL PLASTICITY: Connectivity updated")
+        logging.debug("STRUCTURAL PLASTICITY: Connectivity updated")
 
     def invoke_metaplasticity(self):
         """Update growth curve parameters."""
         if self.is_metaplasticity_enabled:
             [ca_e, ca_i, ca_lpz_e, ca_lpz_i] = self.__get_ca_concentration()
             self.__set_str_p_hom_point(ca_e, ca_i)
-        logging.info("META PLASTICITY: Growth curves updated")
+        logging.debug("META PLASTICITY: Growth curves updated")
 
     def __get_neurons_from_region(self, num_neurons, first_point, last_point):
         """Get neurons in the centre of the grid.
@@ -1522,7 +1521,7 @@ class Sinha2016:
         mid_point = [(x + y)/2 for x, y in zip(last_point, first_point)]
         neurons = self.location_tree.query(
             mid_point, k=num_neurons)[1]
-        logging.info("Got {}/{} neurons".format(len(neurons), num_neurons))
+        logging.debug("Got {}/{} neurons".format(len(neurons), num_neurons))
         return neurons
 
     def __strengthen_pattern_connections(self, pattern_neurons):
@@ -1964,7 +1963,7 @@ class Sinha2016:
 
     def dump_data(self):
         """Master datadump function."""
-        logging.info("Rank {}: Printing data to files".format(self.rank))
+        logging.debug("Rank {}: Printing data to files".format(self.rank))
         self.__dump_synaptic_weights()
         self.__dump_ca_concentration()
         # self.__dump_synaptic_elements_per_neurons()
@@ -1972,7 +1971,7 @@ class Sinha2016:
 
     def close_files(self):
         """Close all files when the simulation is finished."""
-        logging.info("Rank {}: Closing open files".format(self.rank))
+        logging.debug("Rank {}: Closing open files".format(self.rank))
         # Comma printed so that pandas can read it as a dataframe point
         print("{},".format(self.num_synapses_EE),
               file=self.weights_file_handle_EE)
@@ -2118,7 +2117,7 @@ if __name__ == "__main__":
     # Set up logging configuration
     logging.basicConfig(
         format='%(funcName)s: %(lineno)d: %(levelname)s: %(message)s',
-        level=logging.CRITICAL)
+        level=logging.INFO)
 
     step = False
     store_patterns = False
