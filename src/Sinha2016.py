@@ -227,7 +227,7 @@ class Sinha2016:
             locations.append([x, y])
             if self.rank == 0:
                 print("{}\t{}\t{}\t{}\t{}".format(neuron, col, row, x, y),
-                      file=loc_file)
+                      file=loc_file, flush=True)
         if self.rank == 0:
             loc_file.close()
 
@@ -245,7 +245,7 @@ class Sinha2016:
             locations.append([x, y])
             if self.rank == 0:
                 print("{}\t{}\t{}\t{}\t{}".format(neuron, col, row, x, y),
-                      file=loc_file)
+                      file=loc_file, flush=True)
         if self.rank == 0:
             loc_file.close()
         self.location_tree = cKDTree(locations)
@@ -444,7 +444,7 @@ class Sinha2016:
         # only structural plasticity
         if self.is_str_p_enabled and not self.is_syn_p_enabled:
             logging.debug("Only structural plasticity enabled" +
-                         "Not setting up any synapses.")
+                          "Not setting up any synapses.")
         # only synaptic plasticity
         # setup connections using Nest methods
         elif self.is_syn_p_enabled and not self.is_str_p_enabled:
@@ -571,7 +571,7 @@ class Sinha2016:
             self.synaptic_p_weights_file_name_EE, 'w')
         print("{},{}".format(
             "time(ms)", "EE(nS)"),
-            file=self.weights_file_handle_EE)
+            file=self.weights_file_handle_EE, flush=True)
 
         self.synaptic_p_weights_file_name_EI = (
             "01-synaptic-weights-EI-" + str(self.rank) + ".txt")
@@ -579,7 +579,7 @@ class Sinha2016:
             self.synaptic_p_weights_file_name_EI, 'w')
         print("{},{}".format(
             "time(ms)", "EI(nS)"),
-            file=self.weights_file_handle_EI)
+            file=self.weights_file_handle_EI, flush=True)
 
         self.synaptic_p_weights_file_name_II = (
             "01-synaptic-weights-II-" + str(self.rank) + ".txt")
@@ -587,7 +587,7 @@ class Sinha2016:
             self.synaptic_p_weights_file_name_II, 'w')
         print("{},{}".format(
             "time(ms)", "II(nS)"),
-            file=self.weights_file_handle_II)
+            file=self.weights_file_handle_II, flush=True)
 
         self.synaptic_p_weights_file_name_IE = (
             "01-synaptic-weights-IE-" + str(self.rank) + ".txt")
@@ -595,29 +595,31 @@ class Sinha2016:
             self.synaptic_p_weights_file_name_IE, 'w')
         print("{},{}".format(
             "time(ms)", "IE(nS)"),
-            file=self.weights_file_handle_IE)
+            file=self.weights_file_handle_IE, flush=True)
 
         self.ca_filename_E = ("02-calcium-E-" +
                               str(self.rank) + ".txt")
         self.ca_file_handle_E = open(self.ca_filename_E, 'w')
         print("{}, {}".format(
-            "time(ms)", "cal_E values"), file=self.ca_file_handle_E)
+            "time(ms)", "cal_E values"), file=self.ca_file_handle_E, flush=True)
         self.ca_filename_LPZ_E = ("02-calcium-lpz-E-" +
                                   str(self.rank) + ".txt")
         self.ca_file_handle_LPZ_E = open(self.ca_filename_LPZ_E, 'w')
         print("{}, {}".format(
-            "time(ms)", "cal_E values"), file=self.ca_file_handle_LPZ_E)
+            "time(ms)", "cal_E values"), file=self.ca_file_handle_LPZ_E,
+            flush=True)
 
         self.ca_filename_I = ("02-calcium-I-" +
                               str(self.rank) + ".txt")
         self.ca_file_handle_I = open(self.ca_filename_I, 'w')
         print("{}, {}".format(
-            "time(ms)", "cal_I values"), file=self.ca_file_handle_I)
+            "time(ms)", "cal_I values"), file=self.ca_file_handle_I, flush=True)
         self.ca_filename_LPZ_I = ("02-calcium-lpz-I-" +
                                   str(self.rank) + ".txt")
         self.ca_file_handle_LPZ_I = open(self.ca_filename_LPZ_I, 'w')
         print("{}, {}".format(
-            "time(ms)", "cal_I values"), file=self.ca_file_handle_LPZ_I)
+            "time(ms)", "cal_I values"), file=self.ca_file_handle_LPZ_I,
+            flush=True)
 
         if self.is_str_p_enabled:
             self.syn_elms_filename_E = ("03-synaptic-elements-totals-E-" +
@@ -631,7 +633,7 @@ class Sinha2016:
                     "d_ex_ex_total", "d_ex_ex_connected",
                     "d_ex_in_total", "d_ex_in_connected",
                 ),
-                file=self.syn_elms_file_handle_E)
+                file=self.syn_elms_file_handle_E, flush=True)
             self.syn_elms_filename_lpz_E = (
                 "03-synaptic-elements-totals-lpz-E-" + str(self.rank) + ".txt")
             self.syn_elms_file_handle_lpz_E = open(
@@ -644,7 +646,7 @@ class Sinha2016:
                     "d_ex_ex_total", "d_ex_ex_connected",
                     "d_ex_in_total", "d_ex_in_connected",
                 ),
-                file=self.syn_elms_file_handle_lpz_E)
+                file=self.syn_elms_file_handle_lpz_E, flush=True)
 
             self.syn_elms_filename_I = ("03-synaptic-elements-totals-I-" +
                                         str(self.rank) + ".txt")
@@ -657,7 +659,7 @@ class Sinha2016:
                     "d_in_ex_total", "d_in_ex_connected",
                     "d_in_in_total", "d_in_in_connected"
                 ),
-                file=self.syn_elms_file_handle_I)
+                file=self.syn_elms_file_handle_I, flush=True)
             self.syn_elms_filename_lpz_I = (
                 "03-synaptic-elements-totals-lpz-I-" + str(self.rank) + ".txt")
             self.syn_elms_file_handle_lpz_I = open(
@@ -670,7 +672,7 @@ class Sinha2016:
                     "d_in_ex_total", "d_in_ex_connected",
                     "d_in_in_total", "d_in_in_connected"
                 ),
-                file=self.syn_elms_file_handle_lpz_I)
+                file=self.syn_elms_file_handle_lpz_I, flush=True)
 
             self.synapses_deleted_filename = (
                 "04-synapses-deleted-" + str(self.rank) + ".txt")
@@ -678,7 +680,7 @@ class Sinha2016:
                 self.synapses_deleted_filename, 'w')
             print("{}\t{}\t{}\t{}".format(
                 "time(ms)", "gid", "total conns", "conns deleted"),
-                file=self.synapses_deleted_handle)
+                file=self.synapses_deleted_handle, flush=True)
 
             self.synapses_formed_filename = (
                 "04-synapses-formed-" + str(self.rank) + ".txt")
@@ -686,7 +688,7 @@ class Sinha2016:
                 self.synapses_formed_filename, 'w')
             print("{}\t{}\t{}".format(
                 "time(ms)", "gid", "conns gained"),
-                file=self.synapses_formed_handle)
+                file=self.synapses_formed_handle, flush=True)
 
     def setup_plasticity(self, structural_p=True, synaptic_p=True):
         """Control plasticities."""
@@ -1138,7 +1140,7 @@ class Sinha2016:
                     print("{}\t{}\t{}\t{}".format(
                         current_simtime, gid, total_synapses_this_gid,
                         deleted_synapses_this_gid),
-                        file=self.synapses_deleted_handle)
+                        file=self.synapses_deleted_handle, flush=True)
                     deleted_synapses += deleted_synapses_this_gid
 
             except KeyError as e:
@@ -1330,7 +1332,7 @@ class Sinha2016:
                     print("{}\t{}\t{}\t{}".format(
                         current_simtime, gid, total_synapses_this_gid,
                         deleted_synapses_this_gid),
-                        file=self.synapses_deleted_handle)
+                        file=self.synapses_deleted_handle, flush=True)
                     deleted_synapses += deleted_synapses_this_gid
 
             except KeyError as e:
@@ -1480,7 +1482,7 @@ class Sinha2016:
             if synapses_formed_this_gid > 0:
                 print("{}\t{}\t{}".format(
                     current_simtime, gid, synapses_formed_this_gid),
-                    file=self.synapses_formed_handle)
+                    file=self.synapses_formed_handle, flush=True)
                 synapses_formed += synapses_formed_this_gid
 
         logging.debug(
@@ -1855,7 +1857,7 @@ class Sinha2016:
                     dendrites_ex_ex_total, dendrites_ex_ex_connected,
                     dendrites_ex_in_total, dendrites_ex_in_connected,
                 ),
-                file=self.syn_elms_file_handle_E)
+                file=self.syn_elms_file_handle_E, flush=True)
 
             print(
                 "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
@@ -1865,7 +1867,7 @@ class Sinha2016:
                     dendrites_in_ex_total, dendrites_in_ex_connected,
                     dendrites_in_in_total, dendrites_in_in_connected,
                 ),
-                file=self.syn_elms_file_handle_I)
+                file=self.syn_elms_file_handle_I, flush=True)
 
             # LPZ bits
             syn_elms_lpz_e = nest.GetStatus(loc_lpz_e, 'synaptic_elements')
@@ -1905,7 +1907,7 @@ class Sinha2016:
                     lpz_dendrites_ex_ex_total, lpz_dendrites_ex_ex_connected,
                     lpz_dendrites_ex_in_total, lpz_dendrites_ex_in_connected,
                 ),
-                file=self.syn_elms_file_handle_lpz_E)
+                file=self.syn_elms_file_handle_lpz_E, flush=True)
 
             print(
                 "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
@@ -1915,7 +1917,7 @@ class Sinha2016:
                     lpz_dendrites_in_ex_total, lpz_dendrites_in_ex_connected,
                     lpz_dendrites_in_in_total, lpz_dendrites_in_in_connected,
                 ),
-                file=self.syn_elms_file_handle_lpz_I)
+                file=self.syn_elms_file_handle_lpz_I, flush=True)
 
     def __dump_synaptic_weights(self):
         """Dump synaptic weights."""
@@ -1927,7 +1929,7 @@ class Sinha2016:
         print("{}, {}".format(
             current_simtime,
             str(weightsIE).strip('[]').strip('()')),
-            file=self.weights_file_handle_IE)
+            file=self.weights_file_handle_IE, flush=True)
         if len(weightsIE) > self.num_synapses_IE:
             self.num_synapses_IE = len(weightsIE)
 
@@ -1937,7 +1939,7 @@ class Sinha2016:
         print("{}, {}".format(
             current_simtime,
             str(weightsII).strip('[]').strip('()')),
-            file=self.weights_file_handle_II)
+            file=self.weights_file_handle_II, flush=True)
         if len(weightsII) > self.num_synapses_II:
             self.num_synapses_II = len(weightsII)
 
@@ -1947,7 +1949,7 @@ class Sinha2016:
         print("{}, {}".format(
             current_simtime,
             str(weightsEI).strip('[]').strip('()')),
-            file=self.weights_file_handle_EI)
+            file=self.weights_file_handle_EI, flush=True)
         if len(weightsEI) > self.num_synapses_EI:
             self.num_synapses_EI = len(weightsEI)
 
@@ -1957,7 +1959,7 @@ class Sinha2016:
         print("{}, {}".format(
             current_simtime,
             str(weightsEE).strip('[]').strip('()')),
-            file=self.weights_file_handle_EE)
+            file=self.weights_file_handle_EE, flush=True)
         if len(weightsEE) > self.num_synapses_EE:
             self.num_synapses_EE = len(weightsEE)
 
