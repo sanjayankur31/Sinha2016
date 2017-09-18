@@ -444,7 +444,7 @@ class Sinha2016:
         # only structural plasticity
         if self.is_str_p_enabled and not self.is_syn_p_enabled:
             logging.debug("Only structural plasticity enabled" +
-                          "Not setting up any synapses.")
+                         "Not setting up any synapses.")
         # only synaptic plasticity
         # setup connections using Nest methods
         elif self.is_syn_p_enabled and not self.is_str_p_enabled:
@@ -568,7 +568,7 @@ class Sinha2016:
         self.synaptic_p_weights_file_name_EE = (
             "01-synaptic-weights-EE-" + str(self.rank) + ".txt")
         self.weights_file_handle_EE = open(
-            self.synaptic_p_weights_file_name_EE, 'w', 0)
+            self.synaptic_p_weights_file_name_EE, 'w')
         print("{},{}".format(
             "time(ms)", "EE(nS)"),
             file=self.weights_file_handle_EE)
@@ -576,7 +576,7 @@ class Sinha2016:
         self.synaptic_p_weights_file_name_EI = (
             "01-synaptic-weights-EI-" + str(self.rank) + ".txt")
         self.weights_file_handle_EI = open(
-            self.synaptic_p_weights_file_name_EI, 'w', 0)
+            self.synaptic_p_weights_file_name_EI, 'w')
         print("{},{}".format(
             "time(ms)", "EI(nS)"),
             file=self.weights_file_handle_EI)
@@ -584,7 +584,7 @@ class Sinha2016:
         self.synaptic_p_weights_file_name_II = (
             "01-synaptic-weights-II-" + str(self.rank) + ".txt")
         self.weights_file_handle_II = open(
-            self.synaptic_p_weights_file_name_II, 'w', 0)
+            self.synaptic_p_weights_file_name_II, 'w')
         print("{},{}".format(
             "time(ms)", "II(nS)"),
             file=self.weights_file_handle_II)
@@ -592,37 +592,37 @@ class Sinha2016:
         self.synaptic_p_weights_file_name_IE = (
             "01-synaptic-weights-IE-" + str(self.rank) + ".txt")
         self.weights_file_handle_IE = open(
-            self.synaptic_p_weights_file_name_IE, 'w', 0)
+            self.synaptic_p_weights_file_name_IE, 'w')
         print("{},{}".format(
             "time(ms)", "IE(nS)"),
             file=self.weights_file_handle_IE)
 
         self.ca_filename_E = ("02-calcium-E-" +
                               str(self.rank) + ".txt")
-        self.ca_file_handle_E = open(self.ca_filename_E, 'w', 0)
+        self.ca_file_handle_E = open(self.ca_filename_E, 'w')
         print("{}, {}".format(
             "time(ms)", "cal_E values"), file=self.ca_file_handle_E)
         self.ca_filename_LPZ_E = ("02-calcium-lpz-E-" +
                                   str(self.rank) + ".txt")
-        self.ca_file_handle_LPZ_E = open(self.ca_filename_LPZ_E, 'w', 0)
+        self.ca_file_handle_LPZ_E = open(self.ca_filename_LPZ_E, 'w')
         print("{}, {}".format(
             "time(ms)", "cal_E values"), file=self.ca_file_handle_LPZ_E)
 
         self.ca_filename_I = ("02-calcium-I-" +
                               str(self.rank) + ".txt")
-        self.ca_file_handle_I = open(self.ca_filename_I, 'w', 0)
+        self.ca_file_handle_I = open(self.ca_filename_I, 'w')
         print("{}, {}".format(
             "time(ms)", "cal_I values"), file=self.ca_file_handle_I)
         self.ca_filename_LPZ_I = ("02-calcium-lpz-I-" +
                                   str(self.rank) + ".txt")
-        self.ca_file_handle_LPZ_I = open(self.ca_filename_LPZ_I, 'w', 0)
+        self.ca_file_handle_LPZ_I = open(self.ca_filename_LPZ_I, 'w')
         print("{}, {}".format(
             "time(ms)", "cal_I values"), file=self.ca_file_handle_LPZ_I)
 
         if self.is_str_p_enabled:
             self.syn_elms_filename_E = ("03-synaptic-elements-totals-E-" +
                                         str(self.rank) + ".txt")
-            self.syn_elms_file_handle_E = open(self.syn_elms_filename_E, 'w', 0)
+            self.syn_elms_file_handle_E = open(self.syn_elms_filename_E, 'w')
             print(
                 "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
                 (
@@ -635,7 +635,7 @@ class Sinha2016:
             self.syn_elms_filename_lpz_E = (
                 "03-synaptic-elements-totals-lpz-E-" + str(self.rank) + ".txt")
             self.syn_elms_file_handle_lpz_E = open(
-                self.syn_elms_filename_lpz_E, 'w', 0)
+                self.syn_elms_filename_lpz_E, 'w')
             print(
                 "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
                 (
@@ -648,7 +648,7 @@ class Sinha2016:
 
             self.syn_elms_filename_I = ("03-synaptic-elements-totals-I-" +
                                         str(self.rank) + ".txt")
-            self.syn_elms_file_handle_I = open(self.syn_elms_filename_I, 'w', 0)
+            self.syn_elms_file_handle_I = open(self.syn_elms_filename_I, 'w')
             print(
                 "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
                 (
@@ -661,7 +661,7 @@ class Sinha2016:
             self.syn_elms_filename_lpz_I = (
                 "03-synaptic-elements-totals-lpz-I-" + str(self.rank) + ".txt")
             self.syn_elms_file_handle_lpz_I = open(
-                self.syn_elms_filename_lpz_I, 'w', 0)
+                self.syn_elms_filename_lpz_I, 'w')
             print(
                 "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
                 (
@@ -675,7 +675,7 @@ class Sinha2016:
             self.synapses_deleted_filename = (
                 "04-synapses-deleted-" + str(self.rank) + ".txt")
             self.synapses_deleted_handle = open(
-                self.synapses_deleted_filename, 'w', 0)
+                self.synapses_deleted_filename, 'w')
             print("{}\t{}\t{}\t{}".format(
                 "time(ms)", "gid", "total conns", "conns deleted"),
                 file=self.synapses_deleted_handle)
@@ -683,7 +683,7 @@ class Sinha2016:
             self.synapses_formed_filename = (
                 "04-synapses-formed-" + str(self.rank) + ".txt")
             self.synapses_formed_handle = open(
-                self.synapses_formed_filename, 'w', 0)
+                self.synapses_formed_filename, 'w')
             print("{}\t{}\t{}".format(
                 "time(ms)", "gid", "conns gained"),
                 file=self.synapses_formed_handle)
