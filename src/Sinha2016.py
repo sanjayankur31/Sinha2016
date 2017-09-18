@@ -722,7 +722,6 @@ class Sinha2016:
         self.update_time_windows(stabilisation_time, sp_update_interval,
                                  recording_interval)
         self.__setup_simulation()
-        self.comm.Barrier()
 
     def print_simulation_parameters(self):
         """Print the parameters of the simulation to a file."""
@@ -881,7 +880,6 @@ class Sinha2016:
             self.dump_data()
         if current_simtime % self.sp_update_interval == 0:
             self.update_connectivity()
-            self.comm.Barrier()
 
         logging.info("Simulation time: {} seconds".format(current_simtime))
 
