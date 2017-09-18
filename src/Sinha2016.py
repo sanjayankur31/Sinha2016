@@ -1966,7 +1966,7 @@ class Sinha2016:
         logging.debug("Rank {}: Printing data to files".format(self.rank))
         self.__dump_synaptic_weights()
         self.__dump_ca_concentration()
-        # self.__dump_synaptic_elements_per_neurons()
+        self.__dump_synaptic_elements_per_neurons()
         self.__dump_total_synaptic_elements()
 
     def close_files(self):
@@ -2134,7 +2134,7 @@ if __name__ == "__main__":
     simulation.prerun_setup(
         stabilisation_time=2000.,
         sp_update_interval=1000.,
-        recording_interval=50.)
+        recording_interval=100.)
     # print em up
     simulation.print_simulation_parameters()
     logging.info("Rank {}: SIMULATION SETUP".format(simulation.rank))
@@ -2165,13 +2165,13 @@ if __name__ == "__main__":
     # in the paper, they updated connectivity every 100ms
     simulation.update_time_windows(stabilisation_time=1000.,
                                    sp_update_interval=0.1,
-                                   recording_interval=50.)
+                                   recording_interval=100.)
     # Stabilise with both plasticities active
     simulation.stabilise()
 
     simulation.update_time_windows(stabilisation_time=5000.,
                                    sp_update_interval=0.1,
-                                   recording_interval=50.)
+                                   recording_interval=100.)
     if deafferentate_network:
         # Deaff network
         simulation.deaff_network()
