@@ -524,31 +524,37 @@ class Sinha2016:
         # E neurons
         self.sd_paramsE = {
             'to_file': True,
+            'to_memory': False,
             'label': 'spikes-E'
         }
         # deaffed E neurons
         self.sd_params_LPZ_E = {
             'to_file': True,
+            'to_memory': False,
             'label': 'spikes-lpz-E'
         }
         # I neurons
         self.sd_paramsI = {
             'to_file': True,
+            'to_memory': False,
             'label': 'spikes-I'
         }
         # deaffed I neurons
         self.sd_params_LPZ_I = {
             'to_file': True,
+            'to_memory': False,
             'label': 'spikes-lpz-I'
         }
         # pattern neurons
         self.sd_paramsP = {
             'to_file': True,
+            'to_memory': False,
             'label': 'spikes-pattern'
         }
         # background neurons
         self.sd_paramsB = {
             'to_file': True,
+            'to_memory': False,
             'label': 'spikes-background'
         }
 
