@@ -875,10 +875,10 @@ class Sinha2016:
         else:
             nest.Simulate(simtime*1000)
 
-        current_simtime = nest.GetKernelStatus()['time']/1000.
-        if current_simtime % self.recording_interval == 0:
+        current_simtime = nest.GetKernelStatus()['time']  # in ms
+        if current_simtime % (1000 * self.recording_interval) == 0:
             self.dump_data()
-        if current_simtime % self.sp_update_interval == 0:
+        if current_simtime % (1000 * self.sp_update_interval) == 0:
             self.update_connectivity()
 
         logging.info("Simulation time: {} seconds".format(current_simtime))
