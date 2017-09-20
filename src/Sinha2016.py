@@ -881,7 +881,7 @@ class Sinha2016:
         if int(current_simtime % (1000 * self.sp_update_interval)) == 0:
             self.update_connectivity()
 
-        logging.info("Simulation time: {} seconds".format(current_simtime))
+        logging.info("Simulation time: {} seconds".format(current_simtime/1000))
 
     def __get_syn_elms(self):
         """Get synaptic elements all neurons."""
