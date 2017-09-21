@@ -1200,7 +1200,7 @@ class Sinha2016:
 
                     allsources = self.comm.allgather(localsources)
                     sources = [s for sublist in allsources for s in sublist]
-                    total_synapses_this_gid = len(sources)
+                    total_synapses_this_gid += len(sources)
 
                     if len(sources) > 0:
                         if len(sources) > int(abs(elms['Den_ex'])):
@@ -1248,7 +1248,7 @@ class Sinha2016:
 
                         allsources = self.comm.allgather(localsources)
                         sources = [s for sublist in allsources for s in sublist]
-                        total_synapses_this_gid = len(sources)
+                        total_synapses_this_gid += len(sources)
 
                         if len(sources) > 0:
                             if len(sources) > int(abs(elms['Den_in'])):
@@ -1298,7 +1298,7 @@ class Sinha2016:
                                 localsources.append(acon[0])
                         allsources = self.comm.allgather(localsources)
                         sources = [s for sublist in allsources for s in sublist]
-                        total_synapses_this_gid = len(sources)
+                        total_synapses_this_gid += len(sources)
 
                         if len(sources) > 0:
                             if len(sources) > int(abs(elms['Den_in'])):
