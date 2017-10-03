@@ -1377,7 +1377,8 @@ class Sinha2016:
 
     def __create_connections(self, synelms):
         """Connect random neurons to create new connections."""
-        logging.debug("Creating RANDOM connections")
+        logging.debug("Creating connections using the {} strategy".format(
+            self.syn_form_strategy))
         synapses_formed = 0
         current_simtime = (str(nest.GetKernelStatus()['time']))
         for nrn in (self.neuronsE + self.neuronsI):
