@@ -870,10 +870,10 @@ class Sinha2016:
         if self.step:
             sim_steps = numpy.arange(0, simtime)
             for i, step in enumerate(sim_steps):
-                nest.Simulate(1000)
+                nest.Run(1000)
                 self.__dump_synaptic_weights()
         else:
-            nest.Simulate(simtime*1000)
+            nest.Run(simtime*1000)
 
         current_simtime = nest.GetKernelStatus()['time']  # in ms
         if int(current_simtime % (1000 * self.recording_interval)) == 0:
@@ -2136,10 +2136,10 @@ if __name__ == "__main__":
     # update of the network
     simulation.setup_plasticity(True, True)
     # set up deaff extent, and neuron sets
-    simulation.set_lpz_percent(0.3)
+    simulation.set_lpz_percent(0.1)
     # set up neurons, connections, spike detectors, files
     simulation.prerun_setup(
-        stabilisation_time=2000.,
+        stabilisation_time=1500.,
         sp_update_interval=1000.,
         recording_interval=100.)
     # print em up
@@ -2148,6 +2148,7 @@ if __name__ == "__main__":
 
     # initial setup
     logging.info("Rank {}: SIMULATION STARTED".format(simulation.rank))
+    nest.Prepare()
     simulation.stabilise()
 
     # Pattern related simulation
@@ -2170,13 +2171,13 @@ if __name__ == "__main__":
     # update time windows
     # we update connectivity every 2 seconds, and dump data every 50 seconds
     # in the paper, they updated connectivity every 100ms
-    simulation.update_time_windows(stabilisation_time=1000.,
-                                   sp_update_interval=0.1,
-                                   recording_interval=100.)
+    #  simulation.update_time_windows(stabilisation_time=1000.,
+    #  sp_update_interval=0.1,
+    #  recording_interval=100.)
     # Stabilise with both plasticities active
-    simulation.stabilise()
+    #  simulation.stabilise()
 
-    simulation.update_time_windows(stabilisation_time=5000.,
+    simulation.update_time_windows(stabilisation_time=2000.,
                                    sp_update_interval=0.1,
                                    recording_interval=100.)
     if deafferentate_network:
@@ -2191,7 +2192,7 @@ if __name__ == "__main__":
         simulation.recall_pattern(50, 2)
         simulation.recall_pattern(50, 3)
 
-    simulation.close_files()
     nest.Cleanup()
+    simulation.close_files()
     logging.info("Rank {}: SIMULATION FINISHED SUCCESSFULLY".format(
         simulation.rank))
