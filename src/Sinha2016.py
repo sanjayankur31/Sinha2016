@@ -132,10 +132,10 @@ class Sinha2016:
         # epsilon is the target mean calcium concentration
         if self.is_str_p_enabled:
             # set all growth rates to zero initially so that no change in z
-            # takes place. So, we have a stable network with the required firing
-            # rate, the required synaptic connections, the required numbers of
-            # synaptic elements, and we obtain the required values of epsilon
-            # too.
+            # takes place. So, we have a stable network with the required
+            # firing rate, the required synaptic connections, the required
+            # numbers of synaptic elements, and we obtain the required values
+            # of epsilon too.
             self.growth_curve_axonal_E = {
                 'growth_curve': "gaussian",
                 'growth_rate': 0.,
