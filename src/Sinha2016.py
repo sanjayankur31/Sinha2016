@@ -870,10 +870,10 @@ class Sinha2016:
         if self.step:
             sim_steps = numpy.arange(0, simtime)
             for i, step in enumerate(sim_steps):
-                nest.Run(1000)
+                nest.Simulate(1000)
                 self.__dump_synaptic_weights()
         else:
-            nest.Run(simtime*1000)
+            nest.Simulate(simtime*1000)
 
         current_simtime = nest.GetKernelStatus()['time']  # in ms
         if int(current_simtime % (1000 * self.recording_interval)) == 0:
@@ -2148,7 +2148,6 @@ if __name__ == "__main__":
 
     # initial setup
     logging.info("Rank {}: SIMULATION STARTED".format(simulation.rank))
-    nest.Prepare()
     simulation.stabilise()
 
     # Pattern related simulation
