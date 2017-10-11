@@ -2124,7 +2124,7 @@ if __name__ == "__main__":
     # Set up logging configuration
     logging.basicConfig(
         format='%(funcName)s: %(lineno)d: %(levelname)s: %(message)s',
-        level=logging.DEBUG)
+        level=logging.INFO)
 
     step = False
     store_patterns = False
