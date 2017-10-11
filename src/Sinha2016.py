@@ -687,7 +687,7 @@ class Sinha2016:
             self.synapses_deleted_handle = open(
                 self.synapses_deleted_filename, 'w')
             print("{}\t{}\t{}\t{}".format(
-                "time(ms)", "gid", "total conns", "conns deleted"),
+                "time(ms)", "gid", "total_conns", "conns_deleted"),
                 file=self.synapses_deleted_handle, flush=True)
 
             self.synapses_formed_filename = (
@@ -695,7 +695,7 @@ class Sinha2016:
             self.synapses_formed_handle = open(
                 self.synapses_formed_filename, 'w')
             print("{}\t{}\t{}".format(
-                "time(ms)", "gid", "conns gained"),
+                "time(ms)", "gid", "conns_gained"),
                 file=self.synapses_formed_handle, flush=True)
 
     def setup_plasticity(self, structural_p=True, synaptic_p=True):
@@ -1144,12 +1144,13 @@ class Sinha2016:
                                 )
 
                 total_synapses += total_synapses_this_gid
-                if deleted_synapses_this_gid > 0:
-                    print("{}\t{}\t{}\t{}".format(
-                        current_simtime, gid, total_synapses_this_gid,
-                        deleted_synapses_this_gid),
-                        file=self.synapses_deleted_handle, flush=True)
-                    deleted_synapses += deleted_synapses_this_gid
+                if self.rank == 0:
+                    if deleted_synapses_this_gid > 0:
+                        print("{}\t{}\t{}\t{}".format(
+                            current_simtime, gid, total_synapses_this_gid,
+                            deleted_synapses_this_gid),
+                            file=self.synapses_deleted_handle, flush=True)
+                        deleted_synapses += deleted_synapses_this_gid
 
             except KeyError as e:
                 logging.critical("KeyError exception while disconnecting!")
@@ -1490,11 +1491,12 @@ class Sinha2016:
                                          conn_spec='one_to_one',
                                          syn_spec=self.synDictII)
 
-            if synapses_formed_this_gid > 0:
-                print("{}\t{}\t{}".format(
-                    current_simtime, gid, synapses_formed_this_gid),
-                    file=self.synapses_formed_handle, flush=True)
-                synapses_formed += synapses_formed_this_gid
+            if self.rank == 0:
+                if synapses_formed_this_gid > 0:
+                    print("{}\t{}\t{}".format(
+                        current_simtime, gid, synapses_formed_this_gid),
+                        file=self.synapses_formed_handle, flush=True)
+                    synapses_formed += synapses_formed_this_gid
 
         logging.debug(
             "Rank {}: {} new connections created".format(
@@ -2024,8 +2026,9 @@ class Sinha2016:
         if self.is_str_p_enabled:
             self.syn_elms_file_handle_E.close()
             self.syn_elms_file_handle_I.close()
-            self.synapses_formed_handle.close()
-            self.synapses_deleted_handle.close()
+            if self.rank == 0:
+                self.synapses_formed_handle.close()
+                self.synapses_deleted_handle.close()
 
     def enable_rewiring(self):
         """Enable the rewiring."""
