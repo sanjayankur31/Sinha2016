@@ -1761,7 +1761,7 @@ class Sinha2016:
             current_simtime = (str(nest.GetKernelStatus()['time']))
 
             synaptic_element_file_E = (
-                "04-synaptic-elements-E-" + str(self.rank) + "-" +
+                "05-synaptic-elements-E-" + str(self.rank) + "-" +
                 current_simtime + ".txt")
             with open(synaptic_element_file_E, 'w') as filehandle_E:
                 print("neuronID\tAxon_ex\tAxon_ex_connected" +
@@ -1785,7 +1785,7 @@ class Sinha2016:
                     ), file=filehandle_E)
 
             synaptic_element_file_I = (
-                "04-synaptic-elements-I-" + str(self.rank) + "-" +
+                "05-synaptic-elements-I-" + str(self.rank) + "-" +
                 current_simtime + ".txt")
             with open(synaptic_element_file_I, 'w') as filehandle_I:
                 print("neuronID\tAxon_in\tAxon_in_connected" +
