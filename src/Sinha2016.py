@@ -1837,30 +1837,30 @@ class Sinha2016:
 
             # Only need presynaptic elements to find number of synapses
             # Excitatory neuron set
-            axons_ex_total = sum(neuron['Axon_ex']['z'] for neuron in
-                                 syn_elms_e)
+            axons_ex_total = sum(
+                math.ceil(neuron['Axon_ex']['z']) for neuron in syn_elms_e)
             axons_ex_connected = sum(neuron['Axon_ex']['z_connected']
                                      for neuron in syn_elms_e)
-            dendrites_ex_ex_total = sum(neuron['Den_ex']['z'] for neuron in
-                                        syn_elms_e)
+            dendrites_ex_ex_total = sum(
+                math.ceil(neuron['Den_ex']['z']) for neuron in syn_elms_e)
             dendrites_ex_ex_connected = sum(neuron['Den_ex']['z_connected'] for
                                             neuron in syn_elms_e)
-            dendrites_ex_in_total = sum(neuron['Den_in']['z'] for neuron in
-                                        syn_elms_e)
+            dendrites_ex_in_total = sum(
+                math.ceil(neuron['Den_in']['z']) for neuron in syn_elms_e)
             dendrites_ex_in_connected = sum(neuron['Den_in']['z_connected'] for
                                             neuron in syn_elms_e)
 
             # Inhibitory neuron set
-            axons_in_total = sum(neuron['Axon_in']['z'] for neuron in
-                                 syn_elms_i)
+            axons_in_total = sum(
+                math.ceil(neuron['Axon_in']['z']) for neuron in syn_elms_i)
             axons_in_connected = sum(neuron['Axon_in']['z_connected']
                                      for neuron in syn_elms_i)
-            dendrites_in_ex_total = sum(neuron['Den_ex']['z'] for neuron in
-                                        syn_elms_i)
+            dendrites_in_ex_total = sum(
+                math.ceil(neuron['Den_ex']['z']) for neuron in syn_elms_i)
             dendrites_in_ex_connected = sum(neuron['Den_ex']['z_connected'] for
                                             neuron in syn_elms_i)
-            dendrites_in_in_total = sum(neuron['Den_in']['z'] for neuron in
-                                        syn_elms_i)
+            dendrites_in_in_total = sum(
+                math.ceil(neuron['Den_in']['z']) for neuron in syn_elms_i)
             dendrites_in_in_connected = sum(neuron['Den_in']['z_connected'] for
                                             neuron in syn_elms_i)
 
@@ -1887,30 +1887,30 @@ class Sinha2016:
             # LPZ bits
             syn_elms_lpz_e = nest.GetStatus(loc_lpz_e, 'synaptic_elements')
             syn_elms_lpz_i = nest.GetStatus(loc_lpz_i, 'synaptic_elements')
-            lpz_axons_ex_total = sum(neuron['Axon_ex']['z'] for neuron in
-                                     syn_elms_lpz_e)
+            lpz_axons_ex_total = sum(
+                math.ceil(neuron['Axon_ex']['z']) for neuron in syn_elms_lpz_e)
             lpz_axons_ex_connected = sum(neuron['Axon_ex']['z_connected']
                                          for neuron in syn_elms_lpz_e)
-            lpz_dendrites_ex_ex_total = sum(neuron['Den_ex']['z'] for neuron in
-                                            syn_elms_lpz_e)
+            lpz_dendrites_ex_ex_total = sum(
+                math.ceil(neuron['Den_ex']['z']) for neuron in syn_elms_lpz_e)
             lpz_dendrites_ex_ex_connected = sum(neuron['Den_ex']['z_connected']
                                                 for neuron in syn_elms_lpz_e)
-            lpz_dendrites_ex_in_total = sum(neuron['Den_in']['z'] for neuron in
-                                            syn_elms_lpz_e)
+            lpz_dendrites_ex_in_total = sum(
+                math.ceil(neuron['Den_in']['z']) for neuron in syn_elms_lpz_e)
             lpz_dendrites_ex_in_connected = sum(neuron['Den_in']['z_connected']
                                                 for neuron in syn_elms_lpz_e)
 
             # Inhibitory neuron set
-            lpz_axons_in_total = sum(neuron['Axon_in']['z'] for neuron in
-                                     syn_elms_lpz_i)
+            lpz_axons_in_total = sum(
+                math.ceil(neuron['Axon_in']['z']) for neuron in syn_elms_lpz_i)
             lpz_axons_in_connected = sum(neuron['Axon_in']['z_connected']
                                          for neuron in syn_elms_lpz_i)
-            lpz_dendrites_in_ex_total = sum(neuron['Den_ex']['z'] for neuron in
-                                            syn_elms_lpz_i)
+            lpz_dendrites_in_ex_total = sum(
+                math.ceil(neuron['Den_ex']['z']) for neuron in syn_elms_lpz_i)
             lpz_dendrites_in_ex_connected = sum(neuron['Den_ex']['z_connected']
                                                 for neuron in syn_elms_lpz_i)
-            lpz_dendrites_in_in_total = sum(neuron['Den_in']['z'] for neuron in
-                                            syn_elms_lpz_i)
+            lpz_dendrites_in_in_total = sum(
+                math.ceil(neuron['Den_in']['z']) for neuron in syn_elms_lpz_i)
             lpz_dendrites_in_in_connected = sum(neuron['Den_in']['z_connected']
                                                 for neuron in syn_elms_lpz_i)
 
