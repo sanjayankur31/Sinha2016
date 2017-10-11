@@ -331,8 +331,8 @@ class Sinha2016:
         going to try to manually find the right number of syapses and connect
         neurons to get a certain sparsity.
         """
-        required_synapses = int(float(len(sources)) * float(len(destinations)) *
-                                sparsity)
+        required_synapses = int(float(len(sources)) * float(len(destinations))
+                                * sparsity)
         chosen_synapses = []
 
         # native python random.choices is quicker but isn't in py < 3.6
@@ -607,7 +607,8 @@ class Sinha2016:
                               str(self.rank) + ".txt")
         self.ca_file_handle_E = open(self.ca_filename_E, 'w')
         print("{}, {}".format(
-            "time(ms)", "cal_E values"), file=self.ca_file_handle_E, flush=True)
+            "time(ms)", "cal_E values"), file=self.ca_file_handle_E,
+              flush=True)
         self.ca_filename_LPZ_E = ("02-calcium-lpz-E-" +
                                   str(self.rank) + ".txt")
         self.ca_file_handle_LPZ_E = open(self.ca_filename_LPZ_E, 'w')
@@ -619,7 +620,8 @@ class Sinha2016:
                               str(self.rank) + ".txt")
         self.ca_file_handle_I = open(self.ca_filename_I, 'w')
         print("{}, {}".format(
-            "time(ms)", "cal_I values"), file=self.ca_file_handle_I, flush=True)
+            "time(ms)", "cal_I values"), file=self.ca_file_handle_I,
+              flush=True)
         self.ca_filename_LPZ_I = ("02-calcium-lpz-I-" +
                                   str(self.rank) + ".txt")
         self.ca_file_handle_LPZ_I = open(self.ca_filename_LPZ_I, 'w')
@@ -776,7 +778,8 @@ class Sinha2016:
                     "grid_size_E",
                     self.location_tree.data[len(self.neuronsE) - 1]),
                     file=pfile)
-                print("{}: {} micro metres".format("sd_dist", self.location_sd),
+                print("{}: {} micro metres".format("sd_dist",
+                                                   self.location_sd),
                       file=pfile)
                 print("{}: {} seconds".format("sp_update_interval",
                                               self.sp_update_interval),
@@ -881,7 +884,8 @@ class Sinha2016:
         if int(current_simtime % (1000 * self.sp_update_interval)) == 0:
             self.update_connectivity()
 
-        logging.info("Simulation time: {} seconds".format(current_simtime/1000))
+        logging.info("Simulation time: {} seconds".format(
+            current_simtime/1000))
 
     def __get_syn_elms(self):
         """Get synaptic elements all neurons."""
@@ -978,9 +982,9 @@ class Sinha2016:
 
     def __delete_connections_from_pre(self, synelms):
         """Delete connections when the neuron is a source."""
-        logging.debug(
-            "Deleting connections from pre using '{}' deletion strategy".format(
-                self.syn_del_strategy))
+        logging.debug
+        ("Deleting connections from pre using '{}' deletion strategy".format(
+            self.syn_del_strategy))
         total_synapses = 0
         deleted_synapses = 0
         current_simtime = (str(nest.GetKernelStatus()['time']))
@@ -1247,7 +1251,8 @@ class Sinha2016:
                             localsources.append(acon[0])
 
                         allsources = self.comm.allgather(localsources)
-                        sources = [s for sublist in allsources for s in sublist]
+                        sources = [s for sublist in allsources for s in
+                                   sublist]
                         total_synapses_this_gid += len(sources)
 
                         if len(sources) > 0:
@@ -1297,7 +1302,8 @@ class Sinha2016:
                             for acon in conns:
                                 localsources.append(acon[0])
                         allsources = self.comm.allgather(localsources)
-                        sources = [s for sublist in allsources for s in sublist]
+                        sources = [s for sublist in allsources for s in
+                                   sublist]
                         total_synapses_this_gid += len(sources)
 
                         if len(sources) > 0:
@@ -1547,8 +1553,9 @@ class Sinha2016:
             set(self.neuronsE) - set(pattern_neurons))
         # print to file
         # NOTE: since these are E neurons, the indices match in the location
-        # tree. No need to subtract self.neuronsE[0] to get the right indices at
-        # the moment. But keep in mind in case something changes in the future.
+        # tree. No need to subtract self.neuronsE[0] to get the right indices
+        # at the moment. But keep in mind in case something changes in the
+        # future.
         if self.rank == 0:
             file_name = "00-pattern-neurons-{}.txt".format(
                 self.pattern_count)
@@ -1610,7 +1617,8 @@ class Sinha2016:
                                        (1.25 * self.populations['P']),
                                        track=True)
 
-    def store_pattern_with_centre(self, centre_point, num_neurons, track=False):
+    def store_pattern_with_centre(self, centre_point, num_neurons,
+                                  track=False):
         """Store a pattern by specifying area extent."""
         logging.debug(
             "SIMULATION: Storing pattern {} centred at:".format(
@@ -1634,8 +1642,8 @@ class Sinha2016:
         Set up a pattern for recall.
 
         Creates a new poisson generator and connects it to a recall subset of
-        this pattern - the poisson stimulus will run for the set recall_duration
-        from the invocation of this method.
+        this pattern - the poisson stimulus will run for the set
+        recall_duration from the invocation of this method.
         """
         # set up external stimulus
         pattern_neurons = self.patterns[pattern_number - 1]
