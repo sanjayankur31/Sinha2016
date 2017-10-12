@@ -2147,7 +2147,7 @@ if __name__ == "__main__":
     # update of the network
     simulation.setup_plasticity(True, True)
     # set up deaff extent, and neuron sets
-    simulation.set_lpz_percent(0.3)
+    simulation.set_lpz_percent(0.1)
     # set up neurons, connections, spike detectors, files
     simulation.prerun_setup(
         stabilisation_time=1500.,
@@ -2188,7 +2188,7 @@ if __name__ == "__main__":
     simulation.stabilise()
     """
 
-    simulation.update_time_windows(stabilisation_time=5000.,
+    simulation.update_time_windows(stabilisation_time=8500.,
                                    sp_update_interval=0.1,
                                    recording_interval=100.)
     if deafferentate_network:
