@@ -2178,14 +2178,15 @@ if __name__ == "__main__":
     simulation.invoke_metaplasticity()
     # Enable structural plasticity for repair #
     simulation.enable_rewiring()
-    # update time windows
-    # we update connectivity every 2 seconds, and dump data every 50 seconds
-    # in the paper, they updated connectivity every 100ms
-    #  simulation.update_time_windows(stabilisation_time=1000.,
-    #  sp_update_interval=0.1,
-    #  recording_interval=100.)
-    # Stabilise with both plasticities active
-    #  simulation.stabilise()
+
+    #  Stabilise with both plasticities active
+    #  update time windows
+    """
+    simulation.update_time_windows(stabilisation_time=1000.,
+                                   sp_update_interval=0.1,
+                                   recording_interval=100.)
+    simulation.stabilise()
+    """
 
     simulation.update_time_windows(stabilisation_time=5000.,
                                    sp_update_interval=0.1,
