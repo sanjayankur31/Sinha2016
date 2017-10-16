@@ -650,9 +650,6 @@ class Sinha2016:
 
     def __setup_files(self):
         """Set up the filenames and handles."""
-        # Get the number of spikes in these files and then post-process them to
-        # get the firing rate and so on
-
         self.synaptic_p_weights_file_name_EE = (
             "01-synaptic-weights-EE-" + str(self.rank) + ".txt")
         self.weights_file_handle_EE = open(
