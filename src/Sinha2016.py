@@ -122,6 +122,18 @@ class Sinha2016:
         self.num_synapses_EI = 0
         self.num_synapses_II = 0
         self.num_synapses_IE = 0
+
+        self.neuronsE = []
+        self.neuronsI = []
+        self.lpz_border_neurons_E = []
+        self.lpz_centre_neurons_E = []
+        self.lpz_neurons_E = []
+        self.peri_lpz_neurons_E = []
+        self.lpz_border_neurons_I = []
+        self.lpz_centre_neurons_I = []
+        self.peri_lpz_neurons_I = []
+        self.lpz_neurons_I = []
+
         random.seed(42)
 
     def __setup_neurons(self):
@@ -258,31 +270,82 @@ class Sinha2016:
         """Divide neurons into LPZ and the rest."""
         first_point = self.location_tree.data[0]
         last_point = self.location_tree.data[len(self.neuronsE) - 1]
+
         lpz_neurons = self.__get_neurons_from_region(
             (len(self.neuronsE) + len(self.neuronsI)) * self.lpz_percent,
             first_point, last_point)
-        self.lpz_neurons_E = list(set(lpz_neurons).intersection(
+        lpz_centre_neurons = self.__get_neurons_from_region(
+            (len(self.neuronsE) + len(self.neuronsI)) * self.lpz_percent/2,
+            first_point, last_point)
+        lpz_border_neurons = list(set(lpz_neurons) - set(lpz_centre_neurons))
+
+        self.lpz_centre_neurons_E = list(set(lpz_centre_neurons).intersection(
             set(self.neuronsE)))
-        self.lpz_neurons_I = list(set(lpz_neurons).intersection(
+        self.lpz_border_neurons_E = list(set(lpz_border_neurons).intersection(
+            set(self.neuronsE)))
+        self.lpz_neurons_E = (self.lpz_centre_neurons_E +
+                              self.lpz_border_neurons_E)
+
+        self.lpz_centre_neurons_I = list(set(lpz_centre_neurons).intersection(
             set(self.neuronsI)))
+        self.lpz_border_neurons_I = list(set(lpz_border_neurons).intersection(
+            set(self.neuronsI)))
+        self.lpz_neurons_I = (self.lpz_centre_neurons_I +
+                              self.lpz_border_neurons_I)
+
+        self.peri_lpz_neurons_E = list(set(self.neuronsE) - set(lpz_neurons))
+        self.peri_lpz_neurons_I = list(set(self.neuronsI) - set(lpz_neurons))
 
         if self.rank == 0:
-            with open("00-lpz-neuron-locations-E.txt", 'w') as f1:
-                for neuron in self.lpz_neurons_E:
+            # excitatory neurons
+            with open("00-peri-lpz-neuron-locations-E.txt", 'w') as f1:
+                for neuron in self.peri_lpz_neurons_E:
                     nrnindex = neuron - self.neuronsE[0]
                     print("{}\t{}\t{}".format(
                         neuron,
                         self.location_tree.data[nrnindex][0],
                         self.location_tree.data[nrnindex][1]),
                         file=f1)
-            with open("00-lpz-neuron-locations-I.txt", 'w') as f1:
-                for neuron in self.lpz_neurons_I:
+            with open("00-lpz-centre-neuron-locations-E.txt", 'w') as f2:
+                for neuron in self.lpz_centre_neurons_E:
+                    nrnindex = neuron - self.neuronsE[0]
+                    print("{}\t{}\t{}".format(
+                        neuron,
+                        self.location_tree.data[nrnindex][0],
+                        self.location_tree.data[nrnindex][1]),
+                        file=f2)
+            with open("00-lpz-border-neuron-locations-E.txt", 'w') as f3:
+                for neuron in self.lpz_centre_neurons_E:
+                    nrnindex = neuron - self.neuronsE[0]
+                    print("{}\t{}\t{}".format(
+                        neuron,
+                        self.location_tree.data[nrnindex][0],
+                        self.location_tree.data[nrnindex][1]),
+                        file=f3)
+            with open("00-peri-lpz-neuron-locations-I.txt", 'w') as f2:
+                for neuron in self.peri_lpz_neurons_I:
                     nrnindex = neuron + self.neuronsE[-1] - self.neuronsI[0]
                     print("{}\t{}\t{}".format(
                         neuron,
                         self.location_tree.data[nrnindex][0],
                         self.location_tree.data[nrnindex][1]),
                         file=f1)
+            with open("00-lpz-centre-neuron-locations-I.txt", 'w') as f2:
+                for neuron in self.lpz_centre_neurons_I:
+                    nrnindex = neuron + self.neuronsE[-1] - self.neuronsI[0]
+                    print("{}\t{}\t{}".format(
+                        neuron,
+                        self.location_tree.data[nrnindex][0],
+                        self.location_tree.data[nrnindex][1]),
+                        file=f1)
+            with open("00-lpz-border-neuron-locations-I.txt", 'w') as f3:
+                for neuron in self.lpz_border_neurons_I:
+                    nrnindex = neuron + self.neuronsE[-1] - self.neuronsI[0]
+                    print("{}\t{}\t{}".format(
+                        neuron,
+                        self.location_tree.data[nrnindex][0],
+                        self.location_tree.data[nrnindex][1]),
+                        file=f3)
 
     def __create_sparse_list(self, length, static_w, sparsity):
         """Create one list to use with SetStatus."""
@@ -522,28 +585,35 @@ class Sinha2016:
     def __setup_detectors(self):
         """Setup spike detectors."""
         # E neurons
-        self.sd_paramsE = {
+        self.sd_params_lpz_centre_E = {
             'to_file': True,
             'to_memory': False,
-            'label': 'spikes-E'
+            'label': 'spikes-lpz-centre-E'
         }
-        # deaffed E neurons
-        self.sd_params_LPZ_E = {
+        self.sd_params_lpz_border_E = {
             'to_file': True,
             'to_memory': False,
-            'label': 'spikes-lpz-E'
+            'label': 'spikes-lpz-border-E'
         }
-        # I neurons
-        self.sd_paramsI = {
+        self.sd_params_peri_lpz_E = {
             'to_file': True,
             'to_memory': False,
-            'label': 'spikes-I'
+            'label': 'spikes-peri-lpz-E'
         }
-        # deaffed I neurons
-        self.sd_params_LPZ_I = {
+        self.sd_params_lpz_centre_I = {
             'to_file': True,
             'to_memory': False,
-            'label': 'spikes-lpz-I'
+            'label': 'spikes-lpz-centre-I'
+        }
+        self.sd_params_lpz_border_I = {
+            'to_file': True,
+            'to_memory': False,
+            'label': 'spikes-lpz-border-I'
+        }
+        self.sd_params_peri_lpz_I = {
+            'to_file': True,
+            'to_memory': False,
+            'label': 'spikes-peri-lpz-I'
         }
         # pattern neurons
         self.sd_paramsP = {
@@ -558,13 +628,25 @@ class Sinha2016:
             'label': 'spikes-background'
         }
 
-        self.sdE = nest.Create('spike_detector',
-                               params=self.sd_paramsE)
-        self.sdI = nest.Create('spike_detector',
-                               params=self.sd_paramsI)
+        self.sd_lpz_centre_E = nest.Create('spike_detector',
+                                           params=self.sd_params_lpz_centre_E)
+        self.sd_lpz_border_E = nest.Create('spike_detector',
+                                           params=self.sd_params_lpz_border_E)
+        self.sd_peri_lpz_E = nest.Create('spike_detector',
+                                         params=self.sd_params_peri_lpz_E)
+        self.sd_lpz_centre_I = nest.Create('spike_detector',
+                                           params=self.sd_params_lpz_centre_I)
+        self.sd_lpz_border_I = nest.Create('spike_detector',
+                                           params=self.sd_params_lpz_border_I)
+        self.sd_peri_lpz_I = nest.Create('spike_detector',
+                                         params=self.sd_params_peri_lpz_E)
 
-        nest.Connect(self.neuronsE, self.sdE)
-        nest.Connect(self.neuronsI, self.sdI)
+        nest.Connect(self.lpz_centre_neurons_E, self.sd_lpz_centre_E)
+        nest.Connect(self.lpz_border_neurons_E, self.sd_lpz_border_E)
+        nest.Connect(self.peri_lpz_neurons_E, self.sd_peri_lpz_E)
+        nest.Connect(self.lpz_centre_neurons_I, self.sd_lpz_centre_I)
+        nest.Connect(self.lpz_border_neurons_I, self.sd_lpz_border_I)
+        nest.Connect(self.peri_lpz_neurons_I, self.sd_peri_lpz_I)
 
     def __setup_files(self):
         """Set up the filenames and handles."""
@@ -1704,14 +1786,6 @@ class Sinha2016:
         for nrn in self.lpz_neurons_I:
             nest.DisconnectOneToOne(self.poissonExt[0], nrn,
                                     syn_spec={'model': 'static_synapse'})
-
-        self.sd_LPZ_E = nest.Create('spike_detector',
-                                    params=self.sd_params_LPZ_E)
-        self.sd_LPZ_I = nest.Create('spike_detector',
-                                    params=self.sd_params_LPZ_I)
-
-        nest.Connect(self.lpz_neurons_E, self.sd_LPZ_E)
-        nest.Connect(self.lpz_neurons_I, self.sd_LPZ_I)
         logging.info("SIMULATION: Network deafferentated")
 
     def __dump_neuron_set(self, file_name, neurons):
