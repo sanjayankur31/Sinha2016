@@ -682,32 +682,6 @@ class Sinha2016:
             "time(ms)", "IE(nS)"),
             file=self.weights_file_handle_IE, flush=True)
 
-        self.ca_filename_E = ("02-calcium-E-" +
-                              str(self.rank) + ".txt")
-        self.ca_file_handle_E = open(self.ca_filename_E, 'w')
-        print("{}, {}".format(
-            "time(ms)", "cal_E values"), file=self.ca_file_handle_E,
-              flush=True)
-        self.ca_filename_LPZ_E = ("02-calcium-lpz-E-" +
-                                  str(self.rank) + ".txt")
-        self.ca_file_handle_LPZ_E = open(self.ca_filename_LPZ_E, 'w')
-        print("{}, {}".format(
-            "time(ms)", "cal_E values"), file=self.ca_file_handle_LPZ_E,
-            flush=True)
-
-        self.ca_filename_I = ("02-calcium-I-" +
-                              str(self.rank) + ".txt")
-        self.ca_file_handle_I = open(self.ca_filename_I, 'w')
-        print("{}, {}".format(
-            "time(ms)", "cal_I values"), file=self.ca_file_handle_I,
-              flush=True)
-        self.ca_filename_LPZ_I = ("02-calcium-lpz-I-" +
-                                  str(self.rank) + ".txt")
-        self.ca_file_handle_LPZ_I = open(self.ca_filename_LPZ_I, 'w')
-        print("{}, {}".format(
-            "time(ms)", "cal_I values"), file=self.ca_file_handle_LPZ_I,
-            flush=True)
-
         if self.is_str_p_enabled:
             self.syn_elms_filename_E = ("03-synaptic-elements-totals-E-" +
                                         str(self.rank) + ".txt")
@@ -1791,39 +1765,68 @@ class Sinha2016:
             for neuron in neurons:
                 print(neuron, file=file_handle)
 
-    def __get_ca_concentration(self):
-        """Get calcium concentrations from all neurons."""
-        loc_e = [stat['global_id'] for stat in nest.GetStatus(self.neuronsE)
-                 if stat['local']]
-        loc_i = [stat['global_id'] for stat in nest.GetStatus(self.neuronsI)
-                 if stat['local']]
-        lpz_e = list(set(loc_e).intersection(set(self.lpz_neurons_E)))
-        lpz_i = list(set(loc_i).intersection(set(self.lpz_neurons_I)))
-
-        ca_e = nest.GetStatus(loc_e, 'Ca')
-        ca_i = nest.GetStatus(loc_i, 'Ca')
-        ca_lpz_e = nest.GetStatus(lpz_e, 'Ca')
-        ca_lpz_i = nest.GetStatus(lpz_i, 'Ca')
-
-        return [ca_e, ca_i, ca_lpz_e, ca_lpz_i]
-
     def __dump_ca_concentration(self):
         """Dump calcium concentration."""
-        [ca_e, ca_i, ca_lpz_e, ca_lpz_i] = self.__get_ca_concentration()
         current_simtime = (str(nest.GetKernelStatus()['time']))
-        print("{}, {}".format(current_simtime,
-                              str(ca_e).strip('[]').strip('()')),
-              file=self.ca_file_handle_E)
-        print("{}, {}".format(current_simtime,
-                              str(ca_lpz_e).strip('[]').strip('()')),
-              file=self.ca_file_handle_LPZ_E)
+        ca_filename_lpz_centre_E = ("02-calcium-elements-lpz_centre_E-" +
+                                    str(self.rank) + "-" + current_simtime +
+                                    ".txt")
+        with open(ca_filename_lpz_centre_E, 'w') as f:
+            for info in nest.GetStatus(self.lpz_centre_neurons_E,
+                                       ['global_id', 'local', 'Ca']):
+                if info[1]:
+                    print("{}\t{}".format(info[0], info[2]), file=f,
+                          flush=True)
 
-        print("{}, {}".format(current_simtime,
-                              str(ca_i).strip('[]').strip('()')),
-              file=self.ca_file_handle_I)
-        print("{}, {}".format(current_simtime,
-                              str(ca_lpz_i).strip('[]').strip('()')),
-              file=self.ca_file_handle_LPZ_I)
+        ca_filename_lpz_border_E = ("02-calcium-elements-lpz_border_E-" +
+                                    str(self.rank) + "-" + current_simtime +
+                                    ".txt")
+        with open(ca_filename_lpz_border_E, 'w') as f:
+            for info in nest.GetStatus(self.peri_lpz_neurons_E,
+                                       ['global_id', 'local', 'Ca']):
+                if info[1]:
+                    print("{}\t{}".format(info[0], info[2]), file=f,
+                          flush=True)
+
+        ca_filename_peri_lpz_E = ("02-calcium-elements-peri_lpz_E-" +
+                                  str(self.rank) + "-" + current_simtime +
+                                  ".txt")
+        with open(ca_filename_peri_lpz_E, 'w') as f:
+            for info in nest.GetStatus(self.lpz_border_neurons_E,
+                                       ['global_id', 'local', 'Ca']):
+                if info[1]:
+                    print("{}\t{}".format(info[0], info[2]), file=f,
+                          flush=True)
+
+        ca_filename_lpz_centre_I = ("02-calcium-elements-lpz_centre_I-" +
+                                    str(self.rank) + "-" + current_simtime +
+                                    ".txt")
+        with open(ca_filename_lpz_centre_I, 'w') as f:
+            for info in nest.GetStatus(self.lpz_centre_neurons_I,
+                                       ['global_id', 'local', 'Ca']):
+                if info[1]:
+                    print("{}\t{}".format(info[0], info[2]), file=f,
+                          flush=True)
+
+        ca_filename_lpz_border_I = ("02-calcium-elements-lpz_border_I-" +
+                                    str(self.rank) + "-" + current_simtime +
+                                    ".txt")
+        with open(ca_filename_lpz_border_I, 'w') as f:
+            for info in nest.GetStatus(self.peri_lpz_neurons_I,
+                                       ['global_id', 'local', 'Ca']):
+                if info[1]:
+                    print("{}\t{}".format(info[0], info[2]), file=f,
+                          flush=True)
+
+        ca_filename_peri_lpz_I = ("02-calcium-elements-peri_lpz_I-" +
+                                  str(self.rank) + "-" + current_simtime +
+                                  ".txt")
+        with open(ca_filename_peri_lpz_I, 'w') as f:
+            for info in nest.GetStatus(self.lpz_border_neurons_I,
+                                       ['global_id', 'local', 'Ca']):
+                if info[1]:
+                    print("{}\t{}".format(info[0], info[2]), file=f,
+                          flush=True)
 
     def __dump_synaptic_elements_per_neurons(self):
         """
@@ -2075,24 +2078,6 @@ class Sinha2016:
         print("{},".format(self.num_synapses_IE),
               file=self.weights_file_handle_IE)
         self.weights_file_handle_IE.close()
-
-        local_neurons = [stat['global_id'] for stat in
-                         nest.GetStatus(self.neuronsE) if stat['local']]
-        print("{},".format(len(local_neurons)), file=self.ca_file_handle_E)
-        self.ca_file_handle_E.close()
-
-        lpz_e = list(set(local_neurons).intersection(set(self.lpz_neurons_E)))
-        print("{},".format(len(lpz_e)), file=self.ca_file_handle_LPZ_E)
-        self.ca_file_handle_LPZ_E.close()
-
-        local_neurons = [stat['global_id'] for stat in
-                         nest.GetStatus(self.neuronsI) if stat['local']]
-        print("{},".format(len(local_neurons)), file=self.ca_file_handle_I)
-        self.ca_file_handle_I.close()
-
-        lpz_i = list(set(local_neurons).intersection(set(self.lpz_neurons_I)))
-        print("{},".format(len(lpz_i)), file=self.ca_file_handle_LPZ_I)
-        self.ca_file_handle_LPZ_I.close()
 
         if self.is_str_p_enabled:
             self.syn_elms_file_handle_E.close()
