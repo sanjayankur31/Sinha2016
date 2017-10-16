@@ -683,58 +683,6 @@ class Sinha2016:
             file=self.weights_file_handle_IE, flush=True)
 
         if self.is_str_p_enabled:
-            self.syn_elms_filename_E = ("03-synaptic-elements-totals-E-" +
-                                        str(self.rank) + ".txt")
-            self.syn_elms_file_handle_E = open(self.syn_elms_filename_E, 'w')
-            print(
-                "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
-                (
-                    "time(ms)",
-                    "a_ex_total", "a_ex_connected",
-                    "d_ex_ex_total", "d_ex_ex_connected",
-                    "d_ex_in_total", "d_ex_in_connected",
-                ),
-                file=self.syn_elms_file_handle_E, flush=True)
-            self.syn_elms_filename_lpz_E = (
-                "03-synaptic-elements-totals-lpz-E-" + str(self.rank) + ".txt")
-            self.syn_elms_file_handle_lpz_E = open(
-                self.syn_elms_filename_lpz_E, 'w')
-            print(
-                "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
-                (
-                    "time(ms)",
-                    "a_ex_total", "a_ex_connected",
-                    "d_ex_ex_total", "d_ex_ex_connected",
-                    "d_ex_in_total", "d_ex_in_connected",
-                ),
-                file=self.syn_elms_file_handle_lpz_E, flush=True)
-
-            self.syn_elms_filename_I = ("03-synaptic-elements-totals-I-" +
-                                        str(self.rank) + ".txt")
-            self.syn_elms_file_handle_I = open(self.syn_elms_filename_I, 'w')
-            print(
-                "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
-                (
-                    "time(ms)",
-                    "a_in_total", "a_in_connected",
-                    "d_in_ex_total", "d_in_ex_connected",
-                    "d_in_in_total", "d_in_in_connected"
-                ),
-                file=self.syn_elms_file_handle_I, flush=True)
-            self.syn_elms_filename_lpz_I = (
-                "03-synaptic-elements-totals-lpz-I-" + str(self.rank) + ".txt")
-            self.syn_elms_file_handle_lpz_I = open(
-                self.syn_elms_filename_lpz_I, 'w')
-            print(
-                "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
-                (
-                    "time(ms)",
-                    "a_in_total", "a_in_connected",
-                    "d_in_ex_total", "d_in_ex_connected",
-                    "d_in_in_total", "d_in_in_connected"
-                ),
-                file=self.syn_elms_file_handle_lpz_I, flush=True)
-
             self.synapses_deleted_filename = (
                 "04-synapses-deleted-" + str(self.rank) + ".txt")
             self.synapses_deleted_handle = open(
@@ -1835,178 +1783,150 @@ class Sinha2016:
         neuronid    ax_total    ax_connected    den_ex_total ...
         """
         if self.is_str_p_enabled:
-            loc_e = [stat['global_id'] for stat
-                     in nest.GetStatus(self.neuronsE)
-                     if stat['local']]
-            loc_i = [stat['global_id'] for stat
-                     in nest.GetStatus(self.neuronsI)
-                     if stat['local']]
-
             current_simtime = (str(nest.GetKernelStatus()['time']))
+            se_filename_lpz_centre_E = (
+                "05-se-lpz_centre_E-" + str(self.rank) + "-" + current_simtime
+                + ".txt"
+            )
+            with open(se_filename_lpz_centre_E, 'w') as f:
+                for info in nest.GetStatus(self.lpz_centre_neurons_E,
+                                           ['global_id', 'local',
+                                            'synaptic_elements']):
+                    if info[1]:
+                        syn_elms = info[2]
+                        axons = syn_elms['Axon_ex']['z']
+                        axons_conn = syn_elms['Axon_ex']['z_connected']
+                        dendrites_ex = syn_elms['Den_ex']['z']
+                        dendrites_ex_conn = syn_elms['Den_ex']['z_connected']
+                        dendrites_in = syn_elms['Den_in']['z']
+                        dendrites_in_conn = syn_elms['Den_in']['z_connected']
 
-            synaptic_element_file_E = (
-                "05-synaptic-elements-E-" + str(self.rank) + "-" +
-                current_simtime + ".txt")
-            with open(synaptic_element_file_E, 'w') as filehandle_E:
-                print("neuronID\tAxon_ex\tAxon_ex_connected" +
-                      "\tDend_ex\tDend_ex_con\t" +
-                      "Dend_in\tDend_in_con", file=filehandle_E)
+                        print("{}\t{}\t{}\t{}\t{}\t{}\t{}".format(
+                            info[0],
+                            axons, axons_conn,
+                            dendrites_ex, dendrites_ex_conn,
+                            dendrites_in, dendrites_in_conn),
+                            flush=True, file=f)
 
-                for neuron in loc_e:
-                    syn_elms = nest.GetStatus([neuron], 'synaptic_elements')[0]
-                    axons = syn_elms['Axon_ex']['z']
-                    axons_conn = syn_elms['Axon_ex']['z_connected']
-                    dendrites_ex = syn_elms['Den_ex']['z']
-                    dendrites_ex_conn = syn_elms['Den_ex']['z_connected']
-                    dendrites_in = syn_elms['Den_in']['z']
-                    dendrites_in_conn = syn_elms['Den_in']['z_connected']
+            se_filename_lpz_border_E = (
+                "05-se-lpz_border_E-" + str(self.rank) + "-" + current_simtime
+                + ".txt"
+            )
+            with open(se_filename_lpz_border_E, 'w') as f:
+                for info in nest.GetStatus(self.lpz_border_neurons_E,
+                                           ['global_id', 'local',
+                                            'synaptic_elements']):
+                    if info[1]:
+                        syn_elms = info[2]
+                        axons = syn_elms['Axon_ex']['z']
+                        axons_conn = syn_elms['Axon_ex']['z_connected']
+                        dendrites_ex = syn_elms['Den_ex']['z']
+                        dendrites_ex_conn = syn_elms['Den_ex']['z_connected']
+                        dendrites_in = syn_elms['Den_in']['z']
+                        dendrites_in_conn = syn_elms['Den_in']['z_connected']
 
-                    print("{}\t{}\t{}\t{}\t{}\t{}\t{}".format(
-                        neuron,
-                        axons, axons_conn,
-                        dendrites_ex, dendrites_ex_conn,
-                        dendrites_in, dendrites_in_conn
-                    ), file=filehandle_E)
+                        print("{}\t{}\t{}\t{}\t{}\t{}\t{}".format(
+                            info[0],
+                            axons, axons_conn,
+                            dendrites_ex, dendrites_ex_conn,
+                            dendrites_in, dendrites_in_conn),
+                            flush=True, file=f)
 
-            synaptic_element_file_I = (
-                "05-synaptic-elements-I-" + str(self.rank) + "-" +
-                current_simtime + ".txt")
-            with open(synaptic_element_file_I, 'w') as filehandle_I:
-                print("neuronID\tAxon_in\tAxon_in_connected" +
-                      "\tDend_ex\tDend_ex_con\t" +
-                      "Dend_in\tDend_in_con", file=filehandle_I)
+            se_filename_peri_lpz_E = (
+                "05-se-peri_lpz_E-" + str(self.rank) + "-" + current_simtime
+                + ".txt"
+            )
+            with open(se_filename_peri_lpz_E, 'w') as f:
+                for info in nest.GetStatus(self.peri_lpz_neurons_E,
+                                           ['global_id', 'local',
+                                            'synaptic_elements']):
+                    if info[1]:
+                        syn_elms = info[2]
+                        axons = syn_elms['Axon_ex']['z']
+                        axons_conn = syn_elms['Axon_ex']['z_connected']
+                        dendrites_ex = syn_elms['Den_ex']['z']
+                        dendrites_ex_conn = syn_elms['Den_ex']['z_connected']
+                        dendrites_in = syn_elms['Den_in']['z']
+                        dendrites_in_conn = syn_elms['Den_in']['z_connected']
 
-                for neuron in loc_i:
-                    syn_elms = nest.GetStatus([neuron], 'synaptic_elements')[0]
-                    axons = syn_elms['Axon_in']['z']
-                    axons_conn = syn_elms['Axon_in']['z_connected']
-                    dendrites_ex = syn_elms['Den_ex']['z']
-                    dendrites_ex_conn = syn_elms['Den_ex']['z_connected']
-                    dendrites_in = syn_elms['Den_in']['z']
-                    dendrites_in_conn = syn_elms['Den_in']['z_connected']
+                        print("{}\t{}\t{}\t{}\t{}\t{}\t{}".format(
+                            info[0],
+                            axons, axons_conn,
+                            dendrites_ex, dendrites_ex_conn,
+                            dendrites_in, dendrites_in_conn),
+                            flush=True, file=f)
 
-                    print("{}\t{}\t{}\t{}\t{}\t{}\t{}".format(
-                        neuron,
-                        axons, axons_conn,
-                        dendrites_ex, dendrites_ex_conn,
-                        dendrites_in, dendrites_in_conn
-                    ), file=filehandle_I)
+            se_filename_lpz_centre_I = (
+                "05-se-lpz_centre_I-" + str(self.rank) + "-" + current_simtime
+                + ".txt"
+            )
+            with open(se_filename_lpz_centre_I, 'w') as f:
+                for info in nest.GetStatus(self.lpz_centre_neurons_I,
+                                           ['global_id', 'local',
+                                            'synaptic_elements']):
+                    if info[1]:
+                        syn_elms = info[2]
+                        axons = syn_elms['Axon_in']['z']
+                        axons_conn = syn_elms['Axon_in']['z_connected']
+                        dendrites_ex = syn_elms['Den_ex']['z']
+                        dendrites_ex_conn = syn_elms['Den_ex']['z_connected']
+                        dendrites_in = syn_elms['Den_in']['z']
+                        dendrites_in_conn = syn_elms['Den_in']['z_connected']
 
-    def __dump_total_synaptic_elements(self):
-        """Dump total number of synaptic elements."""
-        if self.is_str_p_enabled:
-            loc_e = [stat['global_id'] for stat
-                     in nest.GetStatus(self.neuronsE)
-                     if stat['local']]
-            loc_i = [stat['global_id'] for stat
-                     in nest.GetStatus(self.neuronsI)
-                     if stat['local']]
-            loc_lpz_e = list(set(loc_e).intersection(set(self.lpz_neurons_E)))
-            loc_lpz_i = list(set(loc_i).intersection(set(self.lpz_neurons_I)))
+                        print("{}\t{}\t{}\t{}\t{}\t{}\t{}".format(
+                            info[0],
+                            axons, axons_conn,
+                            dendrites_ex, dendrites_ex_conn,
+                            dendrites_in, dendrites_in_conn),
+                            flush=True, file=f)
 
-            syn_elms_e = nest.GetStatus(loc_e, 'synaptic_elements')
-            syn_elms_i = nest.GetStatus(loc_i, 'synaptic_elements')
+            se_filename_lpz_border_I = (
+                "05-se-lpz_border_I-" + str(self.rank) + "-" + current_simtime
+                + ".txt"
+            )
+            with open(se_filename_lpz_border_I, 'w') as f:
+                for info in nest.GetStatus(self.lpz_border_neurons_I,
+                                           ['global_id', 'local',
+                                            'synaptic_elements']):
+                    if info[1]:
+                        syn_elms = info[2]
+                        axons = syn_elms['Axon_in']['z']
+                        axons_conn = syn_elms['Axon_in']['z_connected']
+                        dendrites_ex = syn_elms['Den_ex']['z']
+                        dendrites_ex_conn = syn_elms['Den_ex']['z_connected']
+                        dendrites_in = syn_elms['Den_in']['z']
+                        dendrites_in_conn = syn_elms['Den_in']['z_connected']
 
-            current_simtime = (str(nest.GetKernelStatus()['time']))
+                        print("{}\t{}\t{}\t{}\t{}\t{}\t{}".format(
+                            info[0],
+                            axons, axons_conn,
+                            dendrites_ex, dendrites_ex_conn,
+                            dendrites_in, dendrites_in_conn),
+                            flush=True, file=f)
 
-            # Only need presynaptic elements to find number of synapses
-            # Excitatory neuron set
-            axons_ex_total = sum(
-                math.ceil(neuron['Axon_ex']['z']) for neuron in syn_elms_e)
-            axons_ex_connected = sum(neuron['Axon_ex']['z_connected']
-                                     for neuron in syn_elms_e)
-            dendrites_ex_ex_total = sum(
-                math.ceil(neuron['Den_ex']['z']) for neuron in syn_elms_e)
-            dendrites_ex_ex_connected = sum(neuron['Den_ex']['z_connected'] for
-                                            neuron in syn_elms_e)
-            dendrites_ex_in_total = sum(
-                math.ceil(neuron['Den_in']['z']) for neuron in syn_elms_e)
-            dendrites_ex_in_connected = sum(neuron['Den_in']['z_connected'] for
-                                            neuron in syn_elms_e)
+            se_filename_peri_lpz_I = (
+                "05-se-peri_lpz_I-" + str(self.rank) + "-" + current_simtime
+                + ".txt"
+            )
+            with open(se_filename_peri_lpz_I, 'w') as f:
+                for info in nest.GetStatus(self.peri_lpz_neurons_I,
+                                           ['global_id', 'local',
+                                            'synaptic_elements']):
+                    if info[1]:
+                        syn_elms = info[2]
+                        axons = syn_elms['Axon_in']['z']
+                        axons_conn = syn_elms['Axon_in']['z_connected']
+                        dendrites_ex = syn_elms['Den_ex']['z']
+                        dendrites_ex_conn = syn_elms['Den_ex']['z_connected']
+                        dendrites_in = syn_elms['Den_in']['z']
+                        dendrites_in_conn = syn_elms['Den_in']['z_connected']
 
-            # Inhibitory neuron set
-            axons_in_total = sum(
-                math.ceil(neuron['Axon_in']['z']) for neuron in syn_elms_i)
-            axons_in_connected = sum(neuron['Axon_in']['z_connected']
-                                     for neuron in syn_elms_i)
-            dendrites_in_ex_total = sum(
-                math.ceil(neuron['Den_ex']['z']) for neuron in syn_elms_i)
-            dendrites_in_ex_connected = sum(neuron['Den_ex']['z_connected'] for
-                                            neuron in syn_elms_i)
-            dendrites_in_in_total = sum(
-                math.ceil(neuron['Den_in']['z']) for neuron in syn_elms_i)
-            dendrites_in_in_connected = sum(neuron['Den_in']['z_connected'] for
-                                            neuron in syn_elms_i)
-
-            print(
-                "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
-                (
-                    current_simtime,
-                    axons_ex_total, axons_ex_connected,
-                    dendrites_ex_ex_total, dendrites_ex_ex_connected,
-                    dendrites_ex_in_total, dendrites_ex_in_connected,
-                ),
-                file=self.syn_elms_file_handle_E, flush=True)
-
-            print(
-                "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
-                (
-                    current_simtime,
-                    axons_in_total, axons_in_connected,
-                    dendrites_in_ex_total, dendrites_in_ex_connected,
-                    dendrites_in_in_total, dendrites_in_in_connected,
-                ),
-                file=self.syn_elms_file_handle_I, flush=True)
-
-            # LPZ bits
-            syn_elms_lpz_e = nest.GetStatus(loc_lpz_e, 'synaptic_elements')
-            syn_elms_lpz_i = nest.GetStatus(loc_lpz_i, 'synaptic_elements')
-            lpz_axons_ex_total = sum(
-                math.ceil(neuron['Axon_ex']['z']) for neuron in syn_elms_lpz_e)
-            lpz_axons_ex_connected = sum(neuron['Axon_ex']['z_connected']
-                                         for neuron in syn_elms_lpz_e)
-            lpz_dendrites_ex_ex_total = sum(
-                math.ceil(neuron['Den_ex']['z']) for neuron in syn_elms_lpz_e)
-            lpz_dendrites_ex_ex_connected = sum(neuron['Den_ex']['z_connected']
-                                                for neuron in syn_elms_lpz_e)
-            lpz_dendrites_ex_in_total = sum(
-                math.ceil(neuron['Den_in']['z']) for neuron in syn_elms_lpz_e)
-            lpz_dendrites_ex_in_connected = sum(neuron['Den_in']['z_connected']
-                                                for neuron in syn_elms_lpz_e)
-
-            # Inhibitory neuron set
-            lpz_axons_in_total = sum(
-                math.ceil(neuron['Axon_in']['z']) for neuron in syn_elms_lpz_i)
-            lpz_axons_in_connected = sum(neuron['Axon_in']['z_connected']
-                                         for neuron in syn_elms_lpz_i)
-            lpz_dendrites_in_ex_total = sum(
-                math.ceil(neuron['Den_ex']['z']) for neuron in syn_elms_lpz_i)
-            lpz_dendrites_in_ex_connected = sum(neuron['Den_ex']['z_connected']
-                                                for neuron in syn_elms_lpz_i)
-            lpz_dendrites_in_in_total = sum(
-                math.ceil(neuron['Den_in']['z']) for neuron in syn_elms_lpz_i)
-            lpz_dendrites_in_in_connected = sum(neuron['Den_in']['z_connected']
-                                                for neuron in syn_elms_lpz_i)
-
-            print(
-                "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
-                (
-                    current_simtime,
-                    lpz_axons_ex_total, lpz_axons_ex_connected,
-                    lpz_dendrites_ex_ex_total, lpz_dendrites_ex_ex_connected,
-                    lpz_dendrites_ex_in_total, lpz_dendrites_ex_in_connected,
-                ),
-                file=self.syn_elms_file_handle_lpz_E, flush=True)
-
-            print(
-                "{}\t{}\t{}\t{}\t{}\t{}\t{}".format
-                (
-                    current_simtime,
-                    lpz_axons_in_total, lpz_axons_in_connected,
-                    lpz_dendrites_in_ex_total, lpz_dendrites_in_ex_connected,
-                    lpz_dendrites_in_in_total, lpz_dendrites_in_in_connected,
-                ),
-                file=self.syn_elms_file_handle_lpz_I, flush=True)
+                        print("{}\t{}\t{}\t{}\t{}\t{}\t{}".format(
+                            info[0],
+                            axons, axons_conn,
+                            dendrites_ex, dendrites_ex_conn,
+                            dendrites_in, dendrites_in_conn),
+                            flush=True, file=f)
 
     def __dump_synaptic_weights(self):
         """Dump synaptic weights."""
@@ -2058,7 +1978,6 @@ class Sinha2016:
         self.__dump_synaptic_weights()
         self.__dump_ca_concentration()
         self.__dump_synaptic_elements_per_neurons()
-        self.__dump_total_synaptic_elements()
 
     def close_files(self):
         """Close all files when the simulation is finished."""
