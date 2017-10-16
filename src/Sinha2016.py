@@ -1716,7 +1716,7 @@ class Sinha2016:
     def __dump_ca_concentration(self):
         """Dump calcium concentration."""
         current_simtime = (str(nest.GetKernelStatus()['time']))
-        ca_filename_lpz_centre_E = ("02-calcium-elements-lpz_centre_E-" +
+        ca_filename_lpz_centre_E = ("02-calcium-lpz_centre_E-" +
                                     str(self.rank) + "-" + current_simtime +
                                     ".txt")
         with open(ca_filename_lpz_centre_E, 'w') as f:
@@ -1726,7 +1726,7 @@ class Sinha2016:
                     print("{}\t{}".format(info[0], info[2]), file=f,
                           flush=True)
 
-        ca_filename_lpz_border_E = ("02-calcium-elements-lpz_border_E-" +
+        ca_filename_lpz_border_E = ("02-calcium-lpz_border_E-" +
                                     str(self.rank) + "-" + current_simtime +
                                     ".txt")
         with open(ca_filename_lpz_border_E, 'w') as f:
@@ -1736,7 +1736,7 @@ class Sinha2016:
                     print("{}\t{}".format(info[0], info[2]), file=f,
                           flush=True)
 
-        ca_filename_peri_lpz_E = ("02-calcium-elements-peri_lpz_E-" +
+        ca_filename_peri_lpz_E = ("02-calcium-peri_lpz_E-" +
                                   str(self.rank) + "-" + current_simtime +
                                   ".txt")
         with open(ca_filename_peri_lpz_E, 'w') as f:
@@ -1746,7 +1746,7 @@ class Sinha2016:
                     print("{}\t{}".format(info[0], info[2]), file=f,
                           flush=True)
 
-        ca_filename_lpz_centre_I = ("02-calcium-elements-lpz_centre_I-" +
+        ca_filename_lpz_centre_I = ("02-calcium-lpz_centre_I-" +
                                     str(self.rank) + "-" + current_simtime +
                                     ".txt")
         with open(ca_filename_lpz_centre_I, 'w') as f:
@@ -1756,7 +1756,7 @@ class Sinha2016:
                     print("{}\t{}".format(info[0], info[2]), file=f,
                           flush=True)
 
-        ca_filename_lpz_border_I = ("02-calcium-elements-lpz_border_I-" +
+        ca_filename_lpz_border_I = ("02-calcium-lpz_border_I-" +
                                     str(self.rank) + "-" + current_simtime +
                                     ".txt")
         with open(ca_filename_lpz_border_I, 'w') as f:
@@ -1766,7 +1766,7 @@ class Sinha2016:
                     print("{}\t{}".format(info[0], info[2]), file=f,
                           flush=True)
 
-        ca_filename_peri_lpz_I = ("02-calcium-elements-peri_lpz_I-" +
+        ca_filename_peri_lpz_I = ("02-calcium-peri_lpz_I-" +
                                   str(self.rank) + "-" + current_simtime +
                                   ".txt")
         with open(ca_filename_peri_lpz_I, 'w') as f:
