@@ -1068,7 +1068,12 @@ class Sinha2016:
         ("Deleting connections from pre using '{}' deletion strategy".format(
             self.syn_del_strategy))
         total_synapses = 0
-        deleted_synapses = 0
+        syn_del_lpz_c_E = 0
+        syn_del_lpz_b_E = 0
+        syn_del_p_lpz_E = 0
+        syn_del_lpz_c_I = 0
+        syn_del_lpz_b_I = 0
+        syn_del_p_lpz_I = 0
         current_simtime = (str(nest.GetKernelStatus()['time']))
         # the order in which these are removed should not matter - whether we
         # remove connections using axons first or dendrites first, the end
@@ -1081,7 +1086,7 @@ class Sinha2016:
             elms = synelms[nrn]
             partner = 0  # for exception
             total_synapses_this_gid = 0
-            deleted_synapses_this_gid = 0
+            syn_del_this_gid = 0
             try:
                 # excitatory neurons as sources
                 if 'Axon_ex' in elms and elms['Axon_ex'] < 0:
@@ -1128,7 +1133,7 @@ class Sinha2016:
                                 total_synapses_this_gid, gid))
 
                         for t in chosen_targets:
-                            deleted_synapses_this_gid += 1
+                            syn_del_this_gid += 1
                             partner = t
                             nest.Disconnect(
                                 pre=[gid], post=[t], syn_spec={
@@ -1204,7 +1209,7 @@ class Sinha2016:
 
                         for t in chosen_targets:
                             synelms[t]['Den_in'] += 1
-                            deleted_synapses_this_gid += 1
+                            syn_del_this_gid += 1
                             partner = t
                             if t in targetsE:
                                 nest.Disconnect(
@@ -1227,12 +1232,30 @@ class Sinha2016:
 
                 total_synapses += total_synapses_this_gid
                 if self.rank == 0:
-                    if deleted_synapses_this_gid > 0:
+                    if syn_del_this_gid > 0:
+                        if gid in self.lpz_c_neurons_E:
+                            fh = self.syn_del_fh_lpz_c_E
+                            syn_del_lpz_c_E += syn_del_this_gid
+                        elif gid in self.lpz_b_neurons_E:
+                            fh = self.syn_del_fh_lpz_b_E
+                            syn_del_lpz_b_E += syn_del_this_gid
+                        elif gid in self.p_lpz_neurons_E:
+                            fh = self.syn_del_fh_p_lpz_E
+                            syn_del_p_lpz_E += syn_del_this_gid
+                        elif gid in self.lpz_c_neurons_I:
+                            fh = self.syn_del_fh_lpz_c_I
+                            syn_del_lpz_c_I += syn_del_this_gid
+                        elif gid in self.lpz_b_neurons_I:
+                            fh = self.syn_del_fh_lpz_b_I
+                            syn_del_lpz_b_I += syn_del_this_gid
+                        elif gid in self.p_lpz_neurons_I:
+                            fh = self.syn_del_fh_p_lpz_I
+                            syn_del_p_lpz_I += syn_del_this_gid
+
                         print("{}\t{}\t{}\t{}".format(
                             current_simtime, gid, total_synapses_this_gid,
-                            deleted_synapses_this_gid),
-                            file=self.synapses_deleted_handle, flush=True)
-                        deleted_synapses += deleted_synapses_this_gid
+                            syn_del_this_gid),
+                            file=fh, flush=True)
 
             except KeyError as e:
                 logging.critical("KeyError exception while disconnecting!")
@@ -1248,7 +1271,9 @@ class Sinha2016:
 
         logging.debug(
             "{} of {} connections deleted from pre".format(
-                deleted_synapses,
+                (syn_del_lpz_c_E + syn_del_lpz_b_E +
+                 syn_del_p_lpz_E + syn_del_lpz_c_I +
+                 syn_del_lpz_b_I + syn_del_p_lpz_I),
                 total_synapses))
 
     def __delete_connections_from_post(self, synelms):
@@ -1257,7 +1282,7 @@ class Sinha2016:
             "Deleting conns from post using '{}' deletion strategy".format(
                 self.syn_del_strategy))
         total_synapses = 0
-        deleted_synapses = 0
+        syn_del = 0
         current_simtime = (str(nest.GetKernelStatus()['time']))
         # excitatory dendrites as targets
         # weight dependent deletion doesn't apply - all synapses have
@@ -1267,7 +1292,7 @@ class Sinha2016:
             elms = synelms[nrn]
             partner = 0  # for exception
             total_synapses_this_gid = 0
-            deleted_synapses_this_gid = 0
+            syn_del_this_gid = 0
             try:
                 if 'Den_ex' in elms and elms['Den_ex'] < 0:
                     conns = nest.GetConnections(
@@ -1308,7 +1333,7 @@ class Sinha2016:
                                 total_synapses_this_gid, gid))
 
                         for s in chosen_sources:
-                            deleted_synapses_this_gid += 1
+                            syn_del_this_gid += 1
                             partner = s
                             nest.Disconnect(
                                 pre=[s], post=[gid], syn_spec={
@@ -1355,7 +1380,7 @@ class Sinha2016:
                                     total_synapses_this_gid, gid))
 
                             for s in chosen_sources:
-                                deleted_synapses_this_gid += 1
+                                syn_del_this_gid += 1
                                 partner = s
                                 nest.Disconnect(
                                     pre=[s], post=[gid], syn_spec={
@@ -1408,7 +1433,7 @@ class Sinha2016:
                                     total_synapses_this_gid, gid))
 
                             for s in chosen_sources:
-                                deleted_synapses_this_gid += 1
+                                syn_del_this_gid += 1
                                 partner = s
                                 nest.Disconnect(
                                     pre=[s], post=[gid], syn_spec={
@@ -1421,12 +1446,12 @@ class Sinha2016:
                                 synelms[s]['Axon_in'] += 1
 
                 total_synapses += total_synapses_this_gid
-                if deleted_synapses_this_gid > 0:
+                if syn_del_this_gid > 0:
                     print("{}\t{}\t{}\t{}".format(
                         current_simtime, gid, total_synapses_this_gid,
-                        deleted_synapses_this_gid),
-                        file=self.synapses_deleted_handle, flush=True)
-                    deleted_synapses += deleted_synapses_this_gid
+                        syn_del_this_gid),
+                        file=self.syn_del_fh, flush=True)
+                    syn_del += syn_del_this_gid
 
             except KeyError as e:
                 logging.critical("KeyError exception while disconnecting!")
@@ -1442,7 +1467,7 @@ class Sinha2016:
 
         logging.debug(
             "{} of {} connections deleted from post".format(
-                deleted_synapses,
+                syn_del,
                 total_synapses))
 
     def __get_form_part_d(self, source, options, num_required):
@@ -1468,10 +1493,10 @@ class Sinha2016:
         """Connect random neurons to create new connections."""
         logging.debug("Creating connections using the {} strategy".format(
             self.syn_form_strategy))
-        synapses_formed = 0
+        syn_new = 0
         current_simtime = (str(nest.GetKernelStatus()['time']))
         for nrn in (self.neuronsE + self.neuronsI):
-            synapses_formed_this_gid = 0
+            syn_new_this_gid = 0
             total_options_this_gid = 0
             gid = nrn
             elms = synelms[nrn]
@@ -1514,7 +1539,7 @@ class Sinha2016:
 
                     for cho in chosen_targets:
                         synelms[cho]['Den_ex'] -= 1
-                        synapses_formed_this_gid += 1
+                        syn_new_this_gid += 1
                         if cho in targetsE:
                             nest.Connect([gid], [cho],
                                          conn_spec='one_to_one',
@@ -1562,7 +1587,7 @@ class Sinha2016:
                             total_options_this_gid, gid))
 
                     for target in chosen_targets:
-                        synapses_formed_this_gid += 1
+                        syn_new_this_gid += 1
                         synelms[target]['Den_in'] -= 1
                         if target in targetsE:
                             nest.Connect([gid], [target],
@@ -1574,15 +1599,15 @@ class Sinha2016:
                                          syn_spec=self.synDictII)
 
             if self.rank == 0:
-                if synapses_formed_this_gid > 0:
+                if syn_new_this_gid > 0:
                     print("{}\t{}\t{}".format(
-                        current_simtime, gid, synapses_formed_this_gid),
-                        file=self.synapses_formed_handle, flush=True)
-                    synapses_formed += synapses_formed_this_gid
+                        current_simtime, gid, syn_new_this_gid),
+                        file=self.syn_new_fh, flush=True)
+                    syn_new += syn_new_this_gid
 
         logging.debug(
             "Rank {}: {} new connections created".format(
-                self.rank, synapses_formed))
+                self.rank, syn_new))
 
     def update_connectivity(self):
         """Our implementation of structural plasticity."""
