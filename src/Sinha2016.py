@@ -125,13 +125,13 @@ class Sinha2016:
 
         self.neuronsE = []
         self.neuronsI = []
-        self.lpz_border_neurons_E = []
-        self.lpz_centre_neurons_E = []
+        self.lpz_b_neurons_E = []
+        self.lpz_c_neurons_E = []
         self.lpz_neurons_E = []
-        self.peri_lpz_neurons_E = []
-        self.lpz_border_neurons_I = []
-        self.lpz_centre_neurons_I = []
-        self.peri_lpz_neurons_I = []
+        self.p_lpz_neurons_E = []
+        self.lpz_b_neurons_I = []
+        self.lpz_c_neurons_I = []
+        self.p_lpz_neurons_I = []
         self.lpz_neurons_I = []
 
         random.seed(42)
@@ -274,32 +274,32 @@ class Sinha2016:
         lpz_neurons = self.__get_neurons_from_region(
             (len(self.neuronsE) + len(self.neuronsI)) * self.lpz_percent,
             first_point, last_point)
-        lpz_centre_neurons = self.__get_neurons_from_region(
+        lpz_c_neurons = self.__get_neurons_from_region(
             (len(self.neuronsE) + len(self.neuronsI)) * self.lpz_percent/2,
             first_point, last_point)
-        lpz_border_neurons = list(set(lpz_neurons) - set(lpz_centre_neurons))
+        lpz_b_neurons = list(set(lpz_neurons) - set(lpz_c_neurons))
 
-        self.lpz_centre_neurons_E = list(set(lpz_centre_neurons).intersection(
+        self.lpz_c_neurons_E = list(set(lpz_c_neurons).intersection(
             set(self.neuronsE)))
-        self.lpz_border_neurons_E = list(set(lpz_border_neurons).intersection(
+        self.lpz_b_neurons_E = list(set(lpz_b_neurons).intersection(
             set(self.neuronsE)))
-        self.lpz_neurons_E = (self.lpz_centre_neurons_E +
-                              self.lpz_border_neurons_E)
+        self.lpz_neurons_E = (self.lpz_c_neurons_E +
+                              self.lpz_b_neurons_E)
 
-        self.lpz_centre_neurons_I = list(set(lpz_centre_neurons).intersection(
+        self.lpz_c_neurons_I = list(set(lpz_c_neurons).intersection(
             set(self.neuronsI)))
-        self.lpz_border_neurons_I = list(set(lpz_border_neurons).intersection(
+        self.lpz_b_neurons_I = list(set(lpz_b_neurons).intersection(
             set(self.neuronsI)))
-        self.lpz_neurons_I = (self.lpz_centre_neurons_I +
-                              self.lpz_border_neurons_I)
+        self.lpz_neurons_I = (self.lpz_c_neurons_I +
+                              self.lpz_b_neurons_I)
 
-        self.peri_lpz_neurons_E = list(set(self.neuronsE) - set(lpz_neurons))
-        self.peri_lpz_neurons_I = list(set(self.neuronsI) - set(lpz_neurons))
+        self.p_lpz_neurons_E = list(set(self.neuronsE) - set(lpz_neurons))
+        self.p_lpz_neurons_I = list(set(self.neuronsI) - set(lpz_neurons))
 
         if self.rank == 0:
             # excitatory neurons
             with open("00-peri-lpz-neuron-locations-E.txt", 'w') as f1:
-                for neuron in self.peri_lpz_neurons_E:
+                for neuron in self.p_lpz_neurons_E:
                     nrnindex = neuron - self.neuronsE[0]
                     print("{}\t{}\t{}".format(
                         neuron,
@@ -307,7 +307,7 @@ class Sinha2016:
                         self.location_tree.data[nrnindex][1]),
                         file=f1)
             with open("00-lpz-centre-neuron-locations-E.txt", 'w') as f2:
-                for neuron in self.lpz_centre_neurons_E:
+                for neuron in self.lpz_c_neurons_E:
                     nrnindex = neuron - self.neuronsE[0]
                     print("{}\t{}\t{}".format(
                         neuron,
@@ -315,7 +315,7 @@ class Sinha2016:
                         self.location_tree.data[nrnindex][1]),
                         file=f2)
             with open("00-lpz-border-neuron-locations-E.txt", 'w') as f3:
-                for neuron in self.lpz_centre_neurons_E:
+                for neuron in self.lpz_c_neurons_E:
                     nrnindex = neuron - self.neuronsE[0]
                     print("{}\t{}\t{}".format(
                         neuron,
@@ -323,7 +323,7 @@ class Sinha2016:
                         self.location_tree.data[nrnindex][1]),
                         file=f3)
             with open("00-peri-lpz-neuron-locations-I.txt", 'w') as f2:
-                for neuron in self.peri_lpz_neurons_I:
+                for neuron in self.p_lpz_neurons_I:
                     nrnindex = neuron + self.neuronsE[-1] - self.neuronsI[0]
                     print("{}\t{}\t{}".format(
                         neuron,
@@ -331,7 +331,7 @@ class Sinha2016:
                         self.location_tree.data[nrnindex][1]),
                         file=f1)
             with open("00-lpz-centre-neuron-locations-I.txt", 'w') as f2:
-                for neuron in self.lpz_centre_neurons_I:
+                for neuron in self.lpz_c_neurons_I:
                     nrnindex = neuron + self.neuronsE[-1] - self.neuronsI[0]
                     print("{}\t{}\t{}".format(
                         neuron,
@@ -339,7 +339,7 @@ class Sinha2016:
                         self.location_tree.data[nrnindex][1]),
                         file=f1)
             with open("00-lpz-border-neuron-locations-I.txt", 'w') as f3:
-                for neuron in self.lpz_border_neurons_I:
+                for neuron in self.lpz_b_neurons_I:
                     nrnindex = neuron + self.neuronsE[-1] - self.neuronsI[0]
                     print("{}\t{}\t{}".format(
                         neuron,
@@ -585,32 +585,32 @@ class Sinha2016:
     def __setup_detectors(self):
         """Setup spike detectors."""
         # E neurons
-        self.sd_params_lpz_centre_E = {
+        self.sd_params_lpz_c_E = {
             'to_file': True,
             'to_memory': False,
             'label': 'spikes-lpz-centre-E'
         }
-        self.sd_params_lpz_border_E = {
+        self.sd_params_lpz_b_E = {
             'to_file': True,
             'to_memory': False,
             'label': 'spikes-lpz-border-E'
         }
-        self.sd_params_peri_lpz_E = {
+        self.sd_params_p_lpz_E = {
             'to_file': True,
             'to_memory': False,
             'label': 'spikes-peri-lpz-E'
         }
-        self.sd_params_lpz_centre_I = {
+        self.sd_params_lpz_c_I = {
             'to_file': True,
             'to_memory': False,
             'label': 'spikes-lpz-centre-I'
         }
-        self.sd_params_lpz_border_I = {
+        self.sd_params_lpz_b_I = {
             'to_file': True,
             'to_memory': False,
             'label': 'spikes-lpz-border-I'
         }
-        self.sd_params_peri_lpz_I = {
+        self.sd_params_p_lpz_I = {
             'to_file': True,
             'to_memory': False,
             'label': 'spikes-peri-lpz-I'
@@ -628,25 +628,25 @@ class Sinha2016:
             'label': 'spikes-background'
         }
 
-        self.sd_lpz_centre_E = nest.Create('spike_detector',
-                                           params=self.sd_params_lpz_centre_E)
-        self.sd_lpz_border_E = nest.Create('spike_detector',
-                                           params=self.sd_params_lpz_border_E)
-        self.sd_peri_lpz_E = nest.Create('spike_detector',
-                                         params=self.sd_params_peri_lpz_E)
-        self.sd_lpz_centre_I = nest.Create('spike_detector',
-                                           params=self.sd_params_lpz_centre_I)
-        self.sd_lpz_border_I = nest.Create('spike_detector',
-                                           params=self.sd_params_lpz_border_I)
-        self.sd_peri_lpz_I = nest.Create('spike_detector',
-                                         params=self.sd_params_peri_lpz_E)
+        self.sd_lpz_c_E = nest.Create('spike_detector',
+                                      params=self.sd_params_lpz_c_E)
+        self.sd_lpz_b_E = nest.Create('spike_detector',
+                                      params=self.sd_params_lpz_b_E)
+        self.sd_p_lpz_E = nest.Create('spike_detector',
+                                      params=self.sd_params_p_lpz_E)
+        self.sd_lpz_c_I = nest.Create('spike_detector',
+                                      params=self.sd_params_lpz_c_I)
+        self.sd_lpz_b_I = nest.Create('spike_detector',
+                                      params=self.sd_params_lpz_b_I)
+        self.sd_p_lpz_I = nest.Create('spike_detector',
+                                      params=self.sd_params_p_lpz_E)
 
-        nest.Connect(self.lpz_centre_neurons_E, self.sd_lpz_centre_E)
-        nest.Connect(self.lpz_border_neurons_E, self.sd_lpz_border_E)
-        nest.Connect(self.peri_lpz_neurons_E, self.sd_peri_lpz_E)
-        nest.Connect(self.lpz_centre_neurons_I, self.sd_lpz_centre_I)
-        nest.Connect(self.lpz_border_neurons_I, self.sd_lpz_border_I)
-        nest.Connect(self.peri_lpz_neurons_I, self.sd_peri_lpz_I)
+        nest.Connect(self.lpz_c_neurons_E, self.sd_lpz_c_E)
+        nest.Connect(self.lpz_b_neurons_E, self.sd_lpz_b_E)
+        nest.Connect(self.p_lpz_neurons_E, self.sd_p_lpz_E)
+        nest.Connect(self.lpz_c_neurons_I, self.sd_lpz_c_I)
+        nest.Connect(self.lpz_b_neurons_I, self.sd_lpz_b_I)
+        nest.Connect(self.p_lpz_neurons_I, self.sd_p_lpz_I)
 
     def __setup_files(self):
         """Set up the filenames and handles."""
@@ -683,21 +683,102 @@ class Sinha2016:
             file=self.weights_fh_IE, flush=True)
 
         if self.is_str_p_enabled:
-            self.synapses_deleted_filename = (
-                "04-synapses-deleted-" + str(self.rank) + ".txt")
-            self.synapses_deleted_handle = open(
-                self.synapses_deleted_filename, 'w')
+            self.syn_del_fn_lpz_c_E = (
+                "04-synapses-deleted-lpz_c_E" + str(self.rank) + ".txt")
+            self.syn_del_fh_lpz_c_E = open(
+                self.syn_del_fn_lpz_c_E, 'w')
             print("{}\t{}\t{}\t{}".format(
                 "time(ms)", "gid", "total_conns", "conns_deleted"),
-                file=self.synapses_deleted_handle, flush=True)
+                file=self.syn_del_fh_lpz_c_E, flush=True)
 
-            self.synapses_formed_filename = (
-                "04-synapses-formed-" + str(self.rank) + ".txt")
-            self.synapses_formed_handle = open(
-                self.synapses_formed_filename, 'w')
+            self.syn_new_fn_lpz_c_E = (
+                "04-synapses-formed-lpz_c_E" + str(self.rank) + ".txt")
+            self.syn_new_fh_lpz_c_E = open(
+                self.syn_new_fn_lpz_c_E, 'w')
             print("{}\t{}\t{}".format(
                 "time(ms)", "gid", "conns_gained"),
-                file=self.synapses_formed_handle, flush=True)
+                file=self.syn_new_fh_lpz_c_E, flush=True)
+
+            self.syn_del_fn_lpz_b_E = (
+                "04-synapses-deleted-lpz_b_E" + str(self.rank) + ".txt")
+            self.syn_del_fh_lpz_b_E = open(
+                self.syn_del_fn_lpz_b_E, 'w')
+            print("{}\t{}\t{}\t{}".format(
+                "time(ms)", "gid", "total_conns", "conns_deleted"),
+                file=self.syn_del_fh_lpz_b_E, flush=True)
+
+            self.syn_new_fn_lpz_b_E = (
+                "04-synapses-formed-lpz_b_E" + str(self.rank) + ".txt")
+            self.syn_new_fh_lpz_b_E = open(
+                self.syn_new_fn_lpz_b_E, 'w')
+            print("{}\t{}\t{}".format(
+                "time(ms)", "gid", "conns_gained"),
+                file=self.syn_new_fh_lpz_b_E, flush=True)
+
+            self.syn_del_fn_p_lpz_E = (
+                "04-synapses-deleted-p_lpz_E" + str(self.rank) + ".txt")
+            self.syn_del_fh_p_lpz_E = open(
+                self.syn_del_fn_p_lpz_E, 'w')
+            print("{}\t{}\t{}\t{}".format(
+                "time(ms)", "gid", "total_conns", "conns_deleted"),
+                file=self.syn_del_fh_p_lpz_E, flush=True)
+
+            self.syn_new_fn_p_lpz_E = (
+                "04-synapses-formed-p_lpz_E" + str(self.rank) + ".txt")
+            self.syn_new_fh_p_lpz_E = open(
+                self.syn_new_fn_p_lpz_E, 'w')
+            print("{}\t{}\t{}".format(
+                "time(ms)", "gid", "conns_gained"),
+                file=self.syn_new_fh_p_lpz_E, flush=True)
+
+            # inhibitory neurons
+            self.syn_del_fn_lpz_c_I = (
+                "04-synapses-deleted-lpz_c_I" + str(self.rank) + ".txt")
+            self.syn_del_fh_lpz_c_I = open(
+                self.syn_del_fn_lpz_c_I, 'w')
+            print("{}\t{}\t{}\t{}".format(
+                "time(ms)", "gid", "total_conns", "conns_deleted"),
+                file=self.syn_del_fh_lpz_c_I, flush=True)
+
+            self.syn_new_fn_lpz_c_I = (
+                "04-synapses-formed-lpz_c_I" + str(self.rank) + ".txt")
+            self.syn_new_fh_lpz_c_I = open(
+                self.syn_new_fn_lpz_c_I, 'w')
+            print("{}\t{}\t{}".format(
+                "time(ms)", "gid", "conns_gained"),
+                file=self.syn_new_fh_lpz_c_I, flush=True)
+
+            self.syn_del_fn_lpz_b_I = (
+                "04-synapses-deleted-lpz_b_I" + str(self.rank) + ".txt")
+            self.syn_del_fh_lpz_b_I = open(
+                self.syn_del_fn_lpz_b_I, 'w')
+            print("{}\t{}\t{}\t{}".format(
+                "time(ms)", "gid", "total_conns", "conns_deleted"),
+                file=self.syn_del_fh_lpz_b_I, flush=True)
+
+            self.syn_new_fn_lpz_b_I = (
+                "04-synapses-formed-lpz_b_I" + str(self.rank) + ".txt")
+            self.syn_new_fh_lpz_b_I = open(
+                self.syn_new_fn_lpz_b_I, 'w')
+            print("{}\t{}\t{}".format(
+                "time(ms)", "gid", "conns_gained"),
+                file=self.syn_new_fh_lpz_b_I, flush=True)
+
+            self.syn_del_fn_p_lpz_I = (
+                "04-synapses-deleted-p_lpz_I" + str(self.rank) + ".txt")
+            self.syn_del_fh_p_lpz_I = open(
+                self.syn_del_fn_p_lpz_I, 'w')
+            print("{}\t{}\t{}\t{}".format(
+                "time(ms)", "gid", "total_conns", "conns_deleted"),
+                file=self.syn_del_fh_p_lpz_I, flush=True)
+
+            self.syn_new_fn_p_lpz_I = (
+                "04-synapses-formed-p_lpz_I" + str(self.rank) + ".txt")
+            self.syn_new_fh_p_lpz_I = open(
+                self.syn_new_fn_p_lpz_I, 'w')
+            print("{}\t{}\t{}".format(
+                "time(ms)", "gid", "conns_gained"),
+                file=self.syn_new_fh_p_lpz_I, flush=True)
 
     def setup_plasticity(self, structural_p=True, synaptic_p=True):
         """Control plasticities."""
@@ -1716,61 +1797,61 @@ class Sinha2016:
     def __dump_ca_concentration(self):
         """Dump calcium concentration."""
         current_simtime = (str(nest.GetKernelStatus()['time']))
-        ca_fn_lpz_centre_E = ("02-calcium-lpz_centre_E-" +
-                              str(self.rank) + "-" + current_simtime +
-                              ".txt")
-        with open(ca_fn_lpz_centre_E, 'w') as f:
-            for info in nest.GetStatus(self.lpz_centre_neurons_E,
+        ca_fn_lpz_c_E = ("02-calcium-lpz_c_E-" +
+                         str(self.rank) + "-" + current_simtime +
+                         ".txt")
+        with open(ca_fn_lpz_c_E, 'w') as f:
+            for info in nest.GetStatus(self.lpz_c_neurons_E,
                                        ['global_id', 'local', 'Ca']):
                 if info[1]:
                     print("{}\t{}".format(info[0], info[2]), file=f,
                           flush=True)
 
-        ca_fn_lpz_border_E = ("02-calcium-lpz_border_E-" +
-                              str(self.rank) + "-" + current_simtime +
-                              ".txt")
-        with open(ca_fn_lpz_border_E, 'w') as f:
-            for info in nest.GetStatus(self.peri_lpz_neurons_E,
+        ca_fn_lpz_b_E = ("02-calcium-lpz_b_E-" +
+                         str(self.rank) + "-" + current_simtime +
+                         ".txt")
+        with open(ca_fn_lpz_b_E, 'w') as f:
+            for info in nest.GetStatus(self.p_lpz_neurons_E,
                                        ['global_id', 'local', 'Ca']):
                 if info[1]:
                     print("{}\t{}".format(info[0], info[2]), file=f,
                           flush=True)
 
-        ca_fn_peri_lpz_E = ("02-calcium-peri_lpz_E-" +
-                            str(self.rank) + "-" + current_simtime +
-                            ".txt")
-        with open(ca_fn_peri_lpz_E, 'w') as f:
-            for info in nest.GetStatus(self.lpz_border_neurons_E,
+        ca_fn_p_lpz_E = ("02-calcium-p_lpz_E-" +
+                         str(self.rank) + "-" + current_simtime +
+                         ".txt")
+        with open(ca_fn_p_lpz_E, 'w') as f:
+            for info in nest.GetStatus(self.lpz_b_neurons_E,
                                        ['global_id', 'local', 'Ca']):
                 if info[1]:
                     print("{}\t{}".format(info[0], info[2]), file=f,
                           flush=True)
 
-        ca_fn_lpz_centre_I = ("02-calcium-lpz_centre_I-" +
-                              str(self.rank) + "-" + current_simtime +
-                              ".txt")
-        with open(ca_fn_lpz_centre_I, 'w') as f:
-            for info in nest.GetStatus(self.lpz_centre_neurons_I,
+        ca_fn_lpz_c_I = ("02-calcium-lpz_c_I-" +
+                         str(self.rank) + "-" + current_simtime +
+                         ".txt")
+        with open(ca_fn_lpz_c_I, 'w') as f:
+            for info in nest.GetStatus(self.lpz_c_neurons_I,
                                        ['global_id', 'local', 'Ca']):
                 if info[1]:
                     print("{}\t{}".format(info[0], info[2]), file=f,
                           flush=True)
 
-        ca_fn_lpz_border_I = ("02-calcium-lpz_border_I-" +
-                              str(self.rank) + "-" + current_simtime +
-                              ".txt")
-        with open(ca_fn_lpz_border_I, 'w') as f:
-            for info in nest.GetStatus(self.peri_lpz_neurons_I,
+        ca_fn_lpz_b_I = ("02-calcium-lpz_b_I-" +
+                         str(self.rank) + "-" + current_simtime +
+                         ".txt")
+        with open(ca_fn_lpz_b_I, 'w') as f:
+            for info in nest.GetStatus(self.p_lpz_neurons_I,
                                        ['global_id', 'local', 'Ca']):
                 if info[1]:
                     print("{}\t{}".format(info[0], info[2]), file=f,
                           flush=True)
 
-        ca_fn_peri_lpz_I = ("02-calcium-peri_lpz_I-" +
-                            str(self.rank) + "-" + current_simtime +
-                            ".txt")
-        with open(ca_fn_peri_lpz_I, 'w') as f:
-            for info in nest.GetStatus(self.lpz_border_neurons_I,
+        ca_fn_p_lpz_I = ("02-calcium-p_lpz_I-" +
+                         str(self.rank) + "-" + current_simtime +
+                         ".txt")
+        with open(ca_fn_p_lpz_I, 'w') as f:
+            for info in nest.GetStatus(self.lpz_b_neurons_I,
                                        ['global_id', 'local', 'Ca']):
                 if info[1]:
                     print("{}\t{}".format(info[0], info[2]), file=f,
@@ -1784,12 +1865,12 @@ class Sinha2016:
         """
         if self.is_str_p_enabled:
             current_simtime = (str(nest.GetKernelStatus()['time']))
-            se_fn_lpz_centre_E = (
-                "05-se-lpz_centre_E-" + str(self.rank) + "-" + current_simtime
+            se_fn_lpz_c_E = (
+                "05-se-lpz_c_E-" + str(self.rank) + "-" + current_simtime
                 + ".txt"
             )
-            with open(se_fn_lpz_centre_E, 'w') as f:
-                for info in nest.GetStatus(self.lpz_centre_neurons_E,
+            with open(se_fn_lpz_c_E, 'w') as f:
+                for info in nest.GetStatus(self.lpz_c_neurons_E,
                                            ['global_id', 'local',
                                             'synaptic_elements']):
                     if info[1]:
@@ -1808,12 +1889,12 @@ class Sinha2016:
                             dendrites_in, dendrites_in_conn),
                             flush=True, file=f)
 
-            se_fn_lpz_border_E = (
-                "05-se-lpz_border_E-" + str(self.rank) + "-" + current_simtime
+            se_fn_lpz_b_E = (
+                "05-se-lpz_b_E-" + str(self.rank) + "-" + current_simtime
                 + ".txt"
             )
-            with open(se_fn_lpz_border_E, 'w') as f:
-                for info in nest.GetStatus(self.lpz_border_neurons_E,
+            with open(se_fn_lpz_b_E, 'w') as f:
+                for info in nest.GetStatus(self.lpz_b_neurons_E,
                                            ['global_id', 'local',
                                             'synaptic_elements']):
                     if info[1]:
@@ -1832,12 +1913,12 @@ class Sinha2016:
                             dendrites_in, dendrites_in_conn),
                             flush=True, file=f)
 
-            se_fn_peri_lpz_E = (
-                "05-se-peri_lpz_E-" + str(self.rank) + "-" + current_simtime
+            se_fn_p_lpz_E = (
+                "05-se-p_lpz_E-" + str(self.rank) + "-" + current_simtime
                 + ".txt"
             )
-            with open(se_fn_peri_lpz_E, 'w') as f:
-                for info in nest.GetStatus(self.peri_lpz_neurons_E,
+            with open(se_fn_p_lpz_E, 'w') as f:
+                for info in nest.GetStatus(self.p_lpz_neurons_E,
                                            ['global_id', 'local',
                                             'synaptic_elements']):
                     if info[1]:
@@ -1856,12 +1937,12 @@ class Sinha2016:
                             dendrites_in, dendrites_in_conn),
                             flush=True, file=f)
 
-            se_fn_lpz_centre_I = (
-                "05-se-lpz_centre_I-" + str(self.rank) + "-" + current_simtime
+            se_fn_lpz_c_I = (
+                "05-se-lpz_c_I-" + str(self.rank) + "-" + current_simtime
                 + ".txt"
             )
-            with open(se_fn_lpz_centre_I, 'w') as f:
-                for info in nest.GetStatus(self.lpz_centre_neurons_I,
+            with open(se_fn_lpz_c_I, 'w') as f:
+                for info in nest.GetStatus(self.lpz_c_neurons_I,
                                            ['global_id', 'local',
                                             'synaptic_elements']):
                     if info[1]:
@@ -1880,12 +1961,12 @@ class Sinha2016:
                             dendrites_in, dendrites_in_conn),
                             flush=True, file=f)
 
-            se_fn_lpz_border_I = (
-                "05-se-lpz_border_I-" + str(self.rank) + "-" + current_simtime
+            se_fn_lpz_b_I = (
+                "05-se-lpz_b_I-" + str(self.rank) + "-" + current_simtime
                 + ".txt"
             )
-            with open(se_fn_lpz_border_I, 'w') as f:
-                for info in nest.GetStatus(self.lpz_border_neurons_I,
+            with open(se_fn_lpz_b_I, 'w') as f:
+                for info in nest.GetStatus(self.lpz_b_neurons_I,
                                            ['global_id', 'local',
                                             'synaptic_elements']):
                     if info[1]:
@@ -1904,12 +1985,12 @@ class Sinha2016:
                             dendrites_in, dendrites_in_conn),
                             flush=True, file=f)
 
-            se_fn_peri_lpz_I = (
-                "05-se-peri_lpz_I-" + str(self.rank) + "-" + current_simtime
+            se_fn_p_lpz_I = (
+                "05-se-p_lpz_I-" + str(self.rank) + "-" + current_simtime
                 + ".txt"
             )
-            with open(se_fn_peri_lpz_I, 'w') as f:
-                for info in nest.GetStatus(self.peri_lpz_neurons_I,
+            with open(se_fn_p_lpz_I, 'w') as f:
+                for info in nest.GetStatus(self.p_lpz_neurons_I,
                                            ['global_id', 'local',
                                             'synaptic_elements']):
                     if info[1]:
@@ -2001,9 +2082,20 @@ class Sinha2016:
         if self.is_str_p_enabled:
             self.syn_elms_fh_E.close()
             self.syn_elms_fh_I.close()
+
             if self.rank == 0:
-                self.synapses_formed_handle.close()
-                self.synapses_deleted_handle.close()
+                self.syn_new_fh_lpz_c_E.close()
+                self.syn_new_fh_lpz_b_E.close()
+                self.syn_new_fh_p_lpz_E.close()
+                self.syn_del_fh_lpz_c_E.close()
+                self.syn_del_fh_lpz_b_E.close()
+                self.syn_del_fh_p_lpz_E.close()
+                self.syn_new_fh_lpz_c_I.close()
+                self.syn_new_fh_lpz_b_I.close()
+                self.syn_new_fh_p_lpz_I.close()
+                self.syn_del_fh_lpz_c_I.close()
+                self.syn_del_fh_lpz_b_I.close()
+                self.syn_del_fh_p_lpz_I.close()
 
     def enable_rewiring(self):
         """Enable the rewiring."""
