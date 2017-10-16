@@ -267,7 +267,7 @@ class Sinha2016:
                                       params=self.poissonExtDict)
 
     def __get_lpz_neurons(self):
-        """Divide neurons into LPZ and the rest."""
+        """Divide neurons into regions."""
         first_point = self.location_tree.data[0]
         last_point = self.location_tree.data[len(self.neuronsE) - 1]
 
