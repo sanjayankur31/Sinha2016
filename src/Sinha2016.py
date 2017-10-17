@@ -1282,7 +1282,12 @@ class Sinha2016:
             "Deleting conns from post using '{}' deletion strategy".format(
                 self.syn_del_strategy))
         total_synapses = 0
-        syn_del = 0
+        syn_del_lpz_c_E = 0
+        syn_del_lpz_b_E = 0
+        syn_del_p_lpz_E = 0
+        syn_del_lpz_c_I = 0
+        syn_del_lpz_b_I = 0
+        syn_del_p_lpz_I = 0
         current_simtime = (str(nest.GetKernelStatus()['time']))
         # excitatory dendrites as targets
         # weight dependent deletion doesn't apply - all synapses have
@@ -1447,11 +1452,29 @@ class Sinha2016:
 
                 total_synapses += total_synapses_this_gid
                 if syn_del_this_gid > 0:
+                    if gid in self.lpz_c_neurons_E:
+                        fh = self.syn_del_fh_lpz_c_E
+                        syn_del_lpz_c_E += syn_del_this_gid
+                    elif gid in self.lpz_b_neurons_E:
+                        fh = self.syn_del_fh_lpz_b_E
+                        syn_del_lpz_b_E += syn_del_this_gid
+                    elif gid in self.p_lpz_neurons_E:
+                        fh = self.syn_del_fh_p_lpz_E
+                        syn_del_p_lpz_E += syn_del_this_gid
+                    elif gid in self.lpz_c_neurons_I:
+                        fh = self.syn_del_fh_lpz_c_I
+                        syn_del_lpz_c_I += syn_del_this_gid
+                    elif gid in self.lpz_b_neurons_I:
+                        fh = self.syn_del_fh_lpz_b_I
+                        syn_del_lpz_b_I += syn_del_this_gid
+                    elif gid in self.p_lpz_neurons_I:
+                        fh = self.syn_del_fh_p_lpz_I
+                        syn_del_p_lpz_I += syn_del_this_gid
+
                     print("{}\t{}\t{}\t{}".format(
                         current_simtime, gid, total_synapses_this_gid,
                         syn_del_this_gid),
-                        file=self.syn_del_fh, flush=True)
-                    syn_del += syn_del_this_gid
+                        file=fh, flush=True)
 
             except KeyError as e:
                 logging.critical("KeyError exception while disconnecting!")
@@ -1467,7 +1490,9 @@ class Sinha2016:
 
         logging.debug(
             "{} of {} connections deleted from post".format(
-                syn_del,
+                (syn_del_lpz_c_E + syn_del_lpz_b_E +
+                 syn_del_p_lpz_E + syn_del_lpz_c_I +
+                 syn_del_lpz_b_I + syn_del_p_lpz_I),
                 total_synapses))
 
     def __get_form_part_d(self, source, options, num_required):
