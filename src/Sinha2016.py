@@ -2296,8 +2296,8 @@ if __name__ == "__main__":
     # set up neurons, connections, spike detectors, files
     simulation.prerun_setup(
         stabilisation_time=1500.,
-        sp_update_interval=1000.,
-        recording_interval=100.)
+        sp_update_interval=1500.,
+        recording_interval=250.)
     # print em up
     simulation.print_simulation_parameters()
     logging.info("Rank {}: SIMULATION SETUP".format(simulation.rank))
@@ -2333,14 +2333,18 @@ if __name__ == "__main__":
     simulation.stabilise()
     """
 
-    simulation.update_time_windows(stabilisation_time=8500.,
+    # zoom in on post deaff phase
+    simulation.update_time_windows(stabilisation_time=50.,
                                    sp_update_interval=0.1,
-                                   recording_interval=100.)
+                                   recording_interval=1.)
     if deafferentate_network:
         # Deaff network
         simulation.deaff_network()
         # Stabilise for repair
         simulation.stabilise()
+    simulation.update_time_windows(stabilisation_time=2000.,
+                                   sp_update_interval=0.1,
+                                   recording_interval=100.)
 
     if store_patterns:
         # recall stored and tracked pattern
