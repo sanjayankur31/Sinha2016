@@ -683,102 +683,103 @@ class Sinha2016:
             file=self.weights_fh_IE, flush=True)
 
         if self.is_str_p_enabled:
-            self.syn_del_fn_lpz_c_E = (
-                "04-synapses-deleted-lpz_c_E" + str(self.rank) + ".txt")
-            self.syn_del_fh_lpz_c_E = open(
-                self.syn_del_fn_lpz_c_E, 'w')
-            print("{}\t{}\t{}\t{}".format(
-                "time(ms)", "gid", "total_conns", "conns_deleted"),
-                file=self.syn_del_fh_lpz_c_E, flush=True)
+            if self.rank == 0:
+                self.syn_del_fn_lpz_c_E = (
+                    "04-synapses-deleted-lpz_c_E" + str(self.rank) + ".txt")
+                self.syn_del_fh_lpz_c_E = open(
+                    self.syn_del_fn_lpz_c_E, 'w')
+                print("{}\t{}\t{}\t{}".format(
+                    "time(ms)", "gid", "total_conns", "conns_deleted"),
+                    file=self.syn_del_fh_lpz_c_E, flush=True)
 
-            self.syn_new_fn_lpz_c_E = (
-                "04-synapses-formed-lpz_c_E" + str(self.rank) + ".txt")
-            self.syn_new_fh_lpz_c_E = open(
-                self.syn_new_fn_lpz_c_E, 'w')
-            print("{}\t{}\t{}".format(
-                "time(ms)", "gid", "conns_gained"),
-                file=self.syn_new_fh_lpz_c_E, flush=True)
+                self.syn_new_fn_lpz_c_E = (
+                    "04-synapses-formed-lpz_c_E" + str(self.rank) + ".txt")
+                self.syn_new_fh_lpz_c_E = open(
+                    self.syn_new_fn_lpz_c_E, 'w')
+                print("{}\t{}\t{}".format(
+                    "time(ms)", "gid", "conns_gained"),
+                    file=self.syn_new_fh_lpz_c_E, flush=True)
 
-            self.syn_del_fn_lpz_b_E = (
-                "04-synapses-deleted-lpz_b_E" + str(self.rank) + ".txt")
-            self.syn_del_fh_lpz_b_E = open(
-                self.syn_del_fn_lpz_b_E, 'w')
-            print("{}\t{}\t{}\t{}".format(
-                "time(ms)", "gid", "total_conns", "conns_deleted"),
-                file=self.syn_del_fh_lpz_b_E, flush=True)
+                self.syn_del_fn_lpz_b_E = (
+                    "04-synapses-deleted-lpz_b_E" + str(self.rank) + ".txt")
+                self.syn_del_fh_lpz_b_E = open(
+                    self.syn_del_fn_lpz_b_E, 'w')
+                print("{}\t{}\t{}\t{}".format(
+                    "time(ms)", "gid", "total_conns", "conns_deleted"),
+                    file=self.syn_del_fh_lpz_b_E, flush=True)
 
-            self.syn_new_fn_lpz_b_E = (
-                "04-synapses-formed-lpz_b_E" + str(self.rank) + ".txt")
-            self.syn_new_fh_lpz_b_E = open(
-                self.syn_new_fn_lpz_b_E, 'w')
-            print("{}\t{}\t{}".format(
-                "time(ms)", "gid", "conns_gained"),
-                file=self.syn_new_fh_lpz_b_E, flush=True)
+                self.syn_new_fn_lpz_b_E = (
+                    "04-synapses-formed-lpz_b_E" + str(self.rank) + ".txt")
+                self.syn_new_fh_lpz_b_E = open(
+                    self.syn_new_fn_lpz_b_E, 'w')
+                print("{}\t{}\t{}".format(
+                    "time(ms)", "gid", "conns_gained"),
+                    file=self.syn_new_fh_lpz_b_E, flush=True)
 
-            self.syn_del_fn_p_lpz_E = (
-                "04-synapses-deleted-p_lpz_E" + str(self.rank) + ".txt")
-            self.syn_del_fh_p_lpz_E = open(
-                self.syn_del_fn_p_lpz_E, 'w')
-            print("{}\t{}\t{}\t{}".format(
-                "time(ms)", "gid", "total_conns", "conns_deleted"),
-                file=self.syn_del_fh_p_lpz_E, flush=True)
+                self.syn_del_fn_p_lpz_E = (
+                    "04-synapses-deleted-p_lpz_E" + str(self.rank) + ".txt")
+                self.syn_del_fh_p_lpz_E = open(
+                    self.syn_del_fn_p_lpz_E, 'w')
+                print("{}\t{}\t{}\t{}".format(
+                    "time(ms)", "gid", "total_conns", "conns_deleted"),
+                    file=self.syn_del_fh_p_lpz_E, flush=True)
 
-            self.syn_new_fn_p_lpz_E = (
-                "04-synapses-formed-p_lpz_E" + str(self.rank) + ".txt")
-            self.syn_new_fh_p_lpz_E = open(
-                self.syn_new_fn_p_lpz_E, 'w')
-            print("{}\t{}\t{}".format(
-                "time(ms)", "gid", "conns_gained"),
-                file=self.syn_new_fh_p_lpz_E, flush=True)
+                self.syn_new_fn_p_lpz_E = (
+                    "04-synapses-formed-p_lpz_E" + str(self.rank) + ".txt")
+                self.syn_new_fh_p_lpz_E = open(
+                    self.syn_new_fn_p_lpz_E, 'w')
+                print("{}\t{}\t{}".format(
+                    "time(ms)", "gid", "conns_gained"),
+                    file=self.syn_new_fh_p_lpz_E, flush=True)
 
-            # inhibitory neurons
-            self.syn_del_fn_lpz_c_I = (
-                "04-synapses-deleted-lpz_c_I" + str(self.rank) + ".txt")
-            self.syn_del_fh_lpz_c_I = open(
-                self.syn_del_fn_lpz_c_I, 'w')
-            print("{}\t{}\t{}\t{}".format(
-                "time(ms)", "gid", "total_conns", "conns_deleted"),
-                file=self.syn_del_fh_lpz_c_I, flush=True)
+                # inhibitory neurons
+                self.syn_del_fn_lpz_c_I = (
+                    "04-synapses-deleted-lpz_c_I" + str(self.rank) + ".txt")
+                self.syn_del_fh_lpz_c_I = open(
+                    self.syn_del_fn_lpz_c_I, 'w')
+                print("{}\t{}\t{}\t{}".format(
+                    "time(ms)", "gid", "total_conns", "conns_deleted"),
+                    file=self.syn_del_fh_lpz_c_I, flush=True)
 
-            self.syn_new_fn_lpz_c_I = (
-                "04-synapses-formed-lpz_c_I" + str(self.rank) + ".txt")
-            self.syn_new_fh_lpz_c_I = open(
-                self.syn_new_fn_lpz_c_I, 'w')
-            print("{}\t{}\t{}".format(
-                "time(ms)", "gid", "conns_gained"),
-                file=self.syn_new_fh_lpz_c_I, flush=True)
+                self.syn_new_fn_lpz_c_I = (
+                    "04-synapses-formed-lpz_c_I" + str(self.rank) + ".txt")
+                self.syn_new_fh_lpz_c_I = open(
+                    self.syn_new_fn_lpz_c_I, 'w')
+                print("{}\t{}\t{}".format(
+                    "time(ms)", "gid", "conns_gained"),
+                    file=self.syn_new_fh_lpz_c_I, flush=True)
 
-            self.syn_del_fn_lpz_b_I = (
-                "04-synapses-deleted-lpz_b_I" + str(self.rank) + ".txt")
-            self.syn_del_fh_lpz_b_I = open(
-                self.syn_del_fn_lpz_b_I, 'w')
-            print("{}\t{}\t{}\t{}".format(
-                "time(ms)", "gid", "total_conns", "conns_deleted"),
-                file=self.syn_del_fh_lpz_b_I, flush=True)
+                self.syn_del_fn_lpz_b_I = (
+                    "04-synapses-deleted-lpz_b_I" + str(self.rank) + ".txt")
+                self.syn_del_fh_lpz_b_I = open(
+                    self.syn_del_fn_lpz_b_I, 'w')
+                print("{}\t{}\t{}\t{}".format(
+                    "time(ms)", "gid", "total_conns", "conns_deleted"),
+                    file=self.syn_del_fh_lpz_b_I, flush=True)
 
-            self.syn_new_fn_lpz_b_I = (
-                "04-synapses-formed-lpz_b_I" + str(self.rank) + ".txt")
-            self.syn_new_fh_lpz_b_I = open(
-                self.syn_new_fn_lpz_b_I, 'w')
-            print("{}\t{}\t{}".format(
-                "time(ms)", "gid", "conns_gained"),
-                file=self.syn_new_fh_lpz_b_I, flush=True)
+                self.syn_new_fn_lpz_b_I = (
+                    "04-synapses-formed-lpz_b_I" + str(self.rank) + ".txt")
+                self.syn_new_fh_lpz_b_I = open(
+                    self.syn_new_fn_lpz_b_I, 'w')
+                print("{}\t{}\t{}".format(
+                    "time(ms)", "gid", "conns_gained"),
+                    file=self.syn_new_fh_lpz_b_I, flush=True)
 
-            self.syn_del_fn_p_lpz_I = (
-                "04-synapses-deleted-p_lpz_I" + str(self.rank) + ".txt")
-            self.syn_del_fh_p_lpz_I = open(
-                self.syn_del_fn_p_lpz_I, 'w')
-            print("{}\t{}\t{}\t{}".format(
-                "time(ms)", "gid", "total_conns", "conns_deleted"),
-                file=self.syn_del_fh_p_lpz_I, flush=True)
+                self.syn_del_fn_p_lpz_I = (
+                    "04-synapses-deleted-p_lpz_I" + str(self.rank) + ".txt")
+                self.syn_del_fh_p_lpz_I = open(
+                    self.syn_del_fn_p_lpz_I, 'w')
+                print("{}\t{}\t{}\t{}".format(
+                    "time(ms)", "gid", "total_conns", "conns_deleted"),
+                    file=self.syn_del_fh_p_lpz_I, flush=True)
 
-            self.syn_new_fn_p_lpz_I = (
-                "04-synapses-formed-p_lpz_I" + str(self.rank) + ".txt")
-            self.syn_new_fh_p_lpz_I = open(
-                self.syn_new_fn_p_lpz_I, 'w')
-            print("{}\t{}\t{}".format(
-                "time(ms)", "gid", "conns_gained"),
-                file=self.syn_new_fh_p_lpz_I, flush=True)
+                self.syn_new_fn_p_lpz_I = (
+                    "04-synapses-formed-p_lpz_I" + str(self.rank) + ".txt")
+                self.syn_new_fh_p_lpz_I = open(
+                    self.syn_new_fn_p_lpz_I, 'w')
+                print("{}\t{}\t{}".format(
+                    "time(ms)", "gid", "conns_gained"),
+                    file=self.syn_new_fh_p_lpz_I, flush=True)
 
     def setup_plasticity(self, structural_p=True, synaptic_p=True):
         """Control plasticities."""
