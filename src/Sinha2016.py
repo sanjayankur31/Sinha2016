@@ -1518,7 +1518,12 @@ class Sinha2016:
         """Connect random neurons to create new connections."""
         logging.debug("Creating connections using the {} strategy".format(
             self.syn_form_strategy))
-        syn_new = 0
+        syn_new_lpz_c_E = 0
+        syn_new_lpz_b_E = 0
+        syn_new_p_lpz_E = 0
+        syn_new_lpz_c_I = 0
+        syn_new_lpz_b_I = 0
+        syn_new_p_lpz_I = 0
         current_simtime = (str(nest.GetKernelStatus()['time']))
         for nrn in (self.neuronsE + self.neuronsI):
             syn_new_this_gid = 0
@@ -1625,14 +1630,36 @@ class Sinha2016:
 
             if self.rank == 0:
                 if syn_new_this_gid > 0:
-                    print("{}\t{}\t{}".format(
-                        current_simtime, gid, syn_new_this_gid),
-                        file=self.syn_new_fh, flush=True)
-                    syn_new += syn_new_this_gid
+                    if gid in self.lpz_c_neurons_E:
+                        fh = self.syn_new_fh_lpz_c_E
+                        syn_new_lpz_c_E += syn_new_this_gid
+                    elif gid in self.lpz_b_neurons_E:
+                        fh = self.syn_new_fh_lpz_b_E
+                        syn_new_lpz_b_E += syn_new_this_gid
+                    elif gid in self.p_lpz_neurons_E:
+                        fh = self.syn_new_fh_p_lpz_E
+                        syn_new_p_lpz_E += syn_new_this_gid
+                    elif gid in self.lpz_c_neurons_I:
+                        fh = self.syn_new_fh_lpz_c_I
+                        syn_new_lpz_c_I += syn_new_this_gid
+                    elif gid in self.lpz_b_neurons_I:
+                        fh = self.syn_new_fh_lpz_b_I
+                        syn_new_lpz_b_I += syn_new_this_gid
+                    elif gid in self.p_lpz_neurons_I:
+                        fh = self.syn_new_fh_p_lpz_I
+                        syn_new_p_lpz_I += syn_new_this_gid
 
-        logging.debug(
-            "Rank {}: {} new connections created".format(
-                self.rank, syn_new))
+                    print("{}\t{}\t{}".format(
+                        current_simtime, gid,
+                        syn_new_this_gid),
+                        file=fh, flush=True)
+
+        if self.rank == 0:
+            logging.debug(
+                "{} new connections created".format(
+                    (syn_new_lpz_c_E + syn_new_lpz_b_E +
+                     syn_new_p_lpz_E + syn_new_lpz_c_I +
+                     syn_new_lpz_b_I + syn_new_p_lpz_I)))
 
     def update_connectivity(self):
         """Our implementation of structural plasticity."""
