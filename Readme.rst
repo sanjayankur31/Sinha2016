@@ -29,21 +29,23 @@ Spike raster files
 
 For the following neuron sets:
 
-- Excitatory neurons
-- Inhibitory neurons
+- LPZ centre E
+- LPZ border E
+- Peri LPZ E
+- LPZ centre I
+- LPZ border I
+- Peri LPZ I
 - Pattern/signal neurons
 - Background/noise neurons
 - Recall neurons
-- Deafferentated neurons
 - Stim neurons
 
 Used to generate:
 
-- Global firing rate vs time plots
-- ISI CV vs time plots
 - Mean firing rate vs time plots
-- Population firing rate at particular time plot (snapshots) (WIP)
-- SNR value (WIP)
+- ISI CV vs time plots
+- Population firing rate at particular time plot (snapshots)
+- SNR value
 - Raster plots showing E and I spikes
 
 Synaptic weight files
@@ -70,52 +72,33 @@ One file for each of the following synapse groups:
 Used to generate:
 
 - Plots with Means and STDs of synaptic conductances
-- Also gives an idea of the number of synaptic connections (to compare with synaptic elements to confirm correctness)
 
 Calcium concentration files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: text
 
-    time(ms), comma separated calcium values(unit less)
+    neuron_ID Ca_concentration
 
-    Last line specifies number of neurons which is the same as the number of calcium values in each line
+    tab seprated
 
-- Name format: :code:`01-calcium-{neuron-set}-{rank}.txt`
-- Collected at particular times - set by the recording period in the simulation
-- One file per MPI rank
+- Name format: :code:`02-calcium-{neuron-set}-{rank}-{time}.txt`
+- One file per region per recording time per rank.
 - Will need to be merged, again using pandas dataframes
 
 For the following neuron sets:
 
-- E neurons
-- I neurons
+- LPZ centre E
+- LPZ border E
+- Peri LPZ E
+- LPZ centre I
+- LPZ border I
+- Peri LPZ I
 
 Used to generate:
 
-- Plots showing means + STDs of calcium concentrations
+- Plots showing means + STDs of calcium concentrations for different regions.
 
-
-Total synaptic elements files
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code:: text
-
-    time(ms) a_total a_connected d_ex_total d_ex_connected d_in_total d_in_connected
-
-- Name format: :code:`02-synaptic-elements-totals-{neuron-set}-{rank}.txt`
-- Collected at particular times - set by the recording period in the simulation
-- One file per MPI rank
-- Will need to be merged, again using pandas dataframes
-
-For the following neuron sets:
-
-- E neurons
-- I neurons
-
-Used to generate:
-
-- Plots showing evolution of various synaptic elements
 
 Per neuron synaptic element files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -128,29 +111,43 @@ Per neuron synaptic element files
 - Collected at particular times
 - New file at each collection time
 - One file per MPI rank
-- Will need to be merged and sorted - I'll use pandas
 
 For the following neuron sets:
 
-- E neurons
-- I neurons
+- LPZ centre E
+- LPZ border E
+- Peri LPZ E
+- LPZ centre I
+- LPZ border I
+- Peri LPZ I
 
 Used to generate:
 
 - Plots showing a snapshot of the network
-- Will also come in handy later when we want to look at synaptic elements of particular neurons and particular regions
-
+- Evolution of synaptic elements for different regions at different times.
 
 Per neuron synapse loss files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: text
 
-    time(ms) gid total_conns conns_deleted
+    gid total_conns conns_deleted
 
-- Name format: :code:`04-synapses-deleted-{rank}.txt`
+- Name format: :code:`04-synapses-deleted-{region}-{rank}.txt`
 - Collected after synapses are deleted per structural plasticity update
-- One file per MPI rank, although all files should be identical
+- One file per region
+- Only published by rank 0 (since all ranks would publish identical data)
+
+
+For each of these regions:
+
+- LPZ centre E
+- LPZ border E
+- Peri LPZ E
+- LPZ centre I
+- LPZ border I
+- Peri LPZ I
+
 
 Used to generate:
 
@@ -162,11 +159,21 @@ Per neuron synapse gain files
 
 .. code:: text
 
-    time(ms) gid conns_gained
+    gid conns_gained
 
-- Name format: :code:`04-synapses-formed-{rank}.txt`
+- Name format: :code:`04-synapses-formed-{region}-{rank}.txt`
 - Collected after new synapses are formed per structural plasticity update
 - One file per MPI rank, although all files should be identical
+
+For each of these regions:
+
+- LPZ centre E
+- LPZ border E
+- Peri LPZ E
+- LPZ centre I
+- LPZ border I
+- Peri LPZ I
+
 
 Used to generate:
 
