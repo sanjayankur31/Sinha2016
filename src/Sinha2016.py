@@ -275,7 +275,7 @@ class Sinha2016:
             (len(self.neuronsE) + len(self.neuronsI)) * self.lpz_percent,
             first_point, last_point)
         lpz_c_neurons = self.__get_neurons_from_region(
-            (len(self.neuronsE) + len(self.neuronsI)) * self.lpz_percent/2,
+            (len(self.neuronsE) + len(self.neuronsI)) * self.lpz_percent/2.,
             first_point, last_point)
         lpz_b_neurons = list(set(lpz_neurons) - set(lpz_c_neurons))
 
@@ -315,7 +315,7 @@ class Sinha2016:
                         self.location_tree.data[nrnindex][1]),
                         file=f2)
             with open("00-lpz-border-neuron-locations-E.txt", 'w') as f3:
-                for neuron in self.lpz_c_neurons_E:
+                for neuron in self.lpz_b_neurons_E:
                     nrnindex = neuron - self.neuronsE[0]
                     print("{}\t{}\t{}".format(
                         neuron,
