@@ -322,7 +322,7 @@ class Sinha2016:
                         self.location_tree.data[nrnindex][0],
                         self.location_tree.data[nrnindex][1]),
                         file=f3)
-            with open("00-peri-lpz-neuron-locations-I.txt", 'w') as f2:
+            with open("00-peri-lpz-neuron-locations-I.txt", 'w') as f1:
                 for neuron in self.p_lpz_neurons_I:
                     nrnindex = neuron + self.neuronsE[-1] - self.neuronsI[0]
                     print("{}\t{}\t{}".format(
@@ -337,7 +337,7 @@ class Sinha2016:
                         neuron,
                         self.location_tree.data[nrnindex][0],
                         self.location_tree.data[nrnindex][1]),
-                        file=f1)
+                        file=f2)
             with open("00-lpz-border-neuron-locations-I.txt", 'w') as f3:
                 for neuron in self.lpz_b_neurons_I:
                     nrnindex = neuron + self.neuronsE[-1] - self.neuronsI[0]
