@@ -2280,7 +2280,7 @@ if __name__ == "__main__":
     # Set up logging configuration
     logging.basicConfig(
         format='%(funcName)s: %(lineno)d: %(levelname)s: %(message)s',
-        level=logging.INFO)
+        level=logging.ERROR)
 
     step = False
     store_patterns = False
@@ -2333,18 +2333,19 @@ if __name__ == "__main__":
     simulation.stabilise()
     """
 
-    # zoom in on post deaff phase
-    simulation.update_time_windows(stabilisation_time=50.,
-                                   sp_update_interval=0.1,
-                                   recording_interval=1.)
     if deafferentate_network:
         # Deaff network
         simulation.deaff_network()
-        # Stabilise for repair
+        # zoom in on post deaff phase
+        simulation.update_time_windows(stabilisation_time=50.,
+                                       sp_update_interval=0.1,
+                                       recording_interval=1.)
         simulation.stabilise()
-    simulation.update_time_windows(stabilisation_time=2000.,
-                                   sp_update_interval=0.1,
-                                   recording_interval=100.)
+
+        simulation.update_time_windows(stabilisation_time=2000.,
+                                       sp_update_interval=0.1,
+                                       recording_interval=250.)
+        simulation.stabilise()
 
     if store_patterns:
         # recall stored and tracked pattern
