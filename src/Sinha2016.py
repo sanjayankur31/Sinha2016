@@ -1683,8 +1683,11 @@ class Sinha2016:
     def invoke_metaplasticity(self):
         """Update growth curve parameters."""
         if self.is_metaplasticity_enabled:
-            [ca_e, ca_i, ca_lpz_e, ca_lpz_i] = self.__get_ca_concentration()
-            self.__set_str_p_hom_point(ca_e, ca_i)
+            cal_e = [stat['Ca'] for stat in nest.GetStatus(self.neuronsE) if
+                     stat['local']]
+            cal_i = [stat['Ca'] for stat in nest.GetStatus(self.neuronsI) if
+                     stat['local']]
+            self.__set_str_p_hom_point(cal_e, cal_i)
         logging.debug("META PLASTICITY: Growth curves updated")
 
     def __get_neurons_from_region(self, num_neurons, first_point, last_point):
