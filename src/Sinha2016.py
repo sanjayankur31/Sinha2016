@@ -2095,7 +2095,13 @@ class Sinha2016:
                         flush=True, file=f)
 
     def __dump_synaptic_weights(self):
-        """Dump synaptic weights."""
+        """Dump synaptic weights per rank.
+
+        In a parallel simulation GetConnections only returns connections
+        with *targets* on the MPI process executing the function.
+
+        http://www.nest-simulator.org/cc/GetConnections/
+        """
         current_simtime = (str(nest.GetKernelStatus()['time']))
 
         conns = nest.GetConnections(target=self.neuronsE,
