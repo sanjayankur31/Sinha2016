@@ -1256,7 +1256,7 @@ class Sinha2016:
                         print("{}\t{}\t{}\t{}".format(
                             current_simtime, gid, total_synapses_this_gid,
                             syn_del_this_gid),
-                            file=fh, flush=True)
+                            file=fh)
 
             except KeyError as e:
                 logging.critical("KeyError exception while disconnecting!")
@@ -1475,7 +1475,7 @@ class Sinha2016:
                     print("{}\t{}\t{}\t{}".format(
                         current_simtime, gid, total_synapses_this_gid,
                         syn_del_this_gid),
-                        file=fh, flush=True)
+                        file=fh)
 
             except KeyError as e:
                 logging.critical("KeyError exception while disconnecting!")
@@ -1653,7 +1653,7 @@ class Sinha2016:
                     print("{}\t{}\t{}".format(
                         current_simtime, gid,
                         syn_new_this_gid),
-                        file=fh, flush=True)
+                        file=fh)
 
         if self.rank == 0:
             logging.debug(
@@ -1886,8 +1886,7 @@ class Sinha2016:
                        stat in nest.GetStatus(self.lpz_c_neurons_E) if
                        stat['local']]
             for info in allinfo:
-                print("{}\t{}".format(info[0], info[1]), file=f,
-                      flush=True)
+                print("{}\t{}".format(info[0], info[1]), file=f)
 
         ca_fn_lpz_b_E = ("02-calcium-lpz_b_E-" +
                          str(self.rank) + "-" + current_simtime +
@@ -1897,8 +1896,7 @@ class Sinha2016:
                        stat in nest.GetStatus(self.lpz_b_neurons_E) if
                        stat['local']]
             for info in allinfo:
-                print("{}\t{}".format(info[0], info[1]), file=f,
-                      flush=True)
+                print("{}\t{}".format(info[0], info[1]), file=f)
 
         ca_fn_p_lpz_E = ("02-calcium-p_lpz_E-" +
                          str(self.rank) + "-" + current_simtime +
@@ -1908,8 +1906,7 @@ class Sinha2016:
                        stat in nest.GetStatus(self.p_lpz_neurons_E) if
                        stat['local']]
             for info in allinfo:
-                print("{}\t{}".format(info[0], info[1]), file=f,
-                      flush=True)
+                print("{}\t{}".format(info[0], info[1]), file=f)
         # I neurons
         ca_fn_lpz_c_I = ("02-calcium-lpz_c_I-" +
                          str(self.rank) + "-" + current_simtime +
@@ -1919,8 +1916,7 @@ class Sinha2016:
                        stat in nest.GetStatus(self.lpz_c_neurons_I) if
                        stat['local']]
             for info in allinfo:
-                print("{}\t{}".format(info[0], info[1]), file=f,
-                      flush=True)
+                print("{}\t{}".format(info[0], info[1]), file=f)
 
         ca_fn_lpz_b_I = ("02-calcium-lpz_b_I-" +
                          str(self.rank) + "-" + current_simtime +
@@ -1930,8 +1926,7 @@ class Sinha2016:
                        stat in nest.GetStatus(self.lpz_b_neurons_I) if
                        stat['local']]
             for info in allinfo:
-                print("{}\t{}".format(info[0], info[1]), file=f,
-                      flush=True)
+                print("{}\t{}".format(info[0], info[1]), file=f)
 
         ca_fn_p_lpz_I = ("02-calcium-p_lpz_I-" +
                          str(self.rank) + "-" + current_simtime +
@@ -1941,8 +1936,7 @@ class Sinha2016:
                        stat in nest.GetStatus(self.p_lpz_neurons_I) if
                        stat['local']]
             for info in allinfo:
-                print("{}\t{}".format(info[0], info[1]), file=f,
-                      flush=True)
+                print("{}\t{}".format(info[0], info[1]), file=f)
 
     def __dump_synaptic_elements_per_neurons(self):
         """
@@ -1974,7 +1968,7 @@ class Sinha2016:
                         axons, axons_conn,
                         dendrites_ex, dendrites_ex_conn,
                         dendrites_in, dendrites_in_conn),
-                        flush=True, file=f)
+                        file=f)
 
             se_fn_lpz_b_E = (
                 "05-se-lpz_b_E-" + str(self.rank) + "-" + current_simtime
@@ -1998,7 +1992,7 @@ class Sinha2016:
                         axons, axons_conn,
                         dendrites_ex, dendrites_ex_conn,
                         dendrites_in, dendrites_in_conn),
-                        flush=True, file=f)
+                        file=f)
 
             se_fn_p_lpz_E = (
                 "05-se-p_lpz_E-" + str(self.rank) + "-" + current_simtime
@@ -2022,7 +2016,7 @@ class Sinha2016:
                         axons, axons_conn,
                         dendrites_ex, dendrites_ex_conn,
                         dendrites_in, dendrites_in_conn),
-                        flush=True, file=f)
+                        file=f)
 
             # inhibitory neurons
             se_fn_lpz_c_I = (
@@ -2047,7 +2041,7 @@ class Sinha2016:
                         axons, axons_conn,
                         dendrites_ex, dendrites_ex_conn,
                         dendrites_in, dendrites_in_conn),
-                        flush=True, file=f)
+                        file=f)
 
             se_fn_lpz_b_I = (
                 "05-se-lpz_b_I-" + str(self.rank) + "-" + current_simtime
@@ -2071,7 +2065,7 @@ class Sinha2016:
                         axons, axons_conn,
                         dendrites_ex, dendrites_ex_conn,
                         dendrites_in, dendrites_in_conn),
-                        flush=True, file=f)
+                        file=f)
 
             se_fn_p_lpz_I = (
                 "05-se-p_lpz_I-" + str(self.rank) + "-" + current_simtime
@@ -2095,7 +2089,7 @@ class Sinha2016:
                         axons, axons_conn,
                         dendrites_ex, dendrites_ex_conn,
                         dendrites_in, dendrites_in_conn),
-                        flush=True, file=f)
+                        file=f)
 
     def __dump_synaptic_weights(self):
         """Dump synaptic weights per rank.
@@ -2113,7 +2107,7 @@ class Sinha2016:
         print("{}, {}".format(
             current_simtime,
             str(weightsIE).strip('[]').strip('()')),
-            file=self.weights_fh_IE, flush=True)
+            file=self.weights_fh_IE)
         if len(weightsIE) > self.num_synapses_IE:
             self.num_synapses_IE = len(weightsIE)
 
@@ -2123,7 +2117,7 @@ class Sinha2016:
         print("{}, {}".format(
             current_simtime,
             str(weightsII).strip('[]').strip('()')),
-            file=self.weights_fh_II, flush=True)
+            file=self.weights_fh_II)
         if len(weightsII) > self.num_synapses_II:
             self.num_synapses_II = len(weightsII)
 
@@ -2133,7 +2127,7 @@ class Sinha2016:
         print("{}, {}".format(
             current_simtime,
             str(weightsEI).strip('[]').strip('()')),
-            file=self.weights_fh_EI, flush=True)
+            file=self.weights_fh_EI)
         if len(weightsEI) > self.num_synapses_EI:
             self.num_synapses_EI = len(weightsEI)
 
@@ -2143,7 +2137,7 @@ class Sinha2016:
         print("{}, {}".format(
             current_simtime,
             str(weightsEE).strip('[]').strip('()')),
-            file=self.weights_fh_EE, flush=True)
+            file=self.weights_fh_EE)
         if len(weightsEE) > self.num_synapses_EE:
             self.num_synapses_EE = len(weightsEE)
 
