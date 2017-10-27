@@ -1452,30 +1452,31 @@ class Sinha2016:
                                 synelms[s]['Axon_in'] += 1
 
                 total_synapses += total_synapses_this_gid
-                if syn_del_this_gid > 0:
-                    if gid in self.lpz_c_neurons_E:
-                        fh = self.syn_del_fh_lpz_c_E
-                        syn_del_lpz_c_E += syn_del_this_gid
-                    elif gid in self.lpz_b_neurons_E:
-                        fh = self.syn_del_fh_lpz_b_E
-                        syn_del_lpz_b_E += syn_del_this_gid
-                    elif gid in self.p_lpz_neurons_E:
-                        fh = self.syn_del_fh_p_lpz_E
-                        syn_del_p_lpz_E += syn_del_this_gid
-                    elif gid in self.lpz_c_neurons_I:
-                        fh = self.syn_del_fh_lpz_c_I
-                        syn_del_lpz_c_I += syn_del_this_gid
-                    elif gid in self.lpz_b_neurons_I:
-                        fh = self.syn_del_fh_lpz_b_I
-                        syn_del_lpz_b_I += syn_del_this_gid
-                    elif gid in self.p_lpz_neurons_I:
-                        fh = self.syn_del_fh_p_lpz_I
-                        syn_del_p_lpz_I += syn_del_this_gid
+                if self.rank == 0:
+                    if syn_del_this_gid > 0:
+                        if gid in self.lpz_c_neurons_E:
+                            fh = self.syn_del_fh_lpz_c_E
+                            syn_del_lpz_c_E += syn_del_this_gid
+                        elif gid in self.lpz_b_neurons_E:
+                            fh = self.syn_del_fh_lpz_b_E
+                            syn_del_lpz_b_E += syn_del_this_gid
+                        elif gid in self.p_lpz_neurons_E:
+                            fh = self.syn_del_fh_p_lpz_E
+                            syn_del_p_lpz_E += syn_del_this_gid
+                        elif gid in self.lpz_c_neurons_I:
+                            fh = self.syn_del_fh_lpz_c_I
+                            syn_del_lpz_c_I += syn_del_this_gid
+                        elif gid in self.lpz_b_neurons_I:
+                            fh = self.syn_del_fh_lpz_b_I
+                            syn_del_lpz_b_I += syn_del_this_gid
+                        elif gid in self.p_lpz_neurons_I:
+                            fh = self.syn_del_fh_p_lpz_I
+                            syn_del_p_lpz_I += syn_del_this_gid
 
-                    print("{}\t{}\t{}\t{}".format(
-                        current_simtime, gid, total_synapses_this_gid,
-                        syn_del_this_gid),
-                        file=fh)
+                        print("{}\t{}\t{}\t{}".format(
+                            current_simtime, gid, total_synapses_this_gid,
+                            syn_del_this_gid),
+                            file=fh)
 
             except KeyError as e:
                 logging.critical("KeyError exception while disconnecting!")
