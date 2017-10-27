@@ -588,32 +588,32 @@ class Sinha2016:
         self.sd_params_lpz_c_E = {
             'to_file': True,
             'to_memory': False,
-            'label': 'spikes-lpz-centre-E'
+            'label': 'spikes-lpz_c_E'
         }
         self.sd_params_lpz_b_E = {
             'to_file': True,
             'to_memory': False,
-            'label': 'spikes-lpz-border-E'
+            'label': 'spikes-lpz_b_E'
         }
         self.sd_params_p_lpz_E = {
             'to_file': True,
             'to_memory': False,
-            'label': 'spikes-peri-lpz-E'
+            'label': 'spikes-p_lpz_E'
         }
         self.sd_params_lpz_c_I = {
             'to_file': True,
             'to_memory': False,
-            'label': 'spikes-lpz-centre-I'
+            'label': 'spikes-lpz_c_I'
         }
         self.sd_params_lpz_b_I = {
             'to_file': True,
             'to_memory': False,
-            'label': 'spikes-lpz-border-I'
+            'label': 'spikes-lpz_b_I'
         }
         self.sd_params_p_lpz_I = {
             'to_file': True,
             'to_memory': False,
-            'label': 'spikes-peri-lpz-I'
+            'label': 'spikes-p_lpz_I'
         }
         # pattern neurons
         self.sd_paramsP = {
