@@ -2169,9 +2169,6 @@ class Sinha2016:
         self.weights_fh_IE.close()
 
         if self.is_str_p_enabled:
-            self.syn_elms_fh_E.close()
-            self.syn_elms_fh_I.close()
-
             if self.rank == 0:
                 self.syn_new_fh_lpz_c_E.close()
                 self.syn_new_fh_lpz_b_E.close()
