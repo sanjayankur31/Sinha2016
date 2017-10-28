@@ -2204,19 +2204,20 @@ class Sinha2016:
     def close_files(self):
         """Close all files when the simulation is finished."""
         logging.debug("Rank {}: Closing open files".format(self.rank))
-        # Comma printed so that pandas can read it as a dataframe point
-        print("{}\t".format(self.num_synapses_EE),
+        # -1 is a unique index that marks this line. Since the other indexes
+        # represent time, they cannot be negative
+        print("-1\t{}".format(self.num_synapses_EE),
               file=self.weights_fh_EE)
         self.weights_fh_EE.close()
 
-        print("{}\t".format(self.num_synapses_EI),
+        print("-1\t{}".format(self.num_synapses_EI),
               file=self.weights_fh_EI)
         self.weights_fh_EI.close()
-        print("{}\t".format(self.num_synapses_II),
+        print("-1\t{}".format(self.num_synapses_II),
               file=self.weights_fh_II)
         self.weights_fh_II.close()
 
-        print("{}\t".format(self.num_synapses_IE),
+        print("-1\t{}".format(self.num_synapses_IE),
               file=self.weights_fh_IE)
         self.weights_fh_IE.close()
 
