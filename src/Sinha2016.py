@@ -231,6 +231,7 @@ class Sinha2016:
         locations = []
         if self.rank == 0:
             loc_file = open("00-locations-E.txt", 'w')
+            print("gid\tcol\trow\txcor\tycor", file=loc_file, flush=True)
         for neuron in self.neuronsE:
             row = int((neuron - self.neuronsE[0])/self.colsE)
             y = random.gauss(row * self.neuronal_distE, self.location_sd)
@@ -247,6 +248,7 @@ class Sinha2016:
         # neurons
         if self.rank == 0:
             loc_file = open("00-locations-I.txt", 'w')
+            print("gid\tcol\trow\txcor\tycor", file=loc_file, flush=True)
         for neuron in self.neuronsI:
             row = int((neuron - self.neuronsI[0])/self.colsI)
             y = self.neuronal_distI/4 + random.gauss(
@@ -299,6 +301,7 @@ class Sinha2016:
         if self.rank == 0:
             # excitatory neurons
             with open("00-locations-p_lpz_E.txt", 'w') as f1:
+                print("gid\txcor\tycor", file=f1, flush=True)
                 for neuron in self.p_lpz_neurons_E:
                     nrnindex = neuron - self.neuronsE[0]
                     print("{}\t{}\t{}".format(
@@ -307,6 +310,7 @@ class Sinha2016:
                         self.location_tree.data[nrnindex][1]),
                         file=f1)
             with open("00-locations-lpz_c_E.txt", 'w') as f2:
+                print("gid\txcor\tycor", file=f2, flush=True)
                 for neuron in self.lpz_c_neurons_E:
                     nrnindex = neuron - self.neuronsE[0]
                     print("{}\t{}\t{}".format(
@@ -315,6 +319,7 @@ class Sinha2016:
                         self.location_tree.data[nrnindex][1]),
                         file=f2)
             with open("00-locations-lpz_b_E.txt", 'w') as f3:
+                print("gid\txcor\tycor", file=f3, flush=True)
                 for neuron in self.lpz_b_neurons_E:
                     nrnindex = neuron - self.neuronsE[0]
                     print("{}\t{}\t{}".format(
@@ -323,6 +328,7 @@ class Sinha2016:
                         self.location_tree.data[nrnindex][1]),
                         file=f3)
             with open("00-locations-p_lpz_I.txt", 'w') as f1:
+                print("gid\txcor\tycor", file=f1, flush=True)
                 for neuron in self.p_lpz_neurons_I:
                     nrnindex = neuron + self.neuronsE[-1] - self.neuronsI[0]
                     print("{}\t{}\t{}".format(
@@ -331,6 +337,7 @@ class Sinha2016:
                         self.location_tree.data[nrnindex][1]),
                         file=f1)
             with open("00-locations-lpz_c_I.txt", 'w') as f2:
+                print("gid\txcor\tycor", file=f2, flush=True)
                 for neuron in self.lpz_c_neurons_I:
                     nrnindex = neuron + self.neuronsE[-1] - self.neuronsI[0]
                     print("{}\t{}\t{}".format(
@@ -339,6 +346,7 @@ class Sinha2016:
                         self.location_tree.data[nrnindex][1]),
                         file=f2)
             with open("00-locations-lpz_b_I.txt", 'w') as f3:
+                print("gid\txcor\tycor", file=f3, flush=True)
                 for neuron in self.lpz_b_neurons_I:
                     nrnindex = neuron + self.neuronsE[-1] - self.neuronsI[0]
                     print("{}\t{}\t{}".format(
@@ -1726,6 +1734,7 @@ class Sinha2016:
             fn = "00-pattern-neurons-{}.txt".format(
                 self.pattern_count)
             with open(fn, 'w') as fh:
+                print("gid\txcor\tycor", file=fh, flush=True)
                 for neuron in pattern_neurons:
                     print("{}\t{}\t{}".format(
                         neuron,
@@ -1738,6 +1747,7 @@ class Sinha2016:
                 self.pattern_count)
 
             with open(fn, 'w') as fh:
+                print("gid\txcor\tycor", file=fh, flush=True)
                 for neuron in background_neurons:
                     print("{}\t{}\t{}".format(
                         neuron,
@@ -1883,6 +1893,7 @@ class Sinha2016:
                          str(self.rank) + "-" + current_simtime +
                          ".txt")
         with open(ca_fn_lpz_c_E, 'w') as f:
+            print("gid\tCa_conc", file=f, flush=True)
             allinfo = [[stat['global_id'], stat['Ca']] for
                        stat in nest.GetStatus(self.lpz_c_neurons_E) if
                        stat['local']]
@@ -1893,6 +1904,7 @@ class Sinha2016:
                          str(self.rank) + "-" + current_simtime +
                          ".txt")
         with open(ca_fn_lpz_b_E, 'w') as f:
+            print("gid\tCa_conc", file=f, flush=True)
             allinfo = [[stat['global_id'], stat['Ca']] for
                        stat in nest.GetStatus(self.lpz_b_neurons_E) if
                        stat['local']]
@@ -1903,6 +1915,7 @@ class Sinha2016:
                          str(self.rank) + "-" + current_simtime +
                          ".txt")
         with open(ca_fn_p_lpz_E, 'w') as f:
+            print("gid\tCa_conc", file=f, flush=True)
             allinfo = [[stat['global_id'], stat['Ca']] for
                        stat in nest.GetStatus(self.p_lpz_neurons_E) if
                        stat['local']]
@@ -1913,6 +1926,7 @@ class Sinha2016:
                          str(self.rank) + "-" + current_simtime +
                          ".txt")
         with open(ca_fn_lpz_c_I, 'w') as f:
+            print("gid\tCa_conc", file=f, flush=True)
             allinfo = [[stat['global_id'], stat['Ca']] for
                        stat in nest.GetStatus(self.lpz_c_neurons_I) if
                        stat['local']]
@@ -1923,6 +1937,7 @@ class Sinha2016:
                          str(self.rank) + "-" + current_simtime +
                          ".txt")
         with open(ca_fn_lpz_b_I, 'w') as f:
+            print("gid\tCa_conc", file=f, flush=True)
             allinfo = [[stat['global_id'], stat['Ca']] for
                        stat in nest.GetStatus(self.lpz_b_neurons_I) if
                        stat['local']]
@@ -1933,6 +1948,7 @@ class Sinha2016:
                          str(self.rank) + "-" + current_simtime +
                          ".txt")
         with open(ca_fn_p_lpz_I, 'w') as f:
+            print("gid\tCa_conc", file=f, flush=True)
             allinfo = [[stat['global_id'], stat['Ca']] for
                        stat in nest.GetStatus(self.p_lpz_neurons_I) if
                        stat['local']]
@@ -1952,6 +1968,12 @@ class Sinha2016:
                 + ".txt"
             )
             with open(se_fn_lpz_c_E, 'w') as f:
+                print("{}\t{}\t{}\t{}\t{}\t{}\t{}".format(
+                    "gid",
+                    "axons", "axons_conn",
+                    "dendrites_ex", "dendrites_ex_conn",
+                    "dendrites_in", "dendrites_in_conn"),
+                    file=f)
                 allinfo = [[stat['global_id'], stat['synaptic_elements']] for
                            stat in nest.GetStatus(self.lpz_c_neurons_E) if
                            stat['local']]
@@ -1976,6 +1998,12 @@ class Sinha2016:
                 + ".txt"
             )
             with open(se_fn_lpz_b_E, 'w') as f:
+                print("{}\t{}\t{}\t{}\t{}\t{}\t{}".format(
+                    "gid",
+                    "axons", "axons_conn",
+                    "dendrites_ex", "dendrites_ex_conn",
+                    "dendrites_in", "dendrites_in_conn"),
+                    file=f)
                 allinfo = [[stat['global_id'], stat['synaptic_elements']] for
                            stat in nest.GetStatus(self.lpz_b_neurons_E) if
                            stat['local']]
@@ -2000,6 +2028,12 @@ class Sinha2016:
                 + ".txt"
             )
             with open(se_fn_p_lpz_E, 'w') as f:
+                print("{}\t{}\t{}\t{}\t{}\t{}\t{}".format(
+                    "gid",
+                    "axons", "axons_conn",
+                    "dendrites_ex", "dendrites_ex_conn",
+                    "dendrites_in", "dendrites_in_conn"),
+                    file=f)
                 allinfo = [[stat['global_id'], stat['synaptic_elements']] for
                            stat in nest.GetStatus(self.p_lpz_neurons_E) if
                            stat['local']]
@@ -2025,6 +2059,12 @@ class Sinha2016:
                 + ".txt"
             )
             with open(se_fn_lpz_c_I, 'w') as f:
+                print("{}\t{}\t{}\t{}\t{}\t{}\t{}".format(
+                    "gid",
+                    "axons", "axons_conn",
+                    "dendrites_ex", "dendrites_ex_conn",
+                    "dendrites_in", "dendrites_in_conn"),
+                    file=f)
                 allinfo = [[stat['global_id'], stat['synaptic_elements']] for
                            stat in nest.GetStatus(self.lpz_c_neurons_I) if
                            stat['local']]
@@ -2049,6 +2089,12 @@ class Sinha2016:
                 + ".txt"
             )
             with open(se_fn_lpz_b_I, 'w') as f:
+                print("{}\t{}\t{}\t{}\t{}\t{}\t{}".format(
+                    "gid",
+                    "axons", "axons_conn",
+                    "dendrites_ex", "dendrites_ex_conn",
+                    "dendrites_in", "dendrites_in_conn"),
+                    file=f)
                 allinfo = [[stat['global_id'], stat['synaptic_elements']] for
                            stat in nest.GetStatus(self.lpz_b_neurons_I) if
                            stat['local']]
@@ -2073,6 +2119,12 @@ class Sinha2016:
                 + ".txt"
             )
             with open(se_fn_p_lpz_I, 'w') as f:
+                print("{}\t{}\t{}\t{}\t{}\t{}\t{}".format(
+                    "gid",
+                    "axons", "axons_conn",
+                    "dendrites_ex", "dendrites_ex_conn",
+                    "dendrites_in", "dendrites_in_conn"),
+                    file=f)
                 allinfo = [[stat['global_id'], stat['synaptic_elements']] for
                            stat in nest.GetStatus(self.p_lpz_neurons_I) if
                            stat['local']]
