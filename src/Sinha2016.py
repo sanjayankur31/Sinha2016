@@ -230,7 +230,7 @@ class Sinha2016:
         # Generate a grid and construct a cKDTree
         locations = []
         if self.rank == 0:
-            loc_file = open("00-neuron-locations-E.txt", 'w')
+            loc_file = open("00-locations-E.txt", 'w')
         for neuron in self.neuronsE:
             row = int((neuron - self.neuronsE[0])/self.colsE)
             y = random.gauss(row * self.neuronal_distE, self.location_sd)
@@ -246,7 +246,7 @@ class Sinha2016:
         # I neurons have an intiail offset to distribute them evenly between E
         # neurons
         if self.rank == 0:
-            loc_file = open("00-neuron-locations-I.txt", 'w')
+            loc_file = open("00-locations-I.txt", 'w')
         for neuron in self.neuronsI:
             row = int((neuron - self.neuronsI[0])/self.colsI)
             y = self.neuronal_distI/4 + random.gauss(
