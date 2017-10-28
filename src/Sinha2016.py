@@ -662,7 +662,7 @@ class Sinha2016:
             "01-synaptic-weights-EE-" + str(self.rank) + ".txt")
         self.weights_fh_EE = open(
             self.synaptic_p_weights_fn_EE, 'w')
-        print("{},{}".format(
+        print("{}\t{}".format(
             "time(ms)", "EE(nS)"),
             file=self.weights_fh_EE, flush=True)
 
@@ -670,7 +670,7 @@ class Sinha2016:
             "01-synaptic-weights-EI-" + str(self.rank) + ".txt")
         self.weights_fh_EI = open(
             self.synaptic_p_weights_fn_EI, 'w')
-        print("{},{}".format(
+        print("{}\t{}".format(
             "time(ms)", "EI(nS)"),
             file=self.weights_fh_EI, flush=True)
 
@@ -678,7 +678,7 @@ class Sinha2016:
             "01-synaptic-weights-II-" + str(self.rank) + ".txt")
         self.weights_fh_II = open(
             self.synaptic_p_weights_fn_II, 'w')
-        print("{},{}".format(
+        print("{}\t{}".format(
             "time(ms)", "II(nS)"),
             file=self.weights_fh_II, flush=True)
 
@@ -686,7 +686,7 @@ class Sinha2016:
             "01-synaptic-weights-IE-" + str(self.rank) + ".txt")
         self.weights_fh_IE = open(
             self.synaptic_p_weights_fn_IE, 'w')
-        print("{},{}".format(
+        print("{}\t{}".format(
             "time(ms)", "IE(nS)"),
             file=self.weights_fh_IE, flush=True)
 
@@ -2157,9 +2157,9 @@ class Sinha2016:
         conns = nest.GetConnections(target=self.neuronsE,
                                     source=self.neuronsI)
         weightsIE = nest.GetStatus(conns, "weight")
-        print("{}, {}".format(
+        print("{}\t{}".format(
             current_simtime,
-            str(weightsIE).strip('[]').strip('()')),
+            str(weightsIE).strip('[]').strip('()').replace(', ', '\t')),
             file=self.weights_fh_IE)
         if len(weightsIE) > self.num_synapses_IE:
             self.num_synapses_IE = len(weightsIE)
@@ -2167,9 +2167,9 @@ class Sinha2016:
         conns = nest.GetConnections(target=self.neuronsI,
                                     source=self.neuronsI)
         weightsII = nest.GetStatus(conns, "weight")
-        print("{}, {}".format(
+        print("{}\t{}".format(
             current_simtime,
-            str(weightsII).strip('[]').strip('()')),
+            str(weightsII).strip('[]').strip('()').replace(', ', '\t')),
             file=self.weights_fh_II)
         if len(weightsII) > self.num_synapses_II:
             self.num_synapses_II = len(weightsII)
@@ -2177,9 +2177,9 @@ class Sinha2016:
         conns = nest.GetConnections(target=self.neuronsI,
                                     source=self.neuronsE)
         weightsEI = nest.GetStatus(conns, "weight")
-        print("{}, {}".format(
+        print("{}\t{}".format(
             current_simtime,
-            str(weightsEI).strip('[]').strip('()')),
+            str(weightsEI).strip('[]').strip('()').replace(', ', '\t')),
             file=self.weights_fh_EI)
         if len(weightsEI) > self.num_synapses_EI:
             self.num_synapses_EI = len(weightsEI)
@@ -2187,9 +2187,9 @@ class Sinha2016:
         conns = nest.GetConnections(target=self.neuronsE,
                                     source=self.neuronsE)
         weightsEE = nest.GetStatus(conns, "weight")
-        print("{}, {}".format(
+        print("{}\t{}".format(
             current_simtime,
-            str(weightsEE).strip('[]').strip('()')),
+            str(weightsEE).strip('[]').strip('()').replace(', ', '\t')),
             file=self.weights_fh_EE)
         if len(weightsEE) > self.num_synapses_EE:
             self.num_synapses_EE = len(weightsEE)
@@ -2205,18 +2205,18 @@ class Sinha2016:
         """Close all files when the simulation is finished."""
         logging.debug("Rank {}: Closing open files".format(self.rank))
         # Comma printed so that pandas can read it as a dataframe point
-        print("{},".format(self.num_synapses_EE),
+        print("{}\t".format(self.num_synapses_EE),
               file=self.weights_fh_EE)
         self.weights_fh_EE.close()
 
-        print("{},".format(self.num_synapses_EI),
+        print("{}\t".format(self.num_synapses_EI),
               file=self.weights_fh_EI)
         self.weights_fh_EI.close()
-        print("{},".format(self.num_synapses_II),
+        print("{}\t".format(self.num_synapses_II),
               file=self.weights_fh_II)
         self.weights_fh_II.close()
 
-        print("{},".format(self.num_synapses_IE),
+        print("{}\t".format(self.num_synapses_IE),
               file=self.weights_fh_IE)
         self.weights_fh_IE.close()
 
