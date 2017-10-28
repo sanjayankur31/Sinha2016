@@ -298,7 +298,7 @@ class Sinha2016:
 
         if self.rank == 0:
             # excitatory neurons
-            with open("00-peri-lpz-neuron-locations-E.txt", 'w') as f1:
+            with open("00-locations-p_lpz_E.txt", 'w') as f1:
                 for neuron in self.p_lpz_neurons_E:
                     nrnindex = neuron - self.neuronsE[0]
                     print("{}\t{}\t{}".format(
@@ -306,7 +306,7 @@ class Sinha2016:
                         self.location_tree.data[nrnindex][0],
                         self.location_tree.data[nrnindex][1]),
                         file=f1)
-            with open("00-lpz-centre-neuron-locations-E.txt", 'w') as f2:
+            with open("00-locations-lpz_c_E.txt", 'w') as f2:
                 for neuron in self.lpz_c_neurons_E:
                     nrnindex = neuron - self.neuronsE[0]
                     print("{}\t{}\t{}".format(
@@ -314,7 +314,7 @@ class Sinha2016:
                         self.location_tree.data[nrnindex][0],
                         self.location_tree.data[nrnindex][1]),
                         file=f2)
-            with open("00-lpz-border-neuron-locations-E.txt", 'w') as f3:
+            with open("00-locations-lpz_b_E.txt", 'w') as f3:
                 for neuron in self.lpz_b_neurons_E:
                     nrnindex = neuron - self.neuronsE[0]
                     print("{}\t{}\t{}".format(
@@ -322,7 +322,7 @@ class Sinha2016:
                         self.location_tree.data[nrnindex][0],
                         self.location_tree.data[nrnindex][1]),
                         file=f3)
-            with open("00-peri-lpz-neuron-locations-I.txt", 'w') as f1:
+            with open("00-locations-p_lpz_I.txt", 'w') as f1:
                 for neuron in self.p_lpz_neurons_I:
                     nrnindex = neuron + self.neuronsE[-1] - self.neuronsI[0]
                     print("{}\t{}\t{}".format(
@@ -330,7 +330,7 @@ class Sinha2016:
                         self.location_tree.data[nrnindex][0],
                         self.location_tree.data[nrnindex][1]),
                         file=f1)
-            with open("00-lpz-centre-neuron-locations-I.txt", 'w') as f2:
+            with open("00-locations-lpz_c_I.txt", 'w') as f2:
                 for neuron in self.lpz_c_neurons_I:
                     nrnindex = neuron + self.neuronsE[-1] - self.neuronsI[0]
                     print("{}\t{}\t{}".format(
@@ -338,7 +338,7 @@ class Sinha2016:
                         self.location_tree.data[nrnindex][0],
                         self.location_tree.data[nrnindex][1]),
                         file=f2)
-            with open("00-lpz-border-neuron-locations-I.txt", 'w') as f3:
+            with open("00-locations-lpz_b_I.txt", 'w') as f3:
                 for neuron in self.lpz_b_neurons_I:
                     nrnindex = neuron + self.neuronsE[-1] - self.neuronsI[0]
                     print("{}\t{}\t{}".format(
