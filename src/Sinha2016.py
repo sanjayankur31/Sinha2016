@@ -639,7 +639,7 @@ class Sinha2016:
         self.sd_lpz_b_I = nest.Create('spike_detector',
                                       params=self.sd_params_lpz_b_I)
         self.sd_p_lpz_I = nest.Create('spike_detector',
-                                      params=self.sd_params_p_lpz_E)
+                                      params=self.sd_params_p_lpz_I)
 
         nest.Connect(self.lpz_c_neurons_E, self.sd_lpz_c_E)
         nest.Connect(self.lpz_b_neurons_E, self.sd_lpz_b_E)
