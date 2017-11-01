@@ -796,6 +796,22 @@ class Sinha2016:
                     "time(ms)", "gid", "conns_gained"),
                     file=self.syn_new_fh_p_lpz_E, flush=True)
 
+                self.syn_del_fn_o_E = (
+                    "04-synapses-deleted-o_E-" + str(self.rank) + ".txt")
+                self.syn_del_fh_o_E = open(
+                    self.syn_del_fn_o_E, 'w')
+                print("{}\t{}\t{}\t{}".format(
+                    "time(ms)", "gid", "total_conns", "conns_deleted"),
+                    file=self.syn_del_fh_o_E, flush=True)
+
+                self.syn_new_fn_o_E = (
+                    "04-synapses-formed-o_E-" + str(self.rank) + ".txt")
+                self.syn_new_fh_o_E = open(
+                    self.syn_new_fn_o_E, 'w')
+                print("{}\t{}\t{}".format(
+                    "time(ms)", "gid", "conns_gained"),
+                    file=self.syn_new_fh_o_E, flush=True)
+
                 # inhibitory neurons
                 self.syn_del_fn_lpz_c_I = (
                     "04-synapses-deleted-lpz_c_I-" + str(self.rank) + ".txt")
@@ -844,6 +860,22 @@ class Sinha2016:
                 print("{}\t{}\t{}".format(
                     "time(ms)", "gid", "conns_gained"),
                     file=self.syn_new_fh_p_lpz_I, flush=True)
+
+                self.syn_del_fn_o_I = (
+                    "04-synapses-deleted-o_I-" + str(self.rank) + ".txt")
+                self.syn_del_fh_o_I = open(
+                    self.syn_del_fn_o_I, 'w')
+                print("{}\t{}\t{}\t{}".format(
+                    "time(ms)", "gid", "total_conns", "conns_deleted"),
+                    file=self.syn_del_fh_o_I, flush=True)
+
+                self.syn_new_fn_o_I = (
+                    "04-synapses-formed-o_I-" + str(self.rank) + ".txt")
+                self.syn_new_fh_o_I = open(
+                    self.syn_new_fn_o_I, 'w')
+                print("{}\t{}\t{}".format(
+                    "time(ms)", "gid", "conns_gained"),
+                    file=self.syn_new_fh_o_I, flush=True)
 
     def setup_plasticity(self, structural_p=True, synaptic_p=True):
         """Control plasticities."""
@@ -1155,9 +1187,11 @@ class Sinha2016:
         syn_del_lpz_c_E = 0
         syn_del_lpz_b_E = 0
         syn_del_p_lpz_E = 0
+        syn_del_o_E = 0
         syn_del_lpz_c_I = 0
         syn_del_lpz_b_I = 0
         syn_del_p_lpz_I = 0
+        syn_del_o_I = 0
         current_sim_time = (str(nest.GetKernelStatus()['time']))
         # the order in which these are removed should not matter - whether we
         # remove connections using axons first or dendrites first, the end
@@ -1326,6 +1360,9 @@ class Sinha2016:
                         elif gid in self.p_lpz_neurons_E:
                             fh = self.syn_del_fh_p_lpz_E
                             syn_del_p_lpz_E += syn_del_this_gid
+                        elif gid in self.o_neurons_E:
+                            fh = self.syn_del_fh_o_E
+                            syn_del_o_E += syn_del_this_gid
                         elif gid in self.lpz_c_neurons_I:
                             fh = self.syn_del_fh_lpz_c_I
                             syn_del_lpz_c_I += syn_del_this_gid
@@ -1335,6 +1372,9 @@ class Sinha2016:
                         elif gid in self.p_lpz_neurons_I:
                             fh = self.syn_del_fh_p_lpz_I
                             syn_del_p_lpz_I += syn_del_this_gid
+                        elif gid in self.o_neurons_I:
+                            fh = self.syn_del_fh_o_I
+                            syn_del_o_I += syn_del_this_gid
 
                         print("{}\t{}\t{}\t{}".format(
                             current_sim_time, gid, total_synapses_this_gid,
@@ -1357,7 +1397,8 @@ class Sinha2016:
             "{} of {} connections deleted from pre".format(
                 (syn_del_lpz_c_E + syn_del_lpz_b_E +
                  syn_del_p_lpz_E + syn_del_lpz_c_I +
-                 syn_del_lpz_b_I + syn_del_p_lpz_I),
+                 syn_del_lpz_b_I + syn_del_p_lpz_I +
+                 syn_del_o_E + syn_del_o_I),
                 total_synapses))
 
     def __delete_connections_from_post(self, synelms):
@@ -1369,9 +1410,11 @@ class Sinha2016:
         syn_del_lpz_c_E = 0
         syn_del_lpz_b_E = 0
         syn_del_p_lpz_E = 0
+        syn_del_o_E = 0
         syn_del_lpz_c_I = 0
         syn_del_lpz_b_I = 0
         syn_del_p_lpz_I = 0
+        syn_del_o_I = 0
         current_sim_time = (str(nest.GetKernelStatus()['time']))
         # excitatory dendrites as targets
         # weight dependent deletion doesn't apply - all synapses have
@@ -1546,6 +1589,9 @@ class Sinha2016:
                         elif gid in self.p_lpz_neurons_E:
                             fh = self.syn_del_fh_p_lpz_E
                             syn_del_p_lpz_E += syn_del_this_gid
+                        elif gid in self.o_neurons_E:
+                            fh = self.syn_del_fh_o_E
+                            syn_del_o_E += syn_del_this_gid
                         elif gid in self.lpz_c_neurons_I:
                             fh = self.syn_del_fh_lpz_c_I
                             syn_del_lpz_c_I += syn_del_this_gid
@@ -1555,6 +1601,9 @@ class Sinha2016:
                         elif gid in self.p_lpz_neurons_I:
                             fh = self.syn_del_fh_p_lpz_I
                             syn_del_p_lpz_I += syn_del_this_gid
+                        elif gid in self.o_neurons_I:
+                            fh = self.syn_del_fh_o_I
+                            syn_del_o_I += syn_del_this_gid
 
                         print("{}\t{}\t{}\t{}".format(
                             current_sim_time, gid, total_synapses_this_gid,
@@ -1577,7 +1626,8 @@ class Sinha2016:
             "{} of {} connections deleted from post".format(
                 (syn_del_lpz_c_E + syn_del_lpz_b_E +
                  syn_del_p_lpz_E + syn_del_lpz_c_I +
-                 syn_del_lpz_b_I + syn_del_p_lpz_I),
+                 syn_del_lpz_b_I + syn_del_p_lpz_I +
+                 syn_del_o_E + syn_del_o_I),
                 total_synapses))
 
     def __get_form_part_d(self, source, options, num_required):
@@ -1606,9 +1656,11 @@ class Sinha2016:
         syn_new_lpz_c_E = 0
         syn_new_lpz_b_E = 0
         syn_new_p_lpz_E = 0
+        syn_new_o_E = 0
         syn_new_lpz_c_I = 0
         syn_new_lpz_b_I = 0
         syn_new_p_lpz_I = 0
+        syn_new_o_I = 0
         current_sim_time = (str(nest.GetKernelStatus()['time']))
         for nrn in (self.neuronsE + self.neuronsI):
             syn_new_this_gid = 0
@@ -1724,6 +1776,9 @@ class Sinha2016:
                     elif gid in self.p_lpz_neurons_E:
                         fh = self.syn_new_fh_p_lpz_E
                         syn_new_p_lpz_E += syn_new_this_gid
+                    elif gid in self.o_neurons_E:
+                        fh = self.syn_new_fh_o_E
+                        syn_new_o_E += syn_new_this_gid
                     elif gid in self.lpz_c_neurons_I:
                         fh = self.syn_new_fh_lpz_c_I
                         syn_new_lpz_c_I += syn_new_this_gid
@@ -1733,6 +1788,9 @@ class Sinha2016:
                     elif gid in self.p_lpz_neurons_I:
                         fh = self.syn_new_fh_p_lpz_I
                         syn_new_p_lpz_I += syn_new_this_gid
+                    elif gid in self.o_neurons_I:
+                        fh = self.syn_new_fh_o_I
+                        syn_new_o_I += syn_new_this_gid
 
                     print("{}\t{}\t{}".format(
                         current_sim_time, gid,
@@ -1744,7 +1802,8 @@ class Sinha2016:
                 "{} new connections created".format(
                     (syn_new_lpz_c_E + syn_new_lpz_b_E +
                      syn_new_p_lpz_E + syn_new_lpz_c_I +
-                     syn_new_lpz_b_I + syn_new_p_lpz_I)))
+                     syn_new_lpz_b_I + syn_new_p_lpz_I +
+                     syn_new_o_E + syn_new_o_I)))
 
     def update_connectivity(self):
         """Our implementation of structural plasticity."""
@@ -2302,15 +2361,19 @@ class Sinha2016:
                 self.syn_new_fh_lpz_c_E.close()
                 self.syn_new_fh_lpz_b_E.close()
                 self.syn_new_fh_p_lpz_E.close()
+                self.syn_new_fh_o_E.close()
                 self.syn_del_fh_lpz_c_E.close()
                 self.syn_del_fh_lpz_b_E.close()
                 self.syn_del_fh_p_lpz_E.close()
+                self.syn_del_fh_o_E.close()
                 self.syn_new_fh_lpz_c_I.close()
                 self.syn_new_fh_lpz_b_I.close()
                 self.syn_new_fh_p_lpz_I.close()
+                self.syn_new_fh_o_I.close()
                 self.syn_del_fh_lpz_c_I.close()
                 self.syn_del_fh_lpz_b_I.close()
                 self.syn_del_fh_p_lpz_I.close()
+                self.syn_del_fh_o_I.close()
 
     def enable_rewiring(self):
         """Enable the rewiring."""
