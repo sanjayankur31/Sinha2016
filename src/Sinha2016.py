@@ -1101,7 +1101,7 @@ class Sinha2016:
         syn_del_lpz_c_I = 0
         syn_del_lpz_b_I = 0
         syn_del_p_lpz_I = 0
-        current_simtime = (str(nest.GetKernelStatus()['time']))
+        current_sim_time = (str(nest.GetKernelStatus()['time']))
         # the order in which these are removed should not matter - whether we
         # remove connections using axons first or dendrites first, the end
         # state of the network should be the same.
@@ -1280,7 +1280,7 @@ class Sinha2016:
                             syn_del_p_lpz_I += syn_del_this_gid
 
                         print("{}\t{}\t{}\t{}".format(
-                            current_simtime, gid, total_synapses_this_gid,
+                            current_sim_time, gid, total_synapses_this_gid,
                             syn_del_this_gid),
                             file=fh)
 
@@ -1315,7 +1315,7 @@ class Sinha2016:
         syn_del_lpz_c_I = 0
         syn_del_lpz_b_I = 0
         syn_del_p_lpz_I = 0
-        current_simtime = (str(nest.GetKernelStatus()['time']))
+        current_sim_time = (str(nest.GetKernelStatus()['time']))
         # excitatory dendrites as targets
         # weight dependent deletion doesn't apply - all synapses have
         # same weight
@@ -1500,7 +1500,7 @@ class Sinha2016:
                             syn_del_p_lpz_I += syn_del_this_gid
 
                         print("{}\t{}\t{}\t{}".format(
-                            current_simtime, gid, total_synapses_this_gid,
+                            current_sim_time, gid, total_synapses_this_gid,
                             syn_del_this_gid),
                             file=fh)
 
@@ -1552,7 +1552,7 @@ class Sinha2016:
         syn_new_lpz_c_I = 0
         syn_new_lpz_b_I = 0
         syn_new_p_lpz_I = 0
-        current_simtime = (str(nest.GetKernelStatus()['time']))
+        current_sim_time = (str(nest.GetKernelStatus()['time']))
         for nrn in (self.neuronsE + self.neuronsI):
             syn_new_this_gid = 0
             total_options_this_gid = 0
@@ -1678,7 +1678,7 @@ class Sinha2016:
                         syn_new_p_lpz_I += syn_new_this_gid
 
                     print("{}\t{}\t{}".format(
-                        current_simtime, gid,
+                        current_sim_time, gid,
                         syn_new_this_gid),
                         file=fh)
 
@@ -1907,9 +1907,9 @@ class Sinha2016:
 
     def __dump_ca_concentration(self):
         """Dump calcium concentration."""
-        current_simtime = (str(nest.GetKernelStatus()['time']))
+        current_sim_time = (str(nest.GetKernelStatus()['time']))
         ca_fn_lpz_c_E = ("02-calcium-lpz_c_E-" +
-                         str(self.rank) + "-" + current_simtime +
+                         str(self.rank) + "-" + current_sim_time +
                          ".txt")
         with open(ca_fn_lpz_c_E, 'w') as f:
             print("gid\tCa_conc", file=f, flush=True)
@@ -1920,7 +1920,7 @@ class Sinha2016:
                 print("{}\t{}".format(info[0], info[1]), file=f)
 
         ca_fn_lpz_b_E = ("02-calcium-lpz_b_E-" +
-                         str(self.rank) + "-" + current_simtime +
+                         str(self.rank) + "-" + current_sim_time +
                          ".txt")
         with open(ca_fn_lpz_b_E, 'w') as f:
             print("gid\tCa_conc", file=f, flush=True)
@@ -1931,7 +1931,7 @@ class Sinha2016:
                 print("{}\t{}".format(info[0], info[1]), file=f)
 
         ca_fn_p_lpz_E = ("02-calcium-p_lpz_E-" +
-                         str(self.rank) + "-" + current_simtime +
+                         str(self.rank) + "-" + current_sim_time +
                          ".txt")
         with open(ca_fn_p_lpz_E, 'w') as f:
             print("gid\tCa_conc", file=f, flush=True)
@@ -1942,7 +1942,7 @@ class Sinha2016:
                 print("{}\t{}".format(info[0], info[1]), file=f)
         # I neurons
         ca_fn_lpz_c_I = ("02-calcium-lpz_c_I-" +
-                         str(self.rank) + "-" + current_simtime +
+                         str(self.rank) + "-" + current_sim_time +
                          ".txt")
         with open(ca_fn_lpz_c_I, 'w') as f:
             print("gid\tCa_conc", file=f, flush=True)
@@ -1953,7 +1953,7 @@ class Sinha2016:
                 print("{}\t{}".format(info[0], info[1]), file=f)
 
         ca_fn_lpz_b_I = ("02-calcium-lpz_b_I-" +
-                         str(self.rank) + "-" + current_simtime +
+                         str(self.rank) + "-" + current_sim_time +
                          ".txt")
         with open(ca_fn_lpz_b_I, 'w') as f:
             print("gid\tCa_conc", file=f, flush=True)
@@ -1964,7 +1964,7 @@ class Sinha2016:
                 print("{}\t{}".format(info[0], info[1]), file=f)
 
         ca_fn_p_lpz_I = ("02-calcium-p_lpz_I-" +
-                         str(self.rank) + "-" + current_simtime +
+                         str(self.rank) + "-" + current_sim_time +
                          ".txt")
         with open(ca_fn_p_lpz_I, 'w') as f:
             print("gid\tCa_conc", file=f, flush=True)
@@ -1981,9 +1981,9 @@ class Sinha2016:
         neuronid    ax_total    ax_connected    den_ex_total ...
         """
         if self.is_str_p_enabled:
-            current_simtime = (str(nest.GetKernelStatus()['time']))
+            current_sim_time = (str(nest.GetKernelStatus()['time']))
             se_fn_lpz_c_E = (
-                "05-se-lpz_c_E-" + str(self.rank) + "-" + current_simtime
+                "05-se-lpz_c_E-" + str(self.rank) + "-" + current_sim_time
                 + ".txt"
             )
             with open(se_fn_lpz_c_E, 'w') as f:
@@ -2013,7 +2013,7 @@ class Sinha2016:
                         file=f)
 
             se_fn_lpz_b_E = (
-                "05-se-lpz_b_E-" + str(self.rank) + "-" + current_simtime
+                "05-se-lpz_b_E-" + str(self.rank) + "-" + current_sim_time
                 + ".txt"
             )
             with open(se_fn_lpz_b_E, 'w') as f:
@@ -2043,7 +2043,7 @@ class Sinha2016:
                         file=f)
 
             se_fn_p_lpz_E = (
-                "05-se-p_lpz_E-" + str(self.rank) + "-" + current_simtime
+                "05-se-p_lpz_E-" + str(self.rank) + "-" + current_sim_time
                 + ".txt"
             )
             with open(se_fn_p_lpz_E, 'w') as f:
@@ -2074,7 +2074,7 @@ class Sinha2016:
 
             # inhibitory neurons
             se_fn_lpz_c_I = (
-                "05-se-lpz_c_I-" + str(self.rank) + "-" + current_simtime
+                "05-se-lpz_c_I-" + str(self.rank) + "-" + current_sim_time
                 + ".txt"
             )
             with open(se_fn_lpz_c_I, 'w') as f:
@@ -2104,7 +2104,7 @@ class Sinha2016:
                         file=f)
 
             se_fn_lpz_b_I = (
-                "05-se-lpz_b_I-" + str(self.rank) + "-" + current_simtime
+                "05-se-lpz_b_I-" + str(self.rank) + "-" + current_sim_time
                 + ".txt"
             )
             with open(se_fn_lpz_b_I, 'w') as f:
@@ -2134,7 +2134,7 @@ class Sinha2016:
                         file=f)
 
             se_fn_p_lpz_I = (
-                "05-se-p_lpz_I-" + str(self.rank) + "-" + current_simtime
+                "05-se-p_lpz_I-" + str(self.rank) + "-" + current_sim_time
                 + ".txt"
             )
             with open(se_fn_p_lpz_I, 'w') as f:
@@ -2171,13 +2171,13 @@ class Sinha2016:
 
         http://www.nest-simulator.org/cc/GetConnections/
         """
-        current_simtime = (str(nest.GetKernelStatus()['time']))
+        current_sim_time = (str(nest.GetKernelStatus()['time']))
 
         conns = nest.GetConnections(target=self.neuronsE,
                                     source=self.neuronsI)
         weightsIE = nest.GetStatus(conns, "weight")
         print("{}\t{}".format(
-            current_simtime,
+            current_sim_time,
             str(weightsIE).strip('[]').strip('()').replace(', ', '\t')),
             file=self.weights_fh_IE)
         if len(weightsIE) > self.num_synapses_IE:
@@ -2187,7 +2187,7 @@ class Sinha2016:
                                     source=self.neuronsI)
         weightsII = nest.GetStatus(conns, "weight")
         print("{}\t{}".format(
-            current_simtime,
+            current_sim_time,
             str(weightsII).strip('[]').strip('()').replace(', ', '\t')),
             file=self.weights_fh_II)
         if len(weightsII) > self.num_synapses_II:
@@ -2197,7 +2197,7 @@ class Sinha2016:
                                     source=self.neuronsE)
         weightsEI = nest.GetStatus(conns, "weight")
         print("{}\t{}".format(
-            current_simtime,
+            current_sim_time,
             str(weightsEI).strip('[]').strip('()').replace(', ', '\t')),
             file=self.weights_fh_EI)
         if len(weightsEI) > self.num_synapses_EI:
@@ -2207,7 +2207,7 @@ class Sinha2016:
                                     source=self.neuronsE)
         weightsEE = nest.GetStatus(conns, "weight")
         print("{}\t{}".format(
-            current_simtime,
+            current_sim_time,
             str(weightsEE).strip('[]').strip('()').replace(', ', '\t')),
             file=self.weights_fh_EE)
         if len(weightsEE) > self.num_synapses_EE:
