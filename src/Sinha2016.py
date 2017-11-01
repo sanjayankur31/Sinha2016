@@ -2050,6 +2050,18 @@ class Sinha2016:
                        stat['local']]
             for info in allinfo:
                 print("{}\t{}".format(info[0], info[1]), file=f)
+
+        ca_fn_o_E = ("02-calcium-o_E-" +
+                     str(self.rank) + "-" + current_sim_time +
+                     ".txt")
+        with open(ca_fn_o_E, 'w') as f:
+            print("gid\tCa_conc", file=f, flush=True)
+            allinfo = [[stat['global_id'], stat['Ca']] for
+                       stat in nest.GetStatus(self.o_neurons_E) if
+                       stat['local']]
+            for info in allinfo:
+                print("{}\t{}".format(info[0], info[1]), file=f)
+
         # I neurons
         ca_fn_lpz_c_I = ("02-calcium-lpz_c_I-" +
                          str(self.rank) + "-" + current_sim_time +
@@ -2080,6 +2092,17 @@ class Sinha2016:
             print("gid\tCa_conc", file=f, flush=True)
             allinfo = [[stat['global_id'], stat['Ca']] for
                        stat in nest.GetStatus(self.p_lpz_neurons_I) if
+                       stat['local']]
+            for info in allinfo:
+                print("{}\t{}".format(info[0], info[1]), file=f)
+
+        ca_fn_o_I = ("02-calcium-o_I-" +
+                     str(self.rank) + "-" + current_sim_time +
+                     ".txt")
+        with open(ca_fn_o_I, 'w') as f:
+            print("gid\tCa_conc", file=f, flush=True)
+            allinfo = [[stat['global_id'], stat['Ca']] for
+                       stat in nest.GetStatus(self.o_neurons_I) if
                        stat['local']]
             for info in allinfo:
                 print("{}\t{}".format(info[0], info[1]), file=f)
