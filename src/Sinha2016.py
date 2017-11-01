@@ -903,6 +903,12 @@ class Sinha2016:
         if recording_interval:
             self.recording_interval = recording_interval
 
+        if math.gcd(self.recording_interval, self.sp_update_interval) == 1:
+            logging.warning(
+                "Recording interval({}) and SP interval({}) are not multiples")
+            logging.warning(
+                "Simulation will run in 1 second chunks only")
+
     def __setup_simulation(self):
         """Setup the common simulation things."""
         # Nest stuff
