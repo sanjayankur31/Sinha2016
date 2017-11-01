@@ -648,6 +648,11 @@ class Sinha2016:
             'to_memory': False,
             'label': 'spikes-p_lpz_E'
         }
+        self.sd_params_o_E = {
+            'to_file': True,
+            'to_memory': False,
+            'label': 'spikes-o_E'
+        }
         self.sd_params_lpz_c_I = {
             'to_file': True,
             'to_memory': False,
@@ -662,6 +667,11 @@ class Sinha2016:
             'to_file': True,
             'to_memory': False,
             'label': 'spikes-p_lpz_I'
+        }
+        self.sd_params_o_I = {
+            'to_file': True,
+            'to_memory': False,
+            'label': 'spikes-o_I'
         }
         # pattern neurons
         self.sd_paramsP = {
@@ -682,19 +692,25 @@ class Sinha2016:
                                       params=self.sd_params_lpz_b_E)
         self.sd_p_lpz_E = nest.Create('spike_detector',
                                       params=self.sd_params_p_lpz_E)
+        self.sd_o_E = nest.Create('spike_detector',
+                                  params=self.sd_params_o_E)
         self.sd_lpz_c_I = nest.Create('spike_detector',
                                       params=self.sd_params_lpz_c_I)
         self.sd_lpz_b_I = nest.Create('spike_detector',
                                       params=self.sd_params_lpz_b_I)
         self.sd_p_lpz_I = nest.Create('spike_detector',
                                       params=self.sd_params_p_lpz_I)
+        self.sd_o_I = nest.Create('spike_detector',
+                                  params=self.sd_params_o_I)
 
         nest.Connect(self.lpz_c_neurons_E, self.sd_lpz_c_E)
         nest.Connect(self.lpz_b_neurons_E, self.sd_lpz_b_E)
         nest.Connect(self.p_lpz_neurons_E, self.sd_p_lpz_E)
+        nest.Connect(self.o_neurons_E, self.sd_o_E)
         nest.Connect(self.lpz_c_neurons_I, self.sd_lpz_c_I)
         nest.Connect(self.lpz_b_neurons_I, self.sd_lpz_b_I)
         nest.Connect(self.p_lpz_neurons_I, self.sd_p_lpz_I)
+        nest.Connect(self.o_neurons_I, self.sd_o_I)
 
     def __setup_files(self):
         """Set up the filenames and handles."""
