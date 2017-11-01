@@ -2015,12 +2015,6 @@ class Sinha2016:
                                     syn_spec={'model': 'static_synapse'})
         logging.info("SIMULATION: Network deafferentated")
 
-    def __dump_neuron_set(self, fn, neurons):
-        """Dump a set of neuronIDs to a text file."""
-        with open(fn, 'w') as fh:
-            for neuron in neurons:
-                print(neuron, file=fh)
-
     def __dump_ca_concentration(self):
         """Dump calcium concentration."""
         current_sim_time = (str(nest.GetKernelStatus()['time']))
