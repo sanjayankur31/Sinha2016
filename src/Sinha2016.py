@@ -941,8 +941,9 @@ class Sinha2016:
 
         self.dump_data()
 
-    def stabilise(self, stab_time=0.):
+    def stabilise(self, stab_time=0., label="Stabilising"):
         """Stabilise network."""
+        # use default if not mentioned
         if stab_time:
             stabilisation_time = stab_time
         else:
@@ -950,30 +951,50 @@ class Sinha2016:
 
         logging.debug("SIMULATION: STABILISING for {} seconds".format(
             stabilisation_time))
+        self.run_sim_phase(stabilisation_time, label)
 
+    def run_sim_phase(self, sim_time=2000, label="Phase A"):
+        """Run a simulation phase."""
         # take the smaller of the two intervals
-        run_duration = self.recording_interval
+        current_sim_time = nest.GetKernelStatus()['time']
+        logging.info("Phase started at {}: {}".format(
+            current_sim_time, label))
+        phase_time = 0
+
+        # make sure we run for the smallest interval
         if self.is_rewiring_enabled:
-            if self.sp_update_interval < run_duration:
-                run_duration = self.sp_update_interval
+            run_duration = math.gcd(self.sp_update_interval,
+                                    self.recording_interval)
+        else:
+            run_duration = self.recording_interval
 
-        update_steps = numpy.arange(0, stabilisation_time,
-                                    run_duration)
-        for i, j in enumerate(update_steps):
-            self.run_simulation(run_duration)
+        if sim_time < run_duration:
+            logging.warning(
+                "Requested run time ({}) < minimum run duration ({})".format(
+                    sim_time, run_duration))
+            logging.warning(
+                "Setting run time to run duration")
+            sim_time = run_duration
 
-    def run_simulation(self, simtime=2000):
-        """Run the simulation."""
-        nest.Simulate(simtime*1000)
+        update_steps = numpy.arange(0, sim_time, run_duration)
+        for i in update_steps:
+            nest.Simulate(run_duration*1000)
+            current_sim_time = nest.GetKernelStatus()['time']
+            logging.info("Simulation time: {} seconds".format(
+                current_sim_time/1000))
+            # so it's always a multiple of the smallest simulation run time
+            phase_time += run_duration
 
-        current_simtime = nest.GetKernelStatus()['time']  # in ms
-        if int(current_simtime % (1000 * self.recording_interval)) == 0:
-            self.dump_data()
-        if int(current_simtime % (1000 * self.sp_update_interval)) == 0:
-            self.update_connectivity()
+            # dump data
+            if int(phase_time % self.recording_interval) == 0:
+                self.dump_data()
+            # update connectivity
+            if int(phase_time % self.sp_update_interval) == 0:
+                self.update_connectivity()
 
-        logging.info("Simulation time: {} seconds".format(
-            current_simtime/1000))
+        current_sim_time = nest.GetKernelStatus()['time']
+        logging.info("Phase ended at {}: {}".format(
+            current_sim_time, label))
 
     def __get_syn_elms(self):
         """Get synaptic elements all neurons."""
@@ -1864,7 +1885,8 @@ class Sinha2016:
     def recall_pattern(self, time, pattern_number):
         """Recall a pattern."""
         self.setup_pattern_for_recall(pattern_number)
-        self.run_simulation(time)
+        self.run_sim_phase(
+            time, label="Recalling pattern {}".format(pattern_number))
 
     def deaff_network(self):
         """Deaff a the network."""
@@ -2362,7 +2384,7 @@ if __name__ == "__main__":
 
     # initial setup
     logging.info("Rank {}: SIMULATION STARTED".format(simulation.rank))
-    simulation.stabilise()
+    simulation.stabilise(label="Initial stabilisation")
 
     # Pattern related simulation
     if store_patterns:
@@ -2375,7 +2397,7 @@ if __name__ == "__main__":
         simulation.store_pattern_off_centre([0., 2000.0], True)
 
         # stabilise network after storing patterns
-        simulation.stabilise()
+        simulation.stabilise(label="Pattern stabilisation")
     # Set homoeostatic structural plasticity parameters to whatever the network
     # has achieved now
     simulation.invoke_metaplasticity()
