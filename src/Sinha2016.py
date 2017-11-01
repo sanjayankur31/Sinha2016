@@ -123,15 +123,18 @@ class Sinha2016:
         self.num_synapses_IE = 0
 
         self.neuronsE = []
-        self.neuronsI = []
-        self.lpz_b_neurons_E = []
         self.lpz_c_neurons_E = []
+        self.lpz_b_neurons_E = []
         self.lpz_neurons_E = []
         self.p_lpz_neurons_E = []
-        self.lpz_b_neurons_I = []
+        self.o_neurons_E = []
+
+        self.neuronsI = []
         self.lpz_c_neurons_I = []
-        self.p_lpz_neurons_I = []
+        self.lpz_b_neurons_I = []
         self.lpz_neurons_I = []
+        self.p_lpz_neurons_I = []
+        self.o_neurons_I = []
 
         random.seed(42)
 
@@ -272,33 +275,61 @@ class Sinha2016:
         first_point = self.location_tree.data[0]
         last_point = self.location_tree.data[len(self.neuronsE) - 1]
 
+        # lpz
         lpz_neurons = self.__get_neurons_from_region(
             (len(self.neuronsE) + len(self.neuronsI)) * self.lpz_percent,
             first_point, last_point)
+        # centre of lpz
         lpz_c_neurons = self.__get_neurons_from_region(
             (len(self.neuronsE) + len(self.neuronsI)) * self.lpz_percent/2.,
             first_point, last_point)
+        # so inner border of lpz
         lpz_b_neurons = list(set(lpz_neurons) - set(lpz_c_neurons))
 
+        # lpz and the outer peri
+        with_p_lpz_neurons = self.__get_neurons_from_region(
+            (len(self.neuronsE) + len(self.neuronsI)) * self.lpz_percent * 2.,
+            first_point, last_point)
+
+        # for E
         self.lpz_c_neurons_E = list(set(lpz_c_neurons).intersection(
             set(self.neuronsE)))
         self.lpz_b_neurons_E = list(set(lpz_b_neurons).intersection(
             set(self.neuronsE)))
         self.lpz_neurons_E = (self.lpz_c_neurons_E +
                               self.lpz_b_neurons_E)
+        with_p_lpz_neurons_E = list(set(with_p_lpz_neurons).intersection(
+            set(self.neuronsE)))
+        self.p_lpz_neurons_E = list(set(with_p_lpz_neurons_E) -
+                                    set(lpz_neurons))
+        # other E neurons that are not in lpz and p_lpz
+        self.o_neurons_E = list(set(self.neuronsE - set(with_p_lpz_neurons_E)))
 
+        # for I
         self.lpz_c_neurons_I = list(set(lpz_c_neurons).intersection(
             set(self.neuronsI)))
         self.lpz_b_neurons_I = list(set(lpz_b_neurons).intersection(
             set(self.neuronsI)))
         self.lpz_neurons_I = (self.lpz_c_neurons_I +
                               self.lpz_b_neurons_I)
-
-        self.p_lpz_neurons_E = list(set(self.neuronsE) - set(lpz_neurons))
-        self.p_lpz_neurons_I = list(set(self.neuronsI) - set(lpz_neurons))
+        with_p_lpz_neurons_I = list(set(with_p_lpz_neurons).intersection(
+            set(self.neuronsI)))
+        self.p_lpz_neurons_I = list(set(with_p_lpz_neurons_I) -
+                                    set(lpz_neurons))
+        # other I neurons that are not in lpz and p_lpz
+        self.o_neurons_I = list(set(self.neuronsI - set(with_p_lpz_neurons_I)))
 
         if self.rank == 0:
             # excitatory neurons
+            with open("00-locations-o_E.txt", 'w') as f1:
+                print("gid\txcor\tycor", file=f1, flush=True)
+                for neuron in self.o_neurons_E:
+                    nrnindex = neuron - self.neuronsE[0]
+                    print("{}\t{}\t{}".format(
+                        neuron,
+                        self.location_tree.data[nrnindex][0],
+                        self.location_tree.data[nrnindex][1]),
+                        file=f1)
             with open("00-locations-p_lpz_E.txt", 'w') as f1:
                 print("gid\txcor\tycor", file=f1, flush=True)
                 for neuron in self.p_lpz_neurons_E:
@@ -326,6 +357,16 @@ class Sinha2016:
                         self.location_tree.data[nrnindex][0],
                         self.location_tree.data[nrnindex][1]),
                         file=f3)
+
+            with open("00-locations-o_I.txt", 'w') as f1:
+                print("gid\txcor\tycor", file=f1, flush=True)
+                for neuron in self.o_neurons_I:
+                    nrnindex = neuron + self.neuronsE[-1] - self.neuronsI[0]
+                    print("{}\t{}\t{}".format(
+                        neuron,
+                        self.location_tree.data[nrnindex][0],
+                        self.location_tree.data[nrnindex][1]),
+                        file=f1)
             with open("00-locations-p_lpz_I.txt", 'w') as f1:
                 print("gid\txcor\tycor", file=f1, flush=True)
                 for neuron in self.p_lpz_neurons_I:
