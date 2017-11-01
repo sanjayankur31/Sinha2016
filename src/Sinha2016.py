@@ -40,7 +40,6 @@ class Sinha2016:
     def __init__(self):
         """Initialise variables."""
         self.comm = MPI.COMM_WORLD
-        self.step = False
         # default resolution in nest is 0.1ms. Using the same value
         # http://www.nest-simulator.org/scheduling-and-simulation-flow/
         self.dt = 0.1
@@ -804,14 +803,12 @@ class Sinha2016:
             logging.critical("Both plasticities cannot be disabled. Exiting.")
             sys.exit()
 
-    def prerun_setup(self, step=False,
+    def prerun_setup(self,
                      stabilisation_time=None,
                      sp_update_interval=None,
                      recording_interval=None):
         """Pre reun configuration."""
         # Cannot be changed mid simulation
-        if step:
-            self.step = step
         self.update_time_windows(stabilisation_time, sp_update_interval,
                                  recording_interval)
         self.__setup_simulation()
@@ -961,13 +958,7 @@ class Sinha2016:
 
     def run_simulation(self, simtime=2000):
         """Run the simulation."""
-        if self.step:
-            sim_steps = numpy.arange(0, simtime)
-            for i, step in enumerate(sim_steps):
-                nest.Simulate(1000)
-                self.__dump_synaptic_weights()
-        else:
-            nest.Simulate(simtime*1000)
+        nest.Simulate(simtime*1000)
 
         current_simtime = nest.GetKernelStatus()['time']  # in ms
         if int(current_simtime % (1000 * self.recording_interval)) == 0:
