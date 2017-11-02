@@ -2615,13 +2615,13 @@ if __name__ == "__main__":
         simulation.deaff_network()
         # zoom in on post deaff phase
         simulation.update_time_windows(stabilisation_time=50.,
-                                       sp_update_interval=0.1,
-                                       recording_interval=1.)
+                                       sp_update_interval=50.,
+                                       recording_interval=5.)
         simulation.stabilise()
 
         simulation.update_time_windows(stabilisation_time=2000.,
-                                       sp_update_interval=0.1,
-                                       recording_interval=250.)
+                                       sp_update_interval=50.,
+                                       recording_interval=50.)
         simulation.stabilise()
 
     if store_patterns:
