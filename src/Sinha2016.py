@@ -1645,13 +1645,13 @@ class Sinha2016:
                  syn_del_o_E + syn_del_o_I),
                 total_synapses))
 
-    def __get_nearest_ps_prob(self, source, options, num_required,
+    def __get_nearest_ps_prob(self, source, options, max_num_required,
                               probability):
         """Choose nearest partners but pick them with a probability.
 
         :source: source neuron
         :options: options to choose from
-        :num_required: number of partners needed
+        :max_num_required: max number of partners needed
         :probability: probability of picking a partner
         :returns: chosen nearest partners
 
@@ -1674,10 +1674,11 @@ class Sinha2016:
             if random.random() > probability:
                 nearest_opts.append(nrn)
                 counter += 1
-            if counter >= num_required:
+            if counter >= max_num_required:
                 return nearest_opts
 
-        # otherwise just return how many we got
+        # otherwise just return how many we got after traversing the whole
+        # option list
         return nearest_opts
 
     def __get_nearest_ps(self, source, options, num_required):
