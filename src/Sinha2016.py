@@ -1181,7 +1181,14 @@ class Sinha2016:
         return synaptic_elms
 
     def __get_del_ps_w(self, anchor, options, num_required):
-        """Choose partners to delete based on weight of connections."""
+        """Choose partners to delete based on weight of connections.
+
+        :anchor: source neuron
+        :options: options to pick from
+        :num_required: number of options required
+        :returns: chosen options
+
+        """
         optdict = {}
         for opt in options:
             optdict[opt[0]] = opt[1]
@@ -1193,7 +1200,14 @@ class Sinha2016:
         return weakestoptions
 
     def __get_del_ps_d(self, anchor, options, num_required):
-        """Choose partners to delete based on distance."""
+        """Choose farthest partners to delete.
+
+        :anchor: source neuron
+        :options: options to choose from
+        :num_required: number of options needed
+        :returns: chosen options
+
+        """
         distances = {}
         anchorloc = numpy.array(
             self.location_tree.data[anchor - self.neuronsE[0]])
@@ -1663,7 +1677,14 @@ class Sinha2016:
                 total_synapses))
 
     def __get_form_part_d(self, source, options, num_required):
-        """Choose partners based on distance."""
+        """Choose nearest partner to form.
+
+        :source: source neuron
+        :options: options to choose from
+        :num_required: number of partners needed
+        :returns: chosen nearest partners
+
+        """
         # in efficient, but works.
         distances = {}
         sourceloc = numpy.array(self.location_tree.data[source -
