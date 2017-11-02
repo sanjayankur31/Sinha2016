@@ -1199,8 +1199,8 @@ class Sinha2016:
         logging.debug("Returning weakest links")
         return weakestoptions
 
-    def __get_del_ps_d(self, anchor, options, num_required):
-        """Choose farthest partners to delete.
+    def __get_farthest_ps(self, anchor, options, num_required):
+        """Choose farthest partners.
 
         :anchor: source neuron
         :options: options to choose from
@@ -1220,7 +1220,7 @@ class Sinha2016:
         sorted_distances = dict(sorted(distances.items(),
                                        key=operator.itemgetter(1)))
         farthest_opts = list(sorted_distances.keys())[-num_required:]
-        logging.debug("Returning closest partners")
+        logging.debug("Returning farthest partners")
 
         return farthest_opts
 
@@ -1284,7 +1284,7 @@ class Sinha2016:
                                 chosen_targets = random.sample(
                                     targets, int(abs(elms['Axon_ex'])))
                             elif self.syn_del_strategy == "distance":
-                                chosen_targets = self.__get_del_ps_d(
+                                chosen_targets = self.__get_farthest_ps(
                                     gid, targets, int(abs(elms['Axon_ex'])))
                             elif self.syn_del_strategy == "weight":
                                 chosen_targets = self.__get_del_ps_w(
@@ -1357,7 +1357,7 @@ class Sinha2016:
                                     (targetsE + targetsI),
                                     int(abs(elms['Axon_in'])))
                             elif self.syn_del_strategy == "distance":
-                                chosen_targets = self.__get_del_ps_d(
+                                chosen_targets = self.__get_farthest_ps(
                                     gid, (targetsE + targetsI),
                                     int(abs(elms['Axon_in'])))
                             elif self.syn_del_strategy == "weight":
@@ -1498,7 +1498,7 @@ class Sinha2016:
                                 chosen_sources = random.sample(
                                     sources, int(abs(elms['Den_ex'])))
                             elif self.syn_del_strategy == "distance":
-                                chosen_sources = self.__get_del_ps_d(
+                                chosen_sources = self.__get_farthest_ps(
                                     gid, sources, int(abs(elms['Den_ex'])))
                             elif self.syn_del_strategy == "weight":
                                 chosen_sources = self.__get_del_ps_w(
@@ -1548,7 +1548,7 @@ class Sinha2016:
                                     chosen_sources = random.sample(
                                         sources, int(abs(elms['Den_in'])))
                                 elif self.syn_del_strategy == "distance":
-                                    chosen_sources = self.__get_del_ps_d(
+                                    chosen_sources = self.__get_farthest_ps(
                                         gid, sources, int(abs(elms['Den_in'])))
                             else:
                                 chosen_sources = sources
@@ -1598,7 +1598,7 @@ class Sinha2016:
                                     chosen_sources = random.sample(
                                         sources, int(abs(elms['Den_in'])))
                                 elif self.syn_del_strategy == "distance":
-                                    chosen_sources = self.__get_del_ps_d(
+                                    chosen_sources = self.__get_farthest_ps(
                                         gid, sources, int(abs(elms['Den_in'])))
                                 elif self.syn_del_strategy == "weight":
                                     chosen_sources = self.__get_del_ps_w(
@@ -1676,8 +1676,8 @@ class Sinha2016:
                  syn_del_o_E + syn_del_o_I),
                 total_synapses))
 
-    def __get_form_part_d(self, source, options, num_required):
-        """Choose nearest partner to form.
+    def __get_nearest_ps(self, source, options, num_required):
+        """Choose nearest partners.
 
         :source: source neuron
         :options: options to choose from
@@ -1698,7 +1698,7 @@ class Sinha2016:
         sorted_distances = dict(sorted(distances.items(),
                                        key=operator.itemgetter(1)))
         nearest_opts = list(sorted_distances.keys())[0:num_required]
-        logging.debug("Returning closest partners")
+        logging.debug("Returning nearest partners")
 
         return nearest_opts
 
@@ -1747,7 +1747,7 @@ class Sinha2016:
                                 (targetsE + targetsI),
                                 int(abs(elms['Axon_ex'])))
                         elif self.syn_form_strategy == "distance":
-                            chosen_targets = self.__get_form_part_d(
+                            chosen_targets = self.__get_nearest_ps(
                                 gid, (targetsE + targetsI),
                                 int(abs(elms['Axon_ex'])))
                     else:
@@ -1796,7 +1796,7 @@ class Sinha2016:
                                 (targetsE + targetsI),
                                 int(abs(elms['Axon_in'])))
                         elif self.syn_form_strategy == "distance":
-                            chosen_targets = self.__get_form_part_d(
+                            chosen_targets = self.__get_nearest_ps(
                                 gid, (targetsE + targetsI),
                                 int(abs(elms['Axon_in'])))
                     else:
