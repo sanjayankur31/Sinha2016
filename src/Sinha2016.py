@@ -1706,8 +1706,8 @@ class Sinha2016:
 
         return nearest_opts
 
-    def __create_connections(self, synelms):
-        """Connect random neurons to create new connections."""
+    def __create_new_connections(self, synelms):
+        """Create new connections."""
         logging.debug("Creating connections using the {} strategy".format(
             self.syn_form_strategy))
         syn_new_lpz_c_E = 0
@@ -1876,7 +1876,7 @@ class Sinha2016:
         # Must wait for all ranks to finish before proceeding
 
         syn_elms_2 = self.__get_syn_elms()
-        self.__create_connections(syn_elms_2)
+        self.__create_new_connections(syn_elms_2)
         # Must wait for all ranks to finish before proceeding
         logging.debug("STRUCTURAL PLASTICITY: Connectivity updated")
 
