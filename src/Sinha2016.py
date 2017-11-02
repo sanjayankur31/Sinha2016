@@ -552,83 +552,75 @@ class Sinha2016:
                      syn_spec={'model': 'static_synapse',
                                'weight': self.weightExt})
 
-        # only structural plasticity
-        if self.is_str_p_enabled and not self.is_syn_p_enabled:
-            logging.debug("Only structural plasticity enabled" +
-                          "Not setting up any synapses.")
-        # only synaptic plasticity
-        # setup connections using Nest methods
-        elif self.is_syn_p_enabled and not self.is_str_p_enabled:
-            conndict = {'rule': 'pairwise_bernoulli',
-                        'p': self.sparsity}
+        # if synaptic plasticity is enabled
+        # setup connections using Nest primitives
+        # we cannot use pairwise_bernoulli and so on because we want our
+        # connections to be distance dependent. I.e., neurons closer to each
+        # other are more likely to connect.
+        if self.is_syn_p_enabled:
+            conndict = {'rule': 'all_to_all'}
             logging.debug("Setting up EE connections.")
-            nest.Connect(self.neuronsE, self.neuronsE,
-                         syn_spec=self.synDictEE,
-                         conn_spec=conndict)
-            logging.debug("EE connections set up.")
-
-            logging.debug("Setting up EI connections.")
-            nest.Connect(self.neuronsE, self.neuronsI,
-                         syn_spec=self.synDictEI,
-                         conn_spec=conndict)
-            logging.debug("EI connections set up.")
-
-            logging.debug("Setting up II connections.")
-            nest.Connect(self.neuronsI, self.neuronsI,
-                         syn_spec=self.synDictII,
-                         conn_spec=conndict)
-            logging.debug("II connections set up.")
-
-            logging.debug("Setting up IE connections.")
-            nest.Connect(self.neuronsI, self.neuronsE,
-                         syn_spec=self.synDictIE,
-                         conn_spec=conndict)
-            logging.debug("IE connections set up.")
-        # manually set up initial connections if structural plasticity and
-        # synaptic plasticity are both enabled
-        # This is because you can only either have all-all or one-one
-        # connections when structural plasticity is enabled
-        elif self.is_str_p_enabled and self.is_syn_p_enabled:
-            conndict = {'rule': 'one_to_one'}
-            logging.debug("Setting up EE connections.")
-            synapses_to_create = self.__get_synapses_to_form(
-                self.neuronsE, self.neuronsE, self.sparsity)
-            for source, destination in synapses_to_create:
-                nest.Connect([source], [destination],
+            for nrn in self.neuronsE:
+                targets = self.__get_nearest_ps_prob(
+                    nrn, self.neuronsE,
+                    (self.neuronsE * self.neuronsE * self.sparsity),
+                    self.sparsity
+                )
+                nest.Connect([nrn], targets,
                              syn_spec=self.synDictEE,
                              conn_spec=conndict)
-            logging.debug("{} EE connections set up.".format(
-                len(synapses_to_create)))
+            conns = nest.GetConnections(source=self.neuronsE,
+                                        target=self.neuronsE)
+            logging.info("{} EE connections set up.".format(
+                len(conns)))
 
             logging.debug("Setting up EI connections.")
-            synapses_to_create = self.__get_synapses_to_form(
-                self.neuronsE, self.neuronsI, self.sparsity)
-            for source, destination in synapses_to_create:
-                nest.Connect([source], [destination],
+            for nrn in self.neuronsE:
+                targets = self.__get_nearest_ps_prob(
+                    nrn, self.neuronsI,
+                    (self.neuronsE * self.neuronsI * self.sparsity),
+                    self.sparsity
+                )
+                nest.Connect([nrn], targets,
                              syn_spec=self.synDictEI,
                              conn_spec=conndict)
-            logging.debug("{} EI connections set up.".format(
-                len(synapses_to_create)))
+            conns = nest.GetConnections(source=self.neuronsE,
+                                        target=self.neuronsI)
+            logging.info("{} EI connections set up.".format(
+                len(conns)))
 
             logging.debug("Setting up II connections.")
-            synapses_to_create = self.__get_synapses_to_form(
-                self.neuronsI, self.neuronsI, self.sparsity)
-            for source, destination in synapses_to_create:
-                nest.Connect([source], [destination],
+            for nrn in self.neuronsI:
+                targets = self.__get_nearest_ps_prob(
+                    nrn, self.neuronsI,
+                    (self.neuronsI * self.neuronsI * self.sparsity),
+                    self.sparsity
+                )
+                nest.Connect([nrn], targets,
                              syn_spec=self.synDictII,
                              conn_spec=conndict)
-            logging.debug("{} II connections set up.".format(
-                len(synapses_to_create)))
+            conns = nest.GetConnections(source=self.neuronsI,
+                                        target=self.neuronsI)
+            logging.info("{} II connections set up.".format(
+                len(conns)))
 
             logging.debug("Setting up IE connections.")
-            synapses_to_create = self.__get_synapses_to_form(
-                self.neuronsI, self.neuronsE, self.sparsity)
-            for source, destination in synapses_to_create:
-                nest.Connect([source], [destination],
+            for nrn in self.neuronsI:
+                targets = self.__get_nearest_ps_prob(
+                    nrn, self.neuronsE,
+                    (self.neuronsI * self.neuronsE * self.sparsity),
+                    self.sparsity
+                )
+                nest.Connect([nrn], targets,
                              syn_spec=self.synDictIE,
                              conn_spec=conndict)
-            logging.debug("{} IE weights set up.".format(
-                len(synapses_to_create)))
+            conns = nest.GetConnections(source=self.neuronsI,
+                                        target=self.neuronsE)
+            logging.info("{} IE connections set up.".format(
+                len(conns)))
+        else:
+            logging.info("Synaptic plasticity not enabled." +
+                         "Not setting up any synapses.")
 
     def __setup_detectors(self):
         """Setup spike detectors."""
