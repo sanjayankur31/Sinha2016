@@ -563,7 +563,7 @@ class Sinha2016:
             for nrn in self.neuronsE:
                 targets = self.__get_nearest_ps_prob(
                     nrn, self.neuronsE,
-                    (self.neuronsE * self.neuronsE * self.sparsity),
+                    (len(self.neuronsE) * len(self.neuronsE) * self.sparsity),
                     self.sparsity
                 )
                 nest.Connect([nrn], targets,
@@ -578,7 +578,7 @@ class Sinha2016:
             for nrn in self.neuronsE:
                 targets = self.__get_nearest_ps_prob(
                     nrn, self.neuronsI,
-                    (self.neuronsE * self.neuronsI * self.sparsity),
+                    (len(self.neuronsE) * len(self.neuronsI) * self.sparsity),
                     self.sparsity
                 )
                 nest.Connect([nrn], targets,
@@ -593,7 +593,7 @@ class Sinha2016:
             for nrn in self.neuronsI:
                 targets = self.__get_nearest_ps_prob(
                     nrn, self.neuronsI,
-                    (self.neuronsI * self.neuronsI * self.sparsity),
+                    (len(self.neuronsI) * len(self.neuronsI) * self.sparsity),
                     self.sparsity
                 )
                 nest.Connect([nrn], targets,
@@ -608,7 +608,7 @@ class Sinha2016:
             for nrn in self.neuronsI:
                 targets = self.__get_nearest_ps_prob(
                     nrn, self.neuronsE,
-                    (self.neuronsI * self.neuronsE * self.sparsity),
+                    (len(self.neuronsI) * len(self.neuronsE) * self.sparsity),
                     self.sparsity
                 )
                 nest.Connect([nrn], targets,
@@ -2627,6 +2627,7 @@ if __name__ == "__main__":
     simulation.print_simulation_parameters()
     logging.info("Rank {}: SIMULATION SETUP".format(simulation.rank))
 
+    sys.exit(0)
     # synaptic plasticity stabilisation
     simulation.stabilise(label="Initial stabilisation")
 
