@@ -2559,14 +2559,13 @@ if __name__ == "__main__":
         format='%(funcName)s: %(lineno)d: %(levelname)s: %(message)s',
         level=logging.ERROR)
 
-    step = False
     store_patterns = False
     deafferentate_network = True
     simulation = Sinha2016()
+    logging.info("Rank {}: SIMULATION STARTED".format(simulation.rank))
 
     # simulation setup
     # Setup network to handle plasticities
-    # update of the network
     simulation.setup_plasticity(True, True)
     # set up deaff extent, and neuron sets
     simulation.set_lpz_percent(0.3)
@@ -2575,12 +2574,10 @@ if __name__ == "__main__":
         stabilisation_time=1500.,
         sp_update_interval=1500.,
         recording_interval=250.)
-    # print em up
     simulation.print_simulation_parameters()
     logging.info("Rank {}: SIMULATION SETUP".format(simulation.rank))
 
-    # initial setup
-    logging.info("Rank {}: SIMULATION STARTED".format(simulation.rank))
+    # synaptic plasticity stabilisation
     simulation.stabilise(label="Initial stabilisation")
 
     # Pattern related simulation
@@ -2617,12 +2614,12 @@ if __name__ == "__main__":
         simulation.update_time_windows(stabilisation_time=50.,
                                        sp_update_interval=50.,
                                        recording_interval=5.)
-        simulation.stabilise()
+        simulation.stabilise(label="Repair zoomed in")
 
-        simulation.update_time_windows(stabilisation_time=2000.,
+        simulation.update_time_windows(stabilisation_time=3000.,
                                        sp_update_interval=50.,
                                        recording_interval=50.)
-        simulation.stabilise()
+        simulation.stabilise(label="Repair #2")
 
     if store_patterns:
         # recall stored and tracked pattern
