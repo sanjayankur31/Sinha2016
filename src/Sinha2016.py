@@ -1200,7 +1200,7 @@ class Sinha2016:
         for opt in options:
             location = numpy.array(
                 self.location_tree.data[opt - self.neuronsE[0]])
-            distance = numpy.linalg.norm(location - anchorloc)
+            distance = self.__get_distance_toroid(location, anchorloc)
             distances[opt] = distance
 
         sorted_distances = dict(sorted(distances.items(),
@@ -1671,7 +1671,7 @@ class Sinha2016:
         for opt in options:
             location = numpy.array(self.location_tree.data[opt -
                                                            self.neuronsE[0]])
-            distance = numpy.linalg.norm(location - sourceloc)
+            distance = self.__get_distance_toroid(location, sourceloc)
             distances[opt] = distance
 
         sorted_distances = dict(sorted(distances.items(),
