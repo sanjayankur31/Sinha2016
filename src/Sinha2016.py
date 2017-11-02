@@ -472,6 +472,14 @@ class Sinha2016:
         Since structural plasticity does not permit sparse connections, I'm
         going to try to manually find the right number of syapses and connect
         neurons to get a certain sparsity.
+
+        These connections are completely random. They do not depend on
+        distance or any other such parameter.
+
+        :sources: set of source neurons
+        :destinations: set of destination neurons
+        :sparsity: probability of forming a connection between a pair
+
         """
         required_synapses = int(float(len(sources)) * float(len(destinations))
                                 * sparsity)
