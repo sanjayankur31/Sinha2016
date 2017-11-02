@@ -1676,6 +1676,41 @@ class Sinha2016:
                  syn_del_o_E + syn_del_o_I),
                 total_synapses))
 
+    def __get_nearest_ps_prob(self, source, options, num_required,
+                              probability):
+        """Choose nearest partners but pick them with a probability.
+
+        :source: source neuron
+        :options: options to choose from
+        :num_required: number of partners needed
+        :probability: probability of picking a partner
+        :returns: chosen nearest partners
+
+        """
+        # inefficient, but works.
+        distances = {}
+        sourceloc = numpy.array(self.location_tree.data[source -
+                                                        self.neuronsE[0]])
+        for opt in options:
+            location = numpy.array(self.location_tree.data[opt -
+                                                           self.neuronsE[0]])
+            distance = self.__get_distance_toroid(location, sourceloc)
+            distances[opt] = distance
+
+        sorted_distances = dict(sorted(distances.items(),
+                                       key=operator.itemgetter(1)))
+        nearest_opts = []
+        counter = 0
+        for nrn, distance in sorted_distances.items():
+            if random.random() > probability:
+                nearest_opts.append(nrn)
+                counter += 1
+            if counter >= num_required:
+                return nearest_opts
+
+        # otherwise just return how many we got
+        return nearest_opts
+
     def __get_nearest_ps(self, source, options, num_required):
         """Choose nearest partners.
 
