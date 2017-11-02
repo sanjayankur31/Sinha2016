@@ -426,45 +426,6 @@ class Sinha2016:
                         self.location_tree.data[nrnindex][1]),
                         file=f3)
 
-    def __create_sparse_list(self, length, static_w, sparsity):
-        """Create one list to use with SetStatus."""
-        weights = []
-        valid_values = int(length * sparsity)
-        weights = (
-            ([float(static_w), ] * valid_values) +
-            ([0., ] * int(length - valid_values)))
-
-        random.shuffle(weights)
-        return weights
-
-    def __fill_matrix(self, weightlist, static_w, sparsity):
-        """Create a weight matrix to use in syn dict."""
-        weights = []
-        for row in weightlist:
-            if isinstance(row, (list, tuple)):
-                rowlen = len(row)
-                valid_values = int(rowlen * sparsity)
-                arow = (
-                    ([float(static_w), ] * valid_values) +
-                    ([0., ] * int(rowlen - valid_values))
-                )
-                random.shuffle(arow)
-                weights.append(arow)
-        return weights
-
-    def __setup_matrix(self, pre_dim, post_dim, static_w, sparsity):
-        """Create a weight matrix to use in syn dict."""
-        weights = []
-        valid_values = int(post_dim * sparsity)
-        for i in range(0, pre_dim):
-            arow = (
-                ([float(static_w), ] * valid_values) +
-                ([0., ] * int(post_dim - valid_values))
-            )
-            random.shuffle(arow)
-            weights.append(arow)
-        return weights
-
     def __get_synapses_to_form(self, sources, destinations, sparsity):
         """
         Find prospective synaptic connections between sets of neurons.
