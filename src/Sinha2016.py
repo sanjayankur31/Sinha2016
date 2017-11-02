@@ -198,7 +198,7 @@ class Sinha2016:
                            'E_L': -60., 'g_L': 10.,
                            'E_ex': 0., 'E_in': -80.,
                            'tau_syn_ex': 5., 'tau_syn_in': 10.,
-                           'beta_Ca': 0.05, 'tau_Ca': 10000.
+                           'beta_Ca': 0.10, 'tau_Ca': 100000.
                            }
         # Set up TIF neurons
         # Setting up two models because then it makes it easier for me to get
