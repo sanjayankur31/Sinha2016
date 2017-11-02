@@ -303,7 +303,7 @@ class Sinha2016:
         self.p_lpz_neurons_E = list(set(with_p_lpz_neurons_E) -
                                     set(lpz_neurons))
         # other E neurons that are not in lpz and p_lpz
-        self.o_neurons_E = list(set(self.neuronsE - set(with_p_lpz_neurons_E)))
+        self.o_neurons_E = list(set(self.neuronsE) - set(with_p_lpz_neurons_E))
 
         # for I
         self.lpz_c_neurons_I = list(set(lpz_c_neurons).intersection(
@@ -317,7 +317,7 @@ class Sinha2016:
         self.p_lpz_neurons_I = list(set(with_p_lpz_neurons_I) -
                                     set(lpz_neurons))
         # other I neurons that are not in lpz and p_lpz
-        self.o_neurons_I = list(set(self.neuronsI - set(with_p_lpz_neurons_I)))
+        self.o_neurons_I = list(set(self.neuronsI) - set(with_p_lpz_neurons_I))
 
         if self.rank == 0:
             # excitatory neurons
