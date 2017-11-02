@@ -1170,12 +1170,8 @@ class Sinha2016:
 
         """
         distances = {}
-        anchorloc = numpy.array(
-            self.location_tree.data[anchor - self.neuronsE[0]])
         for opt in options:
-            location = numpy.array(
-                self.location_tree.data[opt - self.neuronsE[0]])
-            distance = self.__get_distance_toroid(location, anchorloc)
+            distance = self.__get_distance_toroid(anchor, opt)
             distances[opt] = distance
 
         sorted_distances = dict(sorted(distances.items(),
@@ -1650,12 +1646,8 @@ class Sinha2016:
         """
         # inefficient, but works.
         distances = {}
-        sourceloc = numpy.array(self.location_tree.data[source -
-                                                        self.neuronsE[0]])
         for opt in options:
-            location = numpy.array(self.location_tree.data[opt -
-                                                           self.neuronsE[0]])
-            distance = self.__get_distance_toroid(location, sourceloc)
+            distance = self.__get_distance_toroid(source, opt)
             distances[opt] = distance
 
         sorted_distances = dict(sorted(distances.items(),
@@ -1684,12 +1676,8 @@ class Sinha2016:
         """
         # in efficient, but works.
         distances = {}
-        sourceloc = numpy.array(self.location_tree.data[source -
-                                                        self.neuronsE[0]])
         for opt in options:
-            location = numpy.array(self.location_tree.data[opt -
-                                                           self.neuronsE[0]])
-            distance = self.__get_distance_toroid(location, sourceloc)
+            distance = self.__get_distance_toroid(source, opt)
             distances[opt] = distance
 
         sorted_distances = dict(sorted(distances.items(),
