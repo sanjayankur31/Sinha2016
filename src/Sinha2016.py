@@ -77,6 +77,10 @@ class Sinha2016:
         self.location_sd = 15  # micro metres
         self.location_tree = None
         self.lpz_percent = 0.5
+        # to calculate distances as if we're using a toroid
+        # to not run into edge effects
+        self.network_width = 0.
+        self.network_height = 0.
 
         # structural plasticity bits
         # not steps since we're not using it in NEST. This is for our manual
@@ -137,6 +141,30 @@ class Sinha2016:
         self.o_neurons_I = []
 
         random.seed(42)
+
+    def __get_distance_toroid(self, source, destination):
+        """Get distance between a pair of neurons on our toroid
+
+        :source: source neuron
+        :destination: destination neuron
+        :returns: distance between neurons if they were on a toroid
+
+        """
+        source_loc = numpy.array(
+            self.location_tree.data[source - self.neuronsE[0]])
+        dest_loc = numpy.array(
+            self.location_tree.data[destination - self.neuronsE[0]])
+
+        delta_x = abs(source_loc[0] - dest_loc[0])
+        if delta_x > self.network_width/2:
+            delta_x = self.network_width - delta_x
+
+        delta_y = abs(source_loc[1] - dest_loc[1])
+        if delta_y > self.network_height/2:
+            delta_y = self.network_height - delta_y
+
+        distance = math.hypot(delta_x, delta_y)
+        return distance
 
     def __setup_neurons(self):
         """Setup properties of neurons."""
@@ -245,6 +273,9 @@ class Sinha2016:
                       file=loc_file, flush=True)
         if self.rank == 0:
             loc_file.close()
+
+        self.network_width = (locations[-1][0] - locations[0][0])
+        self.network_height = (locations[-1][1] - locations[0][1])
 
         # I neurons have an intiail offset to distribute them evenly between E
         # neurons
