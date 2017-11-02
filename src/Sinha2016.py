@@ -986,13 +986,14 @@ class Sinha2016:
                             recording_interval=None):
         """Set up stabilisation time."""
         if stabilisation_time:
-            self.default_stabilisation_time = stabilisation_time
+            self.default_stabilisation_time = int(stabilisation_time)
         if sp_update_interval:
-            self.sp_update_interval = sp_update_interval
+            self.sp_update_interval = int(sp_update_interval)
         if recording_interval:
-            self.recording_interval = recording_interval
+            self.recording_interval = int(recording_interval)
 
-        if math.gcd(self.recording_interval, self.sp_update_interval) == 1:
+        if math.gcd(int(self.recording_interval),
+                    int(self.sp_update_interval)) == 1:
             logging.warning(
                 "Recording interval({}) and SP interval({}) are not multiples")
             logging.warning(
@@ -1052,8 +1053,8 @@ class Sinha2016:
 
         # make sure we run for the smallest interval
         if self.is_rewiring_enabled:
-            run_duration = math.gcd(self.sp_update_interval,
-                                    self.recording_interval)
+            run_duration = math.gcd(int(self.sp_update_interval),
+                                    int(self.recording_interval))
         else:
             run_duration = self.recording_interval
 
@@ -1067,7 +1068,7 @@ class Sinha2016:
 
         update_steps = numpy.arange(0, sim_time, run_duration)
         for i in update_steps:
-            nest.Simulate(run_duration*1000)
+            nest.Simulate(run_duration*1000.)
             current_sim_time = nest.GetKernelStatus()['time']
             logging.info("Simulation time: {} seconds".format(
                 current_sim_time/1000))
