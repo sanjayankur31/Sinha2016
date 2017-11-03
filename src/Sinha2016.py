@@ -2667,7 +2667,6 @@ if __name__ == "__main__":
     simulation.print_simulation_parameters()
     logging.info("Rank {}: SIMULATION SETUP".format(simulation.rank))
 
-    sys.exit(0)
     # synaptic plasticity stabilisation
     simulation.stabilise(label="Initial stabilisation")
 
