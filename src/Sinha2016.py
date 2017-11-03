@@ -2145,6 +2145,57 @@ class Sinha2016:
             for info in allinfo:
                 print("{}\t{}".format(info[0], info[1]), file=f)
 
+    def __dump_syn_connections(self):
+        """Dump pre-post syn pairs for existing synapses."""
+        current_sim_time = (str(nest.GetKernelStatus()['time']))
+        syn_fn_EE = ("08-syn_conns-EE-" +
+                     str(self.rank) + "-" + current_sim_time +
+                     ".txt")
+        with open(syn_fn_EE, 'w') as f:
+            print("src\tdest", file=f, flush=True)
+            allinfo = [[stat[0], stat[1]] for
+                       stat in nest.GetConnections(
+                           source=self.neuronsE, target=self.neuronsE)
+                       ]
+            for info in allinfo:
+                print("{}\t{}".format(info[0], info[1]), file=f)
+
+        syn_fn_EI = ("08-syn_conns-EI-" +
+                     str(self.rank) + "-" + current_sim_time +
+                     ".txt")
+        with open(syn_fn_EI, 'w') as f:
+            print("src\tdest", file=f, flush=True)
+            allinfo = [[stat[0], stat[1]] for
+                       stat in nest.GetConnections(
+                           source=self.neuronsE, target=self.neuronsI)
+                       ]
+            for info in allinfo:
+                print("{}\t{}".format(info[0], info[1]), file=f)
+
+        syn_fn_II = ("08-syn_conns-II-" +
+                     str(self.rank) + "-" + current_sim_time +
+                     ".txt")
+        with open(syn_fn_II, 'w') as f:
+            print("src\tdest", file=f, flush=True)
+            allinfo = [[stat[0], stat[1]] for
+                       stat in nest.GetConnections(
+                           source=self.neuronsI, target=self.neuronsI)
+                       ]
+            for info in allinfo:
+                print("{}\t{}".format(info[0], info[1]), file=f)
+
+        syn_fn_IE = ("08-syn_conns-IE-" +
+                     str(self.rank) + "-" + current_sim_time +
+                     ".txt")
+        with open(syn_fn_IE, 'w') as f:
+            print("src\tdest", file=f, flush=True)
+            allinfo = [[stat[0], stat[1]] for
+                       stat in nest.GetConnections(
+                           source=self.neuronsI, target=self.neuronsE)
+                       ]
+            for info in allinfo:
+                print("{}\t{}".format(info[0], info[1]), file=f)
+
     def __dump_synaptic_elements_per_neurons(self):
         """
         Dump synaptic elements for each neuron for a time.
@@ -2447,6 +2498,7 @@ class Sinha2016:
     def dump_data(self):
         """Master datadump function."""
         logging.debug("Rank {}: Printing data to files".format(self.rank))
+        self.__dump_syn_connections()
         self.__dump_synaptic_weights()
         self.__dump_ca_concentration()
         self.__dump_synaptic_elements_per_neurons()
