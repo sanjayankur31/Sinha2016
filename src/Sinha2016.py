@@ -563,60 +563,56 @@ class Sinha2016:
             max_num = (len(self.neuronsE) * len(self.neuronsE) * self.sparsity)
             for nrn in self.neuronsE:
                 targets = self.__get_nearest_ps_prob(
-                    nrn, self.neuronsE, max_num,
-                    self.sparsity
+                    nrn, self.neuronsE, self.sparsity
                 )
                 nest.Connect([nrn], targets,
                              syn_spec=self.synDictEE,
                              conn_spec=conndict)
             conns = nest.GetConnections(source=self.neuronsE,
                                         target=self.neuronsE)
-            logging.info("{} ({}) EE connections set up.".format(
+            logging.info("{} ({}) EE connections set up on this rank.".format(
                 len(conns), max_num))
 
             logging.debug("Setting up EI connections.")
             max_num = (len(self.neuronsE) * len(self.neuronsI) * self.sparsity)
             for nrn in self.neuronsE:
                 targets = self.__get_nearest_ps_prob(
-                    nrn, self.neuronsI, max_num,
-                    self.sparsity
+                    nrn, self.neuronsI, self.sparsity
                 )
                 nest.Connect([nrn], targets,
                              syn_spec=self.synDictEI,
                              conn_spec=conndict)
             conns = nest.GetConnections(source=self.neuronsE,
                                         target=self.neuronsI)
-            logging.info("{} ({}) EI connections set up.".format(
+            logging.info("{} ({}) EI connections set up on this rank.".format(
                 len(conns), max_num))
 
             logging.debug("Setting up II connections.")
             max_num = (len(self.neuronsI) * len(self.neuronsI) * self.sparsity)
             for nrn in self.neuronsI:
                 targets = self.__get_nearest_ps_prob(
-                    nrn, self.neuronsI, max_num,
-                    self.sparsity
+                    nrn, self.neuronsI, self.sparsity
                 )
                 nest.Connect([nrn], targets,
                              syn_spec=self.synDictII,
                              conn_spec=conndict)
             conns = nest.GetConnections(source=self.neuronsI,
                                         target=self.neuronsI)
-            logging.info("{} ({}) II connections set up.".format(
+            logging.info("{} ({}) II connections set up on this rank.".format(
                 len(conns), max_num))
 
             logging.debug("Setting up IE connections.")
             max_num = (len(self.neuronsI) * len(self.neuronsE) * self.sparsity)
             for nrn in self.neuronsI:
                 targets = self.__get_nearest_ps_prob(
-                    nrn, self.neuronsE, max_num,
-                    self.sparsity
+                    nrn, self.neuronsE, self.sparsity
                 )
                 nest.Connect([nrn], targets,
                              syn_spec=self.synDictIE,
                              conn_spec=conndict)
             conns = nest.GetConnections(source=self.neuronsI,
                                         target=self.neuronsE)
-            logging.info("{} ({}) IE connections set up.".format(
+            logging.info("{} ({}) IE connections set up on this rank.".format(
                 len(conns), max_num))
         else:
             logging.info("Synaptic plasticity not enabled." +
