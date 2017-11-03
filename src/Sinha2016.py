@@ -1637,6 +1637,8 @@ class Sinha2016:
                               probability):
         """Choose nearest partners but pick them with a probability.
 
+        Do not permit autapses.
+
         :source: source neuron
         :options: options to choose from
         :max_num_required: max number of partners needed
@@ -1647,6 +1649,8 @@ class Sinha2016:
         # inefficient, but works.
         distances = {}
         for opt in options:
+            if opt == source:
+                continue
             distance = self.__get_distance_toroid(source, opt)
             distances[opt] = distance
 
@@ -2595,7 +2599,7 @@ if __name__ == "__main__":
     # Set up logging configuration
     logging.basicConfig(
         format='%(funcName)s: %(lineno)d: %(levelname)s: %(message)s',
-        level=logging.ERROR)
+        level=logging.INFO)
 
     store_patterns = False
     deafferentate_network = True
