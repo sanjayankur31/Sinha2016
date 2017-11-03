@@ -1154,11 +1154,12 @@ class Sinha2016:
         for opt in options:
             optdict[opt[0]] = opt[1]
 
-        sortedoptions = dict(sorted(optdict.items(),
-                                    key=operator.itemgetter(1)))
-        weakestoptions = list(sortedoptions.keys())[0:num_required:]
+        sortedoptions = sorted(optdict.items(),
+                               key=operator.itemgetter(1))
+        weakestoptions = numpy.array(sortedoptions[0:num_required:])
         logging.debug("Returning weakest links")
-        return weakestoptions
+
+        return weakestoptions[:, 0]
 
     def __get_farthest_ps(self, anchor, options, num_required):
         """Choose farthest partners.
@@ -1174,12 +1175,12 @@ class Sinha2016:
             distance = self.__get_distance_toroid(anchor, opt)
             distances[opt] = distance
 
-        sorted_distances = dict(sorted(distances.items(),
-                                       key=operator.itemgetter(1)))
-        farthest_opts = list(sorted_distances.keys())[-num_required:]
+        sorted_distances = sorted(distances.items(),
+                                  key=operator.itemgetter(1))
+        farthest_opts = numpy.array(sorted_distances[-num_required:])
         logging.debug("Returning farthest partners")
 
-        return farthest_opts
+        return farthest_opts[:, 0]
 
     def __delete_connections_from_pre(self, synelms):
         """Delete connections when the neuron is a source."""
@@ -1654,11 +1655,11 @@ class Sinha2016:
             distance = self.__get_distance_toroid(source, opt)
             distances[opt] = distance
 
-        sorted_distances = dict(sorted(distances.items(),
-                                       key=operator.itemgetter(1)))
+        sorted_distances = sorted(distances.items(),
+                                  key=operator.itemgetter(1))
         nearest_opts = []
         counter = 0
-        for nrn, distance in sorted_distances.items():
+        for (nrn, distance) in sorted_distances:
             if random.random() > probability:
                 nearest_opts.append(nrn)
                 counter += 1
@@ -1684,12 +1685,12 @@ class Sinha2016:
             distance = self.__get_distance_toroid(source, opt)
             distances[opt] = distance
 
-        sorted_distances = dict(sorted(distances.items(),
-                                       key=operator.itemgetter(1)))
-        nearest_opts = list(sorted_distances.keys())[0:num_required]
+        sorted_distances = sorted(distances.items(),
+                                  key=operator.itemgetter(1))
+        nearest_opts = numpy.array(sorted_distances[0:num_required])
         logging.debug("Returning nearest partners")
 
-        return nearest_opts
+        return nearest_opts[:, 0]
 
     def __create_new_connections(self, synelms):
         """Create new connections."""
