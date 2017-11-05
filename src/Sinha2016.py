@@ -1163,7 +1163,7 @@ class Sinha2016:
         :anchor: source neuron
         :options: options to choose from
         :num_required: number of options needed
-        :returns: chosen options
+        :returns: a list of chosen options
 
         """
         distances = {}
@@ -1176,7 +1176,9 @@ class Sinha2016:
         farthest_opts = numpy.array(sorted_distances[-num_required:])
         logging.debug("Returning farthest partners")
 
-        return farthest_opts[:, 0]
+        # using numpy converts the array to floats and nest doesn't like that
+        # for neuron ids
+        return list(farthest_opts[:, 0].astype(int))
 
     def __delete_connections_from_pre(self, synelms):
         """Delete connections when the neuron is a source."""
@@ -1638,7 +1640,7 @@ class Sinha2016:
         :source: source neuron
         :options: options to choose from
         :probability: probability of picking a partner
-        :returns: chosen nearest partners
+        :returns: list of chosen nearest partners
 
         """
         # inefficient, but works.
@@ -1671,7 +1673,7 @@ class Sinha2016:
         :source: source neuron
         :options: options to choose from
         :num_required: number of partners needed
-        :returns: chosen nearest partners
+        :returns: list of chosen nearest partners
 
         """
         # in efficient, but works.
@@ -1685,7 +1687,9 @@ class Sinha2016:
         nearest_opts = numpy.array(sorted_distances[0:num_required])
         logging.debug("Returning nearest partners")
 
-        return nearest_opts[:, 0]
+        # using numpy converts the array to floats and nest doesn't like that
+        # for neuron ids
+        return list(nearest_opts[:, 0].astype(int))
 
     def __create_new_connections(self, synelms):
         """Create new connections."""
