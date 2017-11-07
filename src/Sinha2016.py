@@ -55,7 +55,7 @@ class Sinha2016:
         self.is_rewiring_enabled = False
         self.is_metaplasticity_enabled = True
         # "random" or "distance" or "weight"
-        self.syn_del_strategy = "random"
+        self.syn_del_strategy = "weight"
         # "random" or "distance"
         self.syn_form_strategy = "distance"
 
