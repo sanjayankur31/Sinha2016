@@ -865,127 +865,66 @@ class Sinha2016:
                     "time(ms)", "gid", "conns_gained"),
                     file=self.syn_new_fh_o_I, flush=True)
 
-    def setup_plasticity(self, structural_p=True, synaptic_p=True):
-        """Control plasticities."""
-        self.is_str_p_enabled = structural_p
-        self.is_syn_p_enabled = synaptic_p
+    def __set_str_p_hom_point(self, ca_e, ca_i):
+        """Set the new gaussian parameters for MSP."""
+        self.eps_e = numpy.mean(ca_e)
+        self.eps_i = numpy.mean(ca_i)
+        # 0.4/0.7
+        self.eta_ax_e = self.eps_e * 0.56
+        self.eta_ax_i = self.eps_i * 0.56
+        # 0.1/0.7
+        self.eta_den_e = self.eps_e * 0.14
+        self.eta_den_i = self.eps_i * 0.14
 
-        if self.is_str_p_enabled and self.is_syn_p_enabled:
-            logging.info("NETWORK SETUP TO HANDLE BOTH PLASTICITIES")
-        elif self.is_str_p_enabled and not self.is_syn_p_enabled:
-            logging.info("NETWORK SETUP TO HANDLE ONLY STRUCTURAL PLASTICITY")
-        elif self.is_syn_p_enabled and not self.is_str_p_enabled:
-            logging.info("NETWORK SETUP TO HANDLE ONLY SYNAPTIC PLASTICITY")
-        else:
-            logging.critical("Both plasticities cannot be disabled. Exiting.")
-            sys.exit()
+        new_growth_curve_axonal_E = {
+            'growth_curve': "gaussian",
+            'growth_rate': self.nu,  # max dz/dt (elements/ms)
+            'continuous': False,
+            'eta': self.eta_ax_e,
+            'eps': self.eps_e
+        }
+        new_growth_curve_axonal_I = {
+            'growth_curve': "gaussian",
+            'growth_rate': self.nu,  # max dz/dt (elements/ms)
+            'continuous': False,
+            'eta': self.eta_ax_i,
+            'eps': self.eps_i
+        }
+        new_growth_curve_dendritic_E = {
+            'growth_curve': "gaussian",
+            'growth_rate': self.nu,  # max dz/dt (elements/ms)
+            'continuous': False,
+            'eta': self.eta_den_e,
+            'eps': self.eps_e
+        }
+        new_growth_curve_dendritic_I = {
+            'growth_curve': "gaussian",
+            'growth_rate': self.nu,  # max dz/dt (elements/ms)
+            'continuous': False,
+            'eta': self.eta_den_i,
+            'eps': self.eps_i
+        }
 
-    def prerun_setup(self,
-                     stabilisation_time=None,
-                     sp_update_interval=None,
-                     recording_interval=None):
-        """Pre reun configuration."""
-        # Cannot be changed mid simulation
-        self.update_time_windows(stabilisation_time, sp_update_interval,
-                                 recording_interval)
-        self.__setup_simulation()
+        new_structural_p_elements_E = {
+            'Den_ex': new_growth_curve_dendritic_E,
+            'Den_in': new_growth_curve_dendritic_E,
+            'Axon_ex': new_growth_curve_axonal_E
+        }
 
-    def print_simulation_parameters(self):
-        """Print the parameters of the simulation to a file."""
-        if self.rank == 0:
-            with open("99-simulation_params.txt", 'w') as pfile:
-                print("{}: {} milli seconds".format("dt", self.dt),
-                      file=pfile)
-                print("{}: {} seconds".format("stabilisation_time",
-                                              self.default_stabilisation_time),
-                      file=pfile)
-                print("{}: {} seconds".format("recording_interval",
-                                              self.recording_interval),
-                      file=pfile)
-                print("{}: {}".format("str_p_enabled",
-                                      self.is_str_p_enabled),
-                      file=pfile)
-                print("{}: {}".format("syn_p_enabled",
-                                      self.is_syn_p_enabled),
-                      file=pfile)
-                print("{}: {}".format("is_rewiring_enabled",
-                                      self.is_rewiring_enabled),
-                      file=pfile)
-                print("{}: {}".format("syn_del_strategy",
-                                      self.syn_del_strategy),
-                      file=pfile)
-                print("{}: {}".format("syn_form_strategy",
-                                      self.syn_form_strategy),
-                      file=pfile)
-                print("{}: {}".format("num_E", self.populations['E']),
-                      file=pfile)
-                print("{}: {}".format("num_I", self.populations['I']),
-                      file=pfile)
-                print("{}: {}".format("num_P", self.populations['P']),
-                      file=pfile)
-                print("{}: {}".format("num_R", self.populations['R']),
-                      file=pfile)
-                print("{}: {}".format("pattern_percent", self.pattern_percent),
-                      file=pfile)
-                print("{}: {}".format("recall_percent", self.recall_percent),
-                      file=pfile)
-                print("{}: {}".format("num_colsE", self.colsE),
-                      file=pfile)
-                print("{}: {}".format("num_colsI", self.colsI),
-                      file=pfile)
-                print("{}: {}".format("dist_neuronsE", self.neuronal_distE),
-                      file=pfile)
-                print("{}: {}".format("dist_neuronsI", self.neuronal_distI),
-                      file=pfile)
-                print("{}: {}".format("lpz_percent", self.lpz_percent),
-                      file=pfile)
-                print("{}: {} micro metres".format(
-                    "grid_size_E",
-                    self.location_tree.data[len(self.neuronsE) - 1]),
-                    file=pfile)
-                print("{}: {} micro metres".format("sd_dist",
-                                                   self.location_sd),
-                      file=pfile)
-                print("{}: {} seconds".format("sp_update_interval",
-                                              self.sp_update_interval),
-                      file=pfile)
-                print("{}: {} seconds".format("recording_interval",
-                                              self.recording_interval),
-                      file=pfile)
-                print("{}: {} nS".format("wbar", self.wbar),
-                      file=pfile)
-                print("{}: {} nS".format("weightEE", self.weightEE),
-                      file=pfile)
-                print("{}: {} ns".format("weightPatternEE",
-                                         self.weightPatternEE),
-                      file=pfile)
-                print("{}: {} nS".format("weightEI", self.weightEI),
-                      file=pfile)
-                print("{}: {} nS".format("weightII", self.weightII),
-                      file=pfile)
-                print("{}: {} nS".format("weightExt", self.weightExt),
-                      file=pfile)
-                print("{}: {}".format("sparsity", self.sparsity),
-                      file=pfile)
+        new_structural_p_elements_I = {
+            'Den_ex': new_growth_curve_dendritic_I,
+            'Den_in': new_growth_curve_dendritic_I,
+            'Axon_in': new_growth_curve_axonal_I
+        }
 
-    def update_time_windows(self,
-                            stabilisation_time=None,
-                            sp_update_interval=None,
-                            recording_interval=None):
-        """Set up stabilisation time."""
-        if stabilisation_time:
-            self.default_stabilisation_time = int(stabilisation_time)
-        if sp_update_interval:
-            self.sp_update_interval = int(sp_update_interval)
-        if recording_interval:
-            self.recording_interval = int(recording_interval)
-
-        if math.gcd(int(self.recording_interval),
-                    int(self.sp_update_interval)) == 1:
-            logging.warning(
-                "Recording interval({}) and SP interval({}) are not multiples")
-            logging.warning(
-                "Simulation will run in 1 second chunks only")
+        loc_e = [stat['global_id'] for stat in nest.GetStatus(self.neuronsE)
+                 if stat['local']]
+        loc_i = [stat['global_id'] for stat in nest.GetStatus(self.neuronsI)
+                 if stat['local']]
+        nest.SetStatus(loc_e, 'synaptic_elements_param',
+                       new_structural_p_elements_E)
+        nest.SetStatus(loc_i, 'synaptic_elements_param',
+                       new_structural_p_elements_I)
 
     def __setup_simulation(self):
         """Setup the common simulation things."""
@@ -1018,61 +957,6 @@ class Sinha2016:
         self.__setup_files()
 
         self.dump_data()
-
-    def stabilise(self, stab_time=0., label="Stabilising"):
-        """Stabilise network."""
-        # use default if not mentioned
-        if stab_time:
-            stabilisation_time = stab_time
-        else:
-            stabilisation_time = self.default_stabilisation_time
-
-        logging.debug("SIMULATION: STABILISING for {} seconds".format(
-            stabilisation_time))
-        self.run_sim_phase(stabilisation_time, label)
-
-    def run_sim_phase(self, sim_time=2000, label="Phase A"):
-        """Run a simulation phase."""
-        # take the smaller of the two intervals
-        current_sim_time = nest.GetKernelStatus()['time']
-        logging.info("Phase started at {}: {}".format(
-            current_sim_time, label))
-        phase_time = 0
-
-        # make sure we run for the smallest interval
-        if self.is_rewiring_enabled:
-            run_duration = math.gcd(int(self.sp_update_interval),
-                                    int(self.recording_interval))
-        else:
-            run_duration = self.recording_interval
-
-        if sim_time < run_duration:
-            logging.warning(
-                "Requested run time ({}) < minimum run duration ({})".format(
-                    sim_time, run_duration))
-            logging.warning(
-                "Setting run time to run duration")
-            sim_time = run_duration
-
-        update_steps = numpy.arange(0, sim_time, run_duration)
-        for i in update_steps:
-            nest.Simulate(run_duration*1000.)
-            current_sim_time = nest.GetKernelStatus()['time']
-            logging.info("Simulation time: {} seconds".format(
-                current_sim_time/1000))
-            # so it's always a multiple of the smallest simulation run time
-            phase_time += run_duration
-
-            # dump data
-            if int(phase_time % self.recording_interval) == 0:
-                self.dump_data()
-            # update connectivity
-            if int(phase_time % self.sp_update_interval) == 0:
-                self.update_connectivity()
-
-        current_sim_time = nest.GetKernelStatus()['time']
-        logging.info("Phase ended at {}: {}".format(
-            current_sim_time, label))
 
     def __get_syn_elms(self):
         """Get synaptic elements all neurons."""
@@ -1181,6 +1065,65 @@ class Sinha2016:
         # using numpy converts the array to floats and nest doesn't like that
         # for neuron ids
         return list(farthest_opts[:, 0].astype(int))
+
+    def __get_nearest_ps_prob(self, source, options, probability):
+        """Choose nearest partners but pick them with a probability.
+
+        Do not permit autapses.
+
+        :source: source neuron
+        :options: options to choose from
+        :probability: probability of picking a partner
+        :returns: list of chosen nearest partners
+
+        """
+        # inefficient, but works.
+        max_num_required = len(options) * probability
+        distances = {}
+        for opt in options:
+            if opt == source:
+                continue
+            distance = self.__get_distance_toroid(source, opt)
+            distances[opt] = distance
+
+        sorted_distances = sorted(distances.items(),
+                                  key=operator.itemgetter(1))
+        nearest_opts = []
+        counter = 0
+        for (nrn, distance) in sorted_distances:
+            if random.random() <= probability:
+                nearest_opts.append(nrn)
+                counter += 1
+            if counter >= max_num_required:
+                return nearest_opts
+
+        # otherwise just return how many we got after traversing the whole
+        # option list
+        return nearest_opts
+
+    def __get_nearest_ps(self, source, options, num_required):
+        """Choose nearest partners.
+
+        :source: source neuron
+        :options: options to choose from
+        :num_required: number of partners needed
+        :returns: list of chosen nearest partners
+
+        """
+        # in efficient, but works.
+        distances = {}
+        for opt in options:
+            distance = self.__get_distance_toroid(source, opt)
+            distances[opt] = distance
+
+        sorted_distances = sorted(distances.items(),
+                                  key=operator.itemgetter(1))
+        nearest_opts = numpy.array(sorted_distances[0:num_required])
+        logging.debug("Returning nearest partners")
+
+        # using numpy converts the array to floats and nest doesn't like that
+        # for neuron ids
+        return list(nearest_opts[:, 0].astype(int))
 
     def __delete_connections_from_pre(self, synelms):
         """Delete connections when the neuron is a source."""
@@ -1634,65 +1577,6 @@ class Sinha2016:
                  syn_del_o_E + syn_del_o_I),
                 total_synapses))
 
-    def __get_nearest_ps_prob(self, source, options, probability):
-        """Choose nearest partners but pick them with a probability.
-
-        Do not permit autapses.
-
-        :source: source neuron
-        :options: options to choose from
-        :probability: probability of picking a partner
-        :returns: list of chosen nearest partners
-
-        """
-        # inefficient, but works.
-        max_num_required = len(options) * probability
-        distances = {}
-        for opt in options:
-            if opt == source:
-                continue
-            distance = self.__get_distance_toroid(source, opt)
-            distances[opt] = distance
-
-        sorted_distances = sorted(distances.items(),
-                                  key=operator.itemgetter(1))
-        nearest_opts = []
-        counter = 0
-        for (nrn, distance) in sorted_distances:
-            if random.random() <= probability:
-                nearest_opts.append(nrn)
-                counter += 1
-            if counter >= max_num_required:
-                return nearest_opts
-
-        # otherwise just return how many we got after traversing the whole
-        # option list
-        return nearest_opts
-
-    def __get_nearest_ps(self, source, options, num_required):
-        """Choose nearest partners.
-
-        :source: source neuron
-        :options: options to choose from
-        :num_required: number of partners needed
-        :returns: list of chosen nearest partners
-
-        """
-        # in efficient, but works.
-        distances = {}
-        for opt in options:
-            distance = self.__get_distance_toroid(source, opt)
-            distances[opt] = distance
-
-        sorted_distances = sorted(distances.items(),
-                                  key=operator.itemgetter(1))
-        nearest_opts = numpy.array(sorted_distances[0:num_required])
-        logging.debug("Returning nearest partners")
-
-        # using numpy converts the array to floats and nest doesn't like that
-        # for neuron ids
-        return list(nearest_opts[:, 0].astype(int))
-
     def __create_new_connections(self, synelms):
         """Create new connections."""
         logging.debug("Creating connections using the {} strategy".format(
@@ -1848,216 +1732,6 @@ class Sinha2016:
                      syn_new_p_lpz_E + syn_new_lpz_c_I +
                      syn_new_lpz_b_I + syn_new_p_lpz_I +
                      syn_new_o_E + syn_new_o_I)))
-
-    def update_connectivity(self):
-        """Our implementation of structural plasticity."""
-        if not self.is_rewiring_enabled:
-            return
-        logging.debug("STRUCTURAL PLASTICITY: Updating connectivity")
-        syn_elms = self.__get_syn_elms()
-        self.__delete_connections_from_pre(syn_elms)
-        # Must wait for all ranks to finish before proceeding
-
-        syn_elms_1 = self.__get_syn_elms()
-        self.__delete_connections_from_post(syn_elms_1)
-        # Must wait for all ranks to finish before proceeding
-
-        syn_elms_2 = self.__get_syn_elms()
-        self.__create_new_connections(syn_elms_2)
-        # Must wait for all ranks to finish before proceeding
-        logging.debug("STRUCTURAL PLASTICITY: Connectivity updated")
-
-    def invoke_metaplasticity(self):
-        """Update growth curve parameters."""
-        if self.is_metaplasticity_enabled:
-            cal_e = [stat['Ca'] for stat in nest.GetStatus(self.neuronsE) if
-                     stat['local']]
-            cal_i = [stat['Ca'] for stat in nest.GetStatus(self.neuronsI) if
-                     stat['local']]
-            self.__set_str_p_hom_point(cal_e, cal_i)
-        logging.debug("META PLASTICITY: Growth curves updated")
-
-    def __get_neurons_from_region(self, num_neurons, first_point, last_point):
-        """Get neurons in the centre of the grid.
-
-        This will be used to get neurons for deaff, and also to get neurons for
-        the centred pattern.
-        """
-        mid_point = [(x + y)/2 for x, y in zip(last_point, first_point)]
-        neurons = self.location_tree.query(
-            mid_point, k=num_neurons)[1]
-        logging.debug("Got {}/{} neurons".format(len(neurons), num_neurons))
-        return neurons
-
-    def __strengthen_pattern_connections(self, pattern_neurons):
-        """Strengthen connections that make up the pattern."""
-        connections = nest.GetConnections(source=pattern_neurons,
-                                          target=pattern_neurons)
-        nest.SetStatus(connections, {"weight": self.weightPatternEE})
-        logging.debug("ANKUR>> Number of connections strengthened: "
-                      "{}".format(len(connections)))
-
-    def __track_pattern(self, pattern_neurons):
-        """Track the pattern."""
-        logging.debug("Tracking this pattern")
-        self.patterns.append(pattern_neurons)
-        background_neurons = list(
-            set(self.neuronsE) - set(pattern_neurons))
-        # print to file
-        # NOTE: since these are E neurons, the indices match in the location
-        # tree. No need to subtract self.neuronsE[0] to get the right indices
-        # at the moment. But keep in mind in case something changes in the
-        # future.
-        if self.rank == 0:
-            fn = "00-pattern-neurons-{}.txt".format(
-                self.pattern_count)
-            with open(fn, 'w') as fh:
-                print("gid\txcor\tycor", file=fh, flush=True)
-                for neuron in pattern_neurons:
-                    print("{}\t{}\t{}".format(
-                        neuron,
-                        self.location_tree.data[neuron - 1][0],
-                        self.location_tree.data[neuron - 1][1]),
-                        file=fh)
-
-            # background neurons
-            fn = "00-background-neurons-{}.txt".format(
-                self.pattern_count)
-
-            with open(fn, 'w') as fh:
-                print("gid\txcor\tycor", file=fh, flush=True)
-                for neuron in background_neurons:
-                    print("{}\t{}\t{}".format(
-                        neuron,
-                        self.location_tree.data[neuron - 1][0],
-                        self.location_tree.data[neuron - 1][1]),
-                        file=fh)
-
-        # set up spike detectors
-        sd_params = self.sd_paramsP.copy()
-        sd_params['label'] = (sd_params['label'] + "-{}".format(
-            self.pattern_count))
-        # pattern
-        pattern_spike_detector = nest.Create(
-            'spike_detector', params=sd_params)
-        nest.Connect(pattern_neurons, pattern_spike_detector)
-        # save the detector
-        self.sdP.append(pattern_spike_detector)
-
-        # background
-        sd_params = self.sd_paramsB.copy()
-        sd_params['label'] = (sd_params['label'] + "-{}".format(
-            self.pattern_count))
-        background_spike_detector = nest.Create(
-            'spike_detector', params=sd_params)
-        nest.Connect(background_neurons, background_spike_detector)
-        # save the detector
-        self.sdB.append(background_spike_detector)
-
-    def store_pattern_off_centre(self, offset=[0., 0.], track=False):
-        """Store a pattern in the centre of LPZ."""
-        logging.debug(
-            "SIMULATION: Storing pattern {} in centre of LPZ".format(
-                self.pattern_count + 1))
-        # first E neuron
-        first_point = numpy.array(self.location_tree.data[0])
-        # last E neuron
-        # I neurons are spread among the E neurons and therefore do not make it
-        # to the extremeties
-        last_point = numpy.array(
-            self.location_tree.data[len(self.neuronsE) - 1])
-        centre_point = numpy.array(offset) + (first_point + last_point)/2
-        self.store_pattern_with_centre(centre_point,
-                                       (1.25 * self.populations['P']),
-                                       track=True)
-
-    def store_pattern_with_centre(self, centre_point, num_neurons,
-                                  track=False):
-        """Store a pattern by specifying area extent."""
-        logging.debug(
-            "SIMULATION: Storing pattern {} centred at:".format(
-                self.pattern_count + 1, centre_point))
-        self.pattern_count += 1
-        # get 1000 neurons - 800 will be E and 200 will be I
-        # we only need the 800 I neurons
-        all_neurons = self.location_tree.query(
-            centre_point, k=num_neurons)[1]
-        pattern_neurons = list(set(all_neurons).intersection(
-            set(self.neuronsE)))
-        self.__strengthen_pattern_connections(pattern_neurons)
-        if track:
-            self.__track_pattern(pattern_neurons)
-        logging.debug(
-            "Number of patterns stored: {}".format(
-                self.pattern_count))
-
-    def setup_pattern_for_recall(self, pattern_number):
-        """
-        Set up a pattern for recall.
-
-        Creates a new poisson generator and connects it to a recall subset of
-        this pattern - the poisson stimulus will run for the set
-        recall_duration from the invocation of this method.
-        """
-        # set up external stimulus
-        pattern_neurons = self.patterns[pattern_number - 1]
-        # Only neurons that have are not in the LPZ will be given stimulus
-        active_pattern_neurons = list(set(pattern_neurons) -
-                                      set(self.lpz_neurons_E))
-        # Pick percent of neurons that are not in the LPZ
-        recall_neurons = []
-        if len(active_pattern_neurons) > 0:
-            num_recall_neurons = int(math.ceil(len(active_pattern_neurons) *
-                                               self.recall_percent))
-            # if the number of active pattern neurons is too small, use the
-            # whole lot
-            if num_recall_neurons > 0:
-                recall_neurons = active_pattern_neurons[-num_recall_neurons:]
-            else:
-                recall_neurons = active_pattern_neurons
-
-            stim_time = nest.GetKernelStatus()['time']
-            neuronDictStim = {'rate': 200.,
-                              'origin': stim_time,
-                              'start': 0., 'stop': self.recall_duration}
-            stim = nest.Create('poisson_generator', 1,
-                               neuronDictStim)
-
-            nest.Connect(stim, recall_neurons,
-                         conn_spec=self.connDictStim)
-
-            logging.debug("ANKUR>> Number of recall neurons for pattern"
-                          "{}: {}".format(pattern_number, len(recall_neurons)))
-        else:
-            logging.debug("ANKUR>> Pattern {} appears to be completely "
-                          "deafferentated - not setting up a recall stimulus")
-        self.recall_neurons.append(recall_neurons)
-
-    def recall_last_pattern(self, time):
-        """
-        Only setup the last pattern.
-
-        An extra helper method, since we'll be doing this most.
-        """
-        logging.info("SIMULATION: RECALLING LAST PATTERN")
-        self.recall_pattern(time, self.pattern_count)
-
-    def recall_pattern(self, time, pattern_number):
-        """Recall a pattern."""
-        self.setup_pattern_for_recall(pattern_number)
-        self.run_sim_phase(
-            time, label="Recalling pattern {}".format(pattern_number))
-
-    def deaff_network(self):
-        """Deaff a the network."""
-        logging.info("SIMULATION: deaffing spatial network")
-        for nrn in self.lpz_neurons_E:
-            nest.DisconnectOneToOne(self.poissonExt[0], nrn,
-                                    syn_spec={'model': 'static_synapse'})
-        for nrn in self.lpz_neurons_I:
-            nest.DisconnectOneToOne(self.poissonExt[0], nrn,
-                                    syn_spec={'model': 'static_synapse'})
-        logging.info("SIMULATION: Network deafferentated")
 
     def __dump_ca_concentration(self):
         """Dump calcium concentration."""
@@ -2501,6 +2175,216 @@ class Sinha2016:
         if len(weightsEE) > self.num_synapses_EE:
             self.num_synapses_EE = len(weightsEE)
 
+    def __get_neurons_from_region(self, num_neurons, first_point, last_point):
+        """Get neurons in the centre of the grid.
+
+        This will be used to get neurons for deaff, and also to get neurons for
+        the centred pattern.
+        """
+        mid_point = [(x + y)/2 for x, y in zip(last_point, first_point)]
+        neurons = self.location_tree.query(
+            mid_point, k=num_neurons)[1]
+        logging.debug("Got {}/{} neurons".format(len(neurons), num_neurons))
+        return neurons
+
+    def __strengthen_pattern_connections(self, pattern_neurons):
+        """Strengthen connections that make up the pattern."""
+        connections = nest.GetConnections(source=pattern_neurons,
+                                          target=pattern_neurons)
+        nest.SetStatus(connections, {"weight": self.weightPatternEE})
+        logging.debug("ANKUR>> Number of connections strengthened: "
+                      "{}".format(len(connections)))
+
+    def __track_pattern(self, pattern_neurons):
+        """Track the pattern."""
+        logging.debug("Tracking this pattern")
+        self.patterns.append(pattern_neurons)
+        background_neurons = list(
+            set(self.neuronsE) - set(pattern_neurons))
+        # print to file
+        # NOTE: since these are E neurons, the indices match in the location
+        # tree. No need to subtract self.neuronsE[0] to get the right indices
+        # at the moment. But keep in mind in case something changes in the
+        # future.
+        if self.rank == 0:
+            fn = "00-pattern-neurons-{}.txt".format(
+                self.pattern_count)
+            with open(fn, 'w') as fh:
+                print("gid\txcor\tycor", file=fh, flush=True)
+                for neuron in pattern_neurons:
+                    print("{}\t{}\t{}".format(
+                        neuron,
+                        self.location_tree.data[neuron - 1][0],
+                        self.location_tree.data[neuron - 1][1]),
+                        file=fh)
+
+            # background neurons
+            fn = "00-background-neurons-{}.txt".format(
+                self.pattern_count)
+
+            with open(fn, 'w') as fh:
+                print("gid\txcor\tycor", file=fh, flush=True)
+                for neuron in background_neurons:
+                    print("{}\t{}\t{}".format(
+                        neuron,
+                        self.location_tree.data[neuron - 1][0],
+                        self.location_tree.data[neuron - 1][1]),
+                        file=fh)
+
+        # set up spike detectors
+        sd_params = self.sd_paramsP.copy()
+        sd_params['label'] = (sd_params['label'] + "-{}".format(
+            self.pattern_count))
+        # pattern
+        pattern_spike_detector = nest.Create(
+            'spike_detector', params=sd_params)
+        nest.Connect(pattern_neurons, pattern_spike_detector)
+        # save the detector
+        self.sdP.append(pattern_spike_detector)
+
+        # background
+        sd_params = self.sd_paramsB.copy()
+        sd_params['label'] = (sd_params['label'] + "-{}".format(
+            self.pattern_count))
+        background_spike_detector = nest.Create(
+            'spike_detector', params=sd_params)
+        nest.Connect(background_neurons, background_spike_detector)
+        # save the detector
+        self.sdB.append(background_spike_detector)
+
+    def update_connectivity(self):
+        """Our implementation of structural plasticity."""
+        if not self.is_rewiring_enabled:
+            return
+        logging.debug("STRUCTURAL PLASTICITY: Updating connectivity")
+        syn_elms = self.__get_syn_elms()
+        self.__delete_connections_from_pre(syn_elms)
+        # Must wait for all ranks to finish before proceeding
+
+        syn_elms_1 = self.__get_syn_elms()
+        self.__delete_connections_from_post(syn_elms_1)
+        # Must wait for all ranks to finish before proceeding
+
+        syn_elms_2 = self.__get_syn_elms()
+        self.__create_new_connections(syn_elms_2)
+        # Must wait for all ranks to finish before proceeding
+        logging.debug("STRUCTURAL PLASTICITY: Connectivity updated")
+
+    def invoke_metaplasticity(self):
+        """Update growth curve parameters."""
+        if self.is_metaplasticity_enabled:
+            cal_e = [stat['Ca'] for stat in nest.GetStatus(self.neuronsE) if
+                     stat['local']]
+            cal_i = [stat['Ca'] for stat in nest.GetStatus(self.neuronsI) if
+                     stat['local']]
+            self.__set_str_p_hom_point(cal_e, cal_i)
+        logging.debug("META PLASTICITY: Growth curves updated")
+
+    def store_pattern_off_centre(self, offset=[0., 0.], track=False):
+        """Store a pattern in the centre of LPZ."""
+        logging.debug(
+            "SIMULATION: Storing pattern {} in centre of LPZ".format(
+                self.pattern_count + 1))
+        # first E neuron
+        first_point = numpy.array(self.location_tree.data[0])
+        # last E neuron
+        # I neurons are spread among the E neurons and therefore do not make it
+        # to the extremeties
+        last_point = numpy.array(
+            self.location_tree.data[len(self.neuronsE) - 1])
+        centre_point = numpy.array(offset) + (first_point + last_point)/2
+        self.store_pattern_with_centre(centre_point,
+                                       (1.25 * self.populations['P']),
+                                       track=True)
+
+    def store_pattern_with_centre(self, centre_point, num_neurons,
+                                  track=False):
+        """Store a pattern by specifying area extent."""
+        logging.debug(
+            "SIMULATION: Storing pattern {} centred at:".format(
+                self.pattern_count + 1, centre_point))
+        self.pattern_count += 1
+        # get 1000 neurons - 800 will be E and 200 will be I
+        # we only need the 800 I neurons
+        all_neurons = self.location_tree.query(
+            centre_point, k=num_neurons)[1]
+        pattern_neurons = list(set(all_neurons).intersection(
+            set(self.neuronsE)))
+        self.__strengthen_pattern_connections(pattern_neurons)
+        if track:
+            self.__track_pattern(pattern_neurons)
+        logging.debug(
+            "Number of patterns stored: {}".format(
+                self.pattern_count))
+
+    def setup_pattern_for_recall(self, pattern_number):
+        """
+        Set up a pattern for recall.
+
+        Creates a new poisson generator and connects it to a recall subset of
+        this pattern - the poisson stimulus will run for the set
+        recall_duration from the invocation of this method.
+        """
+        # set up external stimulus
+        pattern_neurons = self.patterns[pattern_number - 1]
+        # Only neurons that have are not in the LPZ will be given stimulus
+        active_pattern_neurons = list(set(pattern_neurons) -
+                                      set(self.lpz_neurons_E))
+        # Pick percent of neurons that are not in the LPZ
+        recall_neurons = []
+        if len(active_pattern_neurons) > 0:
+            num_recall_neurons = int(math.ceil(len(active_pattern_neurons) *
+                                               self.recall_percent))
+            # if the number of active pattern neurons is too small, use the
+            # whole lot
+            if num_recall_neurons > 0:
+                recall_neurons = active_pattern_neurons[-num_recall_neurons:]
+            else:
+                recall_neurons = active_pattern_neurons
+
+            stim_time = nest.GetKernelStatus()['time']
+            neuronDictStim = {'rate': 200.,
+                              'origin': stim_time,
+                              'start': 0., 'stop': self.recall_duration}
+            stim = nest.Create('poisson_generator', 1,
+                               neuronDictStim)
+
+            nest.Connect(stim, recall_neurons,
+                         conn_spec=self.connDictStim)
+
+            logging.debug("ANKUR>> Number of recall neurons for pattern"
+                          "{}: {}".format(pattern_number, len(recall_neurons)))
+        else:
+            logging.debug("ANKUR>> Pattern {} appears to be completely "
+                          "deafferentated - not setting up a recall stimulus")
+        self.recall_neurons.append(recall_neurons)
+
+    def recall_last_pattern(self, time):
+        """
+        Only setup the last pattern.
+
+        An extra helper method, since we'll be doing this most.
+        """
+        logging.info("SIMULATION: RECALLING LAST PATTERN")
+        self.recall_pattern(time, self.pattern_count)
+
+    def recall_pattern(self, time, pattern_number):
+        """Recall a pattern."""
+        self.setup_pattern_for_recall(pattern_number)
+        self.run_sim_phase(
+            time, label="Recalling pattern {}".format(pattern_number))
+
+    def deaff_network(self):
+        """Deaff a the network."""
+        logging.info("SIMULATION: deaffing spatial network")
+        for nrn in self.lpz_neurons_E:
+            nest.DisconnectOneToOne(self.poissonExt[0], nrn,
+                                    syn_spec={'model': 'static_synapse'})
+        for nrn in self.lpz_neurons_I:
+            nest.DisconnectOneToOne(self.poissonExt[0], nrn,
+                                    syn_spec={'model': 'static_synapse'})
+        logging.info("SIMULATION: Network deafferentated")
+
     def dump_data(self):
         """Master datadump function."""
         logging.debug("Rank {}: Printing data to files".format(self.rank))
@@ -2587,66 +2471,182 @@ class Sinha2016:
         self.lpz_percent = lpz_percent
         logging.info("LPZ percent set to {}".format(self.lpz_percent))
 
-    def __set_str_p_hom_point(self, ca_e, ca_i):
-        """Set the new gaussian parameters for MSP."""
-        self.eps_e = numpy.mean(ca_e)
-        self.eps_i = numpy.mean(ca_i)
-        # 0.4/0.7
-        self.eta_ax_e = self.eps_e * 0.56
-        self.eta_ax_i = self.eps_i * 0.56
-        # 0.1/0.7
-        self.eta_den_e = self.eps_e * 0.14
-        self.eta_den_i = self.eps_i * 0.14
+    def stabilise(self, stab_time=0., label="Stabilising"):
+        """Stabilise network."""
+        # use default if not mentioned
+        if stab_time:
+            stabilisation_time = stab_time
+        else:
+            stabilisation_time = self.default_stabilisation_time
 
-        new_growth_curve_axonal_E = {
-            'growth_curve': "gaussian",
-            'growth_rate': self.nu,  # max dz/dt (elements/ms)
-            'continuous': False,
-            'eta': self.eta_ax_e,
-            'eps': self.eps_e
-        }
-        new_growth_curve_axonal_I = {
-            'growth_curve': "gaussian",
-            'growth_rate': self.nu,  # max dz/dt (elements/ms)
-            'continuous': False,
-            'eta': self.eta_ax_i,
-            'eps': self.eps_i
-        }
-        new_growth_curve_dendritic_E = {
-            'growth_curve': "gaussian",
-            'growth_rate': self.nu,  # max dz/dt (elements/ms)
-            'continuous': False,
-            'eta': self.eta_den_e,
-            'eps': self.eps_e
-        }
-        new_growth_curve_dendritic_I = {
-            'growth_curve': "gaussian",
-            'growth_rate': self.nu,  # max dz/dt (elements/ms)
-            'continuous': False,
-            'eta': self.eta_den_i,
-            'eps': self.eps_i
-        }
+        logging.debug("SIMULATION: STABILISING for {} seconds".format(
+            stabilisation_time))
+        self.run_sim_phase(stabilisation_time, label)
 
-        new_structural_p_elements_E = {
-            'Den_ex': new_growth_curve_dendritic_E,
-            'Den_in': new_growth_curve_dendritic_E,
-            'Axon_ex': new_growth_curve_axonal_E
-        }
+    def run_sim_phase(self, sim_time=2000, label="Phase A"):
+        """Run a simulation phase."""
+        # take the smaller of the two intervals
+        current_sim_time = nest.GetKernelStatus()['time']
+        logging.info("Phase started at {}: {}".format(
+            current_sim_time, label))
+        phase_time = 0
 
-        new_structural_p_elements_I = {
-            'Den_ex': new_growth_curve_dendritic_I,
-            'Den_in': new_growth_curve_dendritic_I,
-            'Axon_in': new_growth_curve_axonal_I
-        }
+        # make sure we run for the smallest interval
+        if self.is_rewiring_enabled:
+            run_duration = math.gcd(int(self.sp_update_interval),
+                                    int(self.recording_interval))
+        else:
+            run_duration = self.recording_interval
 
-        loc_e = [stat['global_id'] for stat in nest.GetStatus(self.neuronsE)
-                 if stat['local']]
-        loc_i = [stat['global_id'] for stat in nest.GetStatus(self.neuronsI)
-                 if stat['local']]
-        nest.SetStatus(loc_e, 'synaptic_elements_param',
-                       new_structural_p_elements_E)
-        nest.SetStatus(loc_i, 'synaptic_elements_param',
-                       new_structural_p_elements_I)
+        if sim_time < run_duration:
+            logging.warning(
+                "Requested run time ({}) < minimum run duration ({})".format(
+                    sim_time, run_duration))
+            logging.warning(
+                "Setting run time to run duration")
+            sim_time = run_duration
+
+        update_steps = numpy.arange(0, sim_time, run_duration)
+        for i in update_steps:
+            nest.Simulate(run_duration*1000.)
+            current_sim_time = nest.GetKernelStatus()['time']
+            logging.info("Simulation time: {} seconds".format(
+                current_sim_time/1000))
+            # so it's always a multiple of the smallest simulation run time
+            phase_time += run_duration
+
+            # dump data
+            if int(phase_time % self.recording_interval) == 0:
+                self.dump_data()
+            # update connectivity
+            if int(phase_time % self.sp_update_interval) == 0:
+                self.update_connectivity()
+
+        current_sim_time = nest.GetKernelStatus()['time']
+        logging.info("Phase ended at {}: {}".format(
+            current_sim_time, label))
+
+    def setup_plasticity(self, structural_p=True, synaptic_p=True):
+        """Control plasticities."""
+        self.is_str_p_enabled = structural_p
+        self.is_syn_p_enabled = synaptic_p
+
+        if self.is_str_p_enabled and self.is_syn_p_enabled:
+            logging.info("NETWORK SETUP TO HANDLE BOTH PLASTICITIES")
+        elif self.is_str_p_enabled and not self.is_syn_p_enabled:
+            logging.info("NETWORK SETUP TO HANDLE ONLY STRUCTURAL PLASTICITY")
+        elif self.is_syn_p_enabled and not self.is_str_p_enabled:
+            logging.info("NETWORK SETUP TO HANDLE ONLY SYNAPTIC PLASTICITY")
+        else:
+            logging.critical("Both plasticities cannot be disabled. Exiting.")
+            sys.exit()
+
+    def prerun_setup(self,
+                     stabilisation_time=None,
+                     sp_update_interval=None,
+                     recording_interval=None):
+        """Pre reun configuration."""
+        # Cannot be changed mid simulation
+        self.update_time_windows(stabilisation_time, sp_update_interval,
+                                 recording_interval)
+        self.__setup_simulation()
+
+    def print_simulation_parameters(self):
+        """Print the parameters of the simulation to a file."""
+        if self.rank == 0:
+            with open("99-simulation_params.txt", 'w') as pfile:
+                print("{}: {} milli seconds".format("dt", self.dt),
+                      file=pfile)
+                print("{}: {} seconds".format("stabilisation_time",
+                                              self.default_stabilisation_time),
+                      file=pfile)
+                print("{}: {} seconds".format("recording_interval",
+                                              self.recording_interval),
+                      file=pfile)
+                print("{}: {}".format("str_p_enabled",
+                                      self.is_str_p_enabled),
+                      file=pfile)
+                print("{}: {}".format("syn_p_enabled",
+                                      self.is_syn_p_enabled),
+                      file=pfile)
+                print("{}: {}".format("is_rewiring_enabled",
+                                      self.is_rewiring_enabled),
+                      file=pfile)
+                print("{}: {}".format("syn_del_strategy",
+                                      self.syn_del_strategy),
+                      file=pfile)
+                print("{}: {}".format("syn_form_strategy",
+                                      self.syn_form_strategy),
+                      file=pfile)
+                print("{}: {}".format("num_E", self.populations['E']),
+                      file=pfile)
+                print("{}: {}".format("num_I", self.populations['I']),
+                      file=pfile)
+                print("{}: {}".format("num_P", self.populations['P']),
+                      file=pfile)
+                print("{}: {}".format("num_R", self.populations['R']),
+                      file=pfile)
+                print("{}: {}".format("pattern_percent", self.pattern_percent),
+                      file=pfile)
+                print("{}: {}".format("recall_percent", self.recall_percent),
+                      file=pfile)
+                print("{}: {}".format("num_colsE", self.colsE),
+                      file=pfile)
+                print("{}: {}".format("num_colsI", self.colsI),
+                      file=pfile)
+                print("{}: {}".format("dist_neuronsE", self.neuronal_distE),
+                      file=pfile)
+                print("{}: {}".format("dist_neuronsI", self.neuronal_distI),
+                      file=pfile)
+                print("{}: {}".format("lpz_percent", self.lpz_percent),
+                      file=pfile)
+                print("{}: {} micro metres".format(
+                    "grid_size_E",
+                    self.location_tree.data[len(self.neuronsE) - 1]),
+                    file=pfile)
+                print("{}: {} micro metres".format("sd_dist",
+                                                   self.location_sd),
+                      file=pfile)
+                print("{}: {} seconds".format("sp_update_interval",
+                                              self.sp_update_interval),
+                      file=pfile)
+                print("{}: {} seconds".format("recording_interval",
+                                              self.recording_interval),
+                      file=pfile)
+                print("{}: {} nS".format("wbar", self.wbar),
+                      file=pfile)
+                print("{}: {} nS".format("weightEE", self.weightEE),
+                      file=pfile)
+                print("{}: {} ns".format("weightPatternEE",
+                                         self.weightPatternEE),
+                      file=pfile)
+                print("{}: {} nS".format("weightEI", self.weightEI),
+                      file=pfile)
+                print("{}: {} nS".format("weightII", self.weightII),
+                      file=pfile)
+                print("{}: {} nS".format("weightExt", self.weightExt),
+                      file=pfile)
+                print("{}: {}".format("sparsity", self.sparsity),
+                      file=pfile)
+
+    def update_time_windows(self,
+                            stabilisation_time=None,
+                            sp_update_interval=None,
+                            recording_interval=None):
+        """Set up stabilisation time."""
+        if stabilisation_time:
+            self.default_stabilisation_time = int(stabilisation_time)
+        if sp_update_interval:
+            self.sp_update_interval = int(sp_update_interval)
+        if recording_interval:
+            self.recording_interval = int(recording_interval)
+
+        if math.gcd(int(self.recording_interval),
+                    int(self.sp_update_interval)) == 1:
+            logging.warning(
+                "Recording interval({}) and SP interval({}) are not multiples")
+            logging.warning(
+                "Simulation will run in 1 second chunks only")
 
 
 if __name__ == "__main__":
