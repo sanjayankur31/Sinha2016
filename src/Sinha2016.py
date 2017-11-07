@@ -1190,6 +1190,12 @@ class Sinha2016:
                             elif self.syn_del_strategy == "weight":
                                 chosen_targets = self.__get_weakest_ps(
                                     gid, targets, int(abs(elms['Axon_ex'])))
+                                # strip weights from the list
+                                targets = (
+                                    (
+                                        numpy.array(targets)[:, 0]
+                                     ).astype(int)
+                                )
                         else:
                             chosen_targets = targets
                         logging.debug(
@@ -1265,6 +1271,13 @@ class Sinha2016:
                                 chosen_targets = self.__get_weakest_ps(
                                     gid, (targetsE + targetsI),
                                     int(abs(elms['Axon_in'])))
+                                # strip the weights from the list now
+                                targetsE = (
+                                    (numpy.array(targetsE)[:, 0]).astype(int)
+                                )
+                                targetsI = (
+                                    (numpy.array(targetsI)[:, 0]).astype(int)
+                                )
                         else:
                             chosen_targets = (targetsE + targetsI)
                         logging.debug(
@@ -1404,6 +1417,10 @@ class Sinha2016:
                             elif self.syn_del_strategy == "weight":
                                 chosen_sources = self.__get_weakest_ps(
                                     gid, sources, int(abs(elms['Den_ex'])))
+                                # strip weights from the list now
+                                sources = (
+                                    (numpy.array(sources)[:, 0]).astype(int)
+                                )
                         else:
                             chosen_sources = sources
                         logging.debug(
@@ -1504,6 +1521,12 @@ class Sinha2016:
                                 elif self.syn_del_strategy == "weight":
                                     chosen_sources = self.__get_weakest_ps(
                                         gid, sources, int(abs(elms['Den_in'])))
+                                    # strip weights from the list now
+                                    sources = (
+                                        (
+                                            numpy.array(sources)[:, 0]
+                                         ).astype(int)
+                                    )
                             else:
                                 chosen_sources = sources
                             logging.debug(
