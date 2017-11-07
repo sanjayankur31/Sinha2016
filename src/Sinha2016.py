@@ -2627,7 +2627,7 @@ class Sinha2016:
 
         new_structural_p_elements_E = {
             'Den_ex': new_growth_curve_dendritic_E,
-            'Den_in': new_growth_curve_dendritic_I,
+            'Den_in': new_growth_curve_dendritic_E,
             'Axon_ex': new_growth_curve_axonal_E
         }
 
