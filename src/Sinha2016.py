@@ -1152,10 +1152,12 @@ class Sinha2016:
 
         sortedoptions = sorted(optdict.items(),
                                key=operator.itemgetter(1))
-        weakestoptions = numpy.array(sortedoptions[0:num_required:])
+        weakestoptions = numpy.array(sortedoptions[0:num_required])
         logging.debug("Returning weakest links")
 
-        return weakestoptions[:, 0]
+        # using numpy converts the array to floats and nest doesn't like that
+        # for neuron ids
+        return list(weakestoptions[:, 0].astype(int))
 
     def __get_farthest_ps(self, anchor, options, num_required):
         """Choose farthest partners.
