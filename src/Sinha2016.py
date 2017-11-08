@@ -2682,7 +2682,8 @@ class Sinha2016:
         if math.gcd(int(self.recording_interval),
                     int(self.sp_update_interval)) == 1:
             logging.warning(
-                "Recording interval({}) and SP interval({}) are not multiples")
+                "Recording ({}) and SP interval({}) are not multiples".format(
+                    self.recording_interval, self.sp_update_interval))
             logging.warning(
                 "Simulation will run in 1 second chunks only")
 
