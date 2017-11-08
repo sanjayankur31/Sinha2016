@@ -1021,10 +1021,9 @@ class Sinha2016:
                 len(synaptic_elms)))
         return synaptic_elms
 
-    def __get_weakest_ps(self, anchor, options, num_required):
+    def __get_weakest_ps(self, options, num_required):
         """Choose partners to delete based on weight of connections.
 
-        :anchor: source neuron
         :options: options to pick from
         :num_required: number of options required
         :returns: chosen options
@@ -1189,7 +1188,7 @@ class Sinha2016:
                                     gid, targets, int(abs(elms['Axon_ex'])))
                             elif self.syn_del_strategy == "weight":
                                 chosen_targets = self.__get_weakest_ps(
-                                    gid, targets, int(abs(elms['Axon_ex'])))
+                                    targets, int(abs(elms['Axon_ex'])))
                         else:
                             chosen_targets = targets
                         logging.debug(
@@ -1263,7 +1262,7 @@ class Sinha2016:
                                     int(abs(elms['Axon_in'])))
                             elif self.syn_del_strategy == "weight":
                                 chosen_targets = self.__get_weakest_ps(
-                                    gid, (targetsE + targetsI),
+                                    (targetsE + targetsI),
                                     int(abs(elms['Axon_in'])))
                                 # strip the weights from the list now since we
                                 # compare with these later
@@ -1411,7 +1410,7 @@ class Sinha2016:
                                     gid, sources, int(abs(elms['Den_ex'])))
                             elif self.syn_del_strategy == "weight":
                                 chosen_sources = self.__get_weakest_ps(
-                                    gid, sources, int(abs(elms['Den_ex'])))
+                                    sources, int(abs(elms['Den_ex'])))
                         else:
                             chosen_sources = sources
                         logging.debug(
@@ -1511,7 +1510,7 @@ class Sinha2016:
                                         gid, sources, int(abs(elms['Den_in'])))
                                 elif self.syn_del_strategy == "weight":
                                     chosen_sources = self.__get_weakest_ps(
-                                        gid, sources, int(abs(elms['Den_in'])))
+                                        sources, int(abs(elms['Den_in'])))
                             else:
                                 chosen_sources = sources
                             logging.debug(
