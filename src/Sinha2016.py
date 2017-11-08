@@ -1190,7 +1190,15 @@ class Sinha2016:
                                 chosen_targets = self.__get_weakest_ps(
                                     targets, int(abs(elms['Axon_ex'])))
                         else:
-                            chosen_targets = targets
+                            # strip weights from list here too
+                            if self.syn_del_strategy == "weight":
+                                chosen_targets = (
+                                    (
+                                        numpy.array(targets)[:, 0]
+                                    ).astype(int)
+                                )
+                            else:
+                                chosen_targets = targets
                         logging.debug(
                             "Rank {}: {}/{} tgts chosen for neuron {}".format(
                                 self.rank, len(chosen_targets),
@@ -1273,6 +1281,14 @@ class Sinha2016:
                                     (numpy.array(targetsI)[:, 0]).astype(int)
                                 )
                         else:
+                            # strip weight column
+                            if self.syn_del_strategy == "weight":
+                                targetsE = (
+                                    (numpy.array(targetsE)[:, 0]).astype(int)
+                                )
+                                targetsI = (
+                                    (numpy.array(targetsI)[:, 0]).astype(int)
+                                )
                             chosen_targets = (targetsE + targetsI)
                         logging.debug(
                             "Rank {}: {}/{} tgts chosen for neuron {}".format(
@@ -1412,7 +1428,14 @@ class Sinha2016:
                                 chosen_sources = self.__get_weakest_ps(
                                     sources, int(abs(elms['Den_ex'])))
                         else:
-                            chosen_sources = sources
+                            if self.syn_del_strategy == "weight":
+                                chosen_sources = (
+                                    (
+                                        numpy.array(sources)[:, 0]
+                                    ).astype(int)
+                                )
+                            else:
+                                chosen_sources = sources
                         logging.debug(
                             "Rank {}: {}/{} srcs chosen for neuron {}".format(
                                 self.rank, len(chosen_sources),
@@ -1512,7 +1535,15 @@ class Sinha2016:
                                     chosen_sources = self.__get_weakest_ps(
                                         sources, int(abs(elms['Den_in'])))
                             else:
-                                chosen_sources = sources
+                                # strip weights here too
+                                if self.syn_del_strategy == "weight":
+                                    chosen_sources = (
+                                        (
+                                            numpy.array(sources)[:, 0]
+                                        ).astype(int)
+                                    )
+                                else:
+                                    chosen_sources = sources
                             logging.debug(
                                 "Rank {}: {}/{} srcs chosen for nrn {}".format(
                                     self.rank, len(chosen_sources),
