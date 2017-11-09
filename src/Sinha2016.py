@@ -1866,6 +1866,12 @@ class Sinha2016:
     def __dump_syn_connections(self):
         """Dump pre-post syn pairs for existing synapses."""
         current_sim_time = (str(nest.GetKernelStatus()['time']))
+
+        if current_sim_time != "0.0" and not self.is_str_p_enabled:
+            logging.info("Not initial dump, structural plasticity not enabled")
+            logging.info("Not dumping synapses - no change yet")
+            return
+
         syn_fn_EE = ("08-syn_conns-EE-" +
                      str(self.rank) + "-" + current_sim_time +
                      ".txt")
