@@ -1100,6 +1100,28 @@ class Sinha2016:
         # option list
         return nearest_opts
 
+    def __get_nearest_ps_gaussian(self, source, options, num_required):
+        """Choose nearest partners but with a gaussian kernel.
+
+        :source: source neuron
+        :options: options to choose from
+        :num_required: number of partners needed
+        :returns: list of chosen nearest partners
+
+        """
+        # in efficient, but works.
+        weights = []
+        for opt in options:
+            distance = self.__get_distance_toroid(source, opt)
+            weights.append(
+                math.exp(-1.*((distance**2)/((5.*self.neuronal_distE)**2))))
+
+        options = numpy.random.choice(options, num_required,
+                                      replace=False, p=weights)
+        logging.debug("Returning partners using gaussian distance probability")
+
+        return list(options)
+
     def __get_nearest_ps(self, source, options, num_required):
         """Choose nearest partners.
 
@@ -1660,7 +1682,7 @@ class Sinha2016:
                                 (targetsE + targetsI),
                                 int(abs(elms['Axon_ex'])))
                         elif self.syn_form_strategy == "distance":
-                            chosen_targets = self.__get_nearest_ps(
+                            chosen_targets = self.__get_nearest_ps_gaussian(
                                 gid, (targetsE + targetsI),
                                 int(abs(elms['Axon_ex'])))
                     else:
@@ -1709,7 +1731,7 @@ class Sinha2016:
                                 (targetsE + targetsI),
                                 int(abs(elms['Axon_in'])))
                         elif self.syn_form_strategy == "distance":
-                            chosen_targets = self.__get_nearest_ps(
+                            chosen_targets = self.__get_nearest_ps_gaussian(
                                 gid, (targetsE + targetsI),
                                 int(abs(elms['Axon_in'])))
                     else:
