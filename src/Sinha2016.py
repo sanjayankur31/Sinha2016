@@ -1299,21 +1299,35 @@ class Sinha2016:
                                     int(abs(elms['Axon_in'])))
                                 # strip the weights from the list now since we
                                 # compare with these later
-                                targetsE = (
-                                    (numpy.array(targetsE)[:, 0]).astype(int)
-                                )
-                                targetsI = (
-                                    (numpy.array(targetsI)[:, 0]).astype(int)
-                                )
+                                # since one of them can be empty, I need to
+                                # check to keep numpy from complaining
+                                if len(targetsE) > 0:
+                                    targetsE = (
+                                        (numpy.array(
+                                            targetsE
+                                        )[:, 0]).astype(int)
+                                    )
+                                if len(targetsI) > 0:
+                                    targetsI = (
+                                        (numpy.array(
+                                            targetsI
+                                        )[:, 0]).astype(int)
+                                    )
                         else:
                             # strip weight column
                             if self.syn_del_strategy == "weight":
-                                targetsE = (
-                                    (numpy.array(targetsE)[:, 0]).astype(int)
-                                )
-                                targetsI = (
-                                    (numpy.array(targetsI)[:, 0]).astype(int)
-                                )
+                                if len(targetsE) > 0:
+                                    targetsE = (
+                                        (numpy.array(
+                                            targetsE
+                                        )[:, 0]).astype(int)
+                                    )
+                                if len(targetsI) > 0:
+                                    targetsI = (
+                                        (numpy.array(
+                                            targetsI
+                                        )[:, 0]).astype(int)
+                                    )
                             chosen_targets = (targetsE + targetsI)
                         logging.debug(
                             "Rank {}: {}/{} tgts chosen for neuron {}".format(
