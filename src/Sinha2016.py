@@ -1116,6 +1116,9 @@ class Sinha2016:
             weights.append(
                 math.exp(-1.*((distance**2)/((5.*self.neuronal_distE)**2))))
 
+        # probabilites must add up to 1 to use the function
+        weights = numpy.array(weights)/numpy.sum(weights)
+
         options = numpy.random.choice(options, num_required,
                                       replace=False, p=weights)
         logging.debug("Returning partners using gaussian distance probability")
