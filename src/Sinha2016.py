@@ -1024,23 +1024,21 @@ class Sinha2016:
     def __get_weakest_ps(self, options, num_required):
         """Choose partners to delete based on weight of connections.
 
-        :options: options to pick from
+        :options: options to pick from as [[nid, weight]]
         :num_required: number of options required
         :returns: chosen options
 
         """
-        optdict = {}
-        for opt in options:
-            optdict[opt[0]] = opt[1]
-
-        sortedoptions = sorted(optdict.items(),
-                               key=operator.itemgetter(1))
-        weakestoptions = numpy.array(sortedoptions[0:num_required])
         logging.debug("Returning weakest links")
+        if len(options) < num_required:
+            weakest_options = [nid for nid, weight in options]
+            return weakest_options
 
-        # using numpy converts the array to floats and nest doesn't like that
-        # for neuron ids
-        return list(weakestoptions[:, 0].astype(int))
+        sorted_options = sorted(options, key=operator.itemgetter(1))
+        weakest_options = [nid for nid, weight in
+                           sorted_options[0:num_required]]
+
+        return weakest_options
 
     def __get_farthest_ps(self, anchor, options, num_required):
         """Choose farthest partners.
@@ -1051,19 +1049,23 @@ class Sinha2016:
         :returns: a list of chosen options
 
         """
-        distances = {}
+        # if we don't have enough options to choose, simply return whatever is
+        # available
+        logging.debug("Returning farthest partners")
+        if len(options) < num_required:
+            return options
+
+        options_with_distances = []
         for opt in options:
             distance = self.__get_distance_toroid(anchor, opt)
-            distances[opt] = distance
+            options_with_distances.append([opt, distance])
 
-        sorted_distances = sorted(distances.items(),
-                                  key=operator.itemgetter(1))
-        farthest_opts = numpy.array(sorted_distances[-num_required:])
-        logging.debug("Returning farthest partners")
+        sorted_options = sorted(options_with_distances,
+                                key=operator.itemgetter(1), reverse=True)
+        farthest_options = [nid for nid, distance in
+                            sorted_options[0:num_required]]
 
-        # using numpy converts the array to floats and nest doesn't like that
-        # for neuron ids
-        return list(farthest_opts[:, 0].astype(int))
+        return farthest_options
 
     def __get_nearest_ps_prob(self, source, options, probability):
         """Choose nearest partners but pick them with a probability.
@@ -1077,28 +1079,28 @@ class Sinha2016:
 
         """
         # inefficient, but works.
-        max_num_required = len(options) * probability
-        distances = {}
+        max_num_required = int(len(options) * probability)
+        options_with_distances = []
         for opt in options:
             if opt == source:
                 continue
             distance = self.__get_distance_toroid(source, opt)
-            distances[opt] = distance
+            options_with_distances.append([opt, distance])
 
-        sorted_distances = sorted(distances.items(),
-                                  key=operator.itemgetter(1))
-        nearest_opts = []
+        sorted_options = sorted(options_with_distances,
+                                key=operator.itemgetter(1))
+        nearest_options = []
         counter = 0
-        for (nrn, distance) in sorted_distances:
+        for nrn, distance in sorted_options:
             if random.random() <= probability:
-                nearest_opts.append(nrn)
+                nearest_options.append(nrn)
                 counter += 1
             if counter >= max_num_required:
-                return nearest_opts
+                return nearest_options
 
         # otherwise just return how many we got after traversing the whole
         # option list
-        return nearest_opts
+        return nearest_options
 
     def __get_nearest_ps_gaussian(self, source, options, num_required):
         """Choose nearest partners but with a gaussian kernel.
@@ -1109,21 +1111,23 @@ class Sinha2016:
         :returns: list of chosen nearest partners
 
         """
-        # in efficient, but works.
-        weights = []
+        logging.debug("Returning partners using gaussian distance probability")
+        if len(options) < num_required:
+            return options
+
+        probabilities = []
         for opt in options:
             distance = self.__get_distance_toroid(source, opt)
-            weights.append(
+            probabilities.append(
                 math.exp(-1.*((distance**2)/((5.*self.neuronal_distE)**2))))
 
         # probabilites must add up to 1 to use the function
-        weights = numpy.array(weights)/numpy.sum(weights)
+        probabilities = numpy.array(probabilities)/numpy.sum(probabilities)
 
-        options = numpy.random.choice(options, num_required,
-                                      replace=False, p=weights)
-        logging.debug("Returning partners using gaussian distance probability")
+        chosen_options = numpy.random.choice(options, num_required,
+                                             replace=False, p=probabilities)
 
-        return list(options)
+        return list(chosen_options)
 
     def __get_nearest_ps(self, source, options, num_required):
         """Choose nearest partners.
@@ -1134,20 +1138,22 @@ class Sinha2016:
         :returns: list of chosen nearest partners
 
         """
-        # in efficient, but works.
-        distances = {}
+        logging.debug("Returning nearest partners")
+        if len(options) < num_required:
+            return options
+
+        # inefficient, but works.
+        options_with_distances = []
         for opt in options:
             distance = self.__get_distance_toroid(source, opt)
-            distances[opt] = distance
+            options_with_distances.append([opt, distance])
 
-        sorted_distances = sorted(distances.items(),
-                                  key=operator.itemgetter(1))
-        nearest_opts = numpy.array(sorted_distances[0:num_required])
-        logging.debug("Returning nearest partners")
+        sorted_options = sorted(options_with_distances,
+                                key=operator.itemgetter(1))
+        nearest_options = [nid for nid, distance in
+                           sorted_options[0:num_required]]
 
-        # using numpy converts the array to floats and nest doesn't like that
-        # for neuron ids
-        return list(nearest_opts[:, 0].astype(int))
+        return nearest_options
 
     def __delete_connections_from_pre(self, synelms):
         """Delete connections when the neuron is a source."""
