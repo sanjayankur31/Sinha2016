@@ -1209,27 +1209,20 @@ class Sinha2016:
                     total_synapses_this_gid = len(targets)
                     if len(targets) > 0:
                         # this is where the selection logic is
-                        if len(targets) > int(abs(elms['Axon_ex'])):
-                            if self.syn_del_strategy == "random":
-                                # Doesn't merit a new method
+                        if self.syn_del_strategy == "random":
+                            # Doesn't merit a new method
+                            if len(targets) > int(abs(elms['Axon_ex'])):
                                 chosen_targets = random.sample(
                                     targets, int(abs(elms['Axon_ex'])))
-                            elif self.syn_del_strategy == "distance":
-                                chosen_targets = self.__get_farthest_ps(
-                                    gid, targets, int(abs(elms['Axon_ex'])))
-                            elif self.syn_del_strategy == "weight":
-                                chosen_targets = self.__get_weakest_ps(
-                                    targets, int(abs(elms['Axon_ex'])))
-                        else:
-                            # strip weights from list here too
-                            if self.syn_del_strategy == "weight":
-                                chosen_targets = (
-                                    (
-                                        numpy.array(targets)[:, 0]
-                                    ).astype(int)
-                                )
                             else:
                                 chosen_targets = targets
+                        elif self.syn_del_strategy == "distance":
+                            chosen_targets = self.__get_farthest_ps(
+                                gid, targets, int(abs(elms['Axon_ex'])))
+                        elif self.syn_del_strategy == "weight":
+                            chosen_targets = self.__get_weakest_ps(
+                                targets, int(abs(elms['Axon_ex'])))
+
                         logging.debug(
                             "Rank {}: {}/{} tgts chosen for neuron {}".format(
                                 self.rank, len(chosen_targets),
@@ -1288,53 +1281,28 @@ class Sinha2016:
 
                     if (total_synapses_this_gid) > 0:
                         # this is where the selection logic is
-                        if (total_synapses_this_gid) > \
-                                int(abs(elms['Axon_in'])):
-                            if self.syn_del_strategy == "random":
+                        if self.syn_del_strategy == "random":
+                            if (total_synapses_this_gid) > \
+                                    int(abs(elms['Axon_in'])):
                                 # Doesn't merit a new method
                                 chosen_targets = random.sample(
                                     (targetsE + targetsI),
                                     int(abs(elms['Axon_in'])))
-                            elif self.syn_del_strategy == "distance":
-                                chosen_targets = self.__get_farthest_ps(
-                                    gid, (targetsE + targetsI),
-                                    int(abs(elms['Axon_in'])))
-                            elif self.syn_del_strategy == "weight":
-                                chosen_targets = self.__get_weakest_ps(
-                                    (targetsE + targetsI),
-                                    int(abs(elms['Axon_in'])))
-                                # strip the weights from the list now since we
-                                # compare with these later
-                                # since one of them can be empty, I need to
-                                # check to keep numpy from complaining
-                                if len(targetsE) > 0:
-                                    targetsE = (
-                                        (numpy.array(
-                                            targetsE
-                                        )[:, 0]).astype(int)
-                                    )
-                                if len(targetsI) > 0:
-                                    targetsI = (
-                                        (numpy.array(
-                                            targetsI
-                                        )[:, 0]).astype(int)
-                                    )
-                        else:
-                            # strip weight column
-                            if self.syn_del_strategy == "weight":
-                                if len(targetsE) > 0:
-                                    targetsE = (
-                                        (numpy.array(
-                                            targetsE
-                                        )[:, 0]).astype(int)
-                                    )
-                                if len(targetsI) > 0:
-                                    targetsI = (
-                                        (numpy.array(
-                                            targetsI
-                                        )[:, 0]).astype(int)
-                                    )
-                            chosen_targets = (targetsE + targetsI)
+                            else:
+                                chosen_targets = (targetsE + targetsI)
+                        elif self.syn_del_strategy == "distance":
+                            chosen_targets = self.__get_farthest_ps(
+                                gid, (targetsE + targetsI),
+                                int(abs(elms['Axon_in'])))
+                        elif self.syn_del_strategy == "weight":
+                            chosen_targets = self.__get_weakest_ps(
+                                (targetsE + targetsI),
+                                int(abs(elms['Axon_in'])))
+                            # strip the weights from the list now since we
+                            # compare with these later
+                            targetsE = [nid for nid, weight in targetsE]
+                            targetsI = [nid for nid, weight in targetsI]
+
                         logging.debug(
                             "Rank {}: {}/{} tgts chosen for neuron {}".format(
                                 self.rank, len(chosen_targets),
@@ -1462,25 +1430,19 @@ class Sinha2016:
                     total_synapses_this_gid += len(sources)
 
                     if len(sources) > 0:
-                        if len(sources) > int(abs(elms['Den_ex'])):
-                            if self.syn_del_strategy == "random":
+                        if self.syn_del_strategy == "random":
+                            if len(sources) > int(abs(elms['Den_ex'])):
                                 chosen_sources = random.sample(
                                     sources, int(abs(elms['Den_ex'])))
-                            elif self.syn_del_strategy == "distance":
-                                chosen_sources = self.__get_farthest_ps(
-                                    gid, sources, int(abs(elms['Den_ex'])))
-                            elif self.syn_del_strategy == "weight":
-                                chosen_sources = self.__get_weakest_ps(
-                                    sources, int(abs(elms['Den_ex'])))
-                        else:
-                            if self.syn_del_strategy == "weight":
-                                chosen_sources = (
-                                    (
-                                        numpy.array(sources)[:, 0]
-                                    ).astype(int)
-                                )
                             else:
                                 chosen_sources = sources
+                        elif self.syn_del_strategy == "distance":
+                            chosen_sources = self.__get_farthest_ps(
+                                gid, sources, int(abs(elms['Den_ex'])))
+                        elif self.syn_del_strategy == "weight":
+                            chosen_sources = self.__get_weakest_ps(
+                                sources, int(abs(elms['Den_ex'])))
+
                         logging.debug(
                             "Rank {}: {}/{} srcs chosen for neuron {}".format(
                                 self.rank, len(chosen_sources),
@@ -1504,7 +1466,7 @@ class Sinha2016:
                     # is it an inhibitory neuron?
                     if 'Axon_in' in elms:
                         # all synapses are of same weight, so weight dependent
-                        # not required
+                        # selection not required
                         conns = nest.GetConnections(
                             target=[gid], synapse_model='static_synapse_in')
                         localsources = []
@@ -1518,16 +1480,17 @@ class Sinha2016:
                         total_synapses_this_gid += len(sources)
 
                         if len(sources) > 0:
-                            if len(sources) > int(abs(elms['Den_in'])):
-                                if self.syn_del_strategy == "random" or \
-                                        self.syn_del_strategy == "weight":
+                            if self.syn_del_strategy == "random" or \
+                                    self.syn_del_strategy == "weight":
+                                if len(sources) > int(abs(elms['Den_in'])):
                                     chosen_sources = random.sample(
                                         sources, int(abs(elms['Den_in'])))
-                                elif self.syn_del_strategy == "distance":
-                                    chosen_sources = self.__get_farthest_ps(
-                                        gid, sources, int(abs(elms['Den_in'])))
-                            else:
-                                chosen_sources = sources
+                                else:
+                                    chosen_sources = sources
+                            elif self.syn_del_strategy == "distance":
+                                chosen_sources = self.__get_farthest_ps(
+                                    gid, sources, int(abs(elms['Den_in'])))
+
                             logging.debug(
                                 "Rank {}: {}/{} srcs chosen for nrn {}".format(
                                     self.rank, len(chosen_sources),
@@ -1569,26 +1532,19 @@ class Sinha2016:
                         total_synapses_this_gid += len(sources)
 
                         if len(sources) > 0:
-                            if len(sources) > int(abs(elms['Den_in'])):
-                                if self.syn_del_strategy == "random":
+                            if self.syn_del_strategy == "random":
+                                if len(sources) > int(abs(elms['Den_in'])):
                                     chosen_sources = random.sample(
                                         sources, int(abs(elms['Den_in'])))
-                                elif self.syn_del_strategy == "distance":
-                                    chosen_sources = self.__get_farthest_ps(
-                                        gid, sources, int(abs(elms['Den_in'])))
-                                elif self.syn_del_strategy == "weight":
-                                    chosen_sources = self.__get_weakest_ps(
-                                        sources, int(abs(elms['Den_in'])))
-                            else:
-                                # strip weights here too
-                                if self.syn_del_strategy == "weight":
-                                    chosen_sources = (
-                                        (
-                                            numpy.array(sources)[:, 0]
-                                        ).astype(int)
-                                    )
                                 else:
                                     chosen_sources = sources
+                            elif self.syn_del_strategy == "distance":
+                                chosen_sources = self.__get_farthest_ps(
+                                    gid, sources, int(abs(elms['Den_in'])))
+                            elif self.syn_del_strategy == "weight":
+                                chosen_sources = self.__get_weakest_ps(
+                                    sources, int(abs(elms['Den_in'])))
+
                             logging.debug(
                                 "Rank {}: {}/{} srcs chosen for nrn {}".format(
                                     self.rank, len(chosen_sources),
@@ -1699,17 +1655,19 @@ class Sinha2016:
 
                 total_options_this_gid = len(targetsE) + len(targetsI)
                 if (total_options_this_gid) > 0:
-                    if (total_options_this_gid) > int(abs(elms['Axon_ex'])):
-                        if self.syn_form_strategy == "random":
+                    if self.syn_form_strategy == "random":
+                        if (total_options_this_gid) > \
+                                int(abs(elms['Axon_ex'])):
                             chosen_targets = random.sample(
                                 (targetsE + targetsI),
                                 int(abs(elms['Axon_ex'])))
-                        elif self.syn_form_strategy == "distance":
-                            chosen_targets = self.__get_nearest_ps_gaussian(
-                                gid, (targetsE + targetsI),
-                                int(abs(elms['Axon_ex'])))
-                    else:
-                        chosen_targets = (targetsE + targetsI)
+                        else:
+                            chosen_targets = (targetsE + targetsI)
+                    elif self.syn_form_strategy == "distance":
+                        chosen_targets = self.__get_nearest_ps_gaussian(
+                            gid, (targetsE + targetsI),
+                            int(abs(elms['Axon_ex'])))
+
                     logging.debug(
                         "Rank {}: {}/{} options chosen for neuron {}".format(
                             self.rank, len(chosen_targets),
@@ -1748,17 +1706,19 @@ class Sinha2016:
 
                 total_options_this_gid = len(targetsE) + len(targetsI)
                 if (total_options_this_gid) > 0:
-                    if (total_options_this_gid) > int(abs(elms['Axon_in'])):
-                        if self.syn_form_strategy == "random":
+                    if self.syn_form_strategy == "random":
+                        if (total_options_this_gid) > \
+                                int(abs(elms['Axon_in'])):
                             chosen_targets = random.sample(
                                 (targetsE + targetsI),
                                 int(abs(elms['Axon_in'])))
-                        elif self.syn_form_strategy == "distance":
-                            chosen_targets = self.__get_nearest_ps_gaussian(
-                                gid, (targetsE + targetsI),
-                                int(abs(elms['Axon_in'])))
-                    else:
-                        chosen_targets = (targetsE + targetsI)
+                        else:
+                            chosen_targets = (targetsE + targetsI)
+                    elif self.syn_form_strategy == "distance":
+                        chosen_targets = self.__get_nearest_ps_gaussian(
+                            gid, (targetsE + targetsI),
+                            int(abs(elms['Axon_in'])))
+
                     logging.debug(
                         "Rank {}: {}/{} options chosen for neuron {}".format(
                             self.rank, len(chosen_targets),
