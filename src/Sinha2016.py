@@ -2732,6 +2732,16 @@ class Sinha2016:
             logging.warning(
                 "Simulation will run in 1 second chunks only")
 
+    def set_connectivity_strategies(self, formation_strategy,
+                                    deletion_strategy):
+        """Set the connection strategies for simulation.
+
+        :formation_strategy: strategy to use while forming new connections
+        :deletion_strategy: strategy to use while deleting connections
+        """
+        self.syn_del_strategy = deletion_strategy
+        self.syn_form_strategy = formation_strategy
+
 
 if __name__ == "__main__":
     # Set up logging configuration
@@ -2747,6 +2757,7 @@ if __name__ == "__main__":
     # simulation setup
     # Setup network to handle plasticities
     simulation.setup_plasticity(True, True)
+    simulation.set_connectivity_strategies("distance", "random")
     # set up deaff extent, and neuron sets
     simulation.set_lpz_percent(0.3)
     # set up neurons, connections, spike detectors, files
