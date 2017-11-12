@@ -2723,7 +2723,7 @@ if __name__ == "__main__":
     # simulation setup
     # Setup network to handle plasticities
     simulation.setup_plasticity(True, True)
-    simulation.set_connectivity_strategies("distance", "random")
+    simulation.set_connectivity_strategies("distance", "weight")
     # set up deaff extent, and neuron sets
     simulation.set_lpz_percent(0.1)
     # set up neurons, connections, spike detectors, files
