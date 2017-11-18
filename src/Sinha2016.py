@@ -1121,6 +1121,9 @@ class Sinha2016:
 
         probabilities = []
         for opt in options:
+            # no autapses
+            if opt == source:
+                continue
             distance = self.__get_distance_toroid(source, opt)
             probabilities.append(
                 math.exp(-1.*((distance**2)/((5.*self.neuronal_distE)**2))))
