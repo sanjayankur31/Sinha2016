@@ -571,7 +571,7 @@ class Sinha2016:
             conns = nest.GetConnections(source=self.neuronsE,
                                         target=self.neuronsE)
             logging.info("{} ({}) EE connections set up on this rank.".format(
-                len(conns), max_num))
+                len(conns), max_num/self.comm.Get_size()))
 
             logging.debug("Setting up EI connections.")
             max_num = (len(self.neuronsE) * len(self.neuronsI) * self.sparsity)
@@ -585,7 +585,7 @@ class Sinha2016:
             conns = nest.GetConnections(source=self.neuronsE,
                                         target=self.neuronsI)
             logging.info("{} ({}) EI connections set up on this rank.".format(
-                len(conns), max_num))
+                len(conns), max_num/self.comm.Get_size()))
 
             logging.debug("Setting up II connections.")
             max_num = (len(self.neuronsI) * len(self.neuronsI) * self.sparsity)
@@ -599,7 +599,7 @@ class Sinha2016:
             conns = nest.GetConnections(source=self.neuronsI,
                                         target=self.neuronsI)
             logging.info("{} ({}) II connections set up on this rank.".format(
-                len(conns), max_num))
+                len(conns), max_num/self.comm.Get_size()))
 
             logging.debug("Setting up IE connections.")
             max_num = (len(self.neuronsI) * len(self.neuronsE) * self.sparsity)
@@ -613,7 +613,7 @@ class Sinha2016:
             conns = nest.GetConnections(source=self.neuronsI,
                                         target=self.neuronsE)
             logging.info("{} ({}) IE connections set up on this rank.".format(
-                len(conns), max_num))
+                len(conns), max_num/self.comm.Get_size()))
         else:
             logging.info("Synaptic plasticity not enabled." +
                          "Not setting up any synapses.")
