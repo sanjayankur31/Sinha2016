@@ -561,9 +561,10 @@ class Sinha2016:
             conndict = {'rule': 'all_to_all'}
             logging.debug("Setting up EE connections.")
             max_num = (len(self.neuronsE) * len(self.neuronsE) * self.sparsity)
+            outdegree = int(len(self.neuronsE)*self.sparsity)
             for nrn in self.neuronsE:
-                targets = self.__get_nearest_ps_prob(
-                    nrn, self.neuronsE, self.sparsity
+                targets = self.__get_nearest_ps_gaussian(
+                    nrn, self.neuronsE, outdegree
                 )
                 nest.Connect([nrn], targets,
                              syn_spec=self.synDictEE,
@@ -575,9 +576,10 @@ class Sinha2016:
 
             logging.debug("Setting up EI connections.")
             max_num = (len(self.neuronsE) * len(self.neuronsI) * self.sparsity)
+            outdegree = int(len(self.neuronsI)*self.sparsity)
             for nrn in self.neuronsE:
-                targets = self.__get_nearest_ps_prob(
-                    nrn, self.neuronsI, self.sparsity
+                targets = self.__get_nearest_ps_gaussian(
+                    nrn, self.neuronsI, outdegree
                 )
                 nest.Connect([nrn], targets,
                              syn_spec=self.synDictEI,
@@ -589,9 +591,10 @@ class Sinha2016:
 
             logging.debug("Setting up II connections.")
             max_num = (len(self.neuronsI) * len(self.neuronsI) * self.sparsity)
+            outdegree = int(len(self.neuronsI)*self.sparsity)
             for nrn in self.neuronsI:
-                targets = self.__get_nearest_ps_prob(
-                    nrn, self.neuronsI, self.sparsity
+                targets = self.__get_nearest_ps_gaussian(
+                    nrn, self.neuronsI, outdegree
                 )
                 nest.Connect([nrn], targets,
                              syn_spec=self.synDictII,
@@ -603,9 +606,10 @@ class Sinha2016:
 
             logging.debug("Setting up IE connections.")
             max_num = (len(self.neuronsI) * len(self.neuronsE) * self.sparsity)
+            outdegree = int(len(self.neuronsE)*self.sparsity)
             for nrn in self.neuronsI:
-                targets = self.__get_nearest_ps_prob(
-                    nrn, self.neuronsE, self.sparsity
+                targets = self.__get_nearest_ps_gaussian(
+                    nrn, self.neuronsE, outdegree
                 )
                 nest.Connect([nrn], targets,
                              syn_spec=self.synDictIE,
