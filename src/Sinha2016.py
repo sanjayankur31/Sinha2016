@@ -1116,14 +1116,15 @@ class Sinha2016:
 
         """
         logging.debug("Returning partners using gaussian distance probability")
+        # remove source from options to ensure no autapses
+        if source in options:
+            options.remove(source)
+
         if len(options) < num_required:
             return options
 
         probabilities = []
         for opt in options:
-            # no autapses
-            if opt == source:
-                continue
             distance = self.__get_distance_toroid(source, opt)
             probabilities.append(
                 math.exp(-1.*((distance**2)/((5.*self.neuronal_distE)**2))))
