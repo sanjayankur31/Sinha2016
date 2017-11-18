@@ -1117,6 +1117,7 @@ class Sinha2016:
         """
         logging.debug("Returning partners using gaussian distance probability")
         # remove source from options to ensure no autapses
+        options = list(options)
         if source in options:
             options.remove(source)
 
