@@ -141,6 +141,7 @@ class Sinha2016:
         self.o_neurons_I = []
 
         random.seed(42)
+        numpy.random.seed(42)
 
     def __get_distance_toroid(self, source, destination):
         """Get distance between a pair of neurons on our toroid
