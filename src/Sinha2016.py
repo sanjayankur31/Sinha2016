@@ -2737,7 +2737,7 @@ if __name__ == "__main__":
     simulation.setup_plasticity(True, True)
     simulation.set_connectivity_strategies("distance", "weight")
     # set up deaff extent, and neuron sets
-    simulation.set_lpz_percent(0.1)
+    simulation.set_lpz_percent(0.2)
     # set up neurons, connections, spike detectors, files
     simulation.prerun_setup(
         stabilisation_time=1500.,
