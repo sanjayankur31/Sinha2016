@@ -1131,7 +1131,7 @@ class Sinha2016:
         for opt in options:
             distance = self.__get_distance_toroid(source, opt)
             probabilities.append(
-                math.exp(-1.*((distance**2)/((5.*self.neuronal_distE)**2))))
+                math.exp(-1.*((distance**2)/((10.*self.neuronal_distE)**2))))
 
         # probabilites must add up to 1 to use the function
         probabilities = numpy.array(probabilities)/numpy.sum(probabilities)
