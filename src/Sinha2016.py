@@ -1108,7 +1108,7 @@ class Sinha2016:
         return nearest_options
 
     def __get_nearest_ps_gaussian(self, source, options, num_required,
-                                  w_mul=5.):
+                                  w_mul=10.):
         """Choose nearest partners but with a gaussian kernel.
 
         :source: source neuron
