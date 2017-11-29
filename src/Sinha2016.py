@@ -595,7 +595,8 @@ class Sinha2016:
             outdegree = int(len(self.neuronsI)*self.sparsity)
             for nrn in self.neuronsI:
                 targets = self.__get_nearest_ps_gaussian(
-                    nrn, self.neuronsI, outdegree
+                    nrn, self.neuronsI, outdegree,
+                    w_mul=250.
                 )
                 nest.Connect([nrn], targets,
                              syn_spec=self.synDictII,
@@ -610,7 +611,8 @@ class Sinha2016:
             outdegree = int(len(self.neuronsE)*self.sparsity)
             for nrn in self.neuronsI:
                 targets = self.__get_nearest_ps_gaussian(
-                    nrn, self.neuronsE, outdegree
+                    nrn, self.neuronsE, outdegree,
+                    w_mul=250.
                 )
                 nest.Connect([nrn], targets,
                              syn_spec=self.synDictIE,
