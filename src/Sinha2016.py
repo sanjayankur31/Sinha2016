@@ -1733,7 +1733,7 @@ class Sinha2016:
                     elif self.syn_form_strategy == "distance":
                         chosen_targets = self.__get_nearest_ps_gaussian(
                             gid, (targetsE + targetsI),
-                            int(abs(elms['Axon_in'])))
+                            int(abs(elms['Axon_in'])), w_mul=20.)
 
                     logging.debug(
                         "Rank {}: {}/{} options chosen for neuron {}".format(
