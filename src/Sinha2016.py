@@ -596,7 +596,7 @@ class Sinha2016:
             for nrn in self.neuronsI:
                 targets = self.__get_nearest_ps_gaussian(
                     nrn, self.neuronsI, outdegree,
-                    w_mul=250.
+                    w_mul=20.
                 )
                 nest.Connect([nrn], targets,
                              syn_spec=self.synDictII,
@@ -612,7 +612,7 @@ class Sinha2016:
             for nrn in self.neuronsI:
                 targets = self.__get_nearest_ps_gaussian(
                     nrn, self.neuronsE, outdegree,
-                    w_mul=250.
+                    w_mul=20.
                 )
                 nest.Connect([nrn], targets,
                              syn_spec=self.synDictIE,
