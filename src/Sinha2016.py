@@ -1215,7 +1215,7 @@ class Sinha2016:
                         weights = nest.GetStatus(conns, "weight")
                         for i in range(0, len(conns)):
                             localtargets.append(
-                                [conns[i][1], weights[i]])
+                                [conns[i][1], abs(weights[i])])
                     else:
                         for acon in conns:
                             localtargets.append(acon[1])
@@ -1277,10 +1277,10 @@ class Sinha2016:
                         weightsToE = nest.GetStatus(connsToE, "weight")
                         for i in range(0, len(connsToI)):
                             localtargetsI.append(
-                                [connsToI[i][1], weightsToI[i]])
+                                [connsToI[i][1], abs(weightsToI[i])])
                         for i in range(0, len(connsToE)):
                             localtargetsE.append(
-                                [connsToE[i][1], weightsToE[i]])
+                                [connsToE[i][1], abs(weightsToE[i])])
                     else:
                         for acon in connsToI:
                             localtargetsI.append(acon[1])
@@ -1436,7 +1436,7 @@ class Sinha2016:
                         weights = nest.GetStatus(conns, "weight")
                         for i in range(0, len(conns)):
                             localsources.append(
-                                [conns[i][0], weights[i]])
+                                [conns[i][0], abs(weights[i])])
                     else:
                         for acon in conns:
                             localsources.append(acon[0])
@@ -1537,7 +1537,8 @@ class Sinha2016:
                             # weight]..]
                             weights = nest.GetStatus(conns, "weight")
                             for i in range(0, len(conns)):
-                                localsources.append([conns[i][0], weights[i]])
+                                localsources.append([conns[i][0],
+                                                     abs(weights[i])])
                         else:
                             # otherwise only sids
                             for acon in conns:
