@@ -1028,7 +1028,7 @@ class Sinha2016:
                 len(synaptic_elms)))
         return synaptic_elms
 
-    def __get_weakest_ps(self, options, num_required, threshold=0.):
+    def __get_weakest_ps(self, options, num_required, threshold=10000.):
         """Choose partners to delete based on weight of connections.
 
         :options: options to pick from as [[nid, weight]]
