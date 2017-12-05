@@ -2786,12 +2786,12 @@ if __name__ == "__main__":
         simulation.deaff_network()
         # zoom in on post deaff phase
         simulation.update_time_windows(stabilisation_time=50.,
-                                       sp_update_interval=50.,
+                                       sp_update_interval=1.,
                                        recording_interval=5.)
         simulation.stabilise(label="Repair zoomed in")
 
-        simulation.update_time_windows(stabilisation_time=4000.,
-                                       sp_update_interval=50.,
+        simulation.update_time_windows(stabilisation_time=1000.,
+                                       sp_update_interval=1.,
                                        recording_interval=10.)
         simulation.stabilise(label="Repair #2")
 
