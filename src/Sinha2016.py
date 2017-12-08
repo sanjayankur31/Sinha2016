@@ -1028,20 +1028,22 @@ class Sinha2016:
                 len(synaptic_elms)))
         return synaptic_elms
 
-    def __get_weakest_ps(self, options, num_required):
+    def __get_weakest_ps(self, options, num_required, threshold=10000.):
         """Choose partners to delete based on weight of connections.
 
         :options: options to pick from as [[nid, weight]]
         :num_required: number of options required
+        :threshold: only consider synapses weaker than this conductance
         :returns: chosen options
 
         """
         logging.debug("Returning weakest links")
-        if len(options) < num_required:
-            weakest_options = [nid for nid, weight in options]
+        candidates = [[n, w] for n, w in options if w < threshold]
+        if len(candidates) < num_required:
+            weakest_options = [nid for nid, weight in candidates]
             return weakest_options
 
-        sorted_options = sorted(options, key=operator.itemgetter(1))
+        sorted_options = sorted(candidates, key=operator.itemgetter(1))
         weakest_options = [nid for nid, weight in
                            sorted_options[0:num_required]]
 
