@@ -1238,6 +1238,8 @@ class Sinha2016:
                             chosen_targets = self.__get_farthest_ps(
                                 gid, targets, int(abs(elms['Axon_ex'])))
                         elif self.syn_del_strategy == "weight":
+                            # Do not use threshold for E* synapses, leave it at
+                            # default very high value
                             chosen_targets = self.__get_weakest_ps(
                                 targets, int(abs(elms['Axon_ex'])))
 
@@ -1313,9 +1315,13 @@ class Sinha2016:
                                 gid, (targetsE + targetsI),
                                 int(abs(elms['Axon_in'])))
                         elif self.syn_del_strategy == "weight":
+                            # use threshold for I* synapses. It should only
+                            # affect IE synapses, since II synapses are much
+                            # smaller and of constant conductance.
                             chosen_targets = self.__get_weakest_ps(
                                 (targetsE + targetsI),
-                                int(abs(elms['Axon_in'])))
+                                int(abs(elms['Axon_in'])),
+                                threshold=10.)
                             # strip the weights from the list now since we
                             # compare with these later
                             targetsE = [nid for nid, weight in targetsE]
@@ -1458,8 +1464,13 @@ class Sinha2016:
                             chosen_sources = self.__get_farthest_ps(
                                 gid, sources, int(abs(elms['Den_ex'])))
                         elif self.syn_del_strategy == "weight":
+                            # use threshold for *E synapses. It should only
+                            # affect IE synapses since the EE synapses are much
+                            # smaller, constant, and always below the threshold
+                            # - even when patterns are stored in the network.
                             chosen_sources = self.__get_weakest_ps(
-                                sources, int(abs(elms['Den_ex'])))
+                                sources, int(abs(elms['Den_ex'])),
+                                threshold=10.)
 
                         logging.debug(
                             "Rank {}: {}/{} srcs chosen for neuron {}".format(
@@ -1561,6 +1572,7 @@ class Sinha2016:
                                 chosen_sources = self.__get_farthest_ps(
                                     gid, sources, int(abs(elms['Den_in'])))
                             elif self.syn_del_strategy == "weight":
+                                # Do not use threshold for *I synapses.
                                 chosen_sources = self.__get_weakest_ps(
                                     sources, int(abs(elms['Den_in'])))
 
