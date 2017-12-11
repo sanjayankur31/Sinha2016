@@ -2217,67 +2217,43 @@ class Sinha2016:
 
         conns = nest.GetConnections(target=self.neuronsE,
                                     source=self.neuronsI)
-        if conns:
-            weightsIE = nest.GetStatus(conns, "weight")
-            print("{}\t{}".format(
-                current_sim_time,
-                str(weightsIE).strip('[]').strip('()').replace(', ', '\t')),
-                file=self.weights_fh_IE)
-            if len(weightsIE) > self.num_synapses_IE:
-                self.num_synapses_IE = len(weightsIE)
-        else:
-            print("{}\t{}".format(
-                current_sim_time,
-                0.0),
-                file=self.weights_fh_IE)
+        weightsIE = nest.GetStatus(conns, "weight")
+        print("{}\t{}".format(
+            current_sim_time,
+            str(weightsIE).strip('[]').strip('()').replace(', ', '\t')),
+            file=self.weights_fh_IE)
+        if len(weightsIE) > self.num_synapses_IE:
+            self.num_synapses_IE = len(weightsIE)
 
         conns = nest.GetConnections(target=self.neuronsI,
                                     source=self.neuronsI)
-        if conns:
-            weightsII = nest.GetStatus(conns, "weight")
-            print("{}\t{}".format(
-                current_sim_time,
-                str(weightsII).strip('[]').strip('()').replace(', ', '\t')),
-                file=self.weights_fh_II)
-            if len(weightsII) > self.num_synapses_II:
-                self.num_synapses_II = len(weightsII)
-        else:
-            print("{}\t{}".format(
-                current_sim_time,
-                0.0),
-                file=self.weights_fh_II)
+        weightsII = nest.GetStatus(conns, "weight")
+        print("{}\t{}".format(
+            current_sim_time,
+            str(weightsII).strip('[]').strip('()').replace(', ', '\t')),
+            file=self.weights_fh_II)
+        if len(weightsII) > self.num_synapses_II:
+            self.num_synapses_II = len(weightsII)
 
         conns = nest.GetConnections(target=self.neuronsI,
                                     source=self.neuronsE)
-        if conns:
-            weightsEI = nest.GetStatus(conns, "weight")
-            print("{}\t{}".format(
-                current_sim_time,
-                str(weightsEI).strip('[]').strip('()').replace(', ', '\t')),
-                file=self.weights_fh_EI)
-            if len(weightsEI) > self.num_synapses_EI:
-                self.num_synapses_EI = len(weightsEI)
-        else:
-            print("{}\t{}".format(
-                current_sim_time,
-                0.0),
-                file=self.weights_fh_EI)
+        weightsEI = nest.GetStatus(conns, "weight")
+        print("{}\t{}".format(
+            current_sim_time,
+            str(weightsEI).strip('[]').strip('()').replace(', ', '\t')),
+            file=self.weights_fh_EI)
+        if len(weightsEI) > self.num_synapses_EI:
+            self.num_synapses_EI = len(weightsEI)
 
         conns = nest.GetConnections(target=self.neuronsE,
                                     source=self.neuronsE)
-        if conns:
-            weightsEE = nest.GetStatus(conns, "weight")
-            print("{}\t{}".format(
-                current_sim_time,
-                str(weightsEE).strip('[]').strip('()').replace(', ', '\t')),
-                file=self.weights_fh_EE)
-            if len(weightsEE) > self.num_synapses_EE:
-                self.num_synapses_EE = len(weightsEE)
-        else:
-            print("{}\t{}".format(
-                current_sim_time,
-                0.0),
-                file=self.weights_fh_EE)
+        weightsEE = nest.GetStatus(conns, "weight")
+        print("{}\t{}".format(
+            current_sim_time,
+            str(weightsEE).strip('[]').strip('()').replace(', ', '\t')),
+            file=self.weights_fh_EE)
+        if len(weightsEE) > self.num_synapses_EE:
+            self.num_synapses_EE = len(weightsEE)
 
     def __get_neurons_from_region(self, num_neurons, first_point, last_point):
         """Get neurons in the centre of the grid.
