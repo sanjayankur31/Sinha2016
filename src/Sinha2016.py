@@ -2220,7 +2220,7 @@ class Sinha2016:
         weightsIE = nest.GetStatus(conns, "weight")
         print("{}\t{}".format(
             current_sim_time,
-            str(weightsIE).strip('[]').strip('()').replace(', ', '\t')),
+            str(weightsIE).strip('[]()').replace(' ', '').replace(',', '\t')),
             file=self.weights_fh_IE)
         if len(weightsIE) > self.num_synapses_IE:
             self.num_synapses_IE = len(weightsIE)
@@ -2230,7 +2230,7 @@ class Sinha2016:
         weightsII = nest.GetStatus(conns, "weight")
         print("{}\t{}".format(
             current_sim_time,
-            str(weightsII).strip('[]').strip('()').replace(', ', '\t')),
+            str(weightsII).strip('[]()').replace(' ', '').replace(',', '\t')),
             file=self.weights_fh_II)
         if len(weightsII) > self.num_synapses_II:
             self.num_synapses_II = len(weightsII)
@@ -2240,7 +2240,7 @@ class Sinha2016:
         weightsEI = nest.GetStatus(conns, "weight")
         print("{}\t{}".format(
             current_sim_time,
-            str(weightsEI).strip('[]').strip('()').replace(', ', '\t')),
+            str(weightsEI).strip('[]()').replace(' ', '').replace(',', '\t')),
             file=self.weights_fh_EI)
         if len(weightsEI) > self.num_synapses_EI:
             self.num_synapses_EI = len(weightsEI)
@@ -2250,7 +2250,7 @@ class Sinha2016:
         weightsEE = nest.GetStatus(conns, "weight")
         print("{}\t{}".format(
             current_sim_time,
-            str(weightsEE).strip('[]').strip('()').replace(', ', '\t')),
+            str(weightsEE).strip('[]()').replace(' ', '').replace(',', '\t')),
             file=self.weights_fh_EE)
         if len(weightsEE) > self.num_synapses_EE:
             self.num_synapses_EE = len(weightsEE)
