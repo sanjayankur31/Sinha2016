@@ -2720,6 +2720,17 @@ class Sinha2016:
                       file=pfile)
                 print("{}: {}".format("sparsity", self.sparsity),
                       file=pfile)
+                print("{}: {}".format("I* threshold",
+                                      self.stability_threshold_I),
+                      file=pfile)
+                print("{}: {}".format("eta ax E", self.eta_ax_e),
+                      file=pfile)
+                print("{}: {}".format("eta den E", self.eta_den_e),
+                      file=pfile)
+                print("{}: {}".format("eta ax I", self.eta_ax_i),
+                      file=pfile)
+                print("{}: {}".format("eta den I", self.eta_den_i),
+                      file=pfile)
 
     def update_time_windows(self,
                             stabilisation_time=None,
