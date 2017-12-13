@@ -2774,7 +2774,6 @@ if __name__ == "__main__":
         stabilisation_time=1500.,
         sp_update_interval=1500.,
         recording_interval=250.)
-    simulation.print_simulation_parameters()
     logging.info("Rank {}: SIMULATION SETUP".format(simulation.rank))
 
     # synaptic plasticity stabilisation
@@ -2795,6 +2794,7 @@ if __name__ == "__main__":
     # Set homoeostatic structural plasticity parameters to whatever the network
     # has achieved now
     simulation.invoke_metaplasticity()
+    simulation.set_stability_threshold_I()
     # Enable structural plasticity for repair #
     simulation.enable_rewiring()
 
