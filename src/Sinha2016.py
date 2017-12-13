@@ -115,6 +115,7 @@ class Sinha2016:
         self.weightEI = self.wbar  # is the same as EE, specified for clarity
         self.weightPatternEE = self.wbar * 5.
         self.weightExt = 30.
+        self.stability_threshold_I = 100000.
 
         # used to track how many comma separated values each line will have
         # when I store synaptic conductances.
@@ -1321,7 +1322,7 @@ class Sinha2016:
                             chosen_targets = self.__get_weakest_ps(
                                 (targetsE + targetsI),
                                 int(abs(elms['Axon_in'])),
-                                threshold=7.)
+                                threshold=self.stability_threshold_I)
                             # strip the weights from the list now since we
                             # compare with these later
                             targetsE = [nid for nid, weight in targetsE]
@@ -1470,7 +1471,7 @@ class Sinha2016:
                             # - even when patterns are stored in the network.
                             chosen_sources = self.__get_weakest_ps(
                                 sources, int(abs(elms['Den_ex'])),
-                                threshold=7.)
+                                threshold=self.stability_threshold_I)
 
                         logging.debug(
                             "Rank {}: {}/{} srcs chosen for neuron {}".format(
@@ -2349,6 +2350,17 @@ class Sinha2016:
         self.__create_new_connections(syn_elms_2)
         # Must wait for all ranks to finish before proceeding
         logging.debug("STRUCTURAL PLASTICITY: Connectivity updated")
+
+    def set_stability_threshold_I(self):
+        """
+        Sets the stability threshold for inhibitory synapses.
+        """
+        conns = nest.GetConnections(target=self.neuronsE,
+                                    source=self.neuronsI)
+        weightsIE = nest.GetStatus(conns, "weight")
+        mean = numpy.mean(weightsIE)
+        std = numpy.std(weightsIE)
+        self.stability_threshold_I = (mean + std)
 
     def invoke_metaplasticity(self):
         """Update growth curve parameters."""
