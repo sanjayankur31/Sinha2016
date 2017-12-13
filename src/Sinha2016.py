@@ -2796,6 +2796,7 @@ if __name__ == "__main__":
     simulation.invoke_metaplasticity()
     simulation.set_stability_threshold_I()
     # Enable structural plasticity for repair #
+    simulation.print_simulation_parameters()
     simulation.enable_rewiring()
 
     #  Stabilise with both plasticities active
