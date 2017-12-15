@@ -1032,6 +1032,9 @@ class Sinha2016:
     def __get_weakest_ps(self, options, num_required, threshold=10000.):
         """Choose partners to delete based on weight of connections.
 
+        Note that the signs of w and threshold need to have the right signs,
+        this method does not check that bit.
+
         :options: options to pick from as [[nid, weight]]
         :num_required: number of options required
         :threshold: only consider synapses weaker than this conductance
@@ -2358,8 +2361,8 @@ class Sinha2016:
         conns = nest.GetConnections(target=self.neuronsE,
                                     source=self.neuronsI)
         weightsIE = nest.GetStatus(conns, "weight")
-        mean = numpy.mean(weightsIE)
-        std = numpy.std(weightsIE)
+        mean = abs(numpy.mean(weightsIE))
+        std = abs(numpy.std(weightsIE))
         self.stability_threshold_I = (mean - std)
 
     def invoke_metaplasticity(self):
