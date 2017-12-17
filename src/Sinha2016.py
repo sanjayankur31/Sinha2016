@@ -1468,13 +1468,9 @@ class Sinha2016:
                             chosen_sources = self.__get_farthest_ps(
                                 gid, sources, int(abs(elms['Den_ex'])))
                         elif self.syn_del_strategy == "weight":
-                            # use threshold for *E synapses. It should only
-                            # affect IE synapses since the EE synapses are much
-                            # smaller, constant, and always below the threshold
-                            # - even when patterns are stored in the network.
+                            # E* synapses do not use threshold
                             chosen_sources = self.__get_weakest_ps(
-                                sources, int(abs(elms['Den_ex'])),
-                                threshold=self.stability_threshold_I)
+                                sources, int(abs(elms['Den_ex'])))
 
                         logging.debug(
                             "Rank {}: {}/{} srcs chosen for neuron {}".format(
@@ -1576,9 +1572,10 @@ class Sinha2016:
                                 chosen_sources = self.__get_farthest_ps(
                                     gid, sources, int(abs(elms['Den_in'])))
                             elif self.syn_del_strategy == "weight":
-                                # Do not use threshold for *I synapses.
+                                # IE synapses, so use threshold
                                 chosen_sources = self.__get_weakest_ps(
-                                    sources, int(abs(elms['Den_in'])))
+                                    sources, int(abs(elms['Den_in'])),
+                                    threshold=self.stability_threshold_I)
 
                             logging.debug(
                                 "Rank {}: {}/{} srcs chosen for nrn {}".format(
