@@ -1207,9 +1207,6 @@ class Sinha2016:
             try:
                 # excitatory neurons as sources
                 if 'Axon_ex' in elms and elms['Axon_ex'] < 0:
-                    # GetConnections only returns connections who have targets
-                    # on this particular rank. So I need to allgather to
-                    # collect all targets.
                     chosen_targets = []
                     conns = []
                     conns = nest.GetConnections(
@@ -1494,14 +1491,20 @@ class Sinha2016:
                 if 'Den_in' in elms and elms['Den_in'] < 0:
                     # is it an inhibitory neuron?
                     if 'Axon_in' in elms:
-                        # all synapses are of same weight, so weight dependent
-                        # selection not required
                         conns = nest.GetConnections(
                             target=[gid], synapse_model='static_synapse_in')
                         localsources = []
                         chosen_sources = []
-                        for acon in conns:
-                            localsources.append(acon[0])
+
+                        if self.syn_del_strategy == "weight":
+                            # also need to store weight
+                            weights = nest.GetStatus(conns, "weight")
+                            for i in range(0, len(conns)):
+                                localsources.append(
+                                    [conns[i][1], abs(weights[i])])
+                        else:
+                            for acon in conns:
+                                localsources.append(acon[0])
 
                         allsources = self.comm.allgather(localsources)
                         sources = [s for sublist in allsources for s in
@@ -1509,8 +1512,7 @@ class Sinha2016:
                         total_synapses_this_gid += len(sources)
 
                         if len(sources) > 0:
-                            if self.syn_del_strategy == "random" or \
-                                    self.syn_del_strategy == "weight":
+                            if self.syn_del_strategy == "random":
                                 if len(sources) > int(abs(elms['Den_in'])):
                                     chosen_sources = random.sample(
                                         sources, int(abs(elms['Den_in'])))
@@ -1519,6 +1521,15 @@ class Sinha2016:
                             elif self.syn_del_strategy == "distance":
                                 chosen_sources = self.__get_farthest_ps(
                                     gid, sources, int(abs(elms['Den_in'])))
+                            elif self.syn_del_strategy == "weight":
+                                # II synapses, use threshold, even though they
+                                # are all of the same weight, because we'll set
+                                # the threshold to 0 to disable deletion of II
+                                # synapses complete, or we'll set it to a
+                                # really high value to disable thresholding.
+                                chosen_sources = self.__get_weakest_ps(
+                                    sources, int(abs(elms['Den_in'])),
+                                    threshold=self.stability_threshold_I)
 
                             logging.debug(
                                 "Rank {}: {}/{} srcs chosen for nrn {}".format(
