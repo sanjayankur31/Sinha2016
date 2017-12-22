@@ -1501,7 +1501,7 @@ class Sinha2016:
                             weights = nest.GetStatus(conns, "weight")
                             for i in range(0, len(conns)):
                                 localsources.append(
-                                    [conns[i][1], abs(weights[i])])
+                                    [conns[i][0], abs(weights[i])])
                         else:
                             for acon in conns:
                                 localsources.append(acon[0])
