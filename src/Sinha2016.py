@@ -2369,9 +2369,7 @@ class Sinha2016:
         conns = nest.GetConnections(target=self.neuronsE,
                                     source=self.neuronsI)
         weightsIE = nest.GetStatus(conns, "weight")
-        mean = abs(numpy.mean(weightsIE))
-        std = abs(numpy.std(weightsIE))
-        self.stability_threshold_I = (mean - std)
+        self.stability_threshold_I = abs(numpy.mean(weightsIE))
 
     def invoke_metaplasticity(self):
         """Update growth curve parameters."""
