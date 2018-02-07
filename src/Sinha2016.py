@@ -535,6 +535,7 @@ class Sinha2016:
             self.synDictEE = {'model': 'static_synapse_ex',
                               'weight': self.weightEE}
             self.synDictEI = {'model': 'static_synapse_ex',
+                              'weight': self.weightEI}
             self.synDictII = {'model': 'stdp_synapse_in',
                               'weight': -0.0000001, 'Wmax': -30000.,
                               'alpha': .12, 'eta': 0.01,
