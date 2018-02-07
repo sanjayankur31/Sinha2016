@@ -2375,7 +2375,7 @@ class Sinha2016:
 
     def invoke_metaplasticity(self):
         """Update growth curve parameters."""
-        if self.is_metaplasticity_enabled:
+        if self.is_metaplasticity_enabled and self.is_str_p_enabled:
             cal_e = [stat['Ca'] for stat in nest.GetStatus(self.neuronsE) if
                      stat['local']]
             cal_i = [stat['Ca'] for stat in nest.GetStatus(self.neuronsI) if
