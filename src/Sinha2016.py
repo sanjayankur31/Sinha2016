@@ -537,17 +537,17 @@ class Sinha2016:
             self.synDictEE = {'model': 'stdp_synapse_ex',
                               'mu_plus': 0.0,
                               'mu_minus': 1.0,
-                              'weight': 0.0000001}
+                              'weight': 0.5}
             self.synDictEI = {'model': 'stdp_synapse_ex',
                               'mu_plus': 0.0,
                               'mu_minus': 1.0,
-                              'weight': 0.00000001}
+                              'weight': 0.5}
             self.synDictII = {'model': 'stdp_synapse_in',
-                              'weight': -0.0000001, 'Wmax': -30000.,
+                              'weight': -5., 'Wmax': -30000.,
                               'alpha': .12, 'eta': 0.01,
                               'tau': 20.}
             self.synDictIE = {'model': 'stdp_synapse_in',
-                              'weight': -0.0000001, 'Wmax': -30000.,
+                              'weight': -5., 'Wmax': -30000.,
                               'alpha': .12, 'eta': 0.01,
                               'tau': 20.}
 
