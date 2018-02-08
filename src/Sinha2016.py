@@ -114,7 +114,7 @@ class Sinha2016:
         self.weightII = self.wbar * -10.
         self.weightEI = self.wbar  # is the same as EE, specified for clarity
         self.weightPatternEE = self.wbar * 5.
-        self.weightExt = 30.
+        self.weightExt = 15.
         self.stability_threshold_I = 100000.
 
         # used to track how many comma separated values each line will have
@@ -2366,12 +2366,12 @@ class Sinha2016:
         """
         Sets the stability threshold for inhibitory synapses.
         """
-        conns = nest.GetConnections(target=self.neuronsE,
-                                    source=self.neuronsI)
-        weightsIE = nest.GetStatus(conns, "weight")
-        mean = abs(numpy.mean(weightsIE))
-        std = abs(numpy.std(weightsIE))
-        self.stability_threshold_I = (mean - std)
+        #  conns = nest.GetConnections(target=self.neuronsE,
+        #  source=self.neuronsI)
+        #  weightsIE = nest.GetStatus(conns, "weight")
+        #  mean = abs(numpy.mean(weightsIE))
+        #  std = abs(numpy.std(weightsIE))
+        self.stability_threshold_I = abs(self.weightII) + 0.01
 
     def invoke_metaplasticity(self):
         """Update growth curve parameters."""
@@ -2839,7 +2839,7 @@ if __name__ == "__main__":
                                        recording_interval=5.)
         simulation.stabilise(label="Repair zoomed in")
 
-        simulation.update_time_windows(stabilisation_time=1000.,
+        simulation.update_time_windows(stabilisation_time=4000.,
                                        sp_update_interval=1.,
                                        recording_interval=10.)
         simulation.stabilise(label="Repair #2")
