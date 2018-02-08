@@ -488,6 +488,7 @@ class Sinha2016:
         # Only structural plasticity - if synapses are formed, give them
         # constant conductances
         nest.CopyModel('static_synapse', 'static_synapse_ex')
+        nest.CopyModel('stdp_synapse', 'stdp_synapse_ex')
         nest.CopyModel('static_synapse', 'static_synapse_in')
         nest.CopyModel('vogels_sprekeler_synapse', 'stdp_synapse_in')
         if self.is_str_p_enabled:
@@ -532,10 +533,14 @@ class Sinha2016:
             })
         # Only synaptic plasticity - do not define synaptic elements
         else:
-            self.synDictEE = {'model': 'static_synapse_ex',
-                              'weight': self.weightEE}
-            self.synDictEI = {'model': 'static_synapse_ex',
-                              'weight': self.weightEI}
+            self.synDictEE = {'model': 'stdp_synapse_ex',
+                              'mu_plus': 0.0,
+                              'mu_minus': 1.0,
+                              'weight': 0.0000001}
+            self.synDictEI = {'model': 'stdp_synapse_ex',
+                              'mu_plus': 0.0,
+                              'mu_minus': 1.0,
+                              'weight': 0.00000001}
             self.synDictII = {'model': 'stdp_synapse_in',
                               'weight': -0.0000001, 'Wmax': -30000.,
                               'alpha': .12, 'eta': 0.01,
@@ -2817,11 +2822,11 @@ if __name__ == "__main__":
         simulation.stabilise(label="Pattern stabilisation")
     # Set homoeostatic structural plasticity parameters to whatever the network
     # has achieved now
-    simulation.invoke_metaplasticity()
-    simulation.set_stability_threshold_I()
+    #  simulation.invoke_metaplasticity()
+    #  simulation.set_stability_threshold_I()
     # Enable structural plasticity for repair #
     simulation.print_simulation_parameters()
-    simulation.enable_rewiring()
+    #  simulation.enable_rewiring()
 
     #  Stabilise with both plasticities active
     #  update time windows
