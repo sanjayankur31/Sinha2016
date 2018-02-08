@@ -114,7 +114,8 @@ class Sinha2016:
         self.weightII = self.wbar * -10.
         self.weightEI = self.wbar  # is the same as EE, specified for clarity
         self.weightPatternEE = self.wbar * 5.
-        self.weightExt = 15.
+        self.weightExtE = 15.
+        self.weightExtI = 25.
         self.stability_threshold_I = 100000.
 
         # used to track how many comma separated values each line will have
@@ -555,11 +556,11 @@ class Sinha2016:
         nest.Connect(self.poissonExt, self.neuronsE,
                      conn_spec=self.connDictExt,
                      syn_spec={'model': 'static_synapse',
-                               'weight': self.weightExt})
+                               'weight': self.weightExtE})
         nest.Connect(self.poissonExt, self.neuronsI,
                      conn_spec=self.connDictExt,
                      syn_spec={'model': 'static_synapse',
-                               'weight': self.weightExt})
+                               'weight': self.weightExtI})
 
         # if synaptic plasticity is enabled
         # setup connections using Nest primitives
@@ -2734,7 +2735,9 @@ class Sinha2016:
                       file=pfile)
                 print("{}: {} nS".format("weightII", self.weightII),
                       file=pfile)
-                print("{}: {} nS".format("weightExt", self.weightExt),
+                print("{}: {} nS".format("weightExtE", self.weightExtE),
+                      file=pfile)
+                print("{}: {} nS".format("weightExtI", self.weightExtI),
                       file=pfile)
                 print("{}: {}".format("sparsity", self.sparsity),
                       file=pfile)
