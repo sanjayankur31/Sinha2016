@@ -114,8 +114,8 @@ class Sinha2016:
         self.weightII = self.wbar * -10.
         self.weightEI = self.wbar  # is the same as EE, specified for clarity
         self.weightPatternEE = self.wbar * 5.
-        self.weightExtE = 3.
-        self.weightExtI = 5.
+        self.weightExtE = 10.
+        self.weightExtI = 20.
         self.stability_threshold_I = 100000.
 
         # used to track how many comma separated values each line will have
