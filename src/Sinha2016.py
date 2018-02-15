@@ -2848,7 +2848,7 @@ if __name__ == "__main__":
 
         simulation.update_time_windows(stabilisation_time=4000.,
                                        sp_update_interval=1.,
-                                       recording_interval=10.)
+                                       recording_interval=20.)
         simulation.stabilise(label="Repair #2")
 
     if store_patterns:
