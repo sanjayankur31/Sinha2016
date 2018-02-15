@@ -537,8 +537,10 @@ class Sinha2016:
                               'weight': self.weightEE}
             self.synDictEI = {'model': 'static_synapse_ex',
                               'weight': self.weightEI}
-            self.synDictII = {'model': 'static_synapse_in',
-                              'weight': self.weightII}
+            self.synDictII = {'model': 'stdp_synapse_in',
+                              'weight': -0.0000001, 'Wmax': -30000.,
+                              'alpha': .12, 'eta': 0.01,
+                              'tau': 20.}
             self.synDictIE = {'model': 'stdp_synapse_in',
                               'weight': -0.0000001, 'Wmax': -30000.,
                               'alpha': .12, 'eta': 0.01,
@@ -2784,13 +2786,13 @@ if __name__ == "__main__":
         level=logging.INFO)
 
     store_patterns = False
-    deafferentate_network = True
+    deafferentate_network = False
     simulation = Sinha2016()
     logging.info("Rank {}: SIMULATION STARTED".format(simulation.rank))
 
     # simulation setup
     # Setup network to handle plasticities
-    simulation.setup_plasticity(True, True)
+    simulation.setup_plasticity(False, True)
     simulation.set_connectivity_strategies("distance", "weight")
     # set up deaff extent, and neuron sets
     simulation.set_lpz_percent(0.1)
@@ -2798,7 +2800,7 @@ if __name__ == "__main__":
     simulation.prerun_setup(
         stabilisation_time=1500.,
         sp_update_interval=1500.,
-        recording_interval=250.)
+        recording_interval=50.)
     logging.info("Rank {}: SIMULATION SETUP".format(simulation.rank))
 
     # synaptic plasticity stabilisation
