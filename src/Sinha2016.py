@@ -97,7 +97,7 @@ class Sinha2016:
         self.eta_ax_i = 0.4
         self.eta_den_e = 0.1
         self.eta_den_i = 0.1
-        self.nu = 0.0001  # maximum value of dz/dt
+        self.nu = 0.00001  # maximum value of dz/dt
 
         self.rank = nest.Rank()
 
