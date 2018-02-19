@@ -883,11 +883,14 @@ class Sinha2016:
         self.eps_e = numpy.mean(ca_e)
         self.eps_i = numpy.mean(ca_i)
         # 0.4/0.7
-        self.eta_ax_e = self.eps_e * 0.56
-        self.eta_ax_i = self.eps_i * 0.56
         # 0.1/0.7
+        # For E, dendritic form first
+        self.eta_ax_e = self.eps_e * 0.56
         self.eta_den_e = self.eps_e * 0.14
-        self.eta_den_i = self.eps_i * 0.14
+
+        # For I, axonal first
+        self.eta_ax_i = self.eps_i * 0.14
+        self.eta_den_i = self.eps_i * 0.56
 
         new_growth_curve_axonal_E = {
             'growth_curve': "gaussian",
