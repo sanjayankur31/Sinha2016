@@ -514,10 +514,8 @@ class Sinha2016:
                                   'pre_synaptic_element': 'Axon_ex',
                                   'post_synaptic_element': 'Den_ex'}
                 self.synDictEI = self.synDictEE
-                self.synDictII = {'model': 'stdp_synapse_in',
-                                  'weight': -1., 'Wmax': -5.,
-                                  'alpha': .12, 'eta': 0.01,
-                                  'tau': 20.,
+                self.synDictII = {'model': 'static_synapse_in',
+                                  'weight': self.weightEE,
                                   'pre_synaptic_element': 'Axon_in',
                                   'post_synaptic_element': 'Den_in'}
                 self.synDictIE = {'model': 'stdp_synapse_in',
@@ -539,10 +537,8 @@ class Sinha2016:
                               'weight': self.weightEE}
             self.synDictEI = {'model': 'static_synapse_ex',
                               'weight': self.weightEI}
-            self.synDictII = {'model': 'stdp_synapse_in',
-                              'weight': -1., 'Wmax': -5.,
-                              'alpha': .12, 'eta': 0.01,
-                              'tau': 20.}
+            self.synDictII = {'model': 'static_synapse_in',
+                              'weight': self.weightEE}
             self.synDictIE = {'model': 'stdp_synapse_in',
                               'weight': -1., 'Wmax': -5.,
                               'alpha': .12, 'eta': 0.01,
