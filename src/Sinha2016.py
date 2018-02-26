@@ -93,8 +93,8 @@ class Sinha2016:
         # but eta is different for axonal and dendritic elements
         self.eps_e = 0.7
         self.eps_i = 0.7
-        self.eta_ax_e = 0.4
-        self.eta_ax_i = 0.4
+        self.eta_ax_e = 0.3
+        self.eta_ax_i = 0.3
         self.eta_den_e_e = 0.1
         self.eta_den_e_i = 0.1
         self.eta_den_i_e = 0.1
@@ -906,14 +906,14 @@ class Sinha2016:
         # 0.4/0.7
         # 0.1/0.7
         # For E, dendritic form first
-        self.eta_ax_e = self.eps_e * 0.56
-        self.eta_den_e_e = self.eps_e * 0.14
-        self.eta_den_e_i = self.eps_e * 0.14
+        self.eta_ax_e = self.eps_e * 0.30
+        self.eta_den_e_e = self.eps_e * 0.10
+        self.eta_den_e_i = self.eps_e * 0.10
 
         # For I, axonal first
-        self.eta_ax_i = self.eps_i * 0.14
-        self.eta_den_i_e = self.eps_i * 0.56
-        self.eta_den_i_i = self.eps_i * 0.56
+        self.eta_ax_i = self.eps_i * 0.10
+        self.eta_den_i_e = self.eps_i * 0.30
+        self.eta_den_i_i = self.eps_i * 0.30
 
         new_growth_curve_axonal_E = {
             'growth_curve': "gaussian",
