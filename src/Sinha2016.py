@@ -2760,7 +2760,7 @@ class Sinha2016:
                       file=pfile)
                 print("{}: {}".format("sparsity", self.sparsity),
                       file=pfile)
-                print("{}: {}".format("I* threshold",
+                print("{}: {}".format("I_threshold",
                                       self.stability_threshold_I),
                       file=pfile)
 
