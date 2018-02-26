@@ -95,9 +95,16 @@ class Sinha2016:
         self.eps_i = 0.7
         self.eta_ax_e = 0.4
         self.eta_ax_i = 0.4
-        self.eta_den_e = 0.1
-        self.eta_den_i = 0.1
-        self.nu = 0.00001  # maximum value of dz/dt
+        self.eta_den_e_e = 0.1
+        self.eta_den_e_i = 0.1
+        self.eta_den_i_e = 0.1
+        self.eta_den_i_i = 0.1
+        self.nu_ax_e = 0.00001  # maximum value of dz/dt
+        self.nu_ax_i = 0.00001  # maximum value of dz/dt
+        self.nu_den_e_e = 0.00001  # maximum value of dz/dt
+        self.nu_den_e_i = 0.00001  # maximum value of dz/dt
+        self.nu_den_i_e = 0.00001  # maximum value of dz/dt
+        self.nu_den_i_i = 0.00001  # maximum value of dz/dt
 
         self.rank = nest.Rank()
 
@@ -886,50 +893,66 @@ class Sinha2016:
         # 0.1/0.7
         # For E, dendritic form first
         self.eta_ax_e = self.eps_e * 0.56
-        self.eta_den_e = self.eps_e * 0.14
+        self.eta_den_e_e = self.eps_e * 0.14
+        self.eta_den_e_i = self.eps_e * 0.14
 
         # For I, axonal first
         self.eta_ax_i = self.eps_i * 0.14
-        self.eta_den_i = self.eps_i * 0.56
+        self.eta_den_i_e = self.eps_i * 0.56
+        self.eta_den_i_i = self.eps_i * 0.56
 
         new_growth_curve_axonal_E = {
             'growth_curve': "gaussian",
-            'growth_rate': self.nu,  # max dz/dt (elements/ms)
+            'growth_rate': self.nu_ax_e,  # max dz/dt (elements/ms)
             'continuous': False,
             'eta': self.eta_ax_e,
             'eps': self.eps_e
         }
         new_growth_curve_axonal_I = {
             'growth_curve': "gaussian",
-            'growth_rate': self.nu,  # max dz/dt (elements/ms)
+            'growth_rate': self.nu_ax_i,  # max dz/dt (elements/ms)
             'continuous': False,
             'eta': self.eta_ax_i,
             'eps': self.eps_i
         }
-        new_growth_curve_dendritic_E = {
+        new_growth_curve_dendritic_E_e = {
             'growth_curve': "gaussian",
-            'growth_rate': self.nu,  # max dz/dt (elements/ms)
+            'growth_rate': self.nu_den_e_e,  # max dz/dt (elements/ms)
             'continuous': False,
-            'eta': self.eta_den_e,
+            'eta': self.eta_den_e_e,
             'eps': self.eps_e
         }
-        new_growth_curve_dendritic_I = {
+        new_growth_curve_dendritic_E_i = {
             'growth_curve': "gaussian",
-            'growth_rate': self.nu,  # max dz/dt (elements/ms)
+            'growth_rate': self.nu_den_e_i,  # max dz/dt (elements/ms)
             'continuous': False,
-            'eta': self.eta_den_i,
+            'eta': self.eta_den_e_i,
+            'eps': self.eps_e
+        }
+        new_growth_curve_dendritic_I_e = {
+            'growth_curve': "gaussian",
+            'growth_rate': self.nu_i_e,  # max dz/dt (elements/ms)
+            'continuous': False,
+            'eta': self.eta_den_i_e,
+            'eps': self.eps_i
+        }
+        new_growth_curve_dendritic_I_i = {
+            'growth_curve': "gaussian",
+            'growth_rate': self.nu_i_i,  # max dz/dt (elements/ms)
+            'continuous': False,
+            'eta': self.eta_den_i_i,
             'eps': self.eps_i
         }
 
         new_structural_p_elements_E = {
-            'Den_ex': new_growth_curve_dendritic_E,
-            'Den_in': new_growth_curve_dendritic_E,
+            'Den_ex': new_growth_curve_dendritic_E_e,
+            'Den_in': new_growth_curve_dendritic_E_i,
             'Axon_ex': new_growth_curve_axonal_E
         }
 
         new_structural_p_elements_I = {
-            'Den_ex': new_growth_curve_dendritic_I,
-            'Den_in': new_growth_curve_dendritic_I,
+            'Den_ex': new_growth_curve_dendritic_I_e,
+            'Den_in': new_growth_curve_dendritic_I_i,
             'Axon_in': new_growth_curve_axonal_I
         }
 
@@ -2744,13 +2767,35 @@ class Sinha2016:
                 print("{}: {}".format("I* threshold",
                                       self.stability_threshold_I),
                       file=pfile)
-                print("{}: {}".format("eta ax E", self.eta_ax_e),
+
+                print("{}: {}".format("eta_ax_E", self.eta_ax_e),
                       file=pfile)
-                print("{}: {}".format("eta den E", self.eta_den_e),
+                print("{}: {}".format("nu_ax_E", self.nu_ax_e),
                       file=pfile)
-                print("{}: {}".format("eta ax I", self.eta_ax_i),
+                print("{}: {}".format("eta_d_E_e", self.eta_den_e_e),
                       file=pfile)
-                print("{}: {}".format("eta den I", self.eta_den_i),
+                print("{}: {}".format("nu_d_E_e", self.nu_den_e_e),
+                      file=pfile)
+                print("{}: {}".format("eta_d_E_i", self.eta_den_e_i),
+                      file=pfile)
+                print("{}: {}".format("nu_d_E_i", self.nu_den_e_i),
+                      file=pfile)
+                print("{}: {}".format("eps_E", self.eps_e),
+                      file=pfile)
+
+                print("{}: {}".format("eta_ax_I", self.eta_ax_i),
+                      file=pfile)
+                print("{}: {}".format("nu_ax_I", self.nu_ax_i),
+                      file=pfile)
+                print("{}: {}".format("eta_d_I_e", self.eta_den_i_e),
+                      file=pfile)
+                print("{}: {}".format("nu_d_I_e", self.nu_den_i_e),
+                      file=pfile)
+                print("{}: {}".format("eta_d_I_i", self.eta_den_i_i),
+                      file=pfile)
+                print("{}: {}".format("nu_d_I_i", self.nu_den_i_i),
+                      file=pfile)
+                print("{}: {}".format("eps_I", self.eps_i),
                       file=pfile)
 
     def update_time_windows(self,
