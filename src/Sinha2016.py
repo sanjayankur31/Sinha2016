@@ -188,45 +188,59 @@ class Sinha2016:
             # firing rate, the required synaptic connections, the required
             # numbers of synaptic elements, and we obtain the required values
             # of epsilon too.
-            self.growth_curve_axonal_E = {
+            new_growth_curve_axonal_E = {
                 'growth_curve': "gaussian",
                 'growth_rate': 0.,
                 'continuous': False,
                 'eta': self.eta_ax_e,
                 'eps': self.eps_e
             }
-            self.growth_curve_axonal_I = {
+            new_growth_curve_axonal_I = {
                 'growth_curve': "gaussian",
                 'growth_rate': 0.,
                 'continuous': False,
                 'eta': self.eta_ax_i,
                 'eps': self.eps_i
             }
-            self.growth_curve_dendritic_E = {
+            new_growth_curve_dendritic_E_e = {
                 'growth_curve': "gaussian",
                 'growth_rate': 0.,
                 'continuous': False,
-                'eta': self.eta_den_e,
+                'eta': self.eta_den_e_e,
                 'eps': self.eps_e
             }
-            self.growth_curve_dendritic_I = {
+            new_growth_curve_dendritic_E_i = {
                 'growth_curve': "gaussian",
                 'growth_rate': 0.,
                 'continuous': False,
-                'eta': self.eta_den_i,
+                'eta': self.eta_den_e_i,
+                'eps': self.eps_e
+            }
+            new_growth_curve_dendritic_I_e = {
+                'growth_curve': "gaussian",
+                'growth_rate': 0.,
+                'continuous': False,
+                'eta': self.eta_den_i_e,
+                'eps': self.eps_i
+            }
+            new_growth_curve_dendritic_I_i = {
+                'growth_curve': "gaussian",
+                'growth_rate': 0.,
+                'continuous': False,
+                'eta': self.eta_den_i_i,
                 'eps': self.eps_i
             }
 
             self.structural_p_elements_E = {
-                'Den_ex': self.growth_curve_dendritic_E,
-                'Den_in': self.growth_curve_dendritic_I,
-                'Axon_ex': self.growth_curve_axonal_E
+                'Den_ex': new_growth_curve_dendritic_E_e,
+                'Den_in': new_growth_curve_dendritic_E_i,
+                'Axon_ex': new_growth_curve_axonal_E
             }
 
             self.structural_p_elements_I = {
-                'Den_ex': self.growth_curve_dendritic_I,
-                'Den_in': self.growth_curve_dendritic_I,
-                'Axon_in': self.growth_curve_axonal_I
+                'Den_ex': new_growth_curve_dendritic_I_e,
+                'Den_in': new_growth_curve_dendritic_I_i,
+                'Axon_in': new_growth_curve_axonal_I
             }
 
         # see the aif source for symbol definitions
