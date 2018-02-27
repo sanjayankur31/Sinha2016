@@ -2414,12 +2414,23 @@ class Sinha2016:
         """
         Sets the stability threshold for inhibitory synapses.
         """
-        #  conns = nest.GetConnections(target=self.neuronsE,
-        #  source=self.neuronsI)
-        #  weightsIE = nest.GetStatus(conns, "weight")
-        #  mean = abs(numpy.mean(weightsIE))
-        #  std = abs(numpy.std(weightsIE))
-        self.stability_threshold_I = abs(self.weightII) + 0.01
+        connsIE = nest.GetConnections(target=self.neuronsE,
+                                      source=self.neuronsI)
+        weightsIE = nest.GetStatus(connsIE, "weight")
+        meanIE = abs(numpy.mean(weightsIE))
+        stdIE = abs(numpy.std(weightsIE))
+
+        connsII = nest.GetConnections(target=self.neuronsI,
+                                      source=self.neuronsI)
+        weightsII = nest.GetStatus(connsII, "weight")
+        meanII = abs(numpy.mean(weightsII))
+        stdII = abs(numpy.std(weightsII))
+
+        # the higher one is picked
+        if meanII < meanIE:
+            self.stability_threshold_I = (meanIE + stdIE)
+        else:
+            self.stability_threshold_I = (meanII + stdII)
 
     def invoke_metaplasticity(self):
         """Update growth curve parameters."""
