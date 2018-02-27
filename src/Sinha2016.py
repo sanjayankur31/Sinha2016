@@ -73,8 +73,11 @@ class Sinha2016:
         self.colsE = 80
         self.colsI = 40
         self.neuronal_distE = 150  # micro metres
-        self.neuronal_distI = 300  # micro metres
+        self.neuronal_distI = 2 * self.neuronal_distE  # micro metres
         self.location_sd = 15  # micro metres
+        # SD = w_mul * neuron_distE
+        self.w_mul_E = 8.
+        self.w_mul_I = 16.
         self.location_tree = None
         self.lpz_percent = 0.5
         # to calculate distances as if we're using a toroid
@@ -592,7 +595,7 @@ class Sinha2016:
             outdegree = int(len(self.neuronsE)*self.sparsity)
             for nrn in self.neuronsE:
                 targets = self.__get_nearest_ps_gaussian(
-                    nrn, self.neuronsE, outdegree
+                    nrn, self.neuronsE, outdegree, w_mul=self.w_mul_E
                 )
                 nest.Connect([nrn], targets,
                              syn_spec=self.synDictEE,
@@ -607,7 +610,7 @@ class Sinha2016:
             outdegree = int(len(self.neuronsI)*self.sparsity)
             for nrn in self.neuronsE:
                 targets = self.__get_nearest_ps_gaussian(
-                    nrn, self.neuronsI, outdegree
+                    nrn, self.neuronsI, outdegree, w_mul=self.w_mul_E
                 )
                 nest.Connect([nrn], targets,
                              syn_spec=self.synDictEI,
@@ -623,7 +626,7 @@ class Sinha2016:
             for nrn in self.neuronsI:
                 targets = self.__get_nearest_ps_gaussian(
                     nrn, self.neuronsI, outdegree,
-                    w_mul=20.
+                    w_mul=self.w_mul_I
                 )
                 nest.Connect([nrn], targets,
                              syn_spec=self.synDictII,
@@ -639,7 +642,7 @@ class Sinha2016:
             for nrn in self.neuronsI:
                 targets = self.__get_nearest_ps_gaussian(
                     nrn, self.neuronsE, outdegree,
-                    w_mul=20.
+                    w_mul=self.w_mul_I
                 )
                 nest.Connect([nrn], targets,
                              syn_spec=self.synDictIE,
@@ -1754,7 +1757,7 @@ class Sinha2016:
                     elif self.syn_form_strategy == "distance":
                         chosen_targets = self.__get_nearest_ps_gaussian(
                             gid, (targetsE + targetsI),
-                            int(abs(elms['Axon_ex'])))
+                            int(abs(elms['Axon_ex'])), w_mul=self.w_mul_E)
 
                     logging.debug(
                         "Rank {}: {}/{} options chosen for neuron {}".format(
@@ -1805,7 +1808,7 @@ class Sinha2016:
                     elif self.syn_form_strategy == "distance":
                         chosen_targets = self.__get_nearest_ps_gaussian(
                             gid, (targetsE + targetsI),
-                            int(abs(elms['Axon_in'])), w_mul=20.)
+                            int(abs(elms['Axon_in'])), w_mul=self.w_mul_I)
 
                     logging.debug(
                         "Rank {}: {}/{} options chosen for neuron {}".format(
