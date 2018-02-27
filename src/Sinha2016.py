@@ -945,14 +945,14 @@ class Sinha2016:
         }
         new_growth_curve_dendritic_I_e = {
             'growth_curve': "gaussian",
-            'growth_rate': self.nu_i_e,  # max dz/dt (elements/ms)
+            'growth_rate': self.nu_den_i_e,  # max dz/dt (elements/ms)
             'continuous': False,
             'eta': self.eta_den_i_e,
             'eps': self.eps_i
         }
         new_growth_curve_dendritic_I_i = {
             'growth_curve': "gaussian",
-            'growth_rate': self.nu_i_i,  # max dz/dt (elements/ms)
+            'growth_rate': self.nu_den_i_i,  # max dz/dt (elements/ms)
             'continuous': False,
             'eta': self.eta_den_i_i,
             'eps': self.eps_i
