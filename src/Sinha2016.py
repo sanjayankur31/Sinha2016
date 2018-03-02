@@ -2811,17 +2811,17 @@ class Sinha2016:
                       file=pfile)
                 print("{}: {}".format("nu_ax_E", self.nu_ax_e),
                       file=pfile)
-                print("{}: {}".format("eta_d_E_e", self.eta_den_e_e),
+                print("{}: {}".format("eta_den_E_e", self.eta_den_e_e),
                       file=pfile)
-                print("{}: {}".format("eps_d_E_e", self.eps_den_e_e),
+                print("{}: {}".format("eps_den_E_e", self.eps_den_e_e),
                       file=pfile)
-                print("{}: {}".format("nu_d_E_e", self.nu_den_e_e),
+                print("{}: {}".format("nu_den_E_e", self.nu_den_e_e),
                       file=pfile)
-                print("{}: {}".format("eta_d_E_i", self.eta_den_e_i),
+                print("{}: {}".format("eta_den_E_i", self.eta_den_e_i),
                       file=pfile)
-                print("{}: {}".format("eps_d_E_i", self.eps_den_e_i),
+                print("{}: {}".format("eps_den_E_i", self.eps_den_e_i),
                       file=pfile)
-                print("{}: {}".format("nu_d_E_i", self.nu_den_e_i),
+                print("{}: {}".format("nu_den_E_i", self.nu_den_e_i),
                       file=pfile)
 
                 print("{}: {}".format("eta_ax_I", self.eta_ax_i),
@@ -2830,17 +2830,17 @@ class Sinha2016:
                       file=pfile)
                 print("{}: {}".format("nu_ax_I", self.nu_ax_i),
                       file=pfile)
-                print("{}: {}".format("eta_d_I_e", self.eta_den_i_e),
+                print("{}: {}".format("eta_den_I_e", self.eta_den_i_e),
                       file=pfile)
-                print("{}: {}".format("eps_d_I_e", self.eps_den_i_e),
+                print("{}: {}".format("eps_den_I_e", self.eps_den_i_e),
                       file=pfile)
-                print("{}: {}".format("nu_d_I_e", self.nu_den_i_e),
+                print("{}: {}".format("nu_den_I_e", self.nu_den_i_e),
                       file=pfile)
-                print("{}: {}".format("eta_d_I_i", self.eta_den_i_i),
+                print("{}: {}".format("eta_den_I_i", self.eta_den_i_i),
                       file=pfile)
-                print("{}: {}".format("eps_d_I_i", self.eps_den_i_i),
+                print("{}: {}".format("eps_den_I_i", self.eps_den_i_i),
                       file=pfile)
-                print("{}: {}".format("nu_d_I_i", self.nu_den_i_i),
+                print("{}: {}".format("nu_den_I_i", self.nu_den_i_i),
                       file=pfile)
 
     def update_time_windows(self,
