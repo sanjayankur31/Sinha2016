@@ -907,7 +907,7 @@ class Sinha2016:
                     "time(ms)", "gid", "conns_gained"),
                     file=self.syn_new_fh_o_I, flush=True)
 
-    def __set_str_p_hom_point(self, ca_e, ca_i):
+    def __set_str_p_params(self, ca_e, ca_i):
         """Set the new gaussian parameters for MSP."""
         # 0.4/0.7
         # 0.1/0.7
@@ -2448,7 +2448,7 @@ class Sinha2016:
                      stat['local']]
             cal_i = [stat['Ca'] for stat in nest.GetStatus(self.neuronsI) if
                      stat['local']]
-            self.__set_str_p_hom_point(cal_e, cal_i)
+            self.__set_str_p_params(cal_e, cal_i)
         logging.debug("META PLASTICITY: Growth curves updated")
 
     def store_pattern_off_centre(self, offset=[0., 0.], track=False):
