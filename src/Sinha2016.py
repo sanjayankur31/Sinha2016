@@ -916,16 +916,16 @@ class Sinha2016:
         self.eta_ax_e = self.eps_den_e_e * 0.30
         self.eps_den_e_e = numpy.mean(ca_e)
         self.eta_den_e_e = self.eps_den_e_e * 0.10
-        self.eps_den_e_i = numpy.mean(ca_e)
+        self.eps_den_e_i = numpy.mean(ca_e) * 1.5
         self.eta_den_e_i = self.eps_den_e_e
 
         # For I, axonal first
         self.eps_ax_i = numpy.mean(ca_i)
-        self.eta_ax_i = self.eps_den_e_e * 0.30
+        self.eta_ax_i = self.eps_den_i_e * 0.30
         self.eps_den_i_e = numpy.mean(ca_i)
-        self.eta_den_i_e = self.eps_den_e_e * 0.10
-        self.eps_den_i_i = numpy.mean(ca_i)
-        self.eta_den_i_i = self.eps_den_e_e
+        self.eta_den_i_e = self.eps_den_i_e * 0.10
+        self.eps_den_i_i = numpy.mean(ca_i) * 1.5
+        self.eta_den_i_i = self.eps_den_i_e
 
         new_growth_curve_axonal_E = {
             'growth_curve': "gaussian",
