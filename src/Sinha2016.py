@@ -110,9 +110,9 @@ class Sinha2016:
         self.nu_ax_e = 0.00001
         self.nu_ax_i = 0.00001
         self.nu_den_e_e = 0.00001
-        self.nu_den_e_i = 0.000005
+        self.nu_den_e_i = 0.00001
         self.nu_den_i_e = 0.00001
-        self.nu_den_i_i = 0.000005
+        self.nu_den_i_i = 0.00001
 
         self.rank = nest.Rank()
 
