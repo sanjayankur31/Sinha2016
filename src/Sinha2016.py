@@ -907,21 +907,23 @@ class Sinha2016:
         """Set the new gaussian parameters for MSP."""
         # 0.4/0.7
         # 0.1/0.7
-        # For E, dendritic form first
-        self.eps_ax_e = numpy.mean(ca_e)
-        self.eta_ax_e = self.eps_den_e_e * 0.30
-        self.eps_den_e_e = numpy.mean(ca_e)
-        self.eta_den_e_e = self.eps_den_e_e * 0.10
-        self.eps_den_e_i = numpy.mean(ca_e) * 1.5
-        self.eta_den_e_i = self.eps_den_e_e
+        # For E
+        mean_ca_e = numpy.mean(ca_e)
+        mean_ca_i = numpy.mean(ca_i)
+        self.eps_ax_e = mean_ca_e
+        self.eps_den_e_e = mean_ca_e
+        self.eps_den_e_i = mean_ca_e * 1.5
+        self.eta_ax_e = mean_ca_e * 0.30
+        self.eta_den_e_e = mean_ca_e * 0.10
+        self.eta_den_e_i = mean_ca_e
 
-        # For I, axonal first
-        self.eps_ax_i = numpy.mean(ca_i)
-        self.eta_ax_i = self.eps_den_i_e * 0.30
-        self.eps_den_i_e = numpy.mean(ca_i)
-        self.eta_den_i_e = self.eps_den_i_e * 0.10
-        self.eps_den_i_i = numpy.mean(ca_i) * 1.5
-        self.eta_den_i_i = self.eps_den_i_e
+        # For I
+        self.eps_ax_i = mean_ca_i
+        self.eps_den_i_e = mean_ca_i
+        self.eps_den_i_i = mean_ca_i * 1.5
+        self.eta_ax_i = mean_ca_i * 0.30
+        self.eta_den_i_e = mean_ca_i * 0.10
+        self.eta_den_i_i = mean_ca_i
 
         new_growth_curve_axonal_E = {
             'growth_curve': "gaussian",
