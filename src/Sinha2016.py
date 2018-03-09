@@ -1321,8 +1321,9 @@ class Sinha2016:
                 # here, there can be two types of targets, E neurons or
                 # I neurons, and they must each be treated separately
                 elif 'Axon_in' in elms and elms['Axon_in'] < 0:
-                    connsToI = nest.GetConnections(
-                        source=[gid], synapse_model='static_synapse_in')
+                    # Ignore II synapses
+                    logging.debug("Not removing II synapses")
+                    connsToI = []
                     connsToE = nest.GetConnections(
                         source=[gid], synapse_model='stdp_synapse_in')
 
@@ -1546,63 +1547,9 @@ class Sinha2016:
                 if 'Den_in' in elms and elms['Den_in'] < 0:
                     # is it an inhibitory neuron?
                     if 'Axon_in' in elms:
-                        conns = nest.GetConnections(
-                            target=[gid], synapse_model='static_synapse_in')
-                        localsources = []
-                        chosen_sources = []
-
-                        if self.syn_del_strategy == "weight":
-                            # also need to store weight
-                            weights = nest.GetStatus(conns, "weight")
-                            for i in range(0, len(conns)):
-                                localsources.append(
-                                    [conns[i][0], abs(weights[i])])
-                        else:
-                            for acon in conns:
-                                localsources.append(acon[0])
-
-                        allsources = self.comm.allgather(localsources)
-                        sources = [s for sublist in allsources for s in
-                                   sublist]
-                        total_synapses_this_gid += len(sources)
-
-                        if len(sources) > 0:
-                            if self.syn_del_strategy == "random":
-                                if len(sources) > int(abs(elms['Den_in'])):
-                                    chosen_sources = random.sample(
-                                        sources, int(abs(elms['Den_in'])))
-                                else:
-                                    chosen_sources = sources
-                            elif self.syn_del_strategy == "distance":
-                                chosen_sources = self.__get_farthest_ps(
-                                    gid, sources, int(abs(elms['Den_in'])))
-                            elif self.syn_del_strategy == "weight":
-                                # II synapses, use threshold, even though they
-                                # are all of the same weight, because we'll set
-                                # the threshold to 0 to disable deletion of II
-                                # synapses complete, or we'll set it to a
-                                # really high value to disable thresholding.
-                                chosen_sources = self.__get_weakest_ps(
-                                    sources, int(abs(elms['Den_in'])),
-                                    threshold=self.stability_threshold_I)
-
-                            logging.debug(
-                                "Rank {}: {}/{} srcs chosen for nrn {}".format(
-                                    self.rank, len(chosen_sources),
-                                    total_synapses_this_gid, gid))
-
-                            for s in chosen_sources:
-                                syn_del_this_gid += 1
-                                partner = s
-                                nest.Disconnect(
-                                    pre=[s], post=[gid], syn_spec={
-                                        'model': 'static_synapse_in',
-                                        'pre_synaptic_element': 'Axon_in',
-                                        'post_synaptic_element': 'Den_in',
-                                    }, conn_spec={
-                                        'rule': 'one_to_one'}
-                                )
-                                synelms[s]['Axon_in'] += 1
+                        # Ignore II synapses
+                        logging.debug("Not removing II synapses")
+                        continue
 
                     # it's an excitatory neuron
                     else:
