@@ -1738,7 +1738,13 @@ class Sinha2016:
                 targetsE = []
                 targetsI = []
 
-                for atarget in (self.neuronsE + self.neuronsI):
+                # no structural plasticity for II synapses, so no new II
+                # synapses should be formed either. The simplest way of
+                # achieving this is to not consider I neurons as targets here
+                # at all. The rest of the code does not need any changes.
+                # When II synapses can be created, the iterator becomes this:
+                #  for atarget in (self.neuronsE + self.neuronsI):
+                for atarget in self.neuronsE:
                     tid = atarget
                     telms = synelms[atarget]
                     if 'Den_in' in telms and telms['Den_in'] > 0:
