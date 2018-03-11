@@ -605,7 +605,7 @@ class Sinha2016:
                                         target=self.neuronsE)
             for acon in conns:
                 nest.SetStatus(
-                    acon, {
+                    [acon], {
                         'weight': random.gauss(
                             self.weightEE, (0.2 * self.weightEE)
                         )
@@ -628,7 +628,7 @@ class Sinha2016:
                                         target=self.neuronsI)
             for acon in conns:
                 nest.SetStatus(
-                    acon, {
+                    [acon], {
                         'weight': random.gauss(
                             self.weightEI, (0.2 * self.weightEI)
                         )
@@ -652,7 +652,7 @@ class Sinha2016:
                                         target=self.neuronsI)
             for acon in conns:
                 nest.SetStatus(
-                    acon, {
+                    [acon], {
                         'weight': random.gauss(
                             self.weightII, (0.2 * self.weightII)
                         )
@@ -676,7 +676,7 @@ class Sinha2016:
                                         target=self.neuronsE)
             for acon in conns:
                 nest.SetStatus(
-                    acon, {
+                    [acon], {
                         'weight': random.gauss(
                             self.weightIE, (0.2 * self.weightIE)
                         )
