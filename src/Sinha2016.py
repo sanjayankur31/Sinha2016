@@ -128,6 +128,7 @@ class Sinha2016:
         self.weightEE = self.wbar
         self.weightII = self.wbar * -10.
         self.weightEI = self.wbar  # is the same as EE, specified for clarity
+        self.weightIE = self.wbar * -2.  # initial weight for plastic IE
         self.weightPatternEE = self.wbar * 5.
         self.weightExtE = 10.
         self.weightExtI = 15.
@@ -548,7 +549,7 @@ class Sinha2016:
                                   'pre_synaptic_element': 'Axon_in',
                                   'post_synaptic_element': 'Den_in'}
                 self.synDictIE = {'model': 'stdp_synapse_in',
-                                  'weight': -1., 'Wmax': -5.,
+                                  'weight': self.weightIE, 'Wmax': -5.,
                                   'alpha': .12, 'eta': 0.01,
                                   'tau': 20.,
                                   'pre_synaptic_element': 'Axon_in',
@@ -569,7 +570,7 @@ class Sinha2016:
             self.synDictII = {'model': 'static_synapse_in',
                               'weight': self.weightII}
             self.synDictIE = {'model': 'stdp_synapse_in',
-                              'weight': -1., 'Wmax': -5.,
+                              'weight': self.weightIE, 'Wmax': -5.,
                               'alpha': .12, 'eta': 0.01,
                               'tau': 20.}
 
