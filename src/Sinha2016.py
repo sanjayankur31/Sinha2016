@@ -675,14 +675,6 @@ class Sinha2016:
                              conn_spec=conndict)
             conns = nest.GetConnections(source=self.neuronsI,
                                         target=self.neuronsE)
-            for acon in conns:
-                nest.SetStatus(
-                    [acon], {
-                        'weight': random.gauss(
-                            self.weightIE, (0.2 * self.weightIE)
-                        )
-                    }
-                )
             logging.info("{}/{} IE connections set up on this rank.".format(
                 len(conns), int(max_num/self.comm.Get_size())))
         else:
