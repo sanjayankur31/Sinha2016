@@ -603,6 +603,14 @@ class Sinha2016:
                              conn_spec=conndict)
             conns = nest.GetConnections(source=self.neuronsE,
                                         target=self.neuronsE)
+            for acon in conns:
+                nest.SetStatus(
+                    acon, {
+                        'weight': random.gauss(
+                            self.weightEE, (0.2 * self.weightEE)
+                        )
+                    }
+                )
             logging.info("{}/{} EE connections set up on this rank.".format(
                 len(conns), int(max_num/self.comm.Get_size())))
 
@@ -618,6 +626,14 @@ class Sinha2016:
                              conn_spec=conndict)
             conns = nest.GetConnections(source=self.neuronsE,
                                         target=self.neuronsI)
+            for acon in conns:
+                nest.SetStatus(
+                    acon, {
+                        'weight': random.gauss(
+                            self.weightEI, (0.2 * self.weightEI)
+                        )
+                    }
+                )
             logging.info("{}/{} EI connections set up on this rank.".format(
                 len(conns), int(max_num/self.comm.Get_size())))
 
@@ -634,6 +650,14 @@ class Sinha2016:
                              conn_spec=conndict)
             conns = nest.GetConnections(source=self.neuronsI,
                                         target=self.neuronsI)
+            for acon in conns:
+                nest.SetStatus(
+                    acon, {
+                        'weight': random.gauss(
+                            self.weightII, (0.2 * self.weightII)
+                        )
+                    }
+                )
             logging.info("{}/{} II connections set up on this rank.".format(
                 len(conns), int(max_num/self.comm.Get_size())))
 
@@ -650,6 +674,14 @@ class Sinha2016:
                              conn_spec=conndict)
             conns = nest.GetConnections(source=self.neuronsI,
                                         target=self.neuronsE)
+            for acon in conns:
+                nest.SetStatus(
+                    acon, {
+                        'weight': random.gauss(
+                            self.weightIE, (0.2 * self.weightIE)
+                        )
+                    }
+                )
             logging.info("{}/{} IE connections set up on this rank.".format(
                 len(conns), int(max_num/self.comm.Get_size())))
         else:
@@ -1775,13 +1807,21 @@ class Sinha2016:
                         synelms[cho]['Den_ex'] -= 1
                         syn_new_this_gid += 1
                         if cho in targetsE:
+                            syn_dict = self.synDictEE.copy()
+                            syn_dict['weight'] = random.gauss(
+                                self.weightEE, (0.2 * self.weightEE)
+                            )
                             nest.Connect([gid], [cho],
                                          conn_spec='one_to_one',
-                                         syn_spec=self.synDictEE)
+                                         syn_spec=syn_dict)
                         else:
+                            syn_dict = self.synDictEI.copy()
+                            syn_dict['weight'] = random.gauss(
+                                self.weightEI, (0.2 * self.weightEI)
+                            )
                             nest.Connect([gid], [cho],
                                          conn_spec='one_to_one',
-                                         syn_spec=self.synDictEI)
+                                         syn_spec=syn_dict)
 
             # here, you can connect either with E neurons or I neurons but both
             # will have different synapse types. So, a bit more work required
@@ -1826,13 +1866,21 @@ class Sinha2016:
                         syn_new_this_gid += 1
                         synelms[target]['Den_in'] -= 1
                         if target in targetsE:
+                            syn_dict = self.synDictIE.copy()
+                            syn_dict['weight'] = random.gauss(
+                                self.weightIE, (0.2 * self.weightIE)
+                            )
                             nest.Connect([gid], [target],
                                          conn_spec='one_to_one',
-                                         syn_spec=self.synDictIE)
+                                         syn_spec=syn_dict)
                         else:
+                            syn_dict = self.synDictII.copy()
+                            syn_dict['weight'] = random.gauss(
+                                self.weightII, (0.2 * self.weightII)
+                            )
                             nest.Connect([gid], [target],
                                          conn_spec='one_to_one',
-                                         syn_spec=self.synDictII)
+                                         syn_spec=syn_dict)
 
             if self.rank == 0:
                 if syn_new_this_gid > 0:
