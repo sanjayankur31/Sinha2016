@@ -132,7 +132,7 @@ class Sinha2016:
         self.weightPatternEE = self.wbar * 5.
         self.weightExtE = 10.
         self.weightExtI = 15.
-        self.stability_threshold_I = 100000.
+        self.stability_threshold_I = 0.
 
         # used to track how many comma separated values each line will have
         # when I store synaptic conductances.
