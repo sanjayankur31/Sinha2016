@@ -2944,7 +2944,7 @@ if __name__ == "__main__":
     # Set homoeostatic structural plasticity parameters to whatever the network
     # has achieved now
     simulation.invoke_metaplasticity()
-    simulation.set_stability_threshold_I()
+    #  simulation.set_stability_threshold_I()
     # Enable structural plasticity for repair #
     simulation.print_simulation_parameters()
     simulation.enable_rewiring()
