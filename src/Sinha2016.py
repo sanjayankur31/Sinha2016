@@ -114,6 +114,13 @@ class Sinha2016:
         self.nu_den_i_e = 0.00015
         self.nu_den_i_i = 0.000075
 
+        self.tau_ax_e = self.nu_ax_e * 0.1
+        self.tau_ax_i = self.nu_ax_i * 0.1
+        self.tau_den_e_e = self.nu_den_e_e * 0.1
+        self.tau_den_e_i = self.nu_den_e_i * 0.1
+        self.tau_den_i_e = self.nu_den_i_e * 0.1
+        self.tau_den_i_i = self.nu_den_i_i * 0.1
+
         self.rank = nest.Rank()
 
         self.patterns = []
@@ -200,6 +207,7 @@ class Sinha2016:
             new_growth_curve_axonal_E = {
                 'growth_curve': "gaussian",
                 'growth_rate': 0.,
+                'tau_vacant': self.tau_ax_e,
                 'continuous': False,
                 'eta': self.eta_ax_e,
                 'eps': self.eps_ax_e
@@ -207,6 +215,7 @@ class Sinha2016:
             new_growth_curve_axonal_I = {
                 'growth_curve': "gaussian",
                 'growth_rate': 0.,
+                'tau_vacant': self.tau_ax_i,
                 'continuous': False,
                 'eta': self.eta_ax_i,
                 'eps': self.eps_ax_i
@@ -214,6 +223,7 @@ class Sinha2016:
             new_growth_curve_dendritic_E_e = {
                 'growth_curve': "gaussian",
                 'growth_rate': 0.,
+                'tau_vacant': self.tau_den_e_e,
                 'continuous': False,
                 'eta': self.eta_den_e_e,
                 'eps': self.eps_den_e_e
@@ -221,6 +231,7 @@ class Sinha2016:
             new_growth_curve_dendritic_E_i = {
                 'growth_curve': "gaussian",
                 'growth_rate': 0.,
+                'tau_vacant': self.tau_den_e_i,
                 'continuous': False,
                 'eta': self.eta_den_e_i,
                 'eps': self.eps_den_e_i
@@ -228,6 +239,7 @@ class Sinha2016:
             new_growth_curve_dendritic_I_e = {
                 'growth_curve': "gaussian",
                 'growth_rate': 0.,
+                'tau_vacant': self.tau_den_i_e,
                 'continuous': False,
                 'eta': self.eta_den_i_e,
                 'eps': self.eps_den_i_e
@@ -235,6 +247,7 @@ class Sinha2016:
             new_growth_curve_dendritic_I_i = {
                 'growth_curve': "gaussian",
                 'growth_rate': 0.,
+                'tau_vacant': self.tau_den_i_i,
                 'continuous': False,
                 'eta': self.eta_den_i_i,
                 'eps': self.eps_den_i_i
@@ -953,6 +966,7 @@ class Sinha2016:
         new_growth_curve_axonal_E = {
             'growth_curve': "gaussian",
             'growth_rate': self.nu_ax_e,  # max dz/dt (elements/ms)
+            'tau_vacant': self.tau_ax_e,
             'continuous': False,
             'eta': self.eta_ax_e,
             'eps': self.eps_ax_e
@@ -960,6 +974,7 @@ class Sinha2016:
         new_growth_curve_axonal_I = {
             'growth_curve': "gaussian",
             'growth_rate': self.nu_ax_i,  # max dz/dt (elements/ms)
+            'tau_vacant': self.tau_ax_i,
             'continuous': False,
             'eta': self.eta_ax_i,
             'eps': self.eps_ax_i
@@ -967,6 +982,7 @@ class Sinha2016:
         new_growth_curve_dendritic_E_e = {
             'growth_curve': "gaussian",
             'growth_rate': self.nu_den_e_e,  # max dz/dt (elements/ms)
+            'tau_vacant': self.tau_den_e_e,
             'continuous': False,
             'eta': self.eta_den_e_e,
             'eps': self.eps_den_e_e
@@ -974,6 +990,7 @@ class Sinha2016:
         new_growth_curve_dendritic_E_i = {
             'growth_curve': "gaussian",
             'growth_rate': self.nu_den_e_i,  # max dz/dt (elements/ms)
+            'tau_vacant': self.tau_den_e_i,
             'continuous': False,
             'eta': self.eta_den_e_i,
             'eps': self.eps_den_e_i
@@ -981,6 +998,7 @@ class Sinha2016:
         new_growth_curve_dendritic_I_e = {
             'growth_curve': "gaussian",
             'growth_rate': self.nu_den_i_e,  # max dz/dt (elements/ms)
+            'tau_vacant': self.tau_den_i_e,
             'continuous': False,
             'eta': self.eta_den_i_e,
             'eps': self.eps_den_i_e
@@ -988,6 +1006,7 @@ class Sinha2016:
         new_growth_curve_dendritic_I_i = {
             'growth_curve': "gaussian",
             'growth_rate': self.nu_den_i_i,  # max dz/dt (elements/ms)
+            'tau_vacant': self.tau_den_i_i,
             'continuous': False,
             'eta': self.eta_den_i_i,
             'eps': self.eps_den_i_i
