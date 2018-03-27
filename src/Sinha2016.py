@@ -1128,6 +1128,44 @@ class Sinha2016:
                 len(synaptic_elms)))
         return synaptic_elms
 
+    def __get_weakest_ps_gaussian(self, options, num_required,
+                                  threshold=10000.):
+        """Choose partners to delete based on weight of connections.
+
+        However, instead of simply picking the weakest ones, I first calculate
+        their probability of deletion and pick ones to delete stochastically.
+
+        Note that the signs of w and threshold need to have the right signs,
+        this method does not check that bit.
+
+        :options: options to pick from as [[nid, weight]]
+        :num_required: number of options required
+        :threshold: only consider synapses weaker than this conductance
+        :returns: chosen options
+
+        """
+        logging.debug("Returning weakest links stochastically")
+        candidates = [[n, w] for n, w in options if w < threshold]
+
+        # if there aren't enough candidates, return them all
+        if len(candidates) < num_required:
+            targets = [nid for nid, weight in candidates]
+            return targets
+
+        probabilities = []
+        targets = []
+        for [nid, w] in candidates:
+            probabilities.append(math.exp(-1*((w**2)/(threshold*2)**2)))
+            targets.append(nid)
+
+        # probabilities must add up to 1
+        probabilities = numpy.array(probabilities)/numpy.sum(probabilities)
+
+        chosen_options = numpy.random.choice(targets, num_required,
+                                             replace=False, p=probabilities)
+
+        return list(chosen_options)
+
     def __get_weakest_ps(self, options, num_required, threshold=10000.):
         """Choose partners to delete based on weight of connections.
 
