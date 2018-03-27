@@ -140,6 +140,7 @@ class Sinha2016:
         self.weightExtE = 10.
         self.weightExtI = 15.
         self.stability_threshold_I = 100000.
+        self.stability_threshold_E = 100000.
 
         # used to track how many comma separated values each line will have
         # when I store synaptic conductances.
@@ -1128,6 +1129,32 @@ class Sinha2016:
                 len(synaptic_elms)))
         return synaptic_elms
 
+    def __get_random_ps_to_delete(self, options, num_required):
+        """Get random partners from options.
+
+        This is to be used when all the targets are connected to a neuron with
+        the same weight, so one cannot differentiate between them based on
+        weights. They have the same likelihood of deletion, so we randomly pick
+        partners to remove.
+
+        So, the weight is disregarded in this function.
+
+        :options: targets that can be lost
+        :num_required: number of targets to lose
+        :returns: chosen_targets to remove
+
+        """
+        logging.debug("Returning weakest links randomly")
+        targets = [nid for nid, weight in options]
+
+        # if there aren't enough candidates, return them all
+        if len(targets) < num_required:
+            return targets
+
+        chosen_options = numpy.random.choice(targets, num_required,
+                                             replace=False)
+        return list(chosen_options)
+
     def __get_weakest_ps_gaussian(self, options, num_required,
                                   threshold=10000.):
         """Choose partners to delete based on weight of connections.
@@ -1376,10 +1403,11 @@ class Sinha2016:
                             chosen_targets = self.__get_farthest_ps(
                                 gid, targets, int(abs(elms['Axon_ex'])))
                         elif self.syn_del_strategy == "weight":
-                            # Do not use threshold for E* synapses, leave it at
-                            # default very high value
-                            chosen_targets = self.__get_weakest_ps_gaussian(
-                                targets, int(abs(elms['Axon_ex'])))
+                            # need to fetch targets from [nid, w], so use a
+                            # method for clarity
+                            chosen_targets = self.__get_random_ps_to_delete(
+                                targets, int(abs(elms['Axon_ex']))
+                            )
 
                         logging.debug(
                             "Rank {}: {}/{} tgts chosen for neuron {}".format(
@@ -1600,9 +1628,11 @@ class Sinha2016:
                             chosen_sources = self.__get_farthest_ps(
                                 gid, sources, int(abs(elms['Den_ex'])))
                         elif self.syn_del_strategy == "weight":
-                            # E* synapses do not use threshold
-                            chosen_sources = self.__get_weakest_ps_gaussian(
-                                sources, int(abs(elms['Den_ex'])))
+                            # need to strip [nid, w] to get targets, so using a
+                            # different function for clarity
+                            chosen_sources = self.__get_random_ps_to_delete(
+                                sources, int(abs(elms['Den_ex']))
+                            )
 
                         logging.debug(
                             "Rank {}: {}/{} srcs chosen for neuron {}".format(
@@ -2527,6 +2557,7 @@ class Sinha2016:
         #  mean = abs(numpy.mean(weightsIE))
         #  std = abs(numpy.std(weightsIE))
         self.stability_threshold_I = abs(self.weightII) + 0.01
+        self.stability_threshold_E = abs(self.weightEE) + 0.01
 
     def invoke_metaplasticity(self):
         """Update growth curve parameters."""
@@ -2887,6 +2918,9 @@ class Sinha2016:
                 print("{}: {} nS".format("weightExtI", self.weightExtI),
                       file=pfile)
                 print("{}: {}".format("sparsity", self.sparsity),
+                      file=pfile)
+                print("{}: {}".format("E_threshold",
+                                      self.stability_threshold_E),
                       file=pfile)
                 print("{}: {}".format("I_threshold",
                                       self.stability_threshold_I),
