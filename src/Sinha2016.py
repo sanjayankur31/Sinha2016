@@ -1378,7 +1378,7 @@ class Sinha2016:
                         elif self.syn_del_strategy == "weight":
                             # Do not use threshold for E* synapses, leave it at
                             # default very high value
-                            chosen_targets = self.__get_weakest_ps(
+                            chosen_targets = self.__get_weakest_ps_gaussian(
                                 targets, int(abs(elms['Axon_ex'])))
 
                         logging.debug(
@@ -1453,10 +1453,8 @@ class Sinha2016:
                                 gid, (targetsE + targetsI),
                                 int(abs(elms['Axon_in'])))
                         elif self.syn_del_strategy == "weight":
-                            # use threshold for I* synapses. It should only
-                            # affect IE synapses, since II synapses are much
-                            # smaller and of constant conductance.
-                            chosen_targets = self.__get_weakest_ps(
+                            # use threshold for I* synapses.
+                            chosen_targets = self.__get_weakest_ps_gaussian(
                                 (targetsE + targetsI),
                                 int(abs(elms['Axon_in'])),
                                 threshold=self.stability_threshold_I)
@@ -1603,7 +1601,7 @@ class Sinha2016:
                                 gid, sources, int(abs(elms['Den_ex'])))
                         elif self.syn_del_strategy == "weight":
                             # E* synapses do not use threshold
-                            chosen_sources = self.__get_weakest_ps(
+                            chosen_sources = self.__get_weakest_ps_gaussian(
                                 sources, int(abs(elms['Den_ex'])))
 
                         logging.debug(
@@ -1664,9 +1662,11 @@ class Sinha2016:
                                 # the threshold to 0 to disable deletion of II
                                 # synapses complete, or we'll set it to a
                                 # really high value to disable thresholding.
-                                chosen_sources = self.__get_weakest_ps(
-                                    sources, int(abs(elms['Den_in'])),
-                                    threshold=self.stability_threshold_I)
+                                chosen_sources = (
+                                    self.__get_weakest_ps_gaussian(
+                                        sources, int(abs(elms['Den_in'])),
+                                        threshold=self.stability_threshold_I)
+                                )
 
                             logging.debug(
                                 "Rank {}: {}/{} srcs chosen for nrn {}".format(
@@ -1721,9 +1721,11 @@ class Sinha2016:
                                     gid, sources, int(abs(elms['Den_in'])))
                             elif self.syn_del_strategy == "weight":
                                 # IE synapses, so use threshold
-                                chosen_sources = self.__get_weakest_ps(
-                                    sources, int(abs(elms['Den_in'])),
-                                    threshold=self.stability_threshold_I)
+                                chosen_sources = (
+                                    self.__get_weakest_ps_gaussian(
+                                        sources, int(abs(elms['Den_in'])),
+                                        threshold=self.stability_threshold_I)
+                                )
 
                             logging.debug(
                                 "Rank {}: {}/{} srcs chosen for nrn {}".format(
