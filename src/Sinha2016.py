@@ -109,10 +109,10 @@ class Sinha2016:
         # maximum value of dz/dt
         self.nu_ax_e = 0.00005
         self.nu_ax_i = 0.00005
-        self.nu_den_e_e = 0.00015
-        self.nu_den_e_i = 0.000075
-        self.nu_den_i_e = 0.00015
-        self.nu_den_i_i = 0.000075
+        self.nu_den_e_e = 0.0001
+        self.nu_den_e_i = 0.00008
+        self.nu_den_i_e = 0.0001
+        self.nu_den_i_i = 0.00008
 
         self.tau_ax_e = self.nu_ax_e * 0.1
         self.tau_ax_i = self.nu_ax_i * 0.1
