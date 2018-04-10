@@ -2559,6 +2559,19 @@ class Sinha2016:
         self.stability_threshold_I = abs(self.weightII) + 0.01
         self.stability_threshold_E = abs(self.weightEE) + 0.01
 
+    def update_mean_conductances(self):
+        """
+        Update mean conductances after stabilisation by synaptic plasticity.
+
+        Only IE weights need an update currently, since all the others are
+        static.
+        """
+        conns = nest.GetConnections(target=self.neuronsE,
+                                    source=self.neuronsI)
+        weightsIE = nest.GetStatus(conns, "weight")
+        self.weightIE = numpy.mean(weightsIE)
+        logging.debug("Update mean IE weights")
+
     def invoke_metaplasticity(self):
         """Update growth curve parameters."""
         if self.is_metaplasticity_enabled and self.is_str_p_enabled:
@@ -3037,6 +3050,7 @@ if __name__ == "__main__":
     # Set homoeostatic structural plasticity parameters to whatever the network
     # has achieved now
     simulation.invoke_metaplasticity()
+    simulation.update_mean_conductances()
     simulation.set_stability_threshold_I()
     # Enable structural plasticity for repair #
     simulation.print_simulation_parameters()
