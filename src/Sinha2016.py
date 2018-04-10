@@ -1034,6 +1034,8 @@ class Sinha2016:
         nest.SetStatus(loc_i, 'synaptic_elements_param',
                        new_structural_p_elements_I)
 
+        logging.debug("Updated growth curves. Ready for structural plasticity")
+
     def __setup_simulation(self):
         """Setup the common simulation things."""
         # Nest stuff
