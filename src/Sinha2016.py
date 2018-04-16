@@ -136,6 +136,7 @@ class Sinha2016:
         self.weightII = self.wbar * -10.
         self.weightEI = self.wbar  # is the same as EE, specified for clarity
         self.weightIE = self.wbar * -2.  # initial weight for plastic IE
+        self.weightSD = 0.1
         self.weightPatternEE = self.wbar * 5.
         self.weightExtE = 10.
         self.weightExtI = 15.
@@ -622,7 +623,7 @@ class Sinha2016:
                 nest.SetStatus(
                     [acon], {
                         'weight': random.gauss(
-                            self.weightEE, (0.2 * self.weightEE)
+                            self.weightEE, self.weightSD
                         )
                     }
                 )
@@ -645,7 +646,7 @@ class Sinha2016:
                 nest.SetStatus(
                     [acon], {
                         'weight': random.gauss(
-                            self.weightEI, (0.2 * self.weightEI)
+                            self.weightEI, self.weightSD
                         )
                     }
                 )
@@ -669,7 +670,8 @@ class Sinha2016:
                 nest.SetStatus(
                     [acon], {
                         'weight': random.gauss(
-                            self.weightII, (0.2 * self.weightII)
+                            self.weightII,
+                            self.weightSD
                         )
                     }
                 )
@@ -1893,7 +1895,7 @@ class Sinha2016:
                         if cho in targetsE:
                             syn_dict = self.synDictEE.copy()
                             syn_dict['weight'] = random.gauss(
-                                self.weightEE, (0.2 * self.weightEE)
+                                self.weightEE, self.weightSD
                             )
                             nest.Connect([gid], [cho],
                                          conn_spec='one_to_one',
@@ -1952,7 +1954,8 @@ class Sinha2016:
                         if target in targetsE:
                             syn_dict = self.synDictIE.copy()
                             syn_dict['weight'] = random.gauss(
-                                self.weightIE, (0.2 * self.weightIE)
+                                self.weightIE,
+                                self.weightSD
                             )
                             nest.Connect([gid], [target],
                                          conn_spec='one_to_one',
@@ -1960,7 +1963,8 @@ class Sinha2016:
                         else:
                             syn_dict = self.synDictII.copy()
                             syn_dict['weight'] = random.gauss(
-                                self.weightII, (0.2 * self.weightII)
+                                self.weightII,
+                                self.weightSD
                             )
                             nest.Connect([gid], [target],
                                          conn_spec='one_to_one',
@@ -2558,8 +2562,8 @@ class Sinha2016:
         #  weightsIE = nest.GetStatus(conns, "weight")
         #  mean = abs(numpy.mean(weightsIE))
         #  std = abs(numpy.std(weightsIE))
-        self.stability_threshold_I = abs(self.weightII) + 0.01
-        self.stability_threshold_E = abs(self.weightEE) + 0.01
+        self.stability_threshold_I = abs(self.weightII) + (2 * self.weightSD)
+        self.stability_threshold_E = abs(self.weightEE) + (2 * self.weightSD)
 
     def update_mean_conductances(self):
         """
@@ -2572,7 +2576,7 @@ class Sinha2016:
                                     source=self.neuronsI)
         weightsIE = nest.GetStatus(conns, "weight")
         self.weightIE = numpy.mean(weightsIE)
-        logging.debug("Update mean IE weights")
+        logging.debug("Updated mean IE weights")
 
     def invoke_metaplasticity(self):
         """Update growth curve parameters."""
@@ -2919,14 +2923,16 @@ class Sinha2016:
                       file=pfile)
                 print("{}: {} nS".format("wbar", self.wbar),
                       file=pfile)
-                print("{}: {} nS".format("weightEE", self.weightEE),
+                print("{}: {} nS".format("mean weightEE", self.weightEE),
                       file=pfile)
                 print("{}: {} ns".format("weightPatternEE",
                                          self.weightPatternEE),
                       file=pfile)
-                print("{}: {} nS".format("weightEI", self.weightEI),
+                print("{}: {} nS".format("mean weightEI", self.weightEI),
                       file=pfile)
-                print("{}: {} nS".format("weightII", self.weightII),
+                print("{}: {} nS".format("mean weightII", self.weightII),
+                      file=pfile)
+                print("{}: {} nS".format("mean weightIE", self.weightIE),
                       file=pfile)
                 print("{}: {} nS".format("weightExtE", self.weightExtE),
                       file=pfile)
