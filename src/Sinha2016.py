@@ -107,8 +107,8 @@ class Sinha2016:
         self.eta_den_i_e = 0.1
         self.eta_den_i_i = 0.1
         # maximum value of dz/dt
-        self.nu_ax_e = 0.00000
-        self.nu_ax_i = 0.00000
+        self.nu_ax_e = 0.0000000001
+        self.nu_ax_i = 0.0000000001
         self.nu_den_e_e = 0.0001
         self.nu_den_e_i = 0.00008
         self.nu_den_i_e = 0.0001
