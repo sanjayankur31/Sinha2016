@@ -3023,7 +3023,7 @@ if __name__ == "__main__":
         level=logging.INFO)
 
     store_patterns = False
-    deafferentate_network = True
+    deafferentate_network = False
     simulation = Sinha2016()
     logging.info("Rank {}: SIMULATION STARTED".format(simulation.rank))
 
@@ -3037,7 +3037,7 @@ if __name__ == "__main__":
     simulation.prerun_setup(
         stabilisation_time=1500.,
         sp_update_interval=1500.,
-        recording_interval=50.)
+        recording_interval=100.)
     logging.info("Rank {}: SIMULATION SETUP".format(simulation.rank))
 
     # synaptic plasticity stabilisation
@@ -3066,9 +3066,9 @@ if __name__ == "__main__":
 
     #  Stabilise with both plasticities active
     #  update time windows
-    simulation.update_time_windows(stabilisation_time=500.,
+    simulation.update_time_windows(stabilisation_time=2500.,
                                    sp_update_interval=1.,
-                                   recording_interval=50.)
+                                   recording_interval=100.)
     simulation.stabilise()
 
     if deafferentate_network:
@@ -3082,7 +3082,7 @@ if __name__ == "__main__":
         simulation.stabilise(label="Repair zoomed in")
         """
 
-        simulation.update_time_windows(stabilisation_time=6000.,
+        simulation.update_time_windows(stabilisation_time=10000.,
                                        sp_update_interval=1.,
                                        recording_interval=50.)
         simulation.stabilise(label="Repair #2")
