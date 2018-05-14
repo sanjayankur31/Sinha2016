@@ -944,13 +944,111 @@ class Sinha2016:
                     "time(ms)", "gid", "conns_gained"),
                     file=self.syn_new_fh_o_I, flush=True)
 
-    def __set_str_p_params(self, ca_e, ca_i):
+    def __set_str_p_params(self):
         """Set the new gaussian parameters for MSP."""
-        # 0.4/0.7
-        # 0.1/0.7
+
+        list_e = numpy.array(
+            [[stat['global_id'], stat['Ca']] for stat in
+             nest.GetStatus(self.neuronsE) if stat['local']])
+        list_i = numpy.array(
+            [[stat['global_id'], stat['Ca']] for stat in
+             nest.GetStatus(self.neuronsI) if stat['local']])
+
+        growth_curves_e = []
+        for [gid, ca] in list_e:
+            eps_ax_e = ca * 2.0
+            eps_den_e_e = ca
+            eps_den_e_i = ca * 3.0
+            eta_ax_e = ca
+            eta_den_e_e = ca * 0.25
+            eta_den_e_i = ca
+
+            new_growth_curve_axonal_E = {
+                'growth_curve': "gaussian",
+                'growth_rate': self.nu_ax_e,  # max dz/dt (elements/ms)
+                'tau_vacant': self.tau_ax_e,
+                'continuous': False,
+                'eta': eta_ax_e,
+                'eps': eps_ax_e
+            }
+
+            new_growth_curve_dendritic_E_e = {
+                'growth_curve': "gaussian",
+                'growth_rate': self.nu_den_e_e,  # max dz/dt (elements/ms)
+                'tau_vacant': self.tau_den_e_e,
+                'continuous': False,
+                'eta': eta_den_e_e,
+                'eps': eps_den_e_e
+            }
+            new_growth_curve_dendritic_E_i = {
+                'growth_curve': "gaussian",
+                'growth_rate': self.nu_den_e_i,  # max dz/dt (elements/ms)
+                'tau_vacant': self.tau_den_e_i,
+                'continuous': False,
+                'eta': eta_den_e_i,
+                'eps': eps_den_e_i
+            }
+
+            new_structural_p_elements_E = {
+                'Den_ex': new_growth_curve_dendritic_E_e,
+                'Den_in': new_growth_curve_dendritic_E_i,
+                'Axon_ex': new_growth_curve_axonal_E
+            }
+            growth_curves_e.append(new_structural_p_elements_E)
+
+        # For I
+        growth_curves_i = []
+        for [gid, ca] in list_i:
+            eps_ax_i = ca
+            eps_den_i_e = ca
+            eps_den_i_i = ca * 3.0
+            eta_ax_i = ca * 0.5
+            eta_den_i_e = ca * 0.25
+            eta_den_i_i = ca
+
+            new_growth_curve_axonal_I = {
+                'growth_curve': "gaussian",
+                'growth_rate': self.nu_ax_i,  # max dz/dt (elements/ms)
+                'tau_vacant': self.tau_ax_i,
+                'continuous': False,
+                'eta': eta_ax_i,
+                'eps': eps_ax_i
+            }
+            new_growth_curve_dendritic_I_e = {
+                'growth_curve': "gaussian",
+                'growth_rate': self.nu_den_i_e,  # max dz/dt (elements/ms)
+                'tau_vacant': self.tau_den_i_e,
+                'continuous': False,
+                'eta': eta_den_i_e,
+                'eps': eps_den_i_e
+            }
+            new_growth_curve_dendritic_I_i = {
+                'growth_curve': "gaussian",
+                'growth_rate': self.nu_den_i_i,  # max dz/dt (elements/ms)
+                'tau_vacant': self.tau_den_i_i,
+                'continuous': False,
+                'eta': eta_den_i_i,
+                'eps': eps_den_i_i
+            }
+            new_structural_p_elements_I = {
+                'Den_ex': new_growth_curve_dendritic_I_e,
+                'Den_in': new_growth_curve_dendritic_I_i,
+                'Axon_in': new_growth_curve_axonal_I
+            }
+            growth_curves_i.append(new_structural_p_elements_I)
+
+        loc_e = list(list_e[:, 0])
+        nest.SetStatus(loc_e, 'synaptic_elements_param',
+                       growth_curves_e)
+        loc_i = list(list_i[:, 0])
+        nest.SetStatus(loc_i, 'synaptic_elements_param',
+                       growth_curves_e)
+
+        # Network means
+        # Purely for printing and graphing only
         # For E
-        mean_ca_e = numpy.mean(ca_e)
-        mean_ca_i = numpy.mean(ca_i)
+        mean_ca_e = numpy.mean(list_e[:, 1])
+        mean_ca_i = numpy.mean(list_i[:, 1])
         self.eps_ax_e = mean_ca_e * 2.0
         self.eps_den_e_e = mean_ca_e
         self.eps_den_e_i = mean_ca_e * 3.0
@@ -965,76 +1063,6 @@ class Sinha2016:
         self.eta_ax_i = mean_ca_i * 0.5
         self.eta_den_i_e = mean_ca_i * 0.25
         self.eta_den_i_i = mean_ca_i
-
-        new_growth_curve_axonal_E = {
-            'growth_curve': "gaussian",
-            'growth_rate': self.nu_ax_e,  # max dz/dt (elements/ms)
-            'tau_vacant': self.tau_ax_e,
-            'continuous': False,
-            'eta': self.eta_ax_e,
-            'eps': self.eps_ax_e
-        }
-        new_growth_curve_axonal_I = {
-            'growth_curve': "gaussian",
-            'growth_rate': self.nu_ax_i,  # max dz/dt (elements/ms)
-            'tau_vacant': self.tau_ax_i,
-            'continuous': False,
-            'eta': self.eta_ax_i,
-            'eps': self.eps_ax_i
-        }
-        new_growth_curve_dendritic_E_e = {
-            'growth_curve': "gaussian",
-            'growth_rate': self.nu_den_e_e,  # max dz/dt (elements/ms)
-            'tau_vacant': self.tau_den_e_e,
-            'continuous': False,
-            'eta': self.eta_den_e_e,
-            'eps': self.eps_den_e_e
-        }
-        new_growth_curve_dendritic_E_i = {
-            'growth_curve': "gaussian",
-            'growth_rate': self.nu_den_e_i,  # max dz/dt (elements/ms)
-            'tau_vacant': self.tau_den_e_i,
-            'continuous': False,
-            'eta': self.eta_den_e_i,
-            'eps': self.eps_den_e_i
-        }
-        new_growth_curve_dendritic_I_e = {
-            'growth_curve': "gaussian",
-            'growth_rate': self.nu_den_i_e,  # max dz/dt (elements/ms)
-            'tau_vacant': self.tau_den_i_e,
-            'continuous': False,
-            'eta': self.eta_den_i_e,
-            'eps': self.eps_den_i_e
-        }
-        new_growth_curve_dendritic_I_i = {
-            'growth_curve': "gaussian",
-            'growth_rate': self.nu_den_i_i,  # max dz/dt (elements/ms)
-            'tau_vacant': self.tau_den_i_i,
-            'continuous': False,
-            'eta': self.eta_den_i_i,
-            'eps': self.eps_den_i_i
-        }
-
-        new_structural_p_elements_E = {
-            'Den_ex': new_growth_curve_dendritic_E_e,
-            'Den_in': new_growth_curve_dendritic_E_i,
-            'Axon_ex': new_growth_curve_axonal_E
-        }
-
-        new_structural_p_elements_I = {
-            'Den_ex': new_growth_curve_dendritic_I_e,
-            'Den_in': new_growth_curve_dendritic_I_i,
-            'Axon_in': new_growth_curve_axonal_I
-        }
-
-        loc_e = [stat['global_id'] for stat in nest.GetStatus(self.neuronsE)
-                 if stat['local']]
-        loc_i = [stat['global_id'] for stat in nest.GetStatus(self.neuronsI)
-                 if stat['local']]
-        nest.SetStatus(loc_e, 'synaptic_elements_param',
-                       new_structural_p_elements_E)
-        nest.SetStatus(loc_i, 'synaptic_elements_param',
-                       new_structural_p_elements_I)
 
         logging.debug("Updated growth curves. Ready for structural plasticity")
 
@@ -2581,11 +2609,7 @@ class Sinha2016:
     def invoke_metaplasticity(self):
         """Update growth curve parameters."""
         if self.is_metaplasticity_enabled and self.is_str_p_enabled:
-            cal_e = [stat['Ca'] for stat in nest.GetStatus(self.neuronsE) if
-                     stat['local']]
-            cal_i = [stat['Ca'] for stat in nest.GetStatus(self.neuronsI) if
-                     stat['local']]
-            self.__set_str_p_params(cal_e, cal_i)
+            self.__set_str_p_params()
         logging.debug("META PLASTICITY: Growth curves updated")
 
     def store_pattern_off_centre(self, offset=[0., 0.], track=False):
