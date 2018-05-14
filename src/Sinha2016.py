@@ -951,18 +951,18 @@ class Sinha2016:
         # For E
         mean_ca_e = numpy.mean(ca_e)
         mean_ca_i = numpy.mean(ca_i)
-        self.eps_ax_e = mean_ca_e * 2.0
+        self.eps_ax_e = mean_ca_e
         self.eps_den_e_e = mean_ca_e
         self.eps_den_e_i = mean_ca_e * 3.0
-        self.eta_ax_e = mean_ca_e
+        self.eta_ax_e = mean_ca_e * 0.5
         self.eta_den_e_e = mean_ca_e * 0.25
         self.eta_den_e_i = mean_ca_e
 
         # For I
-        self.eps_ax_i = mean_ca_i
+        self.eps_ax_i = mean_ca_i * 2.0
         self.eps_den_i_e = mean_ca_i
         self.eps_den_i_i = mean_ca_i * 3.0
-        self.eta_ax_i = mean_ca_i * 0.5
+        self.eta_ax_i = mean_ca_i
         self.eta_den_i_e = mean_ca_i * 0.25
         self.eta_den_i_i = mean_ca_i
 
