@@ -954,7 +954,6 @@ class Sinha2016:
             [[stat['global_id'], stat['Ca']] for stat in
              nest.GetStatus(self.neuronsI) if stat['local']])
 
-        growth_curves_e = []
         for [gid, ca] in list_e:
             eps_ax_e = ca * 1.1
             eps_den_e_e = ca
@@ -994,10 +993,10 @@ class Sinha2016:
                 'Den_in': new_growth_curve_dendritic_E_i,
                 'Axon_ex': new_growth_curve_axonal_E
             }
-            growth_curves_e.append(new_structural_p_elements_E)
+            nest.SetStatus(gid, 'synaptic_elements_param',
+                           new_structural_p_elements_E)
 
         # For I
-        growth_curves_i = []
         for [gid, ca] in list_i:
             eps_ax_i = ca * 1.1
             eps_den_i_e = ca
@@ -1035,14 +1034,8 @@ class Sinha2016:
                 'Den_in': new_growth_curve_dendritic_I_i,
                 'Axon_in': new_growth_curve_axonal_I
             }
-            growth_curves_i.append(new_structural_p_elements_I)
-
-        loc_e = list(list_e[:, 0])
-        nest.SetStatus(loc_e, 'synaptic_elements_param',
-                       growth_curves_e)
-        loc_i = list(list_i[:, 0])
-        nest.SetStatus(loc_i, 'synaptic_elements_param',
-                       growth_curves_e)
+            nest.SetStatus(gid, 'synaptic_elements_param',
+                           new_structural_p_elements_I)
 
         # Network means
         # Purely for printing and graphing only
