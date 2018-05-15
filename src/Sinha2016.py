@@ -946,8 +946,98 @@ class Sinha2016:
 
     def __set_str_p_params(self, ca_e, ca_i):
         """Set the new gaussian parameters for MSP."""
-        # 0.4/0.7
-        # 0.1/0.7
+        list_e = numpy.array(
+            [[stat['global_id'], stat['Ca']] for stat in
+             nest.GetStatus(self.neuronsE) if stat['local']])
+        list_i = numpy.array(
+            [[stat['global_id'], stat['Ca']] for stat in
+             nest.GetStatus(self.neuronsI) if stat['local']])
+
+        for [gid, ca] in list_e:
+            eps_ax_e = ca * 2.0
+            eps_den_e_e = ca
+            eps_den_e_i = ca * 3.0
+            eta_ax_e = ca
+            eta_den_e_e = ca * 0.25
+            eta_den_e_i = ca
+
+            new_growth_curve_axonal_E = {
+                'growth_curve': "gaussian",
+                'growth_rate': self.nu_ax_e,  # max dz/dt (elements/ms)
+                'tau_vacant': self.tau_ax_e,
+                'continuous': False,
+                'eta': eta_ax_e,
+                'eps': eps_ax_e
+            }
+
+            new_growth_curve_dendritic_E_e = {
+                'growth_curve': "gaussian",
+                'growth_rate': self.nu_den_e_e,  # max dz/dt (elements/ms)
+                'tau_vacant': self.tau_den_e_e,
+                'continuous': False,
+                'eta': eta_den_e_e,
+                'eps': eps_den_e_e
+            }
+            new_growth_curve_dendritic_E_i = {
+                'growth_curve': "gaussian",
+                'growth_rate': self.nu_den_e_i,  # max dz/dt (elements/ms)
+                'tau_vacant': self.tau_den_e_i,
+                'continuous': False,
+                'eta': eta_den_e_i,
+                'eps': eps_den_e_i
+            }
+
+            new_structural_p_elements_E = {
+                'Den_ex': new_growth_curve_dendritic_E_e,
+                'Den_in': new_growth_curve_dendritic_E_i,
+                'Axon_ex': new_growth_curve_axonal_E
+            }
+            nest.SetStatus(gid, 'synaptic_elements_param',
+                           new_structural_p_elements_E)
+
+        # For I
+        for [gid, ca] in list_i:
+            eps_ax_i = ca
+            eps_den_i_e = ca
+            eps_den_i_i = ca * 3.0
+            eta_ax_i = ca * 0.5
+            eta_den_i_e = ca * 0.25
+            eta_den_i_i = ca
+
+            new_growth_curve_axonal_I = {
+                'growth_curve': "gaussian",
+                'growth_rate': self.nu_ax_i,  # max dz/dt (elements/ms)
+                'tau_vacant': self.tau_ax_i,
+                'continuous': False,
+                'eta': eta_ax_i,
+                'eps': eps_ax_i
+            }
+            new_growth_curve_dendritic_I_e = {
+                'growth_curve': "gaussian",
+                'growth_rate': self.nu_den_i_e,  # max dz/dt (elements/ms)
+                'tau_vacant': self.tau_den_i_e,
+                'continuous': False,
+                'eta': eta_den_i_e,
+                'eps': eps_den_i_e
+            }
+            new_growth_curve_dendritic_I_i = {
+                'growth_curve': "gaussian",
+                'growth_rate': self.nu_den_i_i,  # max dz/dt (elements/ms)
+                'tau_vacant': self.tau_den_i_i,
+                'continuous': False,
+                'eta': eta_den_i_i,
+                'eps': eps_den_i_i
+            }
+            new_structural_p_elements_I = {
+                'Den_ex': new_growth_curve_dendritic_I_e,
+                'Den_in': new_growth_curve_dendritic_I_i,
+                'Axon_in': new_growth_curve_axonal_I
+            }
+            nest.SetStatus(gid, 'synaptic_elements_param',
+                           new_structural_p_elements_I)
+
+        # Network means
+        # Purely for printing and graphing only
         # For E
         mean_ca_e = numpy.mean(ca_e)
         mean_ca_i = numpy.mean(ca_i)
