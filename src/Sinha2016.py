@@ -993,7 +993,7 @@ class Sinha2016:
                 'Den_in': new_growth_curve_dendritic_E_i,
                 'Axon_ex': new_growth_curve_axonal_E
             }
-            nest.SetStatus(gid, 'synaptic_elements_param',
+            nest.SetStatus([gid], 'synaptic_elements_param',
                            new_structural_p_elements_E)
 
         # For I
@@ -1034,7 +1034,7 @@ class Sinha2016:
                 'Den_in': new_growth_curve_dendritic_I_i,
                 'Axon_in': new_growth_curve_axonal_I
             }
-            nest.SetStatus(gid, 'synaptic_elements_param',
+            nest.SetStatus([gid], 'synaptic_elements_param',
                            new_structural_p_elements_I)
 
         # Network means
