@@ -1021,7 +1021,7 @@ class Sinha2016:
                 'Den_in': new_growth_curve_dendritic_E_i,
                 'Axon_ex': new_growth_curve_axonal_E
             })
-        gids_e = tuple(list_e[:, 0])
+        gids_e = tuple(list_e[:, 0].astype(int))
         nest.SetStatus(gids_e, 'synaptic_elements_param',
                        new_structural_p_elements_E)
 
@@ -1065,7 +1065,7 @@ class Sinha2016:
                 'Axon_in': new_growth_curve_axonal_I
             })
 
-        gids_i = tuple(list_i[:, 0])
+        gids_i = tuple(list_i[:, 0].astype(int))
         nest.SetStatus(gids_i, 'synaptic_elements_param',
                        new_structural_p_elements_I)
 
