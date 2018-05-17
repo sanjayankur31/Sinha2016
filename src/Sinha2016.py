@@ -31,6 +31,7 @@ from scipy.spatial import cKDTree
 from mpi4py import MPI
 import logging
 import operator
+import time
 
 
 class Sinha2016:
@@ -526,7 +527,10 @@ class Sinha2016:
 
         # If neither, we've messed up
         if not self.is_str_p_enabled and not self.is_syn_p_enabled:
-            logging.critical("Neither plasticity is enabled. Exiting.")
+            logging.critical(
+                "Rank {}: Neither plasticity is enabled.  Exiting.".format(
+                    self.rank)
+            )
             sys.exit()
 
         # Documentation says things are normalised in the iaf neuron so that
@@ -607,7 +611,10 @@ class Sinha2016:
         # other are more likely to connect.
         if self.is_syn_p_enabled:
             conndict = {'rule': 'all_to_all'}
-            logging.debug("Setting up EE connections.")
+            logging.info("Rank {}: Setting up EE connections.".format(
+                self.rank
+            ))
+            start_time = time.clock()
             max_num = (len(self.neuronsE) * len(self.neuronsE) * self.sparsity)
             outdegree = int(len(self.neuronsE)*self.sparsity)
             for nrn in self.neuronsE:
@@ -627,10 +634,16 @@ class Sinha2016:
                         )
                     }
                 )
-            logging.info("{}/{} EE connections set up on this rank.".format(
-                len(conns), int(max_num/self.comm.Get_size())))
+            end_time = time.clock()
+            logging.info(
+                "Rank {}: {}/{} EE connections set up.".format(
+                    self.rank, len(conns), int(max_num/self.comm.Get_size()),
+                    (end_time - start_time)/60.))
 
-            logging.debug("Setting up EI connections.")
+            logging.info("Rank {}: Setting up EI connections.".format(
+                self.rank
+            ))
+            start_time = end_time
             max_num = (len(self.neuronsE) * len(self.neuronsI) * self.sparsity)
             outdegree = int(len(self.neuronsI)*self.sparsity)
             for nrn in self.neuronsE:
@@ -650,10 +663,16 @@ class Sinha2016:
                         )
                     }
                 )
-            logging.info("{}/{} EI connections set up on this rank.".format(
-                len(conns), int(max_num/self.comm.Get_size())))
+            end_time = time.clock()
+            logging.info(
+                "Rank {}: {}/{} EI connections set up.".format(
+                    self.rank, len(conns), int(max_num/self.comm.Get_size()),
+                    (end_time - start_time)/60.))
 
-            logging.debug("Setting up II connections.")
+            logging.info("Rank {}: Setting up II connections.".format(
+                self.rank
+            ))
+            start_time = end_time
             max_num = (len(self.neuronsI) * len(self.neuronsI) * self.sparsity)
             outdegree = int(len(self.neuronsI)*self.sparsity)
             for nrn in self.neuronsI:
@@ -675,10 +694,16 @@ class Sinha2016:
                         )
                     }
                 )
-            logging.info("{}/{} II connections set up on this rank.".format(
-                len(conns), int(max_num/self.comm.Get_size())))
+            end_time = time.clock()
+            logging.info(
+                "Rank{}: {}/{} II connections set up in {}s.".format(
+                    self.rank, len(conns), int(max_num/self.comm.Get_size()),
+                    (end_time - start_time)/60.))
 
-            logging.debug("Setting up IE connections.")
+            logging.info("Rank {}: Setting up IE connections.".format(
+                self.rank
+            ))
+            start_time = end_time
             max_num = (len(self.neuronsI) * len(self.neuronsE) * self.sparsity)
             outdegree = int(len(self.neuronsE)*self.sparsity)
             for nrn in self.neuronsI:
@@ -691,8 +716,11 @@ class Sinha2016:
                              conn_spec=conndict)
             conns = nest.GetConnections(source=self.neuronsI,
                                         target=self.neuronsE)
-            logging.info("{}/{} IE connections set up on this rank.".format(
-                len(conns), int(max_num/self.comm.Get_size())))
+            end_time = time.clock()
+            logging.info(
+                "Rank{}: {}/{} IE connections set up in {}s.".format(
+                    self.rank, len(conns), int(max_num/self.comm.Get_size()),
+                    (end_time - start_time)/60.))
         else:
             logging.info("Synaptic plasticity not enabled." +
                          "Not setting up any synapses.")
@@ -954,10 +982,10 @@ class Sinha2016:
              nest.GetStatus(self.neuronsI) if stat['local']])
 
         for [gid, ca] in list_e:
-            eps_ax_e = ca * 2.0
+            eps_ax_e = ca * 1.4
             eps_den_e_e = ca
             eps_den_e_i = ca * 3.0
-            eta_ax_e = ca
+            eta_ax_e = ca * 0.6
             eta_den_e_e = ca * 0.25
             eta_den_e_i = ca
 
@@ -997,10 +1025,10 @@ class Sinha2016:
 
         # For I
         for [gid, ca] in list_i:
-            eps_ax_i = ca
+            eps_ax_i = ca * 1.4
             eps_den_i_e = ca
             eps_den_i_i = ca * 3.0
-            eta_ax_i = ca * 0.5
+            eta_ax_i = ca * 0.6
             eta_den_i_e = ca * 0.25
             eta_den_i_i = ca
 
@@ -1039,13 +1067,13 @@ class Sinha2016:
         # Network means
         # Purely for printing and graphing only
         # For E
-        mean_ca_e = numpy.mean(ca_e)
-        mean_ca_i = numpy.mean(ca_i)
+        mean_ca_e = numpy.mean(list_e[:, 1])
+        mean_ca_i = numpy.mean(list_i[:, 1])
         self.eps_ax_e = mean_ca_e * 1.4
         self.eps_den_e_e = mean_ca_e
         self.eps_den_e_i = mean_ca_e * 3.0
         self.eta_ax_e = mean_ca_e * 0.6
-        self.eta_den_e_e = mean_ca_e * 0.10
+        self.eta_den_e_e = mean_ca_e * 0.25
         self.eta_den_e_i = mean_ca_e
 
         # For I
@@ -1053,84 +1081,15 @@ class Sinha2016:
         self.eps_den_i_e = mean_ca_i
         self.eps_den_i_i = mean_ca_i * 3.0
         self.eta_ax_i = mean_ca_i * 0.6
-        self.eta_den_i_e = mean_ca_i * 0.10
+        self.eta_den_i_e = mean_ca_i * 0.25
         self.eta_den_i_i = mean_ca_i
 
-        new_growth_curve_axonal_E = {
-            'growth_curve': "gaussian",
-            'growth_rate': self.nu_ax_e,  # max dz/dt (elements/ms)
-            'tau_vacant': self.tau_ax_e,
-            'continuous': False,
-            'eta': self.eta_ax_e,
-            'eps': self.eps_ax_e
-        }
-        new_growth_curve_axonal_I = {
-            'growth_curve': "gaussian",
-            'growth_rate': self.nu_ax_i,  # max dz/dt (elements/ms)
-            'tau_vacant': self.tau_ax_i,
-            'continuous': False,
-            'eta': self.eta_ax_i,
-            'eps': self.eps_ax_i
-        }
-        new_growth_curve_dendritic_E_e = {
-            'growth_curve': "gaussian",
-            'growth_rate': self.nu_den_e_e,  # max dz/dt (elements/ms)
-            'tau_vacant': self.tau_den_e_e,
-            'continuous': False,
-            'eta': self.eta_den_e_e,
-            'eps': self.eps_den_e_e
-        }
-        new_growth_curve_dendritic_E_i = {
-            'growth_curve': "gaussian",
-            'growth_rate': self.nu_den_e_i,  # max dz/dt (elements/ms)
-            'tau_vacant': self.tau_den_e_i,
-            'continuous': False,
-            'eta': self.eta_den_e_i,
-            'eps': self.eps_den_e_i
-        }
-        new_growth_curve_dendritic_I_e = {
-            'growth_curve': "gaussian",
-            'growth_rate': self.nu_den_i_e,  # max dz/dt (elements/ms)
-            'tau_vacant': self.tau_den_i_e,
-            'continuous': False,
-            'eta': self.eta_den_i_e,
-            'eps': self.eps_den_i_e
-        }
-        new_growth_curve_dendritic_I_i = {
-            'growth_curve': "gaussian",
-            'growth_rate': self.nu_den_i_i,  # max dz/dt (elements/ms)
-            'tau_vacant': self.tau_den_i_i,
-            'continuous': False,
-            'eta': self.eta_den_i_i,
-            'eps': self.eps_den_i_i
-        }
+        logging.debug("Rank {}: Updated growth curves.".format(self.rank))
 
-        new_structural_p_elements_E = {
-            'Den_ex': new_growth_curve_dendritic_E_e,
-            'Den_in': new_growth_curve_dendritic_E_i,
-            'Axon_ex': new_growth_curve_axonal_E
-        }
-
-        new_structural_p_elements_I = {
-            'Den_ex': new_growth_curve_dendritic_I_e,
-            'Den_in': new_growth_curve_dendritic_I_i,
-            'Axon_in': new_growth_curve_axonal_I
-        }
-
-        loc_e = [stat['global_id'] for stat in nest.GetStatus(self.neuronsE)
-                 if stat['local']]
-        loc_i = [stat['global_id'] for stat in nest.GetStatus(self.neuronsI)
-                 if stat['local']]
-        nest.SetStatus(loc_e, 'synaptic_elements_param',
-                       new_structural_p_elements_E)
-        nest.SetStatus(loc_i, 'synaptic_elements_param',
-                       new_structural_p_elements_I)
-
-        logging.debug("Updated growth curves. Ready for structural plasticity")
-
-    def __setup_simulation(self):
+    def setup_simulation(self):
         """Setup the common simulation things."""
         # Nest stuff
+        start_time = time.clock()
         nest.ResetKernel()
         # http://www.nest-simulator.org/sli/setverbosity/
         nest.set_verbosity('M_INFO')
@@ -1159,6 +1118,10 @@ class Sinha2016:
         self.__setup_files()
 
         self.dump_data()
+        end_time = time.clock()
+        time_taken = end_time - start_time
+        logging.info("Rank {}: SIMULATION SETUP took {} seconds".format(
+            simulation.rank, time_taken/60))
 
     def __get_syn_elms(self):
         """Get synaptic elements all neurons."""
@@ -1171,14 +1134,15 @@ class Sinha2016:
         local_neurons = [stat['global_id'] for stat in
                          nest.GetStatus(self.neuronsE + self.neuronsI) if
                          stat['local']]
-        logging.debug("Got {} local neurons on rank {}".format(
-            len(local_neurons), self.rank))
+        logging.debug("Rank {}: Got {} local neurons".format(
+             self.rank, len(local_neurons)))
 
         lneurons = nest.GetStatus(local_neurons, ['global_id',
                                                   'synaptic_elements'])
         # returns a list of sets - one set from each rank
         ranksets = self.comm.allgather(lneurons)
-        logging.debug("Got {} ranksets".format(len(ranksets)))
+        logging.debug("Rank {}: Got {} ranksets".format(
+            self.rank, len(ranksets)))
 
         for rankset in ranksets:
             for neuron in rankset:
@@ -1219,8 +1183,8 @@ class Sinha2016:
                     synaptic_elms[gid] = elms
 
         logging.debug(
-            "Got synaptic elements for {} neurons.".format(
-                len(synaptic_elms)))
+            "Rank {}: Got synaptic elements for {} neurons.".format(
+                self.rank, len(synaptic_elms)))
         return synaptic_elms
 
     def __get_random_ps_to_delete(self, options, num_required):
@@ -1238,7 +1202,9 @@ class Sinha2016:
         :returns: chosen_targets to remove
 
         """
-        logging.debug("Returning weakest links randomly")
+        logging.debug("Rank {}: Returning weakest links randomly".format(
+            self.rank
+        ))
         targets = [nid for nid, weight in options]
 
         # if there aren't enough candidates, return them all
@@ -1265,7 +1231,9 @@ class Sinha2016:
         :returns: chosen options
 
         """
-        logging.debug("Returning weakest links stochastically")
+        logging.debug("Rank {}:Returning weakest links stochastically".format(
+            self.rank
+        ))
         candidates = [[n, w] for n, w in options if w < threshold]
 
         # if there aren't enough candidates, return them all
@@ -1299,7 +1267,7 @@ class Sinha2016:
         :returns: chosen options
 
         """
-        logging.debug("Returning weakest links")
+        logging.debug("Rank {}: Returning weakest links".format(self.rank))
         candidates = [[n, w] for n, w in options if w < threshold]
         if len(candidates) < num_required:
             weakest_options = [nid for nid, weight in candidates]
@@ -1322,7 +1290,7 @@ class Sinha2016:
         """
         # if we don't have enough options to choose, simply return whatever is
         # available
-        logging.debug("Returning farthest partners")
+        logging.debug("Rank {}: Returning farthest partners".format(self.rank))
         if len(options) < num_required:
             return options
 
@@ -1384,7 +1352,9 @@ class Sinha2016:
         :returns: list of chosen nearest partners
 
         """
-        logging.debug("Returning partners using gaussian distance probability")
+        logging.debug(
+            "Rank {}: Returning partners (gaussian probability)".format(
+                self.rank))
         # remove source from options to ensure no autapses
         options = list(options)
         try:
@@ -1418,7 +1388,7 @@ class Sinha2016:
         :returns: list of chosen nearest partners
 
         """
-        logging.debug("Returning nearest partners")
+        logging.debug("Rank {}: Returning nearest partners".format(self.rank))
         if len(options) < num_required:
             return options
 
@@ -1438,8 +1408,8 @@ class Sinha2016:
     def __delete_connections_from_pre(self, synelms):
         """Delete connections when the neuron is a source."""
         logging.debug
-        ("Deleting connections from pre using '{}' deletion strategy".format(
-            self.syn_del_strategy))
+        ("Rank {}: Deleting from pre using '{}' deletion strategy".format(
+            self.rank, self.syn_del_strategy))
         total_synapses = 0
         syn_del_lpz_c_E = 0
         syn_del_lpz_b_E = 0
@@ -1669,8 +1639,8 @@ class Sinha2016:
     def __delete_connections_from_post(self, synelms):
         """Delete connections when neuron is target."""
         logging.debug(
-            "Deleting conns from post using '{}' deletion strategy".format(
-                self.syn_del_strategy))
+            "Rank {}: Deleting from post using '{}' deletion strategy".format(
+                self.rank, self.syn_del_strategy))
         total_synapses = 0
         syn_del_lpz_c_E = 0
         syn_del_lpz_b_E = 0
@@ -1924,8 +1894,8 @@ class Sinha2016:
 
     def __create_new_connections(self, synelms):
         """Create new connections."""
-        logging.debug("Creating connections using the {} strategy".format(
-            self.syn_form_strategy))
+        logging.debug("Rank {}: Creating using the {} strategy".format(
+            self.rank, self.syn_form_strategy))
         syn_new_lpz_c_E = 0
         syn_new_lpz_b_E = 0
         syn_new_p_lpz_E = 0
@@ -2557,7 +2527,8 @@ class Sinha2016:
         mid_point = [(x + y)/2 for x, y in zip(last_point, first_point)]
         neurons = self.location_tree.query(
             mid_point, k=num_neurons)[1]
-        logging.debug("Got {}/{} neurons".format(len(neurons), num_neurons))
+        logging.debug("Rank {}: Got {}/{} neurons".format(
+            self.rank, len(neurons), num_neurons))
         return neurons
 
     def __strengthen_pattern_connections(self, pattern_neurons):
@@ -2565,8 +2536,9 @@ class Sinha2016:
         connections = nest.GetConnections(source=pattern_neurons,
                                           target=pattern_neurons)
         nest.SetStatus(connections, {"weight": self.weightPatternEE})
-        logging.debug("ANKUR>> Number of connections strengthened: "
-                      "{}".format(len(connections)))
+        logging.debug(
+            "Rank {}: Number of connections strengthened: {}".format(
+                self.rank, len(connections)))
 
     def __track_pattern(self, pattern_neurons):
         """Track the pattern."""
@@ -2629,7 +2601,10 @@ class Sinha2016:
         """Our implementation of structural plasticity."""
         if not self.is_rewiring_enabled:
             return
-        logging.debug("STRUCTURAL PLASTICITY: Updating connectivity")
+        logging.debug(
+            "Rank {}: STRUCTURAL PLASTICITY: Updating connectivity".format(
+                self.rank
+            ))
         syn_elms = self.__get_syn_elms()
         self.__delete_connections_from_pre(syn_elms)
         # Must wait for all ranks to finish before proceeding
@@ -2641,7 +2616,10 @@ class Sinha2016:
         syn_elms_2 = self.__get_syn_elms()
         self.__create_new_connections(syn_elms_2)
         # Must wait for all ranks to finish before proceeding
-        logging.debug("STRUCTURAL PLASTICITY: Connectivity updated")
+        logging.debug(
+            "Rank {}: STRUCTURAL PLASTICITY: Connectivity updated".format(
+                self.rank
+            ))
 
     def set_stability_threshold_I(self):
         """
@@ -2666,23 +2644,22 @@ class Sinha2016:
                                     source=self.neuronsI)
         weightsIE = nest.GetStatus(conns, "weight")
         self.weightIE = numpy.mean(weightsIE)
-        logging.debug("Updated mean IE weights")
+        logging.debug("Rank {}: Updated mean IE weights".format(self.rank))
 
     def invoke_metaplasticity(self):
         """Update growth curve parameters."""
         if self.is_metaplasticity_enabled and self.is_str_p_enabled:
-            cal_e = [stat['Ca'] for stat in nest.GetStatus(self.neuronsE) if
-                     stat['local']]
-            cal_i = [stat['Ca'] for stat in nest.GetStatus(self.neuronsI) if
-                     stat['local']]
-            self.__set_str_p_params(cal_e, cal_i)
-        logging.debug("META PLASTICITY: Growth curves updated")
+            self.__set_str_p_params()
+        logging.debug(
+            "Rank {}: META PLASTICITY: Growth curves updated".format(
+                self.rank
+            ))
 
     def store_pattern_off_centre(self, offset=[0., 0.], track=False):
         """Store a pattern in the centre of LPZ."""
         logging.debug(
-            "SIMULATION: Storing pattern {} in centre of LPZ".format(
-                self.pattern_count + 1))
+            "Rank {}: SIMULATION: Storing pattern {} in centre of LPZ".format(
+                self.rank, self.pattern_count + 1))
         # first E neuron
         first_point = numpy.array(self.location_tree.data[0])
         # last E neuron
@@ -2699,8 +2676,8 @@ class Sinha2016:
                                   track=False):
         """Store a pattern by specifying area extent."""
         logging.debug(
-            "SIMULATION: Storing pattern {} centred at:".format(
-                self.pattern_count + 1, centre_point))
+            "Rank {}: SIMULATION: Storing pattern {} centred at: {}".format(
+                self.rank, self.pattern_count + 1, centre_point))
         self.pattern_count += 1
         # get 1000 neurons - 800 will be E and 200 will be I
         # we only need the 800 I neurons
@@ -2712,8 +2689,8 @@ class Sinha2016:
         if track:
             self.__track_pattern(pattern_neurons)
         logging.debug(
-            "Number of patterns stored: {}".format(
-                self.pattern_count))
+            "Rank {}: Number of patterns stored: {}".format(
+                self.rank, self.pattern_count))
 
     def setup_pattern_for_recall(self, pattern_number):
         """
@@ -2750,11 +2727,14 @@ class Sinha2016:
             nest.Connect(stim, recall_neurons,
                          conn_spec=self.connDictStim)
 
-            logging.debug("ANKUR>> Number of recall neurons for pattern"
-                          "{}: {}".format(pattern_number, len(recall_neurons)))
+            logging.debug(
+                "Rank {}: Number of recall neurons for pattern {}: {}".format(
+                    self.rank, pattern_number, len(recall_neurons)))
         else:
-            logging.debug("ANKUR>> Pattern {} appears to be completely "
-                          "deafferentated - not setting up a recall stimulus")
+            logging.debug(
+                "Rank {}: Pattern {} is completely deafferentated".format(
+                    self.rank, pattern_number) + "No recall neurons selected"
+            )
         self.recall_neurons.append(recall_neurons)
 
     def recall_last_pattern(self, time):
@@ -2763,7 +2743,9 @@ class Sinha2016:
 
         An extra helper method, since we'll be doing this most.
         """
-        logging.info("SIMULATION: RECALLING LAST PATTERN")
+        logging.info("Rank {}: SIMULATION: RECALLING LAST PATTERN".format(
+            self.rank
+        ))
         self.recall_pattern(time, self.pattern_count)
 
     def recall_pattern(self, time, pattern_number):
@@ -2774,14 +2756,18 @@ class Sinha2016:
 
     def deaff_network(self):
         """Deaff a the network."""
-        logging.info("SIMULATION: deaffing spatial network")
+        logging.info("Rank{}: SIMULATION: deaffing spatial network".format(
+            self.rank
+        ))
         for nrn in self.lpz_neurons_E:
             nest.DisconnectOneToOne(self.poissonExt[0], nrn,
                                     syn_spec={'model': 'static_synapse'})
         for nrn in self.lpz_neurons_I:
             nest.DisconnectOneToOne(self.poissonExt[0], nrn,
                                     syn_spec={'model': 'static_synapse'})
-        logging.info("SIMULATION: Network deafferentated")
+        logging.info("Rank {}:SIMULATION: Network deafferentated".format(
+            self.rank
+        ))
 
     def dump_data(self):
         """Master datadump function."""
@@ -2877,16 +2863,15 @@ class Sinha2016:
         else:
             stabilisation_time = self.default_stabilisation_time
 
-        logging.debug("SIMULATION: STABILISING for {} seconds".format(
-            stabilisation_time))
         self.run_sim_phase(stabilisation_time, label)
 
     def run_sim_phase(self, sim_time=2000, label="Phase A"):
         """Run a simulation phase."""
+        start_time = time.clock()
         # take the smaller of the two intervals
         current_sim_time = nest.GetKernelStatus()['time']
-        logging.info("Phase started at {}: {}".format(
-            current_sim_time, label))
+        logging.info("{}: {}s simtime : phase started".format(
+            label, current_sim_time/1000))
         phase_time = 0
 
         # make sure we run for the smallest interval
@@ -2908,7 +2893,7 @@ class Sinha2016:
         for i in update_steps:
             nest.Simulate(run_duration*1000.)
             current_sim_time = nest.GetKernelStatus()['time']
-            logging.info("Simulation time: {} seconds".format(
+            logging.debug("Simulation time: {} seconds".format(
                 current_sim_time/1000))
             # so it's always a multiple of the smallest simulation run time
             phase_time += run_duration
@@ -2921,8 +2906,11 @@ class Sinha2016:
                 self.update_connectivity()
 
         current_sim_time = nest.GetKernelStatus()['time']
-        logging.info("Phase ended at {}: {}".format(
-            current_sim_time, label))
+        end_time = time.clock()
+        logging.info("{}: {}s simtime: phase ended".format(
+            label, current_sim_time/1000.))
+        logging.info("{}: phase took {}s in realtime".format(
+            label, (end_time - start_time)/60.))
 
     def setup_plasticity(self, structural_p=True, synaptic_p=True):
         """Control plasticities."""
@@ -2938,16 +2926,6 @@ class Sinha2016:
         else:
             logging.critical("Both plasticities cannot be disabled. Exiting.")
             sys.exit()
-
-    def prerun_setup(self,
-                     stabilisation_time=None,
-                     sp_update_interval=None,
-                     recording_interval=None):
-        """Pre reun configuration."""
-        # Cannot be changed mid simulation
-        self.update_time_windows(stabilisation_time, sp_update_interval,
-                                 recording_interval)
-        self.__setup_simulation()
 
     def print_simulation_parameters(self):
         """Print the parameters of the simulation to a file."""
@@ -3109,7 +3087,7 @@ class Sinha2016:
 if __name__ == "__main__":
     # Set up logging configuration
     logging.basicConfig(
-        format='%(funcName)s: %(lineno)d: %(levelname)s: %(message)s',
+        format='%(asctime)-15s: %(levelname)s: %(lineno)d: %(message)s',
         level=logging.INFO)
 
     store_patterns = False
@@ -3124,11 +3102,10 @@ if __name__ == "__main__":
     # set up deaff extent, and neuron sets
     simulation.set_lpz_percent(0.1)
     # set up neurons, connections, spike detectors, files
-    simulation.prerun_setup(
-        stabilisation_time=1500.,
-        sp_update_interval=1500.,
-        recording_interval=100.)
-    logging.info("Rank {}: SIMULATION SETUP".format(simulation.rank))
+    simulation.update_time_windows(stabilisation_time=1500.,
+                                   sp_update_interval=1.,
+                                   recording_interval=100.)
+    simulation.setup_simulation()
 
     # synaptic plasticity stabilisation
     simulation.stabilise(label="Initial stabilisation")
