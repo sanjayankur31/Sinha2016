@@ -636,7 +636,7 @@ class Sinha2016:
                 )
             end_time = time.clock()
             logging.info(
-                "Rank {}: {}/{} EE connections set up.".format(
+                "Rank {}: {}/{} EE connections set up in {}s.".format(
                     self.rank, len(conns), int(max_num/self.comm.Get_size()),
                     (end_time - start_time)/60.))
 
@@ -665,7 +665,7 @@ class Sinha2016:
                 )
             end_time = time.clock()
             logging.info(
-                "Rank {}: {}/{} EI connections set up.".format(
+                "Rank {}: {}/{} EI connections set up in {}s.".format(
                     self.rank, len(conns), int(max_num/self.comm.Get_size()),
                     (end_time - start_time)/60.))
 
@@ -1125,7 +1125,7 @@ class Sinha2016:
         self.dump_data()
         end_time = time.clock()
         time_taken = end_time - start_time
-        logging.info("Rank {}: SIMULATION SETUP took {} seconds".format(
+        logging.info("Rank {}: SIMULATION SETUP took {}s".format(
             simulation.rank, time_taken/60))
 
     def __get_syn_elms(self):
