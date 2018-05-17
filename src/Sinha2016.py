@@ -981,6 +981,7 @@ class Sinha2016:
             [[stat['global_id'], stat['Ca']] for stat in
              nest.GetStatus(self.neuronsI) if stat['local']])
 
+        new_structural_p_elements_E = []
         for [gid, ca] in list_e:
             eps_ax_e = ca * 2.0
             eps_den_e_e = ca
@@ -1015,15 +1016,17 @@ class Sinha2016:
                 'eps': eps_den_e_i
             }
 
-            new_structural_p_elements_E = {
+            new_structural_p_elements_E.append({
                 'Den_ex': new_growth_curve_dendritic_E_e,
                 'Den_in': new_growth_curve_dendritic_E_i,
                 'Axon_ex': new_growth_curve_axonal_E
-            }
-            nest.SetStatus([gid], 'synaptic_elements_param',
-                           new_structural_p_elements_E)
+            })
+        gids_e = tuple(list_e[:, 0])
+        nest.SetStatus(gids_e, 'synaptic_elements_param',
+                       new_structural_p_elements_E)
 
         # For I
+        new_structural_p_elements_I = []
         for [gid, ca] in list_i:
             eps_ax_i = ca
             eps_den_i_e = ca
@@ -1056,13 +1059,15 @@ class Sinha2016:
                 'eta': eta_den_i_i,
                 'eps': eps_den_i_i
             }
-            new_structural_p_elements_I = {
+            new_structural_p_elements_I.append({
                 'Den_ex': new_growth_curve_dendritic_I_e,
                 'Den_in': new_growth_curve_dendritic_I_i,
                 'Axon_in': new_growth_curve_axonal_I
-            }
-            nest.SetStatus([gid], 'synaptic_elements_param',
-                           new_structural_p_elements_I)
+            })
+
+        gids_i = tuple(list_i[:, 0])
+        nest.SetStatus(gids_i, 'synaptic_elements_param',
+                       new_structural_p_elements_I)
 
         # Network means
         # Purely for printing and graphing only
