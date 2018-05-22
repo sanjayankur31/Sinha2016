@@ -28,6 +28,7 @@ import math
 # use random.sample instead of numpy.random - faster
 import random
 from scipy.spatial import cKDTree
+import mpi4py
 from mpi4py import MPI
 import logging
 import operator
@@ -40,6 +41,7 @@ class Sinha2016:
 
     def __init__(self):
         """Initialise variables."""
+        mpi4py.rc.errors = 'fatal'
         self.comm = MPI.COMM_WORLD
         # default resolution in nest is 0.1ms. Using the same value
         # http://www.nest-simulator.org/scheduling-and-simulation-flow/
