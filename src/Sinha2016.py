@@ -1150,7 +1150,7 @@ class Sinha2016:
         self.comm.barrier()
         # returns a list of sets - one set from each rank
         ranksets = self.comm.allgather(lneurons)
-        logging.info("Rank {}: Got {} ranksets".format(
+        logging.debug("Rank {}: Got {} ranksets".format(
             self.rank, len(ranksets)))
 
         for rankset in ranksets:
