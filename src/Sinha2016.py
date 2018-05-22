@@ -1146,9 +1146,10 @@ class Sinha2016:
         lneurons = ()
         lneurons = nest.GetStatus(local_neurons, ['global_id',
                                                   'synaptic_elements'])
+        self.comm.barrier()
         # returns a list of sets - one set from each rank
         ranksets = self.comm.allgather(lneurons)
-        logging.debug("Rank {}: Got {} ranksets".format(
+        logging.info("Rank {}: Got {} ranksets".format(
             self.rank, len(ranksets)))
 
         for rankset in ranksets:
@@ -1458,6 +1459,7 @@ class Sinha2016:
                         for acon in conns:
                             localtargets.append(acon[1])
 
+                    self.comm.barrier()
                     alltargets = self.comm.allgather(localtargets)
                     targets = [t for sublist in alltargets for t in sublist]
                     total_synapses_this_gid = len(targets)
@@ -1528,6 +1530,7 @@ class Sinha2016:
                         for acon in connsToE:
                             localtargetsE.append(acon[1])
 
+                    self.comm.barrier()
                     alltargetsI = self.comm.allgather(localtargetsI)
                     alltargetsE = self.comm.allgather(localtargetsE)
 
@@ -1684,6 +1687,7 @@ class Sinha2016:
                         for acon in conns:
                             localsources.append(acon[0])
 
+                    self.comm.barrier()
                     allsources = self.comm.allgather(localsources)
                     sources = [s for sublist in allsources for s in sublist]
                     total_synapses_this_gid += len(sources)
@@ -1742,6 +1746,7 @@ class Sinha2016:
                             for acon in conns:
                                 localsources.append(acon[0])
 
+                        self.comm.barrier()
                         allsources = self.comm.allgather(localsources)
                         sources = [s for sublist in allsources for s in
                                    sublist]
@@ -1805,6 +1810,7 @@ class Sinha2016:
                             # otherwise only sids
                             for acon in conns:
                                 localsources.append(acon[0])
+                        self.comm.barrier()
                         allsources = self.comm.allgather(localsources)
                         sources = [s for sublist in allsources for s in
                                    sublist]
