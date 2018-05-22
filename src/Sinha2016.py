@@ -1142,6 +1142,7 @@ class Sinha2016:
         logging.debug("Rank {}: Got {} local neurons".format(
              self.rank, len(local_neurons)))
 
+        lneurons = ()
         lneurons = nest.GetStatus(local_neurons, ['global_id',
                                                   'synaptic_elements'])
         # returns a list of sets - one set from each rank
