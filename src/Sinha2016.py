@@ -3175,7 +3175,6 @@ if __name__ == "__main__":
         simulation.recall_pattern(50, 2)
         simulation.recall_pattern(50, 3)
 
-    nest.Cleanup()
     simulation.close_files()
     logging.info("Rank {}: SIMULATION FINISHED SUCCESSFULLY".format(
         simulation.rank))
