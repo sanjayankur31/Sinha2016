@@ -1076,19 +1076,19 @@ class Sinha2016:
         # For E
         mean_ca_e = numpy.mean(list_e[:, 1])
         mean_ca_i = numpy.mean(list_i[:, 1])
-        self.eps_ax_e = mean_ca_e * 1.4
+        self.eps_ax_e = mean_ca_e * 1.4  # doesn't matter, nu is 0
         self.eps_den_e_e = mean_ca_e
         self.eps_den_e_i = mean_ca_e * 3.0
-        self.eta_ax_e = mean_ca_e * 0.6
-        self.eta_den_e_e = mean_ca_e * 0.10
+        self.eta_ax_e = mean_ca_e * 0.6  # doesn't matter, nu is 0
+        self.eta_den_e_e = mean_ca_e * 0.25
         self.eta_den_e_i = mean_ca_e
 
         # For I
-        self.eps_ax_i = mean_ca_i * 1.4
+        self.eps_ax_i = mean_ca_i * 1.4  # doesn't matter, nu is 0
         self.eps_den_i_e = mean_ca_i
         self.eps_den_i_i = mean_ca_i * 3.0
-        self.eta_ax_i = mean_ca_i * 0.6
-        self.eta_den_i_e = mean_ca_i * 0.10
+        self.eta_ax_i = mean_ca_i * 0.6  # doesn't matter, nu is 0
+        self.eta_den_i_e = mean_ca_i * 0.25
         self.eta_den_i_i = mean_ca_i
 
         logging.debug("Rank {}: Updated growth curves.".format(self.rank))
