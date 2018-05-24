@@ -2096,7 +2096,7 @@ class Sinha2016:
                        stat in nest.GetStatus(self.lpz_c_neurons_E) if
                        stat['local']]
             for info in allinfo:
-                print("{}\t{}".format(info[0], info[1]), file=f)
+                print("{}\t{}".format(info[0], info[1]), flush=True, file=f)
 
         ca_fn_lpz_b_E = ("02-calcium-lpz_b_E-" +
                          str(self.rank) + "-" + current_sim_time +
@@ -2107,7 +2107,7 @@ class Sinha2016:
                        stat in nest.GetStatus(self.lpz_b_neurons_E) if
                        stat['local']]
             for info in allinfo:
-                print("{}\t{}".format(info[0], info[1]), file=f)
+                print("{}\t{}".format(info[0], info[1]), flush=True, file=f)
 
         ca_fn_p_lpz_E = ("02-calcium-p_lpz_E-" +
                          str(self.rank) + "-" + current_sim_time +
@@ -2118,7 +2118,7 @@ class Sinha2016:
                        stat in nest.GetStatus(self.p_lpz_neurons_E) if
                        stat['local']]
             for info in allinfo:
-                print("{}\t{}".format(info[0], info[1]), file=f)
+                print("{}\t{}".format(info[0], info[1]), flush=True, file=f)
 
         ca_fn_o_E = ("02-calcium-o_E-" +
                      str(self.rank) + "-" + current_sim_time +
@@ -2129,7 +2129,7 @@ class Sinha2016:
                        stat in nest.GetStatus(self.o_neurons_E) if
                        stat['local']]
             for info in allinfo:
-                print("{}\t{}".format(info[0], info[1]), file=f)
+                print("{}\t{}".format(info[0], info[1]), flush=True, file=f)
 
         # I neurons
         ca_fn_lpz_c_I = ("02-calcium-lpz_c_I-" +
@@ -2141,7 +2141,7 @@ class Sinha2016:
                        stat in nest.GetStatus(self.lpz_c_neurons_I) if
                        stat['local']]
             for info in allinfo:
-                print("{}\t{}".format(info[0], info[1]), file=f)
+                print("{}\t{}".format(info[0], info[1]), flush=True, file=f)
 
         ca_fn_lpz_b_I = ("02-calcium-lpz_b_I-" +
                          str(self.rank) + "-" + current_sim_time +
@@ -2152,7 +2152,7 @@ class Sinha2016:
                        stat in nest.GetStatus(self.lpz_b_neurons_I) if
                        stat['local']]
             for info in allinfo:
-                print("{}\t{}".format(info[0], info[1]), file=f)
+                print("{}\t{}".format(info[0], info[1]), flush=True, file=f)
 
         ca_fn_p_lpz_I = ("02-calcium-p_lpz_I-" +
                          str(self.rank) + "-" + current_sim_time +
@@ -2163,7 +2163,7 @@ class Sinha2016:
                        stat in nest.GetStatus(self.p_lpz_neurons_I) if
                        stat['local']]
             for info in allinfo:
-                print("{}\t{}".format(info[0], info[1]), file=f)
+                print("{}\t{}".format(info[0], info[1]), flush=True, file=f)
 
         ca_fn_o_I = ("02-calcium-o_I-" +
                      str(self.rank) + "-" + current_sim_time +
@@ -2174,7 +2174,7 @@ class Sinha2016:
                        stat in nest.GetStatus(self.o_neurons_I) if
                        stat['local']]
             for info in allinfo:
-                print("{}\t{}".format(info[0], info[1]), file=f)
+                print("{}\t{}".format(info[0], info[1]), flush=True, file=f)
 
     def __dump_syn_connections(self):
         """Dump pre-post syn pairs for existing synapses."""
@@ -2269,7 +2269,9 @@ class Sinha2016:
                         axons, axons_conn,
                         dendrites_ex, dendrites_ex_conn,
                         dendrites_in, dendrites_in_conn),
-                        file=f)
+                          flush=True,
+                          file=f
+                          )
 
             se_fn_lpz_b_E = (
                 "05-se-lpz_b_E-" + str(self.rank) + "-" + current_sim_time
@@ -2299,7 +2301,8 @@ class Sinha2016:
                         axons, axons_conn,
                         dendrites_ex, dendrites_ex_conn,
                         dendrites_in, dendrites_in_conn),
-                        file=f)
+                          flush=True,
+                          file=f)
 
             se_fn_p_lpz_E = (
                 "05-se-p_lpz_E-" + str(self.rank) + "-" + current_sim_time
@@ -2329,7 +2332,8 @@ class Sinha2016:
                         axons, axons_conn,
                         dendrites_ex, dendrites_ex_conn,
                         dendrites_in, dendrites_in_conn),
-                        file=f)
+                          flush=True,
+                          file=f)
 
             se_fn_o_E = (
                 "05-se-o_E-" + str(self.rank) + "-" + current_sim_time
@@ -2359,7 +2363,8 @@ class Sinha2016:
                         axons, axons_conn,
                         dendrites_ex, dendrites_ex_conn,
                         dendrites_in, dendrites_in_conn),
-                        file=f)
+                          flush=True,
+                          file=f)
 
             # inhibitory neurons
             se_fn_lpz_c_I = (
@@ -2390,7 +2395,8 @@ class Sinha2016:
                         axons, axons_conn,
                         dendrites_ex, dendrites_ex_conn,
                         dendrites_in, dendrites_in_conn),
-                        file=f)
+                          flush=True,
+                          file=f)
 
             se_fn_lpz_b_I = (
                 "05-se-lpz_b_I-" + str(self.rank) + "-" + current_sim_time
@@ -2420,7 +2426,8 @@ class Sinha2016:
                         axons, axons_conn,
                         dendrites_ex, dendrites_ex_conn,
                         dendrites_in, dendrites_in_conn),
-                        file=f)
+                          flush=True,
+                          file=f)
 
             se_fn_p_lpz_I = (
                 "05-se-p_lpz_I-" + str(self.rank) + "-" + current_sim_time
@@ -2450,7 +2457,8 @@ class Sinha2016:
                         axons, axons_conn,
                         dendrites_ex, dendrites_ex_conn,
                         dendrites_in, dendrites_in_conn),
-                        file=f)
+                          flush=True,
+                          file=f)
 
             se_fn_o_I = (
                 "05-se-o_I-" + str(self.rank) + "-" + current_sim_time
@@ -2480,7 +2488,8 @@ class Sinha2016:
                         axons, axons_conn,
                         dendrites_ex, dendrites_ex_conn,
                         dendrites_in, dendrites_in_conn),
-                        file=f)
+                          flush=True,
+                          file=f)
 
     def __dump_synaptic_weights(self):
         """Dump synaptic weights per rank.
@@ -2785,11 +2794,13 @@ class Sinha2016:
 
     def dump_data(self):
         """Master datadump function."""
+        self.comm.barrier()
         logging.debug("Rank {}: Printing data to files".format(self.rank))
         self.__dump_syn_connections()
         self.__dump_synaptic_weights()
         self.__dump_ca_concentration()
         self.__dump_synaptic_elements_per_neurons()
+        self.comm.barrier()
 
     def close_files(self):
         """Close all files when the simulation is finished."""
