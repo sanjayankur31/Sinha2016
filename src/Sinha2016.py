@@ -974,7 +974,7 @@ class Sinha2016:
                     "time(ms)", "gid", "conns_gained"),
                     file=self.syn_new_fh_o_I, flush=True)
 
-    def __set_str_p_params(self, ca_e, ca_i):
+    def __set_str_p_params(self):
         """Set the new gaussian parameters for MSP."""
         list_e = numpy.array(
             [[stat['global_id'], stat['Ca']] for stat in
@@ -1074,8 +1074,8 @@ class Sinha2016:
         # Network means
         # Purely for printing and graphing only
         # For E
-        mean_ca_e = numpy.mean(ca_e)
-        mean_ca_i = numpy.mean(ca_i)
+        mean_ca_e = numpy.mean(list_e[:, 1])
+        mean_ca_i = numpy.mean(list_i[:, 1])
         self.eps_ax_e = mean_ca_e * 1.4
         self.eps_den_e_e = mean_ca_e
         self.eps_den_e_i = mean_ca_e * 3.0
