@@ -35,14 +35,18 @@ import operator
 import time
 
 
+mpi4py.rc.errors = 'fatal'
+#  mpi4py.rc.threaded = False
+
+
 class Sinha2016:
 
     """Simulations for my PhD 2016."""
 
     def __init__(self):
         """Initialise variables."""
-        mpi4py.rc.errors = 'fatal'
         self.comm = MPI.COMM_WORLD
+        logging.info("MPI Backend: {}".format(MPI.Get_library_version()))
         # default resolution in nest is 0.1ms. Using the same value
         # http://www.nest-simulator.org/scheduling-and-simulation-flow/
         self.dt = 0.1
@@ -3108,73 +3112,3 @@ if __name__ == "__main__":
     store_patterns = False
     deafferentate_network = False
     simulation = Sinha2016()
-    logging.info("Rank {}: SIMULATION STARTED".format(simulation.rank))
-
-    # simulation setup
-    # Setup network to handle plasticities
-    simulation.setup_plasticity(True, True)
-    simulation.set_connectivity_strategies("distance", "weight")
-    # set up deaff extent, and neuron sets
-    simulation.set_lpz_percent(0.1)
-    # set up neurons, connections, spike detectors, files
-    simulation.update_time_windows(stabilisation_time=1500.,
-                                   sp_update_interval=1.,
-                                   recording_interval=100.)
-    simulation.setup_simulation()
-
-    # synaptic plasticity stabilisation
-    simulation.stabilise(label="Initial stabilisation")
-
-    # Pattern related simulation
-    if store_patterns:
-        # control LPZs
-        # pattern at centre of LPZ
-        simulation.store_pattern_off_centre([0., 0.], True)
-        # outside the LPZ
-        simulation.store_pattern_with_centre([10000, 2000], 600, True)
-        # store other pattern
-        simulation.store_pattern_off_centre([0., 2000.0], True)
-
-        # stabilise network after storing patterns
-        simulation.stabilise(label="Pattern stabilisation")
-    # Set homoeostatic structural plasticity parameters to whatever the network
-    # has achieved now
-    simulation.invoke_metaplasticity()
-    simulation.update_mean_conductances()
-    simulation.set_stability_threshold_I()
-    # Enable structural plasticity for repair #
-    simulation.print_simulation_parameters()
-    simulation.enable_rewiring()
-
-    #  Stabilise with both plasticities active
-    #  update time windows
-    simulation.update_time_windows(stabilisation_time=2500.,
-                                   sp_update_interval=1.,
-                                   recording_interval=100.)
-    simulation.stabilise()
-
-    if deafferentate_network:
-        # Deaff network
-        simulation.deaff_network()
-        # zoom in on post deaff phase
-        """
-        simulation.update_time_windows(stabilisation_time=50.,
-                                       sp_update_interval=1.,
-                                       recording_interval=5.)
-        simulation.stabilise(label="Repair zoomed in")
-        """
-
-        simulation.update_time_windows(stabilisation_time=10000.,
-                                       sp_update_interval=1.,
-                                       recording_interval=50.)
-        simulation.stabilise(label="Repair #2")
-
-    if store_patterns:
-        # recall stored and tracked pattern
-        simulation.recall_pattern(50, 1)
-        simulation.recall_pattern(50, 2)
-        simulation.recall_pattern(50, 3)
-
-    simulation.close_files()
-    logging.info("Rank {}: SIMULATION FINISHED SUCCESSFULLY".format(
-        simulation.rank))
