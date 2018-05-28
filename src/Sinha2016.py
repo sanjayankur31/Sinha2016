@@ -35,14 +35,17 @@ import operator
 import time
 
 
+mpi4py.rc.errors = 'fatal'
+
+
 class Sinha2016:
 
     """Simulations for my PhD 2016."""
 
     def __init__(self):
         """Initialise variables."""
-        mpi4py.rc.errors = 'fatal'
         self.comm = MPI.COMM_WORLD
+        logging.info("MPI Backend:\n{}".format(MPI.Get_library_version()))
         # default resolution in nest is 0.1ms. Using the same value
         # http://www.nest-simulator.org/scheduling-and-simulation-flow/
         self.dt = 0.1
