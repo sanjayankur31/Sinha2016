@@ -113,12 +113,12 @@ class Sinha2016:
         self.eta_den_i_e = 0.1
         self.eta_den_i_i = 0.1
         # maximum value of dz/dt
-        self.nu_ax_e = 0.0000000001
-        self.nu_ax_i = 0.0000000001
-        self.nu_den_e_e = 0.0001
-        self.nu_den_e_i = 0.00008
-        self.nu_den_i_e = 0.0001
-        self.nu_den_i_i = 0.00008
+        self.nu_ax_e = 0.00001
+        self.nu_ax_i = 0.00001
+        self.nu_den_e_e = 0.00001
+        self.nu_den_e_i = 0.00001
+        self.nu_den_i_e = 0.00001
+        self.nu_den_i_i = 0.00001
 
         self.tau_ax_e = self.nu_ax_e * 0.1
         self.tau_ax_i = self.nu_ax_i * 0.1
@@ -988,12 +988,12 @@ class Sinha2016:
 
         new_structural_p_elements_E = []
         for [gid, ca] in list_e:
-            eps_ax_e = ca * 2.0
+            eps_ax_e = ca
             eps_den_e_e = ca
-            eps_den_e_i = ca * 3.0
-            eta_ax_e = ca
-            eta_den_e_e = ca * 0.25
-            eta_den_e_i = ca
+            eps_den_e_i = ca
+            eta_ax_e = ca * 0.4/0.7
+            eta_den_e_e = ca * 0.2/0.7
+            eta_den_e_i = ca * 0.2/0.7
 
             new_growth_curve_axonal_E = {
                 'growth_curve': "gaussian",
@@ -1035,10 +1035,10 @@ class Sinha2016:
         for [gid, ca] in list_i:
             eps_ax_i = ca
             eps_den_i_e = ca
-            eps_den_i_i = ca * 3.0
-            eta_ax_i = ca * 0.5
-            eta_den_i_e = ca * 0.25
-            eta_den_i_i = ca
+            eps_den_i_i = ca
+            eta_ax_i = ca * 0.4/0.7
+            eta_den_i_e = ca * 0.2/0.7
+            eta_den_i_i = ca * 0.2/0.7
 
             new_growth_curve_axonal_I = {
                 'growth_curve': "gaussian",
