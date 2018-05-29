@@ -989,10 +989,10 @@ class Sinha2016:
 
         new_structural_p_elements_E = []
         for [gid, ca] in list_e:
-            eps_ax_e = ca * 2.0
+            eps_ax_e = ca
             eps_den_e_e = ca
             eps_den_e_i = ca * 3.0
-            eta_ax_e = ca
+            eta_ax_e = ca * 0.5
             eta_den_e_e = ca * 0.25
             eta_den_e_i = ca
 
@@ -1034,10 +1034,10 @@ class Sinha2016:
         # For I
         new_structural_p_elements_I = []
         for [gid, ca] in list_i:
-            eps_ax_i = ca * 2.0
+            eps_ax_i = ca
             eps_den_i_e = ca
             eps_den_i_i = ca * 3.0
-            eta_ax_i = ca
+            eta_ax_i = ca * 0.5
             eta_den_i_e = ca * 0.25
             eta_den_i_i = ca
 
