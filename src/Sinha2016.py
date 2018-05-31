@@ -3109,13 +3109,13 @@ if __name__ == "__main__":
         level=logging.INFO)
 
     store_patterns = False
-    deafferentate_network = False
+    deafferentate_network = True
     simulation = Sinha2016()
     logging.info("Rank {}: SIMULATION STARTED".format(simulation.rank))
 
     # simulation setup
     # Setup network to handle plasticities
-    simulation.setup_plasticity(True, True)
+    simulation.setup_plasticity(False, True)
     simulation.set_connectivity_strategies("distance", "weight")
     # set up deaff extent, and neuron sets
     simulation.set_lpz_percent(0.1)
@@ -3149,13 +3149,6 @@ if __name__ == "__main__":
     simulation.print_simulation_parameters()
     simulation.enable_rewiring()
 
-    #  Stabilise with both plasticities active
-    #  update time windows
-    simulation.update_time_windows(stabilisation_time=2500.,
-                                   sp_update_interval=1.,
-                                   recording_interval=100.)
-    simulation.stabilise()
-
     if deafferentate_network:
         # Deaff network
         simulation.deaff_network()
@@ -3167,7 +3160,7 @@ if __name__ == "__main__":
         simulation.stabilise(label="Repair zoomed in")
         """
 
-        simulation.update_time_windows(stabilisation_time=10000.,
+        simulation.update_time_windows(stabilisation_time=2500.,
                                        sp_update_interval=1.,
                                        recording_interval=50.)
         simulation.stabilise(label="Repair #2")
