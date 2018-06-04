@@ -3109,7 +3109,7 @@ if __name__ == "__main__":
         level=logging.INFO)
 
     store_patterns = False
-    deafferentate_network = False
+    deafferentate_network = True
     simulation = Sinha2016()
     logging.info("Rank {}: SIMULATION STARTED".format(simulation.rank))
 
@@ -3169,7 +3169,7 @@ if __name__ == "__main__":
 
         simulation.update_time_windows(stabilisation_time=10000.,
                                        sp_update_interval=1.,
-                                       recording_interval=50.)
+                                       recording_interval=100.)
         simulation.stabilise(label="Repair #2")
 
     if store_patterns:
