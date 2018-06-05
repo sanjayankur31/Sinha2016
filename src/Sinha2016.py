@@ -2872,6 +2872,52 @@ class Sinha2016:
         self.is_rewiring_enabled = False
         logging.info("Rank {}: REWIRING DISABLED".format(self.rank))
 
+    def enable_syn_p(self):
+        """
+        Enable synaptic plasticity in IE synapses.
+
+        It is possible to toggle synaptic plasticity by changing the synapse
+        model that we use between vogels_sprekeler and static, but that would
+        require more work. Simply changing eta is a much easier way.
+        """
+        if self.is_syn_p_enabled:
+            logging.warning(
+                "Rank {}: Synaptic plasticity already enabled!".format(
+                    self.rank)
+            )
+            return
+
+        # Enable STDP for future IE connections
+        self.synDictIE['eta'] = self.etaIE
+
+        conns = nest.GetConnections(source=self.neuronsI, target=self.neuronsE)
+        nest.SetStatus(conns, {'eta': self.etaIE})
+        self.is_syn_p_enabled = True
+        logging.info(
+            "Rank {}: Synaptic plasticity enabled in IE synapses.".format(
+                self.rank)
+        )
+
+    def disable_syn_p(self):
+        """Disable synaptic plasticity in IE synapses."""
+        if not self.is_syn_p_enabled:
+            logging.warning(
+                "Rank {}: Synaptic plasticity already disabled!".format(
+                    self.rank)
+            )
+            return
+
+        # Disable STDP for future IE connections
+        self.synDictIE['eta'] = 0.
+
+        conns = nest.GetConnections(source=self.neuronsI, target=self.neuronsE)
+        nest.SetStatus(conns, {'eta': 0.})
+        self.is_syn_p_enabled = False
+        logging.info(
+            "Rank {}: Synaptic plasticity disabled in IE synapses.".format(
+                self.rank)
+        )
+
     def set_lpz_percent(self, lpz_percent):
         """Set up the network for deaff."""
         self.lpz_percent = lpz_percent
