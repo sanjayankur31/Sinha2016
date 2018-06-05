@@ -149,6 +149,10 @@ class Sinha2016:
         self.stability_threshold_I = 100000.
         self.stability_threshold_E = 100000.
 
+        self.etaIE = 0.01
+        self.alphaIE = .12
+        self.tauIE = 20.
+
         # used to track how many comma separated values each line will have
         # when I store synaptic conductances.
         # Required in post processing, so that I know what the size of my
@@ -574,8 +578,8 @@ class Sinha2016:
                                   'post_synaptic_element': 'Den_in'}
                 self.synDictIE = {'model': 'stdp_synapse_in',
                                   'weight': self.weightIE, 'Wmax': -5.,
-                                  'alpha': .12, 'eta': 0.01,
-                                  'tau': 20.,
+                                  'alpha': self.alphaIE, 'eta': self.etaIE,
+                                  'tau': self.tauIE,
                                   'pre_synaptic_element': 'Axon_in',
                                   'post_synaptic_element': 'Den_in'}
             nest.SetStructuralPlasticityStatus({
@@ -595,8 +599,8 @@ class Sinha2016:
                               'weight': self.weightII}
             self.synDictIE = {'model': 'stdp_synapse_in',
                               'weight': self.weightIE, 'Wmax': -5.,
-                              'alpha': .12, 'eta': 0.01,
-                              'tau': 20.}
+                              'alpha': self.alphaIE, 'eta': self.etaIE,
+                              'tau': self.tauIE}
 
     def __create_initial_connections(self):
         """Initially connect various neuron sets."""
