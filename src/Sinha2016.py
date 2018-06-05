@@ -3100,6 +3100,7 @@ if __name__ == "__main__":
                                    sp_update_interval=1.,
                                    recording_interval=100.)
     simulation.stabilise()
+    simulation.disable_syn_p()
 
     if deafferentate_network:
         # Deaff network
