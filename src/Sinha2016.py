@@ -113,12 +113,12 @@ class Sinha2016:
         self.eta_den_i_e = 0.1
         self.eta_den_i_i = 0.1
         # maximum value of dz/dt
-        self.nu_ax_e = 0.00005
-        self.nu_ax_i = 0.00005
+        self.nu_ax_e = 0.0001
+        self.nu_ax_i = 0.0001
         self.nu_den_e_e = 0.0001
-        self.nu_den_e_i = 0.00008
+        self.nu_den_e_i = 0.0001
         self.nu_den_i_e = 0.0001
-        self.nu_den_i_i = 0.00008
+        self.nu_den_i_i = 0.0001
 
         self.tau_ax_e = self.nu_ax_e * 0.1
         self.tau_ax_i = self.nu_ax_i * 0.1
@@ -993,9 +993,9 @@ class Sinha2016:
 
         new_structural_p_elements_E = []
         for [gid, ca] in list_e:
-            eps_ax_e = ca * 2.0
+            eps_ax_e = ca * 3.0
             eps_den_e_e = ca
-            eps_den_e_i = ca * 3.0
+            eps_den_e_i = ca * 2.0
             eta_ax_e = ca
             eta_den_e_e = ca * 0.25
             eta_den_e_i = ca
@@ -1040,8 +1040,8 @@ class Sinha2016:
         for [gid, ca] in list_i:
             eps_ax_i = ca
             eps_den_i_e = ca
-            eps_den_i_i = ca * 3.0
-            eta_ax_i = ca * 0.5
+            eps_den_i_i = ca * 2.0
+            eta_ax_i = ca * 0.2
             eta_den_i_e = ca * 0.25
             eta_den_i_i = ca
 
@@ -1084,9 +1084,9 @@ class Sinha2016:
         # For E
         mean_ca_e = numpy.mean(list_e[:, 1])
         mean_ca_i = numpy.mean(list_i[:, 1])
-        self.eps_ax_e = mean_ca_e * 2.0
+        self.eps_ax_e = mean_ca_e * 3.0
         self.eps_den_e_e = mean_ca_e
-        self.eps_den_e_i = mean_ca_e * 3.0
+        self.eps_den_e_i = mean_ca_e * 2.0
         self.eta_ax_e = mean_ca_e
         self.eta_den_e_e = mean_ca_e * 0.25
         self.eta_den_e_i = mean_ca_e
@@ -1094,8 +1094,8 @@ class Sinha2016:
         # For I
         self.eps_ax_i = mean_ca_i
         self.eps_den_i_e = mean_ca_i
-        self.eps_den_i_i = mean_ca_i * 3.0
-        self.eta_ax_i = mean_ca_i * 0.5
+        self.eps_den_i_i = mean_ca_i * 2.0
+        self.eta_ax_i = mean_ca_i * 0.2
         self.eta_den_i_e = mean_ca_i * 0.25
         self.eta_den_i_i = mean_ca_i
 
