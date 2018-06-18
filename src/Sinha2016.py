@@ -82,8 +82,8 @@ class Sinha2016:
         self.neuronal_distI = 2 * self.neuronal_distE  # micro metres
         self.location_sd = 15  # micro metres
         # SD = w_mul * neuron_distE
-        self.w_mul_E = 5.
-        self.w_mul_I = 8.
+        self.w_mul_E = 8.
+        self.w_mul_I = 16.
         self.location_tree = None
         self.lpz_percent = 0.5
         # to calculate distances as if we're using a toroid
