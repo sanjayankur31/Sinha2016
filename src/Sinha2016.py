@@ -154,16 +154,6 @@ class Sinha2016:
         self.alphaIE = .12
         self.tauIE = 20.
 
-        # used to track how many comma separated values each line will have
-        # when I store synaptic conductances.
-        # Required in post processing, so that I know what the size of my
-        # dataframe should be. Pandas cannot figure this out on its own. See
-        # postprocessing scripts for more information.
-        self.num_synapses_EE = 0
-        self.num_synapses_EI = 0
-        self.num_synapses_II = 0
-        self.num_synapses_IE = 0
-
         self.neuronsE = []
         self.lpz_c_neurons_E = []
         self.lpz_b_neurons_E = []
@@ -819,38 +809,6 @@ class Sinha2016:
 
     def __setup_files(self):
         """Set up the filenames and handles."""
-        self.synaptic_p_weights_fn_EE = (
-            "01-synaptic-weights-EE-" + str(self.rank) + ".txt")
-        self.weights_fh_EE = open(
-            self.synaptic_p_weights_fn_EE, 'w')
-        print("{}\t{}".format(
-            "time(ms)", "EE(nS)"),
-            file=self.weights_fh_EE, flush=True)
-
-        self.synaptic_p_weights_fn_EI = (
-            "01-synaptic-weights-EI-" + str(self.rank) + ".txt")
-        self.weights_fh_EI = open(
-            self.synaptic_p_weights_fn_EI, 'w')
-        print("{}\t{}".format(
-            "time(ms)", "EI(nS)"),
-            file=self.weights_fh_EI, flush=True)
-
-        self.synaptic_p_weights_fn_II = (
-            "01-synaptic-weights-II-" + str(self.rank) + ".txt")
-        self.weights_fh_II = open(
-            self.synaptic_p_weights_fn_II, 'w')
-        print("{}\t{}".format(
-            "time(ms)", "II(nS)"),
-            file=self.weights_fh_II, flush=True)
-
-        self.synaptic_p_weights_fn_IE = (
-            "01-synaptic-weights-IE-" + str(self.rank) + ".txt")
-        self.weights_fh_IE = open(
-            self.synaptic_p_weights_fn_IE, 'w')
-        print("{}\t{}".format(
-            "time(ms)", "IE(nS)"),
-            file=self.weights_fh_IE, flush=True)
-
         if self.is_str_p_enabled:
             if self.rank == 0:
                 self.syn_del_fn_lpz_c_E = (
@@ -2198,49 +2156,53 @@ class Sinha2016:
                      str(self.rank) + "-" + current_sim_time +
                      ".txt")
         with open(syn_fn_EE, 'w') as f:
-            print("src\tdest", file=f, flush=True)
-            allinfo = [[stat[0], stat[1]] for
-                       stat in nest.GetConnections(
-                           source=self.neuronsE, target=self.neuronsE)
-                       ]
-            for info in allinfo:
-                print("{}\t{}".format(info[0], info[1]), file=f)
+            print("src\tdest\tweight", file=f, flush=True)
+            conns = nest.GetConnections(source=self.neuronsE,
+                                        target=self.neuronsE)
+            weights = nest.GetStatus(conns, 'weight')
+            for i in range(0, len(conns)):
+                print("{}\t{}\t{}".format(
+                    conns[i][0], conns[i][1], weights[i]
+                ), file=f)
 
         syn_fn_EI = ("08-syn_conns-EI-" +
                      str(self.rank) + "-" + current_sim_time +
                      ".txt")
         with open(syn_fn_EI, 'w') as f:
-            print("src\tdest", file=f, flush=True)
-            allinfo = [[stat[0], stat[1]] for
-                       stat in nest.GetConnections(
-                           source=self.neuronsE, target=self.neuronsI)
-                       ]
-            for info in allinfo:
-                print("{}\t{}".format(info[0], info[1]), file=f)
+            print("src\tdest\tweight", file=f, flush=True)
+            conns = nest.GetConnections(source=self.neuronsE,
+                                        target=self.neuronsI)
+            weights = nest.GetStatus(conns, 'weight')
+            for i in range(0, len(conns)):
+                print("{}\t{}\t{}".format(
+                    conns[i][0], conns[i][1], weights[i]
+                ), file=f)
 
         syn_fn_II = ("08-syn_conns-II-" +
                      str(self.rank) + "-" + current_sim_time +
                      ".txt")
         with open(syn_fn_II, 'w') as f:
-            print("src\tdest", file=f, flush=True)
-            allinfo = [[stat[0], stat[1]] for
-                       stat in nest.GetConnections(
-                           source=self.neuronsI, target=self.neuronsI)
-                       ]
-            for info in allinfo:
-                print("{}\t{}".format(info[0], info[1]), file=f)
+            print("src\tdest\tweight", file=f, flush=True)
+            conns = nest.GetConnections(source=self.neuronsI,
+                                        target=self.neuronsI)
+            weights = nest.GetStatus(conns, 'weight')
+            for i in range(0, len(conns)):
+                print("{}\t{}\t{}".format(
+                    conns[i][0], conns[i][1], weights[i]
+                ), file=f)
 
         syn_fn_IE = ("08-syn_conns-IE-" +
                      str(self.rank) + "-" + current_sim_time +
                      ".txt")
         with open(syn_fn_IE, 'w') as f:
-            print("src\tdest", file=f, flush=True)
-            allinfo = [[stat[0], stat[1]] for
-                       stat in nest.GetConnections(
-                           source=self.neuronsI, target=self.neuronsE)
-                       ]
-            for info in allinfo:
-                print("{}\t{}".format(info[0], info[1]), file=f)
+            print("src\tdest\tweight", file=f, flush=True)
+            conns = nest.GetConnections(source=self.neuronsI,
+                                        target=self.neuronsE)
+            weights = nest.GetStatus(conns, 'weight')
+            for i in range(0, len(conns)):
+                print("{}\t{}\t{}".format(
+                    conns[i][0], conns[i][1], weights[i]
+                ), file=f)
 
     def __dump_synaptic_elements_per_neurons(self):
         """
@@ -2490,56 +2452,6 @@ class Sinha2016:
                         dendrites_ex, dendrites_ex_conn,
                         dendrites_in, dendrites_in_conn),
                         file=f)
-
-    def __dump_synaptic_weights(self):
-        """Dump synaptic weights per rank.
-
-        In a parallel simulation GetConnections only returns connections
-        with *targets* on the MPI process executing the function.
-
-        http://www.nest-simulator.org/cc/GetConnections/
-        """
-        current_sim_time = (str(nest.GetKernelStatus()['time']))
-
-        conns = nest.GetConnections(target=self.neuronsE,
-                                    source=self.neuronsI)
-        weightsIE = nest.GetStatus(conns, "weight")
-        print("{}\t{}".format(
-            current_sim_time,
-            str(weightsIE).strip('[]()').replace(' ', '').replace(',', '\t')),
-            file=self.weights_fh_IE)
-        if len(weightsIE) > self.num_synapses_IE:
-            self.num_synapses_IE = len(weightsIE)
-
-        conns = nest.GetConnections(target=self.neuronsI,
-                                    source=self.neuronsI)
-        weightsII = nest.GetStatus(conns, "weight")
-        print("{}\t{}".format(
-            current_sim_time,
-            str(weightsII).strip('[]()').replace(' ', '').replace(',', '\t')),
-            file=self.weights_fh_II)
-        if len(weightsII) > self.num_synapses_II:
-            self.num_synapses_II = len(weightsII)
-
-        conns = nest.GetConnections(target=self.neuronsI,
-                                    source=self.neuronsE)
-        weightsEI = nest.GetStatus(conns, "weight")
-        print("{}\t{}".format(
-            current_sim_time,
-            str(weightsEI).strip('[]()').replace(' ', '').replace(',', '\t')),
-            file=self.weights_fh_EI)
-        if len(weightsEI) > self.num_synapses_EI:
-            self.num_synapses_EI = len(weightsEI)
-
-        conns = nest.GetConnections(target=self.neuronsE,
-                                    source=self.neuronsE)
-        weightsEE = nest.GetStatus(conns, "weight")
-        print("{}\t{}".format(
-            current_sim_time,
-            str(weightsEE).strip('[]()').replace(' ', '').replace(',', '\t')),
-            file=self.weights_fh_EE)
-        if len(weightsEE) > self.num_synapses_EE:
-            self.num_synapses_EE = len(weightsEE)
 
     def __get_neurons_from_region(self, num_neurons, first_point, last_point):
         """Get neurons in the centre of the grid.
@@ -2796,30 +2708,12 @@ class Sinha2016:
         """Master datadump function."""
         logging.debug("Rank {}: Printing data to files".format(self.rank))
         self.__dump_syn_connections()
-        self.__dump_synaptic_weights()
         self.__dump_ca_concentration()
         self.__dump_synaptic_elements_per_neurons()
 
     def close_files(self):
         """Close all files when the simulation is finished."""
         logging.debug("Rank {}: Closing open files".format(self.rank))
-        # -1 is a unique index that marks this line. Since the other indexes
-        # represent time, they cannot be negative
-        print("-1\t{}".format(self.num_synapses_EE),
-              file=self.weights_fh_EE)
-        self.weights_fh_EE.close()
-
-        print("-1\t{}".format(self.num_synapses_EI),
-              file=self.weights_fh_EI)
-        self.weights_fh_EI.close()
-        print("-1\t{}".format(self.num_synapses_II),
-              file=self.weights_fh_II)
-        self.weights_fh_II.close()
-
-        print("-1\t{}".format(self.num_synapses_IE),
-              file=self.weights_fh_IE)
-        self.weights_fh_IE.close()
-
         if self.is_str_p_enabled:
             if self.rank == 0:
                 self.syn_new_fh_lpz_c_E.close()

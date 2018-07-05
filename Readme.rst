@@ -48,31 +48,6 @@ Used to generate:
 - SNR value
 - Raster plots showing E and I spikes
 
-Synaptic weight files
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. code:: text
-
-    time(ms), comma separated conductances(nS)
-
-    Last line specifies max number of conductance columns
-
-- Name format: :code:`00-synaptic-weights-{synapse-group}-{rank}.txt`
-- Collected at particular times - set by the recording period in the simulation
-- One file per MPI rank
-- The conductances from various rank files will need to be merged. Since these files won't be too large, I can use pandas dataframes to quickly do this.
-
-One file for each of the following synapse groups:
-
-- EE
-- EI
-- II
-- IE
-
-Used to generate:
-
-- Plots with Means and STDs of synaptic conductances
-
 Calcium concentration files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -183,3 +158,27 @@ Used to generate:
 The data from the two together will give:
 
 - Plots showing synaptic turnover as the network evolves
+
+
+Network connection information
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: text
+
+    src target weight
+
+- Name format: :code:`08-syn_conns-{synapse type}-{rank}-{simtime}.txt`
+- Collected at regular intervals
+
+For each synapse type:
+
+- EE
+- EI
+- IE
+- II
+
+
+Used to generate:
+
+- Plots showing conductances input to each region, mean and total
+- Plots showing incoming synapse numbers to neurons in different regions
