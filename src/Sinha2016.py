@@ -84,6 +84,14 @@ class Sinha2016:
         # SD = w_mul * neuron_distE
         self.w_mul_E = 8.
         self.w_mul_I = 16.
+        # Maximum distance a neuron can form connections to is
+        # interneuron_distance * max_con_len_mul
+        # So, the longest connection an E neuron can make is with a neuron
+        # at a distance of 150 * 10 = 1500 micro metre
+        self.max_con_len_mul_E = 10.
+        # So, the longest connection an E neuron can make is with a neuron
+        # at a distance of 150 * 20 = 3000 micro metre
+        self.max_con_len_mul_I = 20.
         self.location_tree = None
         self.lpz_percent = 0.5
         # to calculate distances as if we're using a toroid
@@ -619,7 +627,8 @@ class Sinha2016:
             outdegree = int(len(self.neuronsE)*self.sparsity)
             for nrn in self.neuronsE:
                 targets = self.__get_nearest_ps_gaussian(
-                    nrn, self.neuronsE, outdegree, w_mul=self.w_mul_E
+                    nrn, self.neuronsE, outdegree, w_mul=self.w_mul_E,
+                    max_con_len_mul=self.max_con_len_mul_E, replace=True
                 )
                 nest.Connect([nrn], targets,
                              syn_spec=self.synDictEE,
@@ -648,7 +657,8 @@ class Sinha2016:
             outdegree = int(len(self.neuronsI)*self.sparsity)
             for nrn in self.neuronsE:
                 targets = self.__get_nearest_ps_gaussian(
-                    nrn, self.neuronsI, outdegree, w_mul=self.w_mul_E
+                    nrn, self.neuronsI, outdegree, w_mul=self.w_mul_E,
+                    max_con_len_mul=self.max_con_len_mul_E, replace=True
                 )
                 nest.Connect([nrn], targets,
                              syn_spec=self.synDictEI,
@@ -677,8 +687,8 @@ class Sinha2016:
             outdegree = int(len(self.neuronsI)*self.sparsity)
             for nrn in self.neuronsI:
                 targets = self.__get_nearest_ps_gaussian(
-                    nrn, self.neuronsI, outdegree,
-                    w_mul=self.w_mul_I
+                    nrn, self.neuronsI, outdegree, w_mul=self.w_mul_I,
+                    max_con_len_mul=self.max_con_len_mul_I, replace=True
                 )
                 nest.Connect([nrn], targets,
                              syn_spec=self.synDictII,
@@ -708,8 +718,8 @@ class Sinha2016:
             outdegree = int(len(self.neuronsE)*self.sparsity)
             for nrn in self.neuronsI:
                 targets = self.__get_nearest_ps_gaussian(
-                    nrn, self.neuronsE, outdegree,
-                    w_mul=self.w_mul_I
+                    nrn, self.neuronsE, outdegree, w_mul=self.w_mul_I,
+                    max_con_len_mul=self.max_con_len_mul_I, replace=True
                 )
                 nest.Connect([nrn], targets,
                              syn_spec=self.synDictIE,
@@ -1318,13 +1328,18 @@ class Sinha2016:
         return nearest_options
 
     def __get_nearest_ps_gaussian(self, source, options, num_required,
-                                  w_mul=10.):
-        """Choose nearest partners but with a gaussian kernel.
+                                  w_mul=10., max_con_len_mul=20.,
+                                  replace=False):
+        """
+        Choose nearest partners but with a gaussian kernel, within a bounded
+        distance.
 
         :source: source neuron
         :w_mul: width of Gaussian = w_mul x neuronal_distE
         :options: options to choose from
         :num_required: number of partners needed
+        :max_con_len_mul: multiplier for maximum allowed distance to options
+        :replace: pick with or without replacement
         :returns: list of chosen nearest partners
 
         """
@@ -1338,20 +1353,25 @@ class Sinha2016:
         except:
             pass
 
-        if len(options) < num_required:
-            return options
-
         probabilities = []
+        valid_options = []
         for opt in options:
             distance = self.__get_distance_toroid(source, opt)
-            probabilities.append(
-                math.exp(-1.*((distance**2)/((w_mul*self.neuronal_distE)**2))))
+            if distance <= (max_con_len_mul*self.neuronal_distE):
+                valid_options.append(opt)
+                probabilities.append(
+                    math.exp(-1.*(
+                        (distance**2)/((w_mul*self.neuronal_distE)**2))))
+
+        # if there are few valid options, simply accept them
+        if len(valid_options) < num_required:
+            return valid_options
 
         # probabilites must add up to 1 to use the function
         probabilities = numpy.array(probabilities)/numpy.sum(probabilities)
 
-        chosen_options = numpy.random.choice(options, num_required,
-                                             replace=False, p=probabilities)
+        chosen_options = numpy.random.choice(valid_options, num_required,
+                                             replace=replace, p=probabilities)
 
         return list(chosen_options)
 
@@ -1923,7 +1943,9 @@ class Sinha2016:
                     elif self.syn_form_strategy == "distance":
                         chosen_targets = self.__get_nearest_ps_gaussian(
                             gid, (targetsE + targetsI),
-                            int(abs(elms['Axon_ex'])), w_mul=self.w_mul_E)
+                            int(abs(elms['Axon_ex'])), w_mul=self.w_mul_E,
+                            max_con_len_mul=self.max_con_len_mul_E,
+                            replace=False)
 
                     logging.debug(
                         "Rank {}: {}/{} options chosen for neuron {}".format(
@@ -1982,7 +2004,9 @@ class Sinha2016:
                     elif self.syn_form_strategy == "distance":
                         chosen_targets = self.__get_nearest_ps_gaussian(
                             gid, (targetsE + targetsI),
-                            int(abs(elms['Axon_in'])), w_mul=self.w_mul_I)
+                            int(abs(elms['Axon_in'])), w_mul=self.w_mul_I,
+                            max_con_len_mul=self.max_con_len_mul_I,
+                            replace=False)
 
                     logging.debug(
                         "Rank {}: {}/{} options chosen for neuron {}".format(
@@ -2935,8 +2959,14 @@ class Sinha2016:
                       file=pfile)
                 print("{}: {}".format("dist_neuronsE", self.neuronal_distE),
                       file=pfile)
+                print("{}: {}".format("max_con_length_E",
+                                      (self.max_con_len_mul_E *
+                                       self.neuronal_distE), file=pfile))
                 print("{}: {}".format("dist_neuronsI", self.neuronal_distI),
                       file=pfile)
+                print("{}: {}".format("max_con_length_I",
+                                      (self.max_con_len_mul_I *
+                                       self.neuronal_distI), file=pfile))
                 print("{}: {}".format("lpz_percent", self.lpz_percent),
                       file=pfile)
                 print("{}: {} micro metres".format(
