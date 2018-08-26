@@ -82,16 +82,16 @@ class Sinha2016:
         self.neuronal_distI = 2 * self.neuronal_distE  # micro metres
         self.location_sd = 15  # micro metres
         # SD = w_mul * neuron_distE
-        self.w_mul_E = 8.
-        self.w_mul_I = 16.
+        self.w_mul_E = 6.
+        self.w_mul_I = 12.
         # Maximum distance a neuron can form connections to is
         # interneuron_distance * max_con_len_mul
         # So, the longest connection an E neuron can make is with a neuron
-        # at a distance of 150 * 10 = 1500 micro metre
-        self.max_con_len_mul_E = 10.
+        # at a distance of 150 * 16 = 2400 micro metre
+        self.max_con_len_mul_E = 16.
         # So, the longest connection an E neuron can make is with a neuron
-        # at a distance of 150 * 20 = 3000 micro metre
-        self.max_con_len_mul_I = 20.
+        # at a distance of 150 * 32 = 4800 micro metre
+        self.max_con_len_mul_I = 32.
         self.location_tree = None
         self.lpz_percent = 0.5
         # to calculate distances as if we're using a toroid
