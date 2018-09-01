@@ -1219,7 +1219,7 @@ class Sinha2016:
             probability = (math.exp(-1*((w**2)/(threshold*2)**2)))
             if random.random() <= probability:
                 targets.append(nid)
-            if len(targets) == num_required:
+            if len(targets) >= num_required:
                 return targets
 
         return targets
@@ -1341,10 +1341,10 @@ class Sinha2016:
                 (distance**2)/((w_mul*self.neuronal_distE)**2))))
             if random.random() <= probability:
                 chosen_options.append(opt)
-            if len(chosen_options) == num_required:
-                return list(chosen_options)
+            if len(chosen_options) >= num_required:
+                return chosen_options
 
-        return list(chosen_options)
+        return chosen_options
 
     def __get_nearest_ps(self, source, options, num_required):
         """Choose nearest partners.
