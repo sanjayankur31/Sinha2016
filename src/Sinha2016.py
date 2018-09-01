@@ -1214,24 +1214,15 @@ class Sinha2016:
         ))
         candidates = [[n, w] for n, w in options if w < threshold]
 
-        # if there aren't enough candidates, return them all
-        if len(candidates) < num_required:
-            targets = [nid for nid, weight in candidates]
-            return targets
-
-        probabilities = []
         targets = []
         for [nid, w] in candidates:
-            probabilities.append(math.exp(-1*((w**2)/(threshold*2)**2)))
-            targets.append(nid)
+            probability = (math.exp(-1*((w**2)/(threshold*2)**2)))
+            if random.random() <= probability:
+                targets.append(nid)
+            if len(targets) == num_required:
+                return targets
 
-        # probabilities must add up to 1
-        probabilities = numpy.array(probabilities)/numpy.sum(probabilities)
-
-        chosen_options = numpy.random.choice(targets, num_required,
-                                             replace=False, p=probabilities)
-
-        return list(chosen_options)
+        return targets
 
     def __get_weakest_ps(self, options, num_required, threshold=10000.):
         """Choose partners to delete based on weight of connections.
