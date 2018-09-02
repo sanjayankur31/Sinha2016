@@ -1134,10 +1134,25 @@ class Sinha2016:
                     source_elms_con = synelms['Axon_ex']['z_connected']
                     source_elms_total = synelms['Axon_ex']['z']
 
+                if math.isnan(source_elms_con):
+                    source_elms_con = 0
+                if math.isnan(source_elms_total):
+                    source_elms_total = 0
+
                 target_elms_con_ex = synelms['Den_ex']['z_connected']
                 target_elms_con_in = synelms['Den_in']['z_connected']
                 target_elms_total_ex = synelms['Den_ex']['z']
                 target_elms_total_in = synelms['Den_in']['z']
+
+                if math.isnan(target_elms_con_ex):
+                    target_elms_con_ex = 0
+                if math.isnan(target_elms_con_in):
+                    target_elms_con_in = 0
+                if math.isnan(target_elms_total_ex):
+                    target_elms_total_ex = 0
+                if math.isnan(target_elms_total_in):
+                    target_elms_total_in = 0
+
                 # total elms cannot be less than 0
                 # connected elms cannot be less than 0
                 # continuous = False, so all values are already ints here
