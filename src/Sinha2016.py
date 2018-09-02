@@ -82,7 +82,7 @@ class Sinha2016:
         self.neuronal_distI = 2 * self.neuronal_distE  # micro metres
         self.location_sd = 15  # micro metres
         # SD = w_mul * neuron_distE
-        self.w_mul_E = 10.
+        self.w_mul_E = 8.
         self.w_mul_I = 15.
         self.location_tree = None
         self.lpz_percent = 0.5
