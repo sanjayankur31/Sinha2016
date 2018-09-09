@@ -1340,6 +1340,11 @@ class Sinha2016:
         except:
             pass
 
+        # randomise the list so that we don't let the neuron id make a
+        # difference. Otherwise, when creating initial connections, ones that
+        # come first may get priority and use up the required connections.
+        random.shuffle(options)
+
         chosen_options = []
         for opt in options:
             distance = self.__get_distance_toroid(source, opt)
