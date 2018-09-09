@@ -3067,9 +3067,9 @@ if __name__ == "__main__":
     # set up deaff extent, and neuron sets
     simulation.set_lpz_percent(0.1)
     # set up neurons, connections, spike detectors, files
-    simulation.update_time_windows(stabilisation_time=2000.,
+    simulation.update_time_windows(stabilisation_time=1500.,
                                    sp_update_interval=1.,
-                                   recording_interval=400.)
+                                   recording_interval=300.)
     simulation.setup_simulation()
 
     # synaptic plasticity stabilisation
@@ -3098,9 +3098,9 @@ if __name__ == "__main__":
 
     #  Stabilise with both plasticities active
     #  update time windows
-    simulation.update_time_windows(stabilisation_time=2000.,
+    simulation.update_time_windows(stabilisation_time=1500.,
                                    sp_update_interval=1.,
-                                   recording_interval=200.)
+                                   recording_interval=150.)
     simulation.stabilise()
 
     if deafferentate_network:
@@ -3114,7 +3114,7 @@ if __name__ == "__main__":
         simulation.stabilise(label="Repair zoomed in")
         """
 
-        simulation.update_time_windows(stabilisation_time=5000.,
+        simulation.update_time_windows(stabilisation_time=4000.,
                                        sp_update_interval=1.,
                                        recording_interval=100.)
         simulation.stabilise(label="Repair #2")
