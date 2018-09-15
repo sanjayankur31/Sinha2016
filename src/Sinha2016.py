@@ -3098,9 +3098,9 @@ if __name__ == "__main__":
 
     #  Stabilise with both plasticities active
     #  update time windows
-    simulation.update_time_windows(stabilisation_time=1500.,
+    simulation.update_time_windows(stabilisation_time=500.,
                                    sp_update_interval=1.,
-                                   recording_interval=150.)
+                                   recording_interval=100.)
     simulation.stabilise()
 
     if deafferentate_network:
