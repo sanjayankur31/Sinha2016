@@ -115,7 +115,9 @@ class Sinha2016:
         # maximum value of dz/dt
         self.nu = 0.00005
         self.nu_ax_e = 1 * self.nu
-        self.nu_ax_i = 2 * self.nu
+        # 2000 inhibitory neurons must inhibit the whole population of 1000
+        # neurons so their pre-synaptic elements must follow faster dynamics
+        self.nu_ax_i = 5 * self.nu
         self.nu_den_e_e = 1 * self.nu
         self.nu_den_e_i = 1 * self.nu
         self.nu_den_i_e = 1 * self.nu
@@ -3114,7 +3116,7 @@ if __name__ == "__main__":
         simulation.stabilise(label="Repair zoomed in")
         """
 
-        simulation.update_time_windows(stabilisation_time=4000.,
+        simulation.update_time_windows(stabilisation_time=5000.,
                                        sp_update_interval=1.,
                                        recording_interval=100.)
         simulation.stabilise(label="Repair #2")
