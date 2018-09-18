@@ -1890,7 +1890,12 @@ class Sinha2016:
         syn_new_p_lpz_I = 0
         syn_new_o_I = 0
         current_sim_time = (str(nest.GetKernelStatus()['time']))
-        for nrn in (self.neuronsE + self.neuronsI):
+
+        # shuffle so that we iterate over neurons randomly and not in ascending
+        # order of gid
+        all_neurons = (self.neuronsE + self.neuronsI)
+        random.shuffle(all_neurons)
+        for nrn in all_neurons:
             syn_new_this_gid = 0
             total_options_this_gid = 0
             gid = nrn
