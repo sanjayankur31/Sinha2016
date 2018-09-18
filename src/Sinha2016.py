@@ -1907,6 +1907,10 @@ class Sinha2016:
             elms = synelms[nrn]
             chosen_sources = []
 
+            # Depending on whether the gid is E or I, it'll form an EE or EI
+            # connection. However, since all E* connections use the same
+            # parameters, I don't need to check for a special case like I must
+            # in the next conditional
             if 'Den_ex' in elms and elms['Den_ex'] > 0:
                 sources = []
                 # Can only connect with excitatory axons of E neurons
@@ -1944,10 +1948,12 @@ class Sinha2016:
                         syn_dict['weight'] = random.gauss(
                             self.weightEE, self.weightSD
                         )
-                        nest.Connect([gid], [cho],
+                        nest.Connect([cho], [gid],
                                      conn_spec='one_to_one',
                                      syn_spec=syn_dict)
 
+            # depending on whether the gid is E or I it'll form either an II
+            # connection or an IE connection
             elif 'Den_in' in elms and elms['Den_in'] > 0:
                 sources = []
                 # can only connect to inhibitory axons of I neurons
@@ -1957,7 +1963,7 @@ class Sinha2016:
                     if 'Axon_in' in telms and telms['Axon_in'] > 0:
                         # add the source multiple times, since it has multiple
                         # available contact points
-                        sources.intend([tid]*int(telms['Axon_in']))
+                        sources.extend([tid]*int(telms['Axon_in']))
 
                 total_options_this_gid = len(sources)
                 if (total_options_this_gid) > 0:
@@ -1981,11 +1987,19 @@ class Sinha2016:
                     for cho in chosen_sources:
                         synelms[cho]['Axon_in'] -= 1
                         syn_new_this_gid += 1
-                        syn_dict = self.synDictII.copy()
-                        syn_dict['weight'] = random.gauss(
-                            self.weightII, self.weightSD
-                        )
-                        nest.Connect([gid], [cho],
+                        # IE connection
+                        if gid in self.neuronsE:
+                            syn_dict = self.synDictIE.copy()
+                            syn_dict['weight'] = random.gauss(
+                                self.weightIE, self.weightSD
+                            )
+                        # II
+                        else:
+                            syn_dict = self.synDictII.copy()
+                            syn_dict['weight'] = random.gauss(
+                                self.weightII, self.weightSD
+                            )
+                        nest.Connect([cho], [gid],
                                      conn_spec='one_to_one',
                                      syn_spec=syn_dict)
 
