@@ -1882,6 +1882,153 @@ class Sinha2016:
                  syn_del_o_E + syn_del_o_I),
                 total_synapses))
 
+    def __create_new_connections_from_post(self, synelms):
+        """Create new connections from the post-synaptic side."""
+        logging.debug("Rank {}: Creating using the {} strategy".format(
+            self.rank, self.syn_form_strategy))
+        syn_new_lpz_c_E = 0
+        syn_new_lpz_b_E = 0
+        syn_new_p_lpz_E = 0
+        syn_new_o_E = 0
+        syn_new_lpz_c_I = 0
+        syn_new_lpz_b_I = 0
+        syn_new_p_lpz_I = 0
+        syn_new_o_I = 0
+        current_sim_time = (str(nest.GetKernelStatus()['time']))
+
+        # shuffle so that we iterate over neurons randomly and not in ascending
+        # order of gid
+        all_neurons = (self.neuronsE + self.neuronsI)
+        random.shuffle(all_neurons)
+        for nrn in all_neurons:
+            syn_new_this_gid = 0
+            total_options_this_gid = 0
+            gid = nrn
+            elms = synelms[nrn]
+            chosen_sources = []
+
+            if 'Den_ex' in elms and elms['Den_ex'] > 0:
+                sources = []
+                # Can only connect with excitatory axons of E neurons
+                for asource in self.neuronsE:
+                    tid = asource
+                    telms = synelms[asource]
+                    if 'Axon_ex' in telms and telms['Axon_ex'] > 0:
+                        # add the source multiple times, since it has multiple
+                        # available contact points
+                        sources.extend([tid]*int(telms['Axon_ex']))
+
+                total_options_this_gid = len(sources)
+                if (total_options_this_gid) > 0:
+                    if self.syn_form_strategy == "random":
+                        if (total_options_this_gid) > \
+                                int(abs(elms['Den_ex'])):
+                            chosen_sources = random.sample(
+                                sources, int(abs(elms['Den_ex'])))
+                        else:
+                            chosen_sources = sources
+                    elif self.syn_form_strategy == "distance":
+                        chosen_sources = self.__get_nearest_ps_gaussian(
+                            gid, sources, int(abs(elms['Den_ex'])),
+                            w_mul=self.w_mul_E)
+
+                    logging.debug(
+                        "Rank {}: {}/{} options chosen for neuron {}".format(
+                            self.rank, len(chosen_sources),
+                            total_options_this_gid, gid))
+
+                    for cho in chosen_sources:
+                        synelms[cho]['Axon_ex'] -= 1
+                        syn_new_this_gid += 1
+                        syn_dict = self.synDictEE.copy()
+                        syn_dict['weight'] = random.gauss(
+                            self.weightEE, self.weightSD
+                        )
+                        nest.Connect([gid], [cho],
+                                     conn_spec='one_to_one',
+                                     syn_spec=syn_dict)
+
+            elif 'Den_in' in elms and elms['Den_in'] > 0:
+                sources = []
+                # can only connect to inhibitory axons of I neurons
+                for asource in self.neuronsI:
+                    tid = asource
+                    telms = synelms[asource]
+                    if 'Axon_in' in telms and telms['Axon_in'] > 0:
+                        # add the source multiple times, since it has multiple
+                        # available contact points
+                        sources.intend([tid]*int(telms['Axon_in']))
+
+                total_options_this_gid = len(sources)
+                if (total_options_this_gid) > 0:
+                    if self.syn_form_strategy == "random":
+                        if (total_options_this_gid) > \
+                                int(abs(elms['Den_in'])):
+                            chosen_sources = random.sample(
+                                sources, int(abs(elms['Den_in'])))
+                        else:
+                            chosen_sources = sources
+                    elif self.syn_form_strategy == "distance":
+                        chosen_sources = self.__get_nearest_ps_gaussian(
+                            gid, sources, int(abs(elms['Den_in'])),
+                            w_mul=self.w_mul_I)
+
+                    logging.debug(
+                        "Rank {}: {}/{} options chosen for neuron {}".format(
+                            self.rank, len(chosen_sources),
+                            total_options_this_gid, gid))
+
+                    for cho in chosen_sources:
+                        synelms[cho]['Axon_in'] -= 1
+                        syn_new_this_gid += 1
+                        syn_dict = self.synDictII.copy()
+                        syn_dict['weight'] = random.gauss(
+                            self.weightII, self.weightSD
+                        )
+                        nest.Connect([gid], [cho],
+                                     conn_spec='one_to_one',
+                                     syn_spec=syn_dict)
+
+            if self.rank == 0:
+                if syn_new_this_gid > 0:
+                    if gid in self.lpz_c_neurons_E:
+                        fh = self.syn_new_fh_lpz_c_E
+                        syn_new_lpz_c_E += syn_new_this_gid
+                    elif gid in self.lpz_b_neurons_E:
+                        fh = self.syn_new_fh_lpz_b_E
+                        syn_new_lpz_b_E += syn_new_this_gid
+                    elif gid in self.p_lpz_neurons_E:
+                        fh = self.syn_new_fh_p_lpz_E
+                        syn_new_p_lpz_E += syn_new_this_gid
+                    elif gid in self.o_neurons_E:
+                        fh = self.syn_new_fh_o_E
+                        syn_new_o_E += syn_new_this_gid
+                    elif gid in self.lpz_c_neurons_I:
+                        fh = self.syn_new_fh_lpz_c_I
+                        syn_new_lpz_c_I += syn_new_this_gid
+                    elif gid in self.lpz_b_neurons_I:
+                        fh = self.syn_new_fh_lpz_b_I
+                        syn_new_lpz_b_I += syn_new_this_gid
+                    elif gid in self.p_lpz_neurons_I:
+                        fh = self.syn_new_fh_p_lpz_I
+                        syn_new_p_lpz_I += syn_new_this_gid
+                    elif gid in self.o_neurons_I:
+                        fh = self.syn_new_fh_o_I
+                        syn_new_o_I += syn_new_this_gid
+
+                    print("{}\t{}\t{}".format(
+                        current_sim_time, gid,
+                        syn_new_this_gid),
+                        file=fh)
+
+        if self.rank == 0:
+            logging.debug(
+                "{} new connections created".format(
+                    (syn_new_lpz_c_E + syn_new_lpz_b_E +
+                     syn_new_p_lpz_E + syn_new_lpz_c_I +
+                     syn_new_lpz_b_I + syn_new_p_lpz_I +
+                     syn_new_o_E + syn_new_o_I)))
+
     def __create_new_connections_from_pre(self, synelms):
         """Create new connections from the pre-synaptic side."""
         logging.debug("Rank {}: Creating using the {} strategy".format(
