@@ -1406,7 +1406,9 @@ class Sinha2016:
         # Note that we are modifying a dictionary while iterating over it. This
         # is OK here since we're not modifying the keys, only the values.
         # http://stackoverflow.com/a/2315529/375067
-        for nrn in (self.neuronsE + self.neuronsI):
+        all_neurons = (self.neuronsE + self.neuronsI)
+        random.shuffle(all_neurons)
+        for nrn in all_neurons:
             gid = nrn
             elms = synelms[nrn]
             partner = 0  # for exception
@@ -1636,7 +1638,10 @@ class Sinha2016:
         # excitatory dendrites as targets
         # weight dependent deletion doesn't apply - all synapses have
         # same weight
-        for nrn in (self.neuronsE + self.neuronsI):
+
+        all_neurons = (self.neuronsE + self.neuronsI)
+        random.shuffle(all_neurons)
+        for nrn in all_neurons:
             gid = nrn
             elms = synelms[nrn]
             partner = 0  # for exception
