@@ -2703,15 +2703,15 @@ class Sinha2016:
             ))
         syn_elms = self.__get_syn_elms()
         self.__delete_connections_from_pre(syn_elms)
-        # Must wait for all ranks to finish before proceeding
 
         syn_elms_1 = self.__get_syn_elms()
         self.__delete_connections_from_post(syn_elms_1)
-        # Must wait for all ranks to finish before proceeding
 
         syn_elms_2 = self.__get_syn_elms()
         self.__create_new_connections_from_pre(syn_elms_2)
-        # Must wait for all ranks to finish before proceeding
+
+        syn_elms_3 = self.__get_syn_elms()
+        self.__create_new_connections_from_post(syn_elms_3)
         logging.debug(
             "Rank {}: STRUCTURAL PLASTICITY: Connectivity updated".format(
                 self.rank
