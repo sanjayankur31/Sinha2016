@@ -1877,8 +1877,8 @@ class Sinha2016:
                  syn_del_o_E + syn_del_o_I),
                 total_synapses))
 
-    def __create_new_connections(self, synelms):
-        """Create new connections."""
+    def __create_new_connections_from_pre(self, synelms):
+        """Create new connections from the pre-synaptic side."""
         logging.debug("Rank {}: Creating using the {} strategy".format(
             self.rank, self.syn_form_strategy))
         syn_new_lpz_c_E = 0
@@ -2558,7 +2558,7 @@ class Sinha2016:
         # Must wait for all ranks to finish before proceeding
 
         syn_elms_2 = self.__get_syn_elms()
-        self.__create_new_connections(syn_elms_2)
+        self.__create_new_connections_from_pre(syn_elms_2)
         # Must wait for all ranks to finish before proceeding
         logging.debug(
             "Rank {}: STRUCTURAL PLASTICITY: Connectivity updated".format(
