@@ -1406,7 +1406,7 @@ class Sinha2016:
         # Note that we are modifying a dictionary while iterating over it. This
         # is OK here since we're not modifying the keys, only the values.
         # http://stackoverflow.com/a/2315529/375067
-        all_neurons = (self.neuronsE + self.neuronsI)
+        all_neurons = list(self.neuronsE + self.neuronsI)
         random.shuffle(all_neurons)
         for nrn in all_neurons:
             gid = nrn
@@ -1639,7 +1639,7 @@ class Sinha2016:
         # weight dependent deletion doesn't apply - all synapses have
         # same weight
 
-        all_neurons = (self.neuronsE + self.neuronsI)
+        all_neurons = list(self.neuronsE + self.neuronsI)
         random.shuffle(all_neurons)
         for nrn in all_neurons:
             gid = nrn
@@ -1898,7 +1898,7 @@ class Sinha2016:
 
         # shuffle so that we iterate over neurons randomly and not in ascending
         # order of gid
-        all_neurons = (self.neuronsE + self.neuronsI)
+        all_neurons = list(self.neuronsE + self.neuronsI)
         random.shuffle(all_neurons)
         for nrn in all_neurons:
             syn_new_this_gid = 0
@@ -2059,7 +2059,7 @@ class Sinha2016:
 
         # shuffle so that we iterate over neurons randomly and not in ascending
         # order of gid
-        all_neurons = (self.neuronsE + self.neuronsI)
+        all_neurons = list(self.neuronsE + self.neuronsI)
         random.shuffle(all_neurons)
         for nrn in all_neurons:
             syn_new_this_gid = 0
