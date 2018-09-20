@@ -170,6 +170,11 @@ class Sinha2016:
         self.p_lpz_neurons_I = []
         self.o_neurons_I = []
 
+        # a shuffled list of neurons for connection updates so that we don't
+        # always iterate in ascending order of GID---if we did, neurons with
+        # lower GIDs would have a chance to form connections first.
+        self.shuffled_neurons = []
+
         random.seed(42)
         numpy.random.seed(42)
 
@@ -307,6 +312,12 @@ class Sinha2016:
         else:
             self.neuronsE = nest.Create('tif_neuronE', self.populations['E'])
             self.neuronsI = nest.Create('tif_neuronI', self.populations['I'])
+
+        self.shuffled_neurons = list(self.neuronsE + self.neuronsI)
+        # when shuffling, set a constant seed for the Random generator so that
+        # all process get identical results. This is necessary when making
+        # connection updates.
+        random.Random(23).shuffle(self.shuffled_neurons)
 
         # Generate a grid and construct a cKDTree
         locations = []
@@ -1222,6 +1233,7 @@ class Sinha2016:
             self.rank
         ))
         candidates = [[n, w] for n, w in options if w < threshold]
+        random.Random(128).shuffle(candidates)
 
         targets = []
         for [nid, w] in candidates:
@@ -1247,6 +1259,7 @@ class Sinha2016:
         """
         logging.debug("Rank {}: Returning weakest links".format(self.rank))
         candidates = [[n, w] for n, w in options if w < threshold]
+        random.Random(1331).shuffle(candidates)
         if len(candidates) < num_required:
             weakest_options = [nid for nid, weight in candidates]
             return weakest_options
@@ -1298,6 +1311,7 @@ class Sinha2016:
         # inefficient, but works.
         max_num_required = int(len(options) * probability)
         options_with_distances = []
+        random.Random(1010).shuffle(options)
         for opt in options:
             if opt == source:
                 continue
@@ -1345,7 +1359,7 @@ class Sinha2016:
         # randomise the list so that we don't let the neuron id make a
         # difference. Otherwise, when creating initial connections, ones that
         # come first may get priority and use up the required connections.
-        random.shuffle(options)
+        random.Random(143).shuffle(options)
 
         chosen_options = []
         for opt in options:
@@ -1406,9 +1420,7 @@ class Sinha2016:
         # Note that we are modifying a dictionary while iterating over it. This
         # is OK here since we're not modifying the keys, only the values.
         # http://stackoverflow.com/a/2315529/375067
-        all_neurons = list(self.neuronsE + self.neuronsI)
-        random.shuffle(all_neurons)
-        for nrn in all_neurons:
+        for nrn in self.shuffled_neurons:
             gid = nrn
             elms = synelms[nrn]
             partner = 0  # for exception
@@ -1639,9 +1651,7 @@ class Sinha2016:
         # weight dependent deletion doesn't apply - all synapses have
         # same weight
 
-        all_neurons = list(self.neuronsE + self.neuronsI)
-        random.shuffle(all_neurons)
-        for nrn in all_neurons:
+        for nrn in self.shuffled_neurons:
             gid = nrn
             elms = synelms[nrn]
             partner = 0  # for exception
@@ -1896,11 +1906,7 @@ class Sinha2016:
         syn_new_o_I = 0
         current_sim_time = (str(nest.GetKernelStatus()['time']))
 
-        # shuffle so that we iterate over neurons randomly and not in ascending
-        # order of gid
-        all_neurons = list(self.neuronsE + self.neuronsI)
-        random.shuffle(all_neurons)
-        for nrn in all_neurons:
+        for nrn in self.shuffled_neurons:
             syn_new_this_gid = 0
             total_options_this_gid = 0
             gid = nrn
@@ -2057,11 +2063,7 @@ class Sinha2016:
         syn_new_o_I = 0
         current_sim_time = (str(nest.GetKernelStatus()['time']))
 
-        # shuffle so that we iterate over neurons randomly and not in ascending
-        # order of gid
-        all_neurons = list(self.neuronsE + self.neuronsI)
-        random.shuffle(all_neurons)
-        for nrn in all_neurons:
+        for nrn in self.shuffled_neurons:
             syn_new_this_gid = 0
             total_options_this_gid = 0
             gid = nrn
@@ -2715,6 +2717,9 @@ class Sinha2016:
             "Rank {}: STRUCTURAL PLASTICITY: Updating connectivity".format(
                 self.rank
             ))
+        # shuffle before making this round of updates
+        random.Random(23).shuffle(self.shuffled_neurons)
+
         syn_elms = self.__get_syn_elms()
         self.__delete_connections_from_pre(syn_elms)
 
