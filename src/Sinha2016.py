@@ -649,7 +649,7 @@ class Sinha2016:
                 random.Random(88).shuffle(all_sourcesEE)
                 sources = self.__get_nearest_ps_gaussian(
                     nrn, all_sourcesEE, indegreeEE, w_mul=self.w_mul_E)
-                nest.Connect(sources, nrn,
+                nest.Connect(sources, [nrn],
                              syn_spec=self.synDictEE,
                              conn_spec=conndict)
             conns = nest.GetConnections(source=self.neuronsE,
@@ -679,7 +679,7 @@ class Sinha2016:
                 random.Random(66).shuffle(all_sourcesEI)
                 sources = self.__get_nearest_ps_gaussian(
                     nrn, all_sourcesEI, indegreeEI, w_mul=self.w_mul_E)
-                nest.Connect([sources], [nrn],
+                nest.Connect(sources, [nrn],
                              syn_spec=self.synDictEI,
                              conn_spec=conndict)
             conns = nest.GetConnections(source=self.neuronsE,
