@@ -637,11 +637,19 @@ class Sinha2016:
             ))
             start_time = time.clock()
             max_num = (len(self.neuronsE) * len(self.neuronsE) * self.sparsity)
-            outdegree = int(len(self.neuronsE)*self.sparsity)
+            indegreeEE = int(len(self.neuronsE)*self.sparsity)
+            # shuffle the list each time so that the order in which prospective
+            # targets are presented to the method is changed. Otherwise, if the
+            # same set is passed to the method each time, even the shuffle call
+            # in the method will return the same sequence, since it is run with
+            # the same seed (fixed seed so that all ranks return the same
+            # sequence).
+            all_sourcesEE = list(self.neuronsE)
             for nrn in self.neuronsE:
-                targets = self.__get_nearest_ps_gaussian(
-                    nrn, self.neuronsE, outdegree, w_mul=self.w_mul_E)
-                nest.Connect([nrn], targets,
+                random.Random(88).shuffle(all_sourcesEE)
+                sources = self.__get_nearest_ps_gaussian(
+                    nrn, all_sourcesEE, indegreeEE, w_mul=self.w_mul_E)
+                nest.Connect(sources, nrn,
                              syn_spec=self.synDictEE,
                              conn_spec=conndict)
             conns = nest.GetConnections(source=self.neuronsE,
@@ -665,11 +673,13 @@ class Sinha2016:
             ))
             start_time = end_time
             max_num = (len(self.neuronsE) * len(self.neuronsI) * self.sparsity)
-            outdegree = int(len(self.neuronsI)*self.sparsity)
-            for nrn in self.neuronsE:
-                targets = self.__get_nearest_ps_gaussian(
-                    nrn, self.neuronsI, outdegree, w_mul=self.w_mul_E)
-                nest.Connect([nrn], targets,
+            indegreeEI = int(len(self.neuronsE)*self.sparsity)
+            all_sourcesEI = list(self.neuronsE)
+            for nrn in self.neuronsI:
+                random.Random(66).shuffle(all_sourcesEI)
+                sources = self.__get_nearest_ps_gaussian(
+                    nrn, all_sourcesEI, indegreeEI, w_mul=self.w_mul_E)
+                nest.Connect([sources], [nrn],
                              syn_spec=self.synDictEI,
                              conn_spec=conndict)
             conns = nest.GetConnections(source=self.neuronsE,
@@ -693,11 +703,13 @@ class Sinha2016:
             ))
             start_time = end_time
             max_num = (len(self.neuronsI) * len(self.neuronsI) * self.sparsity)
-            outdegree = int(len(self.neuronsI)*self.sparsity)
+            indegreeII = int(len(self.neuronsI)*self.sparsity)
+            all_sourcesII = list(self.neuronsI)
             for nrn in self.neuronsI:
-                targets = self.__get_nearest_ps_gaussian(
-                    nrn, self.neuronsI, outdegree, w_mul=self.w_mul_I)
-                nest.Connect([nrn], targets,
+                random.Random(55).shuffle(all_sourcesII)
+                sources = self.__get_nearest_ps_gaussian(
+                    nrn, all_sourcesII, indegreeII, w_mul=self.w_mul_I)
+                nest.Connect(sources, [nrn],
                              syn_spec=self.synDictII,
                              conn_spec=conndict)
             conns = nest.GetConnections(source=self.neuronsI,
@@ -722,11 +734,13 @@ class Sinha2016:
             ))
             start_time = end_time
             max_num = (len(self.neuronsI) * len(self.neuronsE) * self.sparsity)
-            outdegree = int(len(self.neuronsE)*self.sparsity)
-            for nrn in self.neuronsI:
-                targets = self.__get_nearest_ps_gaussian(
-                    nrn, self.neuronsE, outdegree, w_mul=self.w_mul_I)
-                nest.Connect([nrn], targets,
+            indegreeIE = int(len(self.neuronsI)*self.sparsity)
+            all_sourcesIE = list(self.neuronsI)
+            for nrn in self.neuronsE:
+                random.Random(77).shuffle(all_sourcesIE)
+                sources = self.__get_nearest_ps_gaussian(
+                    nrn, all_sourcesIE, indegreeIE, w_mul=self.w_mul_I)
+                nest.Connect(sources, [nrn],
                              syn_spec=self.synDictIE,
                              conn_spec=conndict)
             conns = nest.GetConnections(source=self.neuronsI,
@@ -1367,6 +1381,8 @@ class Sinha2016:
             "Rank {}: Returning partners (gaussian probability)".format(
                 self.rank))
         # remove source from options to ensure no autapses
+        # note that this copies over "options", so the original object is not
+        # modified here in this method.
         options = list(options)
         try:
             options.remove(source)
