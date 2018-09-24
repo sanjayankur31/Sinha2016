@@ -178,6 +178,9 @@ class Sinha2016:
         # lower GIDs would have a chance to form connections first.
         self.shuffled_neurons = []
 
+        # record when network was deaffed
+        self.deaffed_at = 0.
+
         random.seed(42)
         numpy.random.seed(42)
 
@@ -2901,6 +2904,9 @@ class Sinha2016:
             self.rank
         ))
 
+        # record when the network is deaffed in seconds
+        self.deaffed_at = (str(nest.GetKernelStatus()['time'])/1000.)
+
     def dump_data(self):
         """Master datadump function."""
         logging.debug("Rank {}: Printing data to files".format(self.rank))
@@ -3211,6 +3217,8 @@ class Sinha2016:
                 print("{}: {}".format("eps_den_I_i", self.eps_den_i_i),
                       file=pfile)
                 print("{}: {}".format("nu_den_I_i", self.nu_den_i_i),
+                      file=pfile)
+                print("{}: {}".format("deaffed_at", self.deaffed_at),
                       file=pfile)
 
     def update_time_windows(self,
