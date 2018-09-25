@@ -1256,11 +1256,12 @@ class Sinha2016:
             self.rank
         ))
         candidates = [[n, w] for n, w in options if w < threshold]
-        random.Random(128).shuffle(candidates)
+        sorted_options = sorted(candidates, key=operator.itemgetter(1))
 
         targets = []
-        for [nid, w] in candidates:
+        for nid, w in sorted_options:
             probability = (math.exp(-1*((w**2)/(threshold*2)**2)))
+            # weaker synapses have higher probability of removal
             if random.random() <= probability:
                 targets.append(nid)
             if len(targets) >= num_required:
@@ -1282,7 +1283,6 @@ class Sinha2016:
         """
         logging.debug("Rank {}: Returning weakest links".format(self.rank))
         candidates = [[n, w] for n, w in options if w < threshold]
-        random.Random(1331).shuffle(candidates)
         if len(candidates) < num_required:
             weakest_options = [nid for nid, weight in candidates]
             return weakest_options
@@ -1334,7 +1334,6 @@ class Sinha2016:
         # inefficient, but works.
         max_num_required = int(len(options) * probability)
         options_with_distances = []
-        random.Random(1010).shuffle(options)
         for opt in options:
             if opt == source:
                 continue
@@ -1343,18 +1342,18 @@ class Sinha2016:
 
         sorted_options = sorted(options_with_distances,
                                 key=operator.itemgetter(1))
-        nearest_options = []
-        counter = 0
+        chosen_options = []
         for nrn, distance in sorted_options:
             if random.random() <= probability:
-                nearest_options.append(nrn)
-                counter += 1
-            if counter >= max_num_required:
-                return nearest_options
+                chosen_options.append(nrn)
+                max_num_required -= 1
+            # when max_num_required is zero, return
+            if not max_num_required:
+                return chosen_options
 
         # otherwise just return how many we got after traversing the whole
         # option list
-        return nearest_options
+        return chosen_options
 
     def __get_nearest_ps_gaussian(self, source, options, num_required,
                                   w_mul=10.):
@@ -1372,28 +1371,25 @@ class Sinha2016:
         logging.debug(
             "Rank {}: Returning partners (gaussian probability)".format(
                 self.rank))
-        # remove source from options to ensure no autapses
-        # note that this copies over "options", so the original object is not
-        # modified here in this method.
-        options = list(options)
-        try:
-            options.remove(source)
-        except:
-            pass
-
-        # randomise the list so that we don't let the neuron id make a
-        # difference. Otherwise, when creating initial connections, ones that
-        # come first may get priority and use up the required connections.
-        random.Random(143).shuffle(options)
-
-        chosen_options = []
+        options_with_distances = []
         for opt in options:
+            if opt == source:
+                continue
             distance = self.__get_distance_toroid(source, opt)
-            probability = (math.exp(-1.*(
-                (distance**2)/((w_mul*self.neuronal_distE)**2))))
+            options_with_distances.append([opt, distance])
+
+        sorted_options = sorted(options_with_distances,
+                                key=operator.itemgetter(1))
+        chosen_options = []
+        for opt, distance in sorted_options:
+            probability = (
+                math.exp(-1.*((distance**2)/((w_mul*self.neuronal_distE)**2)))
+            )
             if random.random() <= probability:
                 chosen_options.append(opt)
-            if len(chosen_options) >= num_required:
+                num_required -= 1
+            # when num_required hits 0, return
+            if not num_required:
                 return chosen_options
 
         return chosen_options
