@@ -644,11 +644,9 @@ class Sinha2016:
             # in the method will return the same sequence, since it is run with
             # the same seed (fixed seed so that all ranks return the same
             # sequence).
-            all_sourcesEE = list(self.neuronsE)
             for nrn in self.neuronsE:
-                random.Random(88).shuffle(all_sourcesEE)
                 sources = self.__get_nearest_ps_gaussian(
-                    nrn, all_sourcesEE, indegreeEE, w_mul=self.w_mul_E)
+                    nrn, self.neuronsE, indegreeEE, w_mul=self.w_mul_E)
                 nest.Connect(sources, [nrn],
                              syn_spec=self.synDictEE,
                              conn_spec=conndict)
@@ -674,11 +672,9 @@ class Sinha2016:
             start_time = end_time
             max_num = (len(self.neuronsE) * len(self.neuronsI) * self.sparsity)
             indegreeEI = int(len(self.neuronsE)*self.sparsity)
-            all_sourcesEI = list(self.neuronsE)
             for nrn in self.neuronsI:
-                random.Random(66).shuffle(all_sourcesEI)
                 sources = self.__get_nearest_ps_gaussian(
-                    nrn, all_sourcesEI, indegreeEI, w_mul=self.w_mul_E)
+                    nrn, self.neuronsE, indegreeEI, w_mul=self.w_mul_E)
                 nest.Connect(sources, [nrn],
                              syn_spec=self.synDictEI,
                              conn_spec=conndict)
@@ -704,11 +700,9 @@ class Sinha2016:
             start_time = end_time
             max_num = (len(self.neuronsI) * len(self.neuronsI) * self.sparsity)
             indegreeII = int(len(self.neuronsI)*self.sparsity)
-            all_sourcesII = list(self.neuronsI)
             for nrn in self.neuronsI:
-                random.Random(55).shuffle(all_sourcesII)
                 sources = self.__get_nearest_ps_gaussian(
-                    nrn, all_sourcesII, indegreeII, w_mul=self.w_mul_I)
+                    nrn, self.neuronsI, indegreeII, w_mul=self.w_mul_I)
                 nest.Connect(sources, [nrn],
                              syn_spec=self.synDictII,
                              conn_spec=conndict)
@@ -735,11 +729,9 @@ class Sinha2016:
             start_time = end_time
             max_num = (len(self.neuronsI) * len(self.neuronsE) * self.sparsity)
             indegreeIE = int(len(self.neuronsI)*self.sparsity)
-            all_sourcesIE = list(self.neuronsI)
             for nrn in self.neuronsE:
-                random.Random(77).shuffle(all_sourcesIE)
                 sources = self.__get_nearest_ps_gaussian(
-                    nrn, all_sourcesIE, indegreeIE, w_mul=self.w_mul_I)
+                    nrn, self.neuronsI, indegreeIE, w_mul=self.w_mul_I)
                 nest.Connect(sources, [nrn],
                              syn_spec=self.synDictIE,
                              conn_spec=conndict)
