@@ -648,9 +648,9 @@ class Sinha2016:
             # sequence).
             for nrn in self.neuronsE:
                 sources = self.__get_nearest_ps_gaussian(
-                    nrn, self.neuronsE, indegreeEE, w_mul=self.w_mul_E,
-                    max_p=self.max_p_E
-                )
+                    nrn, self.neuronsE,
+                    int(random.gauss(indegreeEE, 0.1*indegreeEE)),
+                    w_mul=self.w_mul_E, max_p=self.max_p_E)
                 nest.Connect(sources, [nrn],
                              syn_spec=self.synDictEE,
                              conn_spec=conndict)
@@ -678,9 +678,10 @@ class Sinha2016:
             indegreeEI = int(len(self.neuronsE)*self.sparsity)
             for nrn in self.neuronsI:
                 sources = self.__get_nearest_ps_gaussian(
-                    nrn, self.neuronsE, indegreeEI, w_mul=self.w_mul_E,
-                    max_p=self.max_p_E
-                )
+                    nrn, self.neuronsE,
+                    int(random.gauss(indegreeEI, 0.1*indegreeEI)),
+                    w_mul=self.w_mul_E,
+                    max_p=self.max_p_E)
                 nest.Connect(sources, [nrn],
                              syn_spec=self.synDictEI,
                              conn_spec=conndict)
@@ -708,9 +709,10 @@ class Sinha2016:
             indegreeII = int(len(self.neuronsI)*self.sparsity)
             for nrn in self.neuronsI:
                 sources = self.__get_nearest_ps_gaussian(
-                    nrn, self.neuronsI, indegreeII, w_mul=self.w_mul_I,
-                    max_p=self.max_p_I
-                )
+                    nrn, self.neuronsI,
+                    int(random.gauss(indegreeII, 0.1*indegreeII)),
+                    w_mul=self.w_mul_I,
+                    max_p=self.max_p_I)
                 nest.Connect(sources, [nrn],
                              syn_spec=self.synDictII,
                              conn_spec=conndict)
@@ -739,9 +741,10 @@ class Sinha2016:
             indegreeIE = int(len(self.neuronsI)*self.sparsity)
             for nrn in self.neuronsE:
                 sources = self.__get_nearest_ps_gaussian(
-                    nrn, self.neuronsI, indegreeIE, w_mul=self.w_mul_I,
-                    max_p=self.max_p_I
-                )
+                    nrn, self.neuronsI,
+                    int(random.gauss(indegreeIE, 0.1*indegreeIE)),
+                    w_mul=self.w_mul_I,
+                    max_p=self.max_p_I)
                 nest.Connect(sources, [nrn],
                              syn_spec=self.synDictIE,
                              conn_spec=conndict)
