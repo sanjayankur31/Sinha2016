@@ -146,7 +146,8 @@ class Sinha2016:
         self.weightEE = self.wbar
         self.weightII = self.wbar * -10.
         self.weightEI = self.wbar  # is the same as EE, specified for clarity
-        self.weightIE = self.wbar * -2.  # initial weight for plastic IE
+        self.weightIE = -0.000000000000000001  # initial weight for plastic IE
+        self.weightIEmax = -20.  # simulations without limits suggest this
         self.weightSD_EE = self.weightEE/5
         self.weightSD_EI = self.weightEI/5
         self.weightSD_II = self.weightII/5
@@ -590,7 +591,7 @@ class Sinha2016:
                                   'post_synaptic_element': 'Den_in'}
                 self.synDictIE = {'model': 'stdp_synapse_in',
                                   'weight': self.weightIE,
-                                  'Wmax': self.weightII,
+                                  'Wmax': self.weightIEmax,
                                   'alpha': self.alphaIE, 'eta': self.etaIE,
                                   'tau': self.tauIE,
                                   'pre_synaptic_element': 'Axon_in',
@@ -612,7 +613,7 @@ class Sinha2016:
                               'weight': self.weightII}
             self.synDictIE = {'model': 'stdp_synapse_in',
                               'weight': self.weightIE,
-                              'Wmax': self.weightII,
+                              'Wmax': self.weightIEmax,
                               'alpha': self.alphaIE, 'eta': self.etaIE,
                               'tau': self.tauIE}
 
@@ -753,10 +754,7 @@ class Sinha2016:
             for acon in conns:
                 nest.SetStatus(
                     [acon], {
-                        'weight': random.gauss(
-                            self.weightIE,
-                            self.weightSD_IE
-                        )
+                        'weight': self.weightIE,
                     }
                 )
             end_time = time.clock()
@@ -2212,7 +2210,7 @@ class Sinha2016:
                             syn_dict = self.synDictIE.copy()
                             syn_dict['weight'] = random.gauss(
                                 self.weightIE,
-                                self.weightSD
+                                self.weightSD_IE
                             )
                             nest.Connect([gid], [target],
                                          conn_spec='one_to_one',
