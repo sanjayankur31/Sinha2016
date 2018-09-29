@@ -2925,7 +2925,7 @@ class Sinha2016:
         ))
 
         # record when the network is deaffed in seconds
-        self.deaffed_at = (str(nest.GetKernelStatus()['time'])/1000.)
+        self.deaffed_at = (nest.GetKernelStatus()['time']/1000.)
 
     def dump_data(self):
         """Master datadump function."""
