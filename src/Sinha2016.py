@@ -1987,7 +1987,7 @@ class Sinha2016:
                         syn_new_this_gid += 1
                         syn_dict = self.synDictEE.copy()
                         syn_dict['weight'] = random.gauss(
-                            self.weightEE, self.weightSD
+                            self.weightEE, self.weightSD_EE
                         )
                         nest.Connect([cho], [gid],
                                      conn_spec='one_to_one',
@@ -2032,13 +2032,13 @@ class Sinha2016:
                         if gid in self.neuronsE:
                             syn_dict = self.synDictIE.copy()
                             syn_dict['weight'] = random.gauss(
-                                self.weightIE, self.weightSD
+                                self.weightIE, self.weightSD_IE
                             )
                         # II
                         else:
                             syn_dict = self.synDictII.copy()
                             syn_dict['weight'] = random.gauss(
-                                self.weightII, self.weightSD
+                                self.weightII, self.weightSD_II
                             )
                         nest.Connect([cho], [gid],
                                      conn_spec='one_to_one',
@@ -2149,7 +2149,7 @@ class Sinha2016:
                         if cho in targetsE:
                             syn_dict = self.synDictEE.copy()
                             syn_dict['weight'] = random.gauss(
-                                self.weightEE, self.weightSD
+                                self.weightEE, self.weightSD_EE
                             )
                             nest.Connect([gid], [cho],
                                          conn_spec='one_to_one',
@@ -2219,7 +2219,7 @@ class Sinha2016:
                             syn_dict = self.synDictII.copy()
                             syn_dict['weight'] = random.gauss(
                                 self.weightII,
-                                self.weightSD
+                                self.weightSD_II
                             )
                             nest.Connect([gid], [target],
                                          conn_spec='one_to_one',
