@@ -3353,9 +3353,9 @@ if __name__ == "__main__":
         simulation.stabilise(label="Repair zoomed in")
         """
 
-        simulation.update_time_windows(stabilisation_time=5000.,
+        simulation.update_time_windows(stabilisation_time=10000.,
                                        sp_update_interval=1.,
-                                       recording_interval=100.)
+                                       recording_interval=400.)
         simulation.stabilise(label="Repair #2")
 
     if store_patterns:
