@@ -148,6 +148,7 @@ class Sinha2016:
         self.weightEI = self.wbar  # is the same as EE, specified for clarity
         self.weightIE = -0.000000000000000001  # initial weight for plastic IE
         self.weightIEmax = -20.  # simulations without limits suggest this
+        self.weightSD_IEmax = self.weightIEmax/5.
         self.weightSD_EE = self.weightEE/5
         self.weightSD_EI = self.weightEI/5
         self.weightSD_II = self.weightII/5
@@ -755,6 +756,9 @@ class Sinha2016:
                 nest.SetStatus(
                     [acon], {
                         'weight': self.weightIE,
+                        'Wmax': -1. * abs(
+                            random.gauss(self.weightIEmax, self.weightSD_IEmax)
+                        )
                     }
                 )
             end_time = time.clock()
@@ -2034,6 +2038,10 @@ class Sinha2016:
                             syn_dict['weight'] = random.gauss(
                                 self.weightIE, self.weightSD_IE
                             )
+                            syn_dict['Wmax'] = -1. * abs(
+                                random.gauss(self.weightIEmax,
+                                             self.weightSD_IEmax)
+                            )
                         # II
                         else:
                             syn_dict = self.synDictII.copy()
@@ -2211,6 +2219,10 @@ class Sinha2016:
                             syn_dict['weight'] = random.gauss(
                                 self.weightIE,
                                 self.weightSD_IE
+                            )
+                            syn_dict['Wmax'] = -1. * abs(
+                                random.gauss(self.weightIEmax,
+                                             self.weightSD_IEmax)
                             )
                             nest.Connect([gid], [target],
                                          conn_spec='one_to_one',
@@ -2797,8 +2809,12 @@ class Sinha2016:
         conns = nest.GetConnections(target=self.neuronsE,
                                     source=self.neuronsI)
         weightsIE = nest.GetStatus(conns, "weight")
-        self.weightIE = numpy.mean(weightsIE)
-        self.weightSD_IE = self.weightIE/5
+        # these should already be negative
+        weightIE_mean = numpy.mean(weightsIE)
+        self.weightSD_IE = weightIE_mean/5
+        # make new IE synapses slightly weaker than existing ones and let STDP
+        # strengthen them as needed
+        self.weightIE = weightIE_mean - self.weightSD_IE
         logging.debug("Rank {}: Updated mean IE weights".format(self.rank))
 
     def invoke_metaplasticity(self):
