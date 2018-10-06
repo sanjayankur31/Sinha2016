@@ -2032,16 +2032,28 @@ class Sinha2016:
                     for cho in chosen_sources:
                         synelms[cho]['Axon_in'] -= 1
                         syn_new_this_gid += 1
+                        syn_dict = {}
                         # IE connection
                         if gid in self.neuronsE:
                             syn_dict = self.synDictIE.copy()
-                            syn_dict['weight'] = random.gauss(
-                                self.weightIE, self.weightSD_IE
-                            )
-                            syn_dict['Wmax'] = -1. * abs(
-                                random.gauss(self.weightIEmax,
-                                             self.weightSD_IEmax)
-                            )
+                            # ensure new weight is negative
+                            weight = random.gauss(
+                                self.weightIE,
+                                self.weightSD_IE)
+                            while weight >= 0.:
+                                weight = random.gauss(
+                                    self.weightIE,
+                                    self.weightSD_IE
+                                )
+                            syn_dict['weight'] = weight
+
+                            # also ensure that wmax is negative
+                            wmax = random.gauss(self.weightIEmax,
+                                                self.weightSD_IEmax)
+                            while wmax >= 0.:
+                                wmax = random.gauss(self.weightIEmax,
+                                                    self.weightSD_IEmax)
+                            syn_dict['Wmax'] = wmax
                         # II
                         else:
                             syn_dict = self.synDictII.copy()
@@ -2154,22 +2166,20 @@ class Sinha2016:
                     for cho in chosen_targets:
                         synelms[cho]['Den_ex'] -= 1
                         syn_new_this_gid += 1
+                        syn_dict = {}
                         if cho in targetsE:
                             syn_dict = self.synDictEE.copy()
                             syn_dict['weight'] = random.gauss(
                                 self.weightEE, self.weightSD_EE
                             )
-                            nest.Connect([gid], [cho],
-                                         conn_spec='one_to_one',
-                                         syn_spec=syn_dict)
                         else:
                             syn_dict = self.synDictEI.copy()
                             syn_dict['weight'] = random.gauss(
                                 self.weightEI, (0.2 * self.weightEI)
                             )
-                            nest.Connect([gid], [cho],
-                                         conn_spec='one_to_one',
-                                         syn_spec=syn_dict)
+                        nest.Connect([gid], [cho],
+                                     conn_spec='one_to_one',
+                                     syn_spec=syn_dict)
 
             # here, you can connect either with E neurons or I neurons but both
             # will have different synapse types. So, a bit more work required
@@ -2214,28 +2224,38 @@ class Sinha2016:
                     for target in chosen_targets:
                         syn_new_this_gid += 1
                         synelms[target]['Den_in'] -= 1
+                        syn_dict = {}
                         if target in targetsE:
                             syn_dict = self.synDictIE.copy()
-                            syn_dict['weight'] = random.gauss(
+
+                            # ensure new weight is negative
+                            weight = random.gauss(
                                 self.weightIE,
-                                self.weightSD_IE
-                            )
-                            syn_dict['Wmax'] = -1. * abs(
-                                random.gauss(self.weightIEmax,
-                                             self.weightSD_IEmax)
-                            )
-                            nest.Connect([gid], [target],
-                                         conn_spec='one_to_one',
-                                         syn_spec=syn_dict)
+                                self.weightSD_IE)
+                            while weight >= 0.:
+                                weight = random.gauss(
+                                    self.weightIE,
+                                    self.weightSD_IE
+                                )
+                            syn_dict['weight'] = weight
+
+                            # also ensure that wmax is negative
+                            wmax = random.gauss(self.weightIEmax,
+                                                self.weightSD_IEmax)
+                            while wmax >= 0.:
+                                wmax = random.gauss(self.weightIEmax,
+                                                    self.weightSD_IEmax)
+                            syn_dict['Wmax'] = wmax
+
                         else:
                             syn_dict = self.synDictII.copy()
                             syn_dict['weight'] = random.gauss(
                                 self.weightII,
                                 self.weightSD_II
                             )
-                            nest.Connect([gid], [target],
-                                         conn_spec='one_to_one',
-                                         syn_spec=syn_dict)
+                        nest.Connect([gid], [target],
+                                     conn_spec='one_to_one',
+                                     syn_spec=syn_dict)
 
             if self.rank == 0:
                 if syn_new_this_gid > 0:
