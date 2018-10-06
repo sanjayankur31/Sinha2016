@@ -2830,12 +2830,10 @@ class Sinha2016:
                                     source=self.neuronsI)
         weightsIE = nest.GetStatus(conns, "weight")
         # these should already be negative
-        weightIE_mean = numpy.mean(weightsIE)
-        self.weightSD_IE = weightIE_mean/5
-        # make new IE synapses slightly weaker than existing ones and let STDP
-        # strengthen them as needed
-        self.weightIE = weightIE_mean - self.weightSD_IE
-        logging.debug("Rank {}: Updated mean IE weights".format(self.rank))
+        self.weightIE = numpy.mean(weightsIE)
+        self.weightSD_IE = self.weightIE/5.
+        logging.debug("Rank {}: Updated mean IE weights ({}, {})".format(
+            self.rank, self.weightIE, self.weightSD_IE))
 
     def invoke_metaplasticity(self):
         """Update growth curve parameters."""
