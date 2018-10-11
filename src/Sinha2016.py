@@ -3364,14 +3364,12 @@ if __name__ == "__main__":
         # Deaff network
         simulation.deaff_network()
         # zoom in on post deaff phase
-        """
-        simulation.update_time_windows(stabilisation_time=50.,
+        simulation.update_time_windows(stabilisation_time=1000.,
                                        sp_update_interval=1.,
-                                       recording_interval=5.)
+                                       recording_interval=100.)
         simulation.stabilise(label="Repair zoomed in")
-        """
 
-        simulation.update_time_windows(stabilisation_time=10000.,
+        simulation.update_time_windows(stabilisation_time=9000.,
                                        sp_update_interval=1.,
                                        recording_interval=400.)
         simulation.stabilise(label="Repair #2")
