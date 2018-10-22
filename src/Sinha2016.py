@@ -753,12 +753,15 @@ class Sinha2016:
             conns = nest.GetConnections(source=self.neuronsI,
                                         target=self.neuronsE)
             for acon in conns:
+                wmax = random.gauss(self.weightIEmax,
+                                    self.weightSD_IEmax)
+                while wmax >= 0.:
+                    wmax = random.gauss(self.weightIEmax,
+                                        self.weightSD_IEmax)
                 nest.SetStatus(
                     [acon], {
                         'weight': self.weightIE,
-                        'Wmax': -1. * abs(
-                            random.gauss(self.weightIEmax, self.weightSD_IEmax)
-                        )
+                        'Wmax': wmax
                     }
                 )
             end_time = time.clock()
@@ -2036,15 +2039,7 @@ class Sinha2016:
                         # IE connection
                         if gid in self.neuronsE:
                             syn_dict = self.synDictIE.copy()
-                            # ensure new weight is negative
-                            weight = random.gauss(
-                                self.weightIE,
-                                self.weightSD_IE)
-                            while weight >= 0.:
-                                weight = random.gauss(
-                                    self.weightIE,
-                                    self.weightSD_IE
-                                )
+                            weight = self.weightIE
                             syn_dict['weight'] = weight
 
                             # also ensure that wmax is negative
@@ -2229,14 +2224,7 @@ class Sinha2016:
                             syn_dict = self.synDictIE.copy()
 
                             # ensure new weight is negative
-                            weight = random.gauss(
-                                self.weightIE,
-                                self.weightSD_IE)
-                            while weight >= 0.:
-                                weight = random.gauss(
-                                    self.weightIE,
-                                    self.weightSD_IE
-                                )
+                            weight = self.weightIE
                             syn_dict['weight'] = weight
 
                             # also ensure that wmax is negative
@@ -3347,7 +3335,6 @@ if __name__ == "__main__":
     # Set homoeostatic structural plasticity parameters to whatever the network
     # has achieved now
     simulation.invoke_metaplasticity()
-    simulation.update_mean_conductances()
     simulation.set_stability_threshold_I()
     # Enable structural plasticity for repair #
     simulation.print_simulation_parameters()
