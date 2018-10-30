@@ -994,7 +994,7 @@ class Sinha2016:
         # multipliers
         eps_ax_e_mul = 2.0
         eps_den_e_e_mul = 1.0
-        eps_den_e_i_mul = 10.0
+        eps_den_e_i_mul = 4.0
         eta_ax_e_mul = 1.0
         eta_den_e_e_mul = 0.25
         eta_den_e_i_mul = 1.0
@@ -1053,7 +1053,7 @@ class Sinha2016:
         # For I
         eps_ax_i_mul = 1.0
         eps_den_i_e_mul = 1.0
-        eps_den_i_i_mul = 10.0
+        eps_den_i_i_mul = 4.0
         eta_ax_i_mul = 0.1
         eta_den_i_e_mul = 0.25
         eta_den_i_i_mul = 1.0
