@@ -119,11 +119,11 @@ class Sinha2016:
         self.nu_ax_e = 1 * self.nu
         # 2000 inhibitory neurons must inhibit the whole population of 1000
         # neurons so their pre-synaptic elements must follow faster dynamics
-        self.nu_ax_i = 50 * self.nu
+        self.nu_ax_i = 100 * self.nu
         self.nu_den_e_e = 1 * self.nu
-        self.nu_den_e_i = 1 * self.nu
+        self.nu_den_e_i = 0.5 * self.nu
         self.nu_den_i_e = 1 * self.nu
-        self.nu_den_i_i = 1 * self.nu
+        self.nu_den_i_i = 0.5 * self.nu
 
         self.tau_ax_e = self.nu_ax_e * 0.1
         self.tau_ax_i = self.nu_ax_i * 0.1
@@ -994,7 +994,7 @@ class Sinha2016:
         # multipliers
         eps_ax_e_mul = 2.0
         eps_den_e_e_mul = 1.0
-        eps_den_e_i_mul = 2.0
+        eps_den_e_i_mul = 10.0
         eta_ax_e_mul = 1.0
         eta_den_e_e_mul = 0.25
         eta_den_e_i_mul = 1.0
@@ -1053,7 +1053,7 @@ class Sinha2016:
         # For I
         eps_ax_i_mul = 1.0
         eps_den_i_e_mul = 1.0
-        eps_den_i_i_mul = 2.0
+        eps_den_i_i_mul = 10.0
         eta_ax_i_mul = 0.1
         eta_den_i_e_mul = 0.25
         eta_den_i_i_mul = 1.0
