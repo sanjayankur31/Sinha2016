@@ -991,6 +991,14 @@ class Sinha2016:
     def __set_str_p_params(self):
         """Set the new gaussian parameters for MSP."""
 
+        # multipliers
+        eps_ax_e_mul = 2.0
+        eps_den_e_e_mul = 1.0
+        eps_den_e_i_mul = 2.0
+        eta_ax_e_mul = 1.0
+        eta_den_e_e_mul = 0.25
+        eta_den_e_i_mul = 1.0
+
         list_e = numpy.array(
             [[stat['global_id'], stat['Ca']] for stat in
              nest.GetStatus(self.neuronsE) if stat['local']])
@@ -1000,12 +1008,12 @@ class Sinha2016:
 
         new_structural_p_elements_E = []
         for [gid, ca] in list_e:
-            eps_ax_e = ca * 1.9
-            eps_den_e_e = ca
-            eps_den_e_i = ca * 2.0
-            eta_ax_e = ca
-            eta_den_e_e = ca * 0.25
-            eta_den_e_i = ca
+            eps_ax_e = ca * eps_ax_e_mul
+            eps_den_e_e = ca * eps_den_e_e_mul
+            eps_den_e_i = ca * eps_den_e_i_mul
+            eta_ax_e = ca * eta_ax_e_mul
+            eta_den_e_e = ca * eta_den_e_e_mul
+            eta_den_e_i = ca * eta_den_e_i_mul
 
             new_growth_curve_axonal_E = {
                 'growth_curve': "gaussian",
@@ -1043,14 +1051,21 @@ class Sinha2016:
                        new_structural_p_elements_E)
 
         # For I
+        eps_ax_i_mul = 1.0
+        eps_den_i_e_mul = 1.0
+        eps_den_i_i_mul = 2.0
+        eta_ax_i_mul = 0.1
+        eta_den_i_e_mul = 0.25
+        eta_den_i_i_mul = 1.0
+
         new_structural_p_elements_I = []
         for [gid, ca] in list_i:
-            eps_ax_i = ca
-            eps_den_i_e = ca
-            eps_den_i_i = ca * 2.0
-            eta_ax_i = ca * 0.1
-            eta_den_i_e = ca * 0.25
-            eta_den_i_i = ca
+            eps_ax_i = ca * eps_ax_i_mul
+            eps_den_i_e = ca * eps_den_i_e_mul
+            eps_den_i_i = ca * eps_den_i_i_mul
+            eta_ax_i = ca * eta_ax_i_mul
+            eta_den_i_e = ca * eta_den_i_e_mul
+            eta_den_i_i = ca * eta_den_i_i_mul
 
             new_growth_curve_axonal_I = {
                 'growth_curve': "gaussian",
@@ -1091,20 +1106,20 @@ class Sinha2016:
         # For E
         mean_ca_e = numpy.mean(list_e[:, 1])
         mean_ca_i = numpy.mean(list_i[:, 1])
-        self.eps_ax_e = mean_ca_e * 1.9
-        self.eps_den_e_e = mean_ca_e
-        self.eps_den_e_i = mean_ca_e * 2.0
-        self.eta_ax_e = mean_ca_e
-        self.eta_den_e_e = mean_ca_e * 0.25
-        self.eta_den_e_i = mean_ca_e
+        self.eps_ax_e = mean_ca_e * eps_ax_e_mul
+        self.eps_den_e_e = mean_ca_e * eps_den_e_e_mul
+        self.eps_den_e_i = mean_ca_e * eps_den_e_i_mul
+        self.eta_ax_e = mean_ca_e * eta_ax_e_mul
+        self.eta_den_e_e = mean_ca_e * eta_den_e_e_mul
+        self.eta_den_e_i = mean_ca_e * eta_den_e_i_mul
 
         # For I
-        self.eps_ax_i = mean_ca_i
-        self.eps_den_i_e = mean_ca_i
-        self.eps_den_i_i = mean_ca_i * 2.0
-        self.eta_ax_i = mean_ca_i * 0.1
-        self.eta_den_i_e = mean_ca_i * 0.25
-        self.eta_den_i_i = mean_ca_i
+        self.eps_ax_i = mean_ca_i * eps_ax_i_mul
+        self.eps_den_i_e = mean_ca_i * eps_den_i_e_mul
+        self.eps_den_i_i = mean_ca_i * eps_den_i_i_mul
+        self.eta_ax_i = mean_ca_i * eta_ax_i_mul
+        self.eta_den_i_e = mean_ca_i * eta_den_i_e_mul
+        self.eta_den_i_i = mean_ca_i * eta_den_i_i_mul
 
         logging.debug("Rank {}: Updated growth curves.".format(self.rank))
 
