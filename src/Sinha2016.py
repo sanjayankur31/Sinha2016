@@ -115,15 +115,15 @@ class Sinha2016:
         self.eta_den_i_e = 0.1
         self.eta_den_i_i = 0.1
         # maximum value of dz/dt
-        self.nu = 1e-6
+        self.nu = 2.5e-5
         self.nu_ax_e = 1 * self.nu
         # 2000 inhibitory neurons must inhibit the whole population of 1000
         # neurons so their pre-synaptic elements must follow faster dynamics
-        self.nu_ax_i = 100 * self.nu
+        self.nu_ax_i = 1 * self.nu
         self.nu_den_e_e = 1 * self.nu
-        self.nu_den_e_i = 0.5 * self.nu
+        self.nu_den_e_i = 1 * self.nu
         self.nu_den_i_e = 1 * self.nu
-        self.nu_den_i_i = 0.5 * self.nu
+        self.nu_den_i_i = 1 * self.nu
 
         self.tau_ax_e = self.nu_ax_e * 0.1
         self.tau_ax_i = self.nu_ax_i * 0.1
@@ -131,6 +131,13 @@ class Sinha2016:
         self.tau_den_e_i = self.nu_den_e_i * 0.1
         self.tau_den_i_e = self.nu_den_i_e * 0.1
         self.tau_den_i_i = self.nu_den_i_i * 0.1
+
+        self.omega_ax_e = 0.1
+        self.omega_ax_i = 0.1
+        self.omega_den_e_e = 1.
+        self.omega_den_e_i = 1.
+        self.omega_den_i_e = 1.
+        self.omega_den_i_i = 1.
 
         self.rank = nest.Rank()
 
@@ -230,7 +237,8 @@ class Sinha2016:
                 'tau_vacant': self.tau_ax_e,
                 'continuous': False,
                 'eta': self.eta_ax_e,
-                'eps': self.eps_ax_e
+                'eps': self.eps_ax_e,
+                'omega': self.omega_ax_e
             }
             new_growth_curve_axonal_I = {
                 'growth_curve': "gaussian",
@@ -238,7 +246,8 @@ class Sinha2016:
                 'tau_vacant': self.tau_ax_i,
                 'continuous': False,
                 'eta': self.eta_ax_i,
-                'eps': self.eps_ax_i
+                'eps': self.eps_ax_i,
+                'omega': self.omega_ax_i
             }
             new_growth_curve_dendritic_E_e = {
                 'growth_curve': "gaussian",
@@ -246,7 +255,8 @@ class Sinha2016:
                 'tau_vacant': self.tau_den_e_e,
                 'continuous': False,
                 'eta': self.eta_den_e_e,
-                'eps': self.eps_den_e_e
+                'eps': self.eps_den_e_e,
+                'omega': self.omega_den_e_e
             }
             new_growth_curve_dendritic_E_i = {
                 'growth_curve': "gaussian",
@@ -254,7 +264,8 @@ class Sinha2016:
                 'tau_vacant': self.tau_den_e_i,
                 'continuous': False,
                 'eta': self.eta_den_e_i,
-                'eps': self.eps_den_e_i
+                'eps': self.eps_den_e_i,
+                'omega': self.omega_den_e_i
             }
             new_growth_curve_dendritic_I_e = {
                 'growth_curve': "gaussian",
@@ -262,7 +273,8 @@ class Sinha2016:
                 'tau_vacant': self.tau_den_i_e,
                 'continuous': False,
                 'eta': self.eta_den_i_e,
-                'eps': self.eps_den_i_e
+                'eps': self.eps_den_i_e,
+                'omega': self.omega_den_i_e
             }
             new_growth_curve_dendritic_I_i = {
                 'growth_curve': "gaussian",
@@ -270,7 +282,8 @@ class Sinha2016:
                 'tau_vacant': self.tau_den_i_i,
                 'continuous': False,
                 'eta': self.eta_den_i_i,
-                'eps': self.eps_den_i_i
+                'eps': self.eps_den_i_i,
+                'omega': self.omega_den_i_i
             }
 
             self.structural_p_elements_E = {
@@ -994,7 +1007,7 @@ class Sinha2016:
         # multipliers
         eps_ax_e_mul = 2.0
         eps_den_e_e_mul = 1.0
-        eps_den_e_i_mul = 4.0
+        eps_den_e_i_mul = 3.0
         eta_ax_e_mul = 1.0
         eta_den_e_e_mul = 0.25
         eta_den_e_i_mul = 1.0
@@ -1021,7 +1034,8 @@ class Sinha2016:
                 'tau_vacant': self.tau_ax_e,
                 'continuous': False,
                 'eta': eta_ax_e,
-                'eps': eps_ax_e
+                'eps': eps_ax_e,
+                'omega': self.omega_ax_e
             }
 
             new_growth_curve_dendritic_E_e = {
@@ -1030,7 +1044,8 @@ class Sinha2016:
                 'tau_vacant': self.tau_den_e_e,
                 'continuous': False,
                 'eta': eta_den_e_e,
-                'eps': eps_den_e_e
+                'eps': eps_den_e_e,
+                'omega': self.omega_den_e_e
             }
             new_growth_curve_dendritic_E_i = {
                 'growth_curve': "gaussian",
@@ -1038,7 +1053,8 @@ class Sinha2016:
                 'tau_vacant': self.tau_den_e_i,
                 'continuous': False,
                 'eta': eta_den_e_i,
-                'eps': eps_den_e_i
+                'eps': eps_den_e_i,
+                'omega': self.omega_den_e_i
             }
 
             new_structural_p_elements_E.append({
@@ -1053,7 +1069,7 @@ class Sinha2016:
         # For I
         eps_ax_i_mul = 1.0
         eps_den_i_e_mul = 1.0
-        eps_den_i_i_mul = 4.0
+        eps_den_i_i_mul = 3.0
         eta_ax_i_mul = 0.1
         eta_den_i_e_mul = 0.25
         eta_den_i_i_mul = 1.0
@@ -1073,7 +1089,8 @@ class Sinha2016:
                 'tau_vacant': self.tau_ax_i,
                 'continuous': False,
                 'eta': eta_ax_i,
-                'eps': eps_ax_i
+                'eps': eps_ax_i,
+                'omega': self.omega_ax_i
             }
             new_growth_curve_dendritic_I_e = {
                 'growth_curve': "gaussian",
@@ -1081,7 +1098,8 @@ class Sinha2016:
                 'tau_vacant': self.tau_den_i_e,
                 'continuous': False,
                 'eta': eta_den_i_e,
-                'eps': eps_den_i_e
+                'eps': eps_den_i_e,
+                'omega': self.omega_den_i_e
             }
             new_growth_curve_dendritic_I_i = {
                 'growth_curve': "gaussian",
@@ -1089,7 +1107,8 @@ class Sinha2016:
                 'tau_vacant': self.tau_den_i_i,
                 'continuous': False,
                 'eta': eta_den_i_i,
-                'eps': eps_den_i_i
+                'eps': eps_den_i_i,
+                'omega': self.omega_den_i_i
             }
             new_structural_p_elements_I.append({
                 'Den_ex': new_growth_curve_dendritic_I_e,
@@ -3242,17 +3261,23 @@ class Sinha2016:
                       file=pfile)
                 print("{}: {}".format("eps_ax_E", self.eps_ax_e),
                       file=pfile)
+                print("{}: {}".format("omega_ax_E", self.omega_ax_e),
+                      file=pfile)
                 print("{}: {}".format("nu_ax_E", self.nu_ax_e),
                       file=pfile)
                 print("{}: {}".format("eta_den_E_e", self.eta_den_e_e),
                       file=pfile)
                 print("{}: {}".format("eps_den_E_e", self.eps_den_e_e),
                       file=pfile)
+                print("{}: {}".format("omega_den_E_e", self.omega_den_e_e),
+                      file=pfile)
                 print("{}: {}".format("nu_den_E_e", self.nu_den_e_e),
                       file=pfile)
                 print("{}: {}".format("eta_den_E_i", self.eta_den_e_i),
                       file=pfile)
                 print("{}: {}".format("eps_den_E_i", self.eps_den_e_i),
+                      file=pfile)
+                print("{}: {}".format("omega_den_E_i", self.omega_den_e_i),
                       file=pfile)
                 print("{}: {}".format("nu_den_E_i", self.nu_den_e_i),
                       file=pfile)
@@ -3261,17 +3286,23 @@ class Sinha2016:
                       file=pfile)
                 print("{}: {}".format("eps_ax_I", self.eps_ax_i),
                       file=pfile)
+                print("{}: {}".format("omega_ax_I", self.omega_ax_i),
+                      file=pfile)
                 print("{}: {}".format("nu_ax_I", self.nu_ax_i),
                       file=pfile)
                 print("{}: {}".format("eta_den_I_e", self.eta_den_i_e),
                       file=pfile)
                 print("{}: {}".format("eps_den_I_e", self.eps_den_i_e),
                       file=pfile)
+                print("{}: {}".format("omega_den_I_e", self.omega_den_i_e),
+                      file=pfile)
                 print("{}: {}".format("nu_den_I_e", self.nu_den_i_e),
                       file=pfile)
                 print("{}: {}".format("eta_den_I_i", self.eta_den_i_i),
                       file=pfile)
                 print("{}: {}".format("eps_den_I_i", self.eps_den_i_i),
+                      file=pfile)
+                print("{}: {}".format("omega_den_I_i", self.omega_den_i_i),
                       file=pfile)
                 print("{}: {}".format("nu_den_I_i", self.nu_den_i_i),
                       file=pfile)
