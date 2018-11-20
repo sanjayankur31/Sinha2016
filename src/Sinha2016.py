@@ -118,13 +118,13 @@ class Sinha2016:
         # z += dz
         self.nu = 5e-5
         self.nu_ax_e = 1 * self.nu
-        # 2000 inhibitory neurons must inhibit the whole population of 1000
+        # 2000 inhibitory neurons must inhibit the whole population of 10000
         # neurons so their pre-synaptic elements must follow faster dynamics
         self.nu_ax_i = 1 * self.nu
         self.nu_den_e_e = 1 * self.nu
         self.nu_den_e_i = 1 * self.nu
-        self.nu_den_i_e = 1 * self.nu
-        self.nu_den_i_i = 1 * self.nu
+        self.nu_den_i_e = 0.5 * self.nu
+        self.nu_den_i_i = 0.5 * self.nu
 
         # z_vacant is multiplied by this tau at each time step to decay it.
         # z -= z_vacant * tau
