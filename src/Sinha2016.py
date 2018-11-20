@@ -114,32 +114,49 @@ class Sinha2016:
         self.eta_den_e_i = 0.1
         self.eta_den_i_e = 0.1
         self.eta_den_i_i = 0.1
+
         # maximum value of dz/dt per time step
         # z += dz
+        # base value
         self.nu = 1e-4
-        self.nu_ax_e = 1 * self.nu
-        # 2000 inhibitory neurons must inhibit the whole population of 10000
-        # neurons so their pre-synaptic elements must follow faster dynamics
-        self.nu_ax_i = 1 * self.nu
-        self.nu_den_e_e = 1 * self.nu
-        self.nu_den_e_i = 1 * self.nu
-        self.nu_den_i_e = 1 * self.nu
-        self.nu_den_i_i = 1 * self.nu
+        # value for excitatory neurons
+        self.nu_e = self.nu
+        self.nu_den_e_e = 1 * self.nu_e
+        # inhibitory elements react faster than excitatory elements
+        # mostly no spines, so quicker
+        self.nu_den_e_i = 2 * self.nu_e
+        # 8000 excitatory neurons provide input to 10000 neurons of the
+        # network, so they must be slightly faster than the post-synaptic
+        # elements
+        self.nu_ax_e = 1.5 * self.nu
+
+        # post-synaptic elements of inhibitory neurons react slower to activity
+        # changes than excitatory neurons
+        self.nu_i = self.nu_e * 0.5
+        self.nu_den_i_e = 1 * self.nu_i
+        # inhibitory elements react faster than excitatory elements
+        # mostly no spines, so quicker
+        self.nu_den_i_i = 2 * self.nu_i
+        # 2000 inhibitory neurons inhibit 10000 neurons of the network, so the
+        # inhibitory axon must act at a faster rate
+        self.nu_ax_i = 4 * self.nu
 
         # z_vacant is multiplied by this tau at each time step to decay it.
         # z -= z_vacant * tau
         # 1% of free synaptic elements are lost at each time step
         self.tau_ax_e = 0.01
-        self.tau_ax_i = 0.01
         self.tau_den_e_e = 0.01
         self.tau_den_e_i = 0.01
+
+        self.tau_ax_i = 0.01
         self.tau_den_i_e = 0.01
         self.tau_den_i_i = 0.01
 
         self.omega_ax_e = 0.01
-        self.omega_ax_i = 0.01
         self.omega_den_e_e = 1.
         self.omega_den_e_i = 1.
+
+        self.omega_ax_i = 0.01
         self.omega_den_i_e = 1.
         self.omega_den_i_i = 1.
 
