@@ -115,7 +115,7 @@ class Sinha2016:
         self.eta_den_i_e = 0.1
         self.eta_den_i_i = 0.1
         # maximum value of dz/dt
-        self.nu = 2.5e-5
+        self.nu = 5e-5
         self.nu_ax_e = 1 * self.nu
         # 2000 inhibitory neurons must inhibit the whole population of 1000
         # neurons so their pre-synaptic elements must follow faster dynamics
