@@ -114,7 +114,8 @@ class Sinha2016:
         self.eta_den_e_i = 0.1
         self.eta_den_i_e = 0.1
         self.eta_den_i_i = 0.1
-        # maximum value of dz/dt
+        # maximum value of dz/dt per time step
+        # z += dz
         self.nu = 5e-5
         self.nu_ax_e = 1 * self.nu
         # 2000 inhibitory neurons must inhibit the whole population of 1000
@@ -125,12 +126,15 @@ class Sinha2016:
         self.nu_den_i_e = 1 * self.nu
         self.nu_den_i_i = 1 * self.nu
 
-        self.tau_ax_e = self.nu_ax_e * 0.1
-        self.tau_ax_i = self.nu_ax_i * 0.1
-        self.tau_den_e_e = self.nu_den_e_e * 0.1
-        self.tau_den_e_i = self.nu_den_e_i * 0.1
-        self.tau_den_i_e = self.nu_den_i_e * 0.1
-        self.tau_den_i_i = self.nu_den_i_i * 0.1
+        # z_vacant is multiplied by this tau at each time step to decay it.
+        # z -= z_vacant * tau
+        # 1% of free synaptic elements are lost at each time step
+        self.tau_ax_e = 0.01
+        self.tau_ax_i = 0.01
+        self.tau_den_e_e = 0.01
+        self.tau_den_e_i = 0.01
+        self.tau_den_i_e = 0.01
+        self.tau_den_i_i = 0.01
 
         self.omega_ax_e = 0.01
         self.omega_ax_i = 0.01
