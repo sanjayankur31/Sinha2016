@@ -123,8 +123,8 @@ class Sinha2016:
         self.nu_ax_i = 1 * self.nu
         self.nu_den_e_e = 1 * self.nu
         self.nu_den_e_i = 1 * self.nu
-        self.nu_den_i_e = 0.5 * self.nu
-        self.nu_den_i_i = 0.5 * self.nu
+        self.nu_den_i_e = 1 * self.nu
+        self.nu_den_i_i = 1 * self.nu
 
         # z_vacant is multiplied by this tau at each time step to decay it.
         # z -= z_vacant * tau
