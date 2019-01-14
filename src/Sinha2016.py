@@ -118,7 +118,7 @@ class Sinha2016:
         # maximum value of dz/dt per time step
         # z += dz
         # base value
-        self.nu = 5e-5
+        self.nu = 2e-5
         # value for excitatory neurons
         self.nu_e = self.nu
         self.nu_den_e_e = 1 * self.nu_e
