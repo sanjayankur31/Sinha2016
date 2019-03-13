@@ -84,7 +84,7 @@ class Sinha2016:
         # SD = w_mul * neuron_distE
         self.w_mul_E = 8.
         self.w_mul_I = 24.
-        self.max_p_E = 1.
+        self.max_p_E = 0.8
         self.max_p_I = 0.3
         self.location_tree = None
         self.lpz_percent = 0.5
