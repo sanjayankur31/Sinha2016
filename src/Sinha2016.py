@@ -1561,8 +1561,9 @@ class Sinha2016:
                         elif self.syn_del_strategy == "weight":
                             # need to fetch targets from [nid, w], so use a
                             # method for clarity
-                            chosen_targets = self.__get_random_ps_to_delete(
-                                targets, int(abs(elms['Axon_ex']))
+                            chosen_targets = self.__get_weakest_ps_gaussian(
+                                targets, int(abs(elms['Axon_ex'])),
+                                threshold=self.stability_threshold_E
                             )
 
                         logging.debug(
@@ -1789,8 +1790,9 @@ class Sinha2016:
                         elif self.syn_del_strategy == "weight":
                             # need to strip [nid, w] to get targets, so using a
                             # different function for clarity
-                            chosen_sources = self.__get_random_ps_to_delete(
-                                sources, int(abs(elms['Den_ex']))
+                            chosen_sources = self.__get_weakest_ps_gaussian(
+                                sources, int(abs(elms['Den_ex'])),
+                                threshold=self.stability_threshold_E
                             )
 
                         logging.debug(
