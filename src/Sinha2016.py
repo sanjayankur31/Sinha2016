@@ -122,8 +122,10 @@ class Sinha2016:
         # value for excitatory neurons
         self.nu_e = self.nu
         self.nu_den_e_e = 1 * self.nu_e
-        # inhibitory elements react faster than excitatory elements
-        # mostly no spines, so quicker
+        # inhibitory elements react faster than excitatory elements providing
+        # some window for modifications in excitatory synapses, but not letting
+        # them change too much: small tweaks in excitatory connectivity so
+        # small tweaks in functionality.
         self.nu_den_e_i = 2 * self.nu_e
         # 8000 excitatory neurons provide input to 10000 neurons of the
         # network, so they must be slightly faster than the post-synaptic
@@ -132,9 +134,7 @@ class Sinha2016:
 
         # post-synaptic elements of inhibitory neurons react slower to activity
         # changes than excitatory neurons so that the inhibitory network
-        # turns over quicker and prevents the excitatory network from modifying
-        # itself too much: assumption being that the excitatory is the
-        # functional aspect and therefore should not change too much.
+        # reacts to the dynamics of the excitatory network.
         self.nu_i = self.nu * 0.5
         self.nu_den_i_e = 1 * self.nu_i
         # inhibitory elements react faster than excitatory elements
@@ -155,13 +155,13 @@ class Sinha2016:
         self.tau_den_i_e = 0.01
         self.tau_den_i_i = 0.01
 
-        self.omega_ax_e = 0.01
+        self.omega_ax_e = 0.2
         self.omega_den_e_e = 0.4
-        self.omega_den_e_i = 0.4
+        self.omega_den_e_i = 0.1
 
-        self.omega_ax_i = 0.01
+        self.omega_ax_i = 0.2
         self.omega_den_i_e = 0.4
-        self.omega_den_i_i = 0.4
+        self.omega_den_i_i = 0.1
 
         self.rank = nest.Rank()
 
