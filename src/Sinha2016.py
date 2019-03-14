@@ -156,12 +156,12 @@ class Sinha2016:
         self.tau_den_i_i = 0.01
 
         self.omega_ax_e = 0.01
-        self.omega_den_e_e = 1.
-        self.omega_den_e_i = 1.
+        self.omega_den_e_e = 0.4
+        self.omega_den_e_i = 0.4
 
         self.omega_ax_i = 0.01
-        self.omega_den_i_e = 1.
-        self.omega_den_i_i = 1.
+        self.omega_den_i_e = 0.4
+        self.omega_den_i_i = 0.4
 
         self.rank = nest.Rank()
 
