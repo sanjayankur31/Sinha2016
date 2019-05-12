@@ -118,7 +118,7 @@ class Sinha2016:
         # maximum value of dz/dt per time step
         # z += dz
         # base value
-        self.nu = 2e-5
+        self.nu = 5e-5
         # value for excitatory neurons
         self.nu_e = self.nu
         self.nu_den_e_e = 1 * self.nu_e
@@ -126,7 +126,7 @@ class Sinha2016:
         # 8000 excitatory neurons provide input to 10000 neurons of the
         # network, so they must be slightly faster than the post-synaptic
         # elements
-        self.nu_ax_e = 10 * self.nu
+        self.nu_ax_e = 100 * self.nu
 
         # post-synaptic elements of inhibitory neurons react slower to activity
         # changes than excitatory neurons so that the inhibitory network
@@ -136,7 +136,7 @@ class Sinha2016:
         self.nu_den_i_i = 1 * self.nu_i
         # 2000 inhibitory neurons inhibit 10000 neurons of the network, so the
         # inhibitory axon must act at a faster rate
-        self.nu_ax_i = 10 * self.nu
+        self.nu_ax_i = 100 * self.nu
 
         # z_vacant is multiplied by this tau at each time step to decay it.
         # z -= z_vacant * tau
