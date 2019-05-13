@@ -131,7 +131,7 @@ class Sinha2016:
         # post-synaptic elements of inhibitory neurons react slower to activity
         # changes than excitatory neurons so that the inhibitory network
         # reacts to the dynamics of the excitatory network.
-        self.nu_i = self.nu * 0.5
+        self.nu_i = self.nu
         self.nu_den_i_e = 1 * self.nu_i
         self.nu_den_i_i = 1 * self.nu_i
         # 2000 inhibitory neurons inhibit 10000 neurons of the network, so the
@@ -153,7 +153,7 @@ class Sinha2016:
         self.omega_den_e_e = 0.4
         self.omega_den_e_i = 0.4
 
-        self.omega_ax_i = 0.005
+        self.omega_ax_i = 0.01
         self.omega_den_i_e = 0.4
         self.omega_den_i_i = 0.4
 
