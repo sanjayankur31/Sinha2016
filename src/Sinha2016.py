@@ -136,7 +136,7 @@ class Sinha2016:
         self.nu_den_i_i = 1 * self.nu_i
         # 2000 inhibitory neurons inhibit 10000 neurons of the network, so the
         # inhibitory axon must act at a faster rate
-        self.nu_ax_i = 50 * self.nu
+        self.nu_ax_i = 200 * self.nu
 
         # z_vacant is multiplied by this tau at each time step to decay it.
         # z -= z_vacant * tau
@@ -153,7 +153,7 @@ class Sinha2016:
         self.omega_den_e_e = 0.4
         self.omega_den_e_i = 0.4
 
-        self.omega_ax_i = 0.01
+        self.omega_ax_i = 0.002
         self.omega_den_i_e = 0.4
         self.omega_den_i_i = 0.4
 
