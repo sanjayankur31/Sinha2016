@@ -179,8 +179,8 @@ class Sinha2016:
         self.weightSD_II = self.weightII/5
         self.weightSD_IE = self.weightIE/5
         self.weightPatternEE = self.wbar * 5.
-        self.weightExtE = 10.
-        self.weightExtI = 15.
+        self.weightExtE = 8.
+        self.weightExtI = 12.
         self.stability_threshold_I = 100000.
         self.stability_threshold_E = 100000.
 
