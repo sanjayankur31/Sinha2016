@@ -184,7 +184,7 @@ class Sinha2016:
         self.stability_threshold_I = 100000.
         self.stability_threshold_E = 100000.
 
-        self.etaIE = 0.01
+        self.etaIE = 0.05
         self.alphaIE = .12
         self.tauIE = 20.
 
