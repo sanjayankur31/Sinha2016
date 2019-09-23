@@ -3411,13 +3411,7 @@ if __name__ == "__main__":
 
     # Pattern related simulation
     if store_patterns:
-        # control LPZs
-        # pattern at centre of LPZ
-        simulation.store_pattern_off_centre([0., 0.], True)
-        # outside the LPZ
-        simulation.store_pattern_with_centre([10000, 2000], 600, True)
-        # store other pattern
-        simulation.store_pattern_off_centre([0., 2000.0], True)
+        simulation.store_random_pattern(True)
 
         # stabilise network after storing patterns
         simulation.stabilise(label="Pattern stabilisation")
@@ -3434,27 +3428,19 @@ if __name__ == "__main__":
     simulation.update_time_windows(stabilisation_time=500.,
                                    sp_update_interval=1.,
                                    recording_interval=100.)
-    simulation.stabilise()
+    simulation.stabilise(label="Both syn and str p")
 
     if deafferentate_network:
         # Deaff network
         simulation.deaff_network()
-        # zoom in on post deaff phase
-        simulation.update_time_windows(stabilisation_time=1000.,
-                                       sp_update_interval=1.,
-                                       recording_interval=100.)
-        simulation.stabilise(label="Repair zoomed in")
-
-        simulation.update_time_windows(stabilisation_time=25000.,
+        simulation.update_time_windows(stabilisation_time=15000.,
                                        sp_update_interval=1.,
                                        recording_interval=1000.)
-        simulation.stabilise(label="Repair #2")
+        simulation.stabilise(label="Repair")
 
     if store_patterns:
         # recall stored and tracked pattern
         simulation.recall_pattern(50, 1)
-        simulation.recall_pattern(50, 2)
-        simulation.recall_pattern(50, 3)
 
     simulation.close_files()
     logging.info("Rank {}: SIMULATION FINISHED SUCCESSFULLY".format(
