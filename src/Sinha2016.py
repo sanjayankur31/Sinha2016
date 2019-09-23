@@ -2923,10 +2923,11 @@ class Sinha2016:
             "Rank {}: Number of patterns stored: {}".format(
                 self.rank, self.pattern_count))
 
-    def store_random_pattern(self, num_neurons, track=False):
+    def store_random_pattern(self, track=False):
         """Store a pattern in a randomly selected set of neurons.
 
-        :num_neurons: total number of neurons in the pattern.
+        Number of neurons in the pattern is taken from the stored parameter.
+
         :track: do we track the pattern or not.
         :returns: Nothing
 
@@ -2935,7 +2936,9 @@ class Sinha2016:
             "Rank {}: SIMULATION: Storing pattern {} randomly".format(
                 self.rank, self.pattern_count + 1))
         self.pattern_count += 1
-        pattern_neurons = list(random.sample(self.neuronsE))
+        pattern_neurons = list(
+            random.sample(self.neuronsE, (1.25 * self.populations['P']))
+        )
         self.__strengthen_pattern_connections(pattern_neurons)
         if track:
             self.__track_pattern(pattern_neurons)
