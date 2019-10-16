@@ -3389,7 +3389,7 @@ if __name__ == "__main__":
         format='%(asctime)-15s: %(levelname)s: %(lineno)d: %(message)s',
         level=logging.INFO)
 
-    store_patterns = False
+    store_patterns = True
     deafferentate_network = True
     simulation = Sinha2016()
     logging.info("Rank {}: SIMULATION STARTED".format(simulation.rank))
