@@ -72,8 +72,10 @@ class Sinha2016:
         # recall percent of pattern
         self.recall_percent = .25
 
-        self.populations['P'] = self.pattern_percent * self.populations['E']
-        self.populations['R'] = self.recall_percent * self.populations['P']
+        self.populations['P'] = int(self.pattern_percent *
+                                    self.populations['E'])
+        self.populations['R'] = int(self.recall_percent *
+                                    self.populations['P'])
 
         # location bits
         self.colsE = 80
