@@ -2902,7 +2902,7 @@ class Sinha2016:
             self.location_tree.data[len(self.neuronsE) - 1])
         centre_point = numpy.array(offset) + (first_point + last_point)/2
         self.store_pattern_with_centre(centre_point,
-                                       (1.25 * self.populations['P']),
+                                       int(1.25 * self.populations['P']),
                                        track=True)
 
     def store_pattern_with_centre(self, centre_point, num_neurons,
