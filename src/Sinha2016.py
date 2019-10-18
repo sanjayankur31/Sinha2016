@@ -2939,7 +2939,7 @@ class Sinha2016:
                 self.rank, self.pattern_count + 1))
         self.pattern_count += 1
         pattern_neurons = list(
-            random.sample(self.neuronsE, (1.25 * self.populations['P']))
+            random.sample(self.neuronsE, self.populations['P'])
         )
         self.__strengthen_pattern_connections(pattern_neurons)
         if track:
