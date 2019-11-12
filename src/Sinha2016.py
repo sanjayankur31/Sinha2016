@@ -2946,9 +2946,10 @@ class Sinha2016:
         self.__strengthen_pattern_connections(pattern_neurons)
         if track:
             self.__track_pattern(pattern_neurons)
-        logging.debug(
-            "Rank {}: Number of patterns stored: {}".format(
-                self.rank, self.pattern_count))
+        self.comm.barrier()
+        logging.info(
+            "Rank {}: {} neurons selected in pattern: {}".format(
+                self.rank, len(pattern_neurons), self.pattern_count))
 
     def setup_pattern_for_recall(self, pattern_number):
         """
