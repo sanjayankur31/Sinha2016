@@ -2942,6 +2942,7 @@ class Sinha2016:
             # Set a seed, ensure all ranks get the same neurons
             random.Random(182).sample(self.neuronsE, self.populations['P'])
         )
+        self.comm.barrier()
         self.__strengthen_pattern_connections(pattern_neurons)
         if track:
             self.__track_pattern(pattern_neurons)
@@ -2957,6 +2958,7 @@ class Sinha2016:
         this pattern - the poisson stimulus will run for the set
         recall_duration from the invocation of this method.
         """
+        self.comm.barrier()
         # set up external stimulus
         pattern_neurons = self.patterns[pattern_number - 1]
         # Only neurons that have are not in the LPZ will be given stimulus
@@ -2993,6 +2995,7 @@ class Sinha2016:
                     self.rank, pattern_number) + "No recall neurons selected"
             )
         self.recall_neurons.append(recall_neurons)
+        self.comm.barrier()
 
     def recall_last_pattern(self, time):
         """
