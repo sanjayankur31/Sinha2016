@@ -2934,7 +2934,7 @@ class Sinha2016:
         :returns: Nothing
 
         """
-        logging.debug(
+        logging.info(
             "Rank {}: SIMULATION: Storing pattern {} randomly".format(
                 self.rank, self.pattern_count + 1))
         self.pattern_count += 1
@@ -2987,11 +2987,11 @@ class Sinha2016:
             nest.Connect(stim, recall_neurons,
                          conn_spec=self.connDictStim)
 
-            logging.debug(
-                "Rank {}: Number of recall neurons for pattern {}: {}".format(
-                    self.rank, pattern_number, len(recall_neurons)))
+            logging.info(
+                "Rank {}: {} recall neurons set up for pattern: {}".format(
+                    self.rank, len(recall_neurons), pattern_number))
         else:
-            logging.debug(
+            logging.info(
                 "Rank {}: Pattern {} is completely deafferentated".format(
                     self.rank, pattern_number) + "No recall neurons selected"
             )
@@ -3394,7 +3394,7 @@ if __name__ == "__main__":
     # Set up logging configuration
     logging.basicConfig(
         format='%(asctime)-15s: %(levelname)s: %(lineno)d: %(message)s',
-        level=logging.DEBUG)
+        level=logging.INFO)
 
     store_patterns = True
     deafferentate_network = True
