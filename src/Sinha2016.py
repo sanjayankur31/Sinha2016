@@ -3389,7 +3389,7 @@ if __name__ == "__main__":
     # Set up logging configuration
     logging.basicConfig(
         format='%(asctime)-15s: %(levelname)s: %(lineno)d: %(message)s',
-        level=logging.DEBUG)
+        level=logging.INFO)
 
     store_patterns = True
     deafferentate_network = True
