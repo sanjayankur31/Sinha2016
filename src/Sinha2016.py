@@ -3398,6 +3398,7 @@ if __name__ == "__main__":
 
     store_patterns = True
     deafferentate_network = True
+    repair_network = True
     simulation = Sinha2016()
     logging.info("Rank {}: SIMULATION STARTED".format(simulation.rank))
 
@@ -3440,6 +3441,8 @@ if __name__ == "__main__":
     if deafferentate_network:
         # Deaff network
         simulation.deaff_network()
+
+    if repair_network:
         simulation.update_time_windows(stabilisation_time=15000.,
                                        sp_update_interval=1.,
                                        recording_interval=1000.)
