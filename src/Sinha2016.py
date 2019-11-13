@@ -3396,7 +3396,7 @@ if __name__ == "__main__":
         format='%(asctime)-15s: %(levelname)s: %(lineno)d: %(message)s',
         level=logging.INFO)
 
-    store_patterns = True
+    store_patterns = False
     deafferentate_network = True
     repair_network = True
     simulation = Sinha2016()
