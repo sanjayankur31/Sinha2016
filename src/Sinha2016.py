@@ -1717,8 +1717,8 @@ class Sinha2016:
                         partner, synelms[partner]))
                 logging.critical("Exception: {}".format(str(e)))
                 raise
-            except:
-                logging.critical("Some other exception")
+            except Exception as e:
+                logging.critical("Some other exception: {}".format(str(e)))
                 raise
 
         logging.debug(
@@ -1978,8 +1978,8 @@ class Sinha2016:
                         partner, synelms[partner]))
                 logging.critical("Exception: {}".format(str(e)))
                 raise
-            except:
-                logging.critical("Some other exception")
+            except Exception as e:
+                logging.critical("Some other exception: {}".format(str(e)))
                 raise
 
         logging.debug(
