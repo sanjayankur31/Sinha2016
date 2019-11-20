@@ -2962,39 +2962,22 @@ class Sinha2016:
         self.comm.barrier()
         # set up external stimulus
         pattern_neurons = self.patterns[pattern_number - 1]
-        # Only neurons that have are not in the LPZ will be given stimulus
-        active_pattern_neurons = list(set(pattern_neurons) -
-                                      set(self.lpz_neurons_E))
-        # Pick percent of neurons that are not in the LPZ
-        recall_neurons = []
-        if len(active_pattern_neurons) > 0:
-            num_recall_neurons = int(math.ceil(len(active_pattern_neurons) *
-                                               self.recall_percent))
-            # if the number of active pattern neurons is too small, use the
-            # whole lot
-            if num_recall_neurons > 0:
-                recall_neurons = active_pattern_neurons[-num_recall_neurons:]
-            else:
-                recall_neurons = active_pattern_neurons
+        # pattern neurons are randomly chosen, so we can simply choose a
+        # contiguous set
+        recall_neurons = pattern_neurons[-self.populations['R']:]
+        stim_time = nest.GetKernelStatus()['time']
+        neuronDictStim = {'rate': 200.,
+                          'origin': stim_time,
+                          'start': 0., 'stop': self.recall_duration}
+        stim = nest.Create('poisson_generator', 1,
+                           neuronDictStim)
 
-            stim_time = nest.GetKernelStatus()['time']
-            neuronDictStim = {'rate': 200.,
-                              'origin': stim_time,
-                              'start': 0., 'stop': self.recall_duration}
-            stim = nest.Create('poisson_generator', 1,
-                               neuronDictStim)
+        nest.Connect(stim, recall_neurons,
+                     conn_spec=self.connDictStim)
 
-            nest.Connect(stim, recall_neurons,
-                         conn_spec=self.connDictStim)
-
-            logging.info(
-                "Rank {}: {} recall neurons set up for pattern: {}".format(
-                    self.rank, len(recall_neurons), pattern_number))
-        else:
-            logging.info(
-                "Rank {}: Pattern {} is completely deafferentated".format(
-                    self.rank, pattern_number) + "No recall neurons selected"
-            )
+        logging.info(
+            "Rank {}: {} recall neurons set up for pattern: {}".format(
+                self.rank, len(recall_neurons), pattern_number))
         self.recall_neurons.append(recall_neurons)
         self.comm.barrier()
 
