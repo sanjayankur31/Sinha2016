@@ -2965,6 +2965,18 @@ class Sinha2016:
         # pattern neurons are randomly chosen, so we can simply choose a
         # contiguous set
         recall_neurons = pattern_neurons[-self.populations['R']:]
+        if self.rank == 0:
+            fn = "00-recall-neurons-{}.txt".format(pattern_number)
+            with open(fn, 'w') as fh:
+                print("gid\txcor\tycor", file=fh, flush=True)
+                for neuron in recall_neurons:
+                    print("{}\t{}\t{}".format(
+                        neuron,
+                        self.location_tree.data[neuron - 1][0],
+                        self.location_tree.data[neuron - 1][1]),
+                        file=fh)
+
+        # set up spike detectors
         stim_time = nest.GetKernelStatus()['time']
         neuronDictStim = {'rate': 200.,
                           'origin': stim_time,
