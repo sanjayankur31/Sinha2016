@@ -3005,10 +3005,20 @@ class Sinha2016:
         self.recall_pattern(time, self.pattern_count)
 
     def recall_pattern(self, time, pattern_number):
-        """Recall a pattern."""
+        """
+        Recall a pattern.
+
+        We disable plasticities while we do this.
+        We cannot store and load snapshots in NEST, so this is the next best
+        thing to ensure that the network is not affected by the recall.
+        """
         self.setup_pattern_for_recall(pattern_number)
+        self.disable_syn_p()
+        self.disable_rewiring()
         self.run_sim_phase(
             time, label="Recalling pattern {}".format(pattern_number))
+        self.enable_rewiring()
+        self.enable_syn_p()
 
     def deaff_network(self):
         """Deaff a the network."""
