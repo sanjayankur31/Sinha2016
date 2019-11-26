@@ -2976,6 +2976,10 @@ class Sinha2016:
                         self.location_tree.data[neuron - 1][1]),
                         file=fh)
 
+        # Do not provide stimulus to recall neurons that fall in the LPZ
+        active_recall_neurons = list(set(recall_neurons) -
+                                     set(self.lpz_neurons_E))
+
         # set up spike detectors
         stim_time = nest.GetKernelStatus()['time']
         neuronDictStim = {'rate': 200.,
@@ -2984,12 +2988,13 @@ class Sinha2016:
         stim = nest.Create('poisson_generator', 1,
                            neuronDictStim)
 
-        nest.Connect(stim, recall_neurons,
+        nest.Connect(stim, active_recall_neurons,
                      conn_spec=self.connDictStim)
 
         logging.info(
-            "Rank {}: {} recall neurons set up for pattern: {}".format(
-                self.rank, len(recall_neurons), pattern_number))
+            "Rank {}: {}/{} recall neurons set up for pattern: {}".format(
+                self.rank, len(active_recall_neurons), len(recall_neurons),
+                pattern_number))
         self.recall_neurons.append(recall_neurons)
         self.comm.barrier()
 
