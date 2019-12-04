@@ -2925,12 +2925,16 @@ class Sinha2016:
             "Rank {}: Number of patterns stored: {}".format(
                 self.rank, self.pattern_count))
 
-    def store_random_pattern(self, track=False):
+    def store_random_pattern(self, track=False, percent_in_lpz=None):
         """Store a pattern in a randomly selected set of neurons.
 
         Number of neurons in the pattern is taken from the stored parameter.
 
         :track: do we track the pattern or not.
+        :percent_in_lpz: percent of pattern neurons that fall in LPZ,
+            if unspecified, pick randomly. Note that the number of neurons in
+            the LPZ must be kept in mind---if the LPZ has 200 neurons, one
+            cannot request a pattern with 300 neurons in the LPZ.
         :returns: Nothing
 
         """
@@ -2938,10 +2942,36 @@ class Sinha2016:
             "Rank {}: SIMULATION: Storing pattern {} randomly".format(
                 self.rank, self.pattern_count + 1))
         self.pattern_count += 1
-        pattern_neurons = list(
-            # Set a seed, ensure all ranks get the same neurons
-            random.Random(182).sample(self.neuronsE, self.populations['P'])
-        )
+        # Set seed
+        seed = 182
+        # if specified, take that much from LPZ and rest from outside
+        # No need to change anything in recall, this will automatically change
+        # the proportion of recall neurons taken from the LPZ also.
+        if percent_in_lpz:
+            if (int(self.populations['P'] * percent_in_lpz) <=
+                    len(self.lpz_neurons_E)):
+                pattern_neurons = (list(
+                    random.Random(seed).sample(
+                        self.lpz_neurons_E,
+                        int(self.populations['P'] * percent_in_lpz))
+                ) + list(random.Random(seed).sample(
+                    self.p_lpz_neurons_E + self.o_neurons_E,
+                    int(self.populations['P'] * (1 - percent_in_lpz))
+                )))
+            else:
+                logging.critical(
+                    "Requested {} pattern neurons in the LPZ \
+                    but the LPZ only has {} neurons. EXITING".format(
+                        int(self.populations['P'] * percent_in_lpz),
+                        len(self.lpz_neurons_E))
+                )
+                sys.exit(-1)
+        else:
+            pattern_neurons = list(
+                # Set a seed, ensure all ranks get the same neurons
+                random.Random(seed).sample(
+                    self.neuronsE, self.populations['P'])
+            )
         self.comm.barrier()
         self.__strengthen_pattern_connections(pattern_neurons)
         if track:
