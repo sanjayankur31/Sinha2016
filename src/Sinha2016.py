@@ -2958,6 +2958,10 @@ class Sinha2016:
                     self.p_lpz_neurons_E + self.o_neurons_E,
                     int(self.populations['P'] * (1 - percent_in_lpz))
                 )))
+                # shuffle so that the neurons in and out of the LPZ are not in
+                # a contigous list, otherwise when we set up the recall
+                # stimulus, we only get neurons from one of these two groups
+                random.Random(seed).shuffle(pattern_neurons)
             else:
                 logging.critical(
                     "Requested {} pattern neurons in the LPZ \
