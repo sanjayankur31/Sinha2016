@@ -120,15 +120,15 @@ class Sinha2016:
         # maximum value of dz/dt per time step
         # z += dz
         # base value
-        self.nu = 3e-5
+        self.nu = 1e-3
         # value for excitatory neurons
         self.nu_e = self.nu
         self.nu_den_e_e = 1 * self.nu_e
-        self.nu_den_e_i = 10 * self.nu_e
+        self.nu_den_e_i = 1 * self.nu_e
         # 8000 excitatory neurons provide input to 10000 neurons of the
         # network, so they must be slightly faster than the post-synaptic
         # elements
-        self.nu_ax_e = 50 * self.nu
+        self.nu_ax_e = 1 * self.nu
 
         # post-synaptic elements of inhibitory neurons react slower to activity
         # changes than excitatory neurons so that the inhibitory network
@@ -138,7 +138,7 @@ class Sinha2016:
         self.nu_den_i_i = 1 * self.nu_i
         # 2000 inhibitory neurons inhibit 10000 neurons of the network, so the
         # inhibitory axon must act at a faster rate
-        self.nu_ax_i = 1000 * self.nu
+        self.nu_ax_i = 1 * self.nu
 
         # z_vacant is multiplied by this tau at each time step to decay it.
         # z -= z_vacant * tau
@@ -152,12 +152,12 @@ class Sinha2016:
         self.tau_den_i_i = 0.01
 
         self.omega_ax_e = 0.01
-        self.omega_den_e_e = 0.4
-        self.omega_den_e_i = 0.04
+        self.omega_den_e_e = 0.01
+        self.omega_den_e_i = 0.01
 
-        self.omega_ax_i = 0.0004
-        self.omega_den_i_e = 0.4
-        self.omega_den_i_i = 0.4
+        self.omega_ax_i = 0.01
+        self.omega_den_i_e = 0.01
+        self.omega_den_i_i = 0.01
 
         self.rank = nest.Rank()
 
@@ -1025,11 +1025,11 @@ class Sinha2016:
         """Set the new gaussian parameters for MSP."""
 
         # multipliers
-        eps_ax_e_mul = 1.75
+        eps_ax_e_mul = 1.90
         eps_den_e_e_mul = 1.0
-        eps_den_e_i_mul = 3.50
+        eps_den_e_i_mul = 1.90
         eta_ax_e_mul = 1.0
-        eta_den_e_e_mul = 0.25
+        eta_den_e_e_mul = 0.10
         eta_den_e_i_mul = 1.0
 
         list_e = numpy.array(
@@ -1089,9 +1089,9 @@ class Sinha2016:
         # For I
         eps_ax_i_mul = 1.0
         eps_den_i_e_mul = 1.0
-        eps_den_i_i_mul = 3.50
-        eta_ax_i_mul = 0.25
-        eta_den_i_e_mul = 0.25
+        eps_den_i_i_mul = 1.90
+        eta_ax_i_mul = 0.10
+        eta_den_i_e_mul = 0.10
         eta_den_i_i_mul = 1.0
 
         new_structural_p_elements_I = []
