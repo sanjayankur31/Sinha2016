@@ -3210,20 +3210,10 @@ class Sinha2016:
             label, current_sim_time/1000))
         phase_time = 0
 
-        # make sure we run for the smallest interval
         if self.is_rewiring_enabled:
-            run_duration = math.gcd(int(self.sp_update_interval),
-                                    int(self.recording_interval))
+            run_duration = self.sp_update_interval
         else:
             run_duration = self.recording_interval
-
-        if sim_time < run_duration:
-            logging.warning(
-                "Requested run time ({}) < minimum run duration ({})".format(
-                    sim_time, run_duration))
-            logging.warning(
-                "Setting run time to run duration")
-            sim_time = run_duration
 
         update_steps = numpy.arange(0, sim_time, run_duration)
         for i in update_steps:
@@ -3238,8 +3228,7 @@ class Sinha2016:
             if int(phase_time % self.recording_interval) == 0:
                 self.dump_data()
             # update connectivity
-            if int(phase_time % self.sp_update_interval) == 0:
-                self.update_connectivity()
+            self.update_connectivity()
 
         current_sim_time = nest.GetKernelStatus()['time']
         end_time = time.clock()
@@ -3409,19 +3398,11 @@ class Sinha2016:
                             recording_interval=None):
         """Set up stabilisation time."""
         if stabilisation_time:
-            self.default_stabilisation_time = int(stabilisation_time)
+            self.default_stabilisation_time = stabilisation_time
         if sp_update_interval:
-            self.sp_update_interval = int(sp_update_interval)
+            self.sp_update_interval = sp_update_interval
         if recording_interval:
-            self.recording_interval = int(recording_interval)
-
-        if math.gcd(int(self.recording_interval),
-                    int(self.sp_update_interval)) == 1:
-            logging.warning(
-                "Recording ({}) and SP interval({}) are not multiples".format(
-                    self.recording_interval, self.sp_update_interval))
-            logging.warning(
-                "Simulation will run in 1 second chunks only")
+            self.recording_interval = recording_interval
 
     def set_connectivity_strategies(self, formation_strategy,
                                     deletion_strategy):
