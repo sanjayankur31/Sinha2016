@@ -3454,7 +3454,7 @@ if __name__ == "__main__":
     simulation.set_lpz_percent(0.025)
     # set up neurons, connections, spike detectors, files
     simulation.update_time_windows(stabilisation_time=1500.,
-                                   sp_update_interval=1.,
+                                   sp_update_interval=.5,
                                    recording_interval=300.)
     simulation.setup_simulation()
 
@@ -3478,7 +3478,7 @@ if __name__ == "__main__":
     #  Stabilise with both plasticities active
     #  update time windows
     simulation.update_time_windows(stabilisation_time=2500.,
-                                   sp_update_interval=1.,
+                                   sp_update_interval=.5,
                                    recording_interval=100.)
     simulation.stabilise(label="Both syn and str p")
 
